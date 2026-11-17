@@ -36,9 +36,11 @@ Composer-Abhängigkeit installiert. Das Paket stellt RFC-6238-TOTP,
 verschlüsselte Secrets, gehashte Recovery-Codes und den Schutz vor der
 Wiederverwendung eines Zeitfensters bereit. Die Anwendung ergänzt die
 fachliche Re-Authentifizierung, Rate-Limits und CSRF-geschützte Web-Endpunkte.
-Die Profiloberfläche zeigt URI und Recovery-Codes ausschließlich während der
-noch nicht bestätigten Einschreibung. Ein Neustart ersetzt eine ausstehende
-Einschreibung und die zugehörigen Recovery-Codes. Die Paketversion und ihre
+Die Profiloberfläche führt durch einen Dialog mit lokal erzeugtem QR-Code,
+manueller Eingabealternative, Passwortbestätigung und expliziter Sicherung der
+Recovery-Codes. URI und Recovery-Codes werden ausschließlich während der noch
+nicht bestätigten Einschreibung angezeigt. Ein Neustart ersetzt eine
+ausstehende Einschreibung und die zugehörigen Recovery-Codes. Die Paketversion und ihre
 Lizenz werden im Composer-Lockfile festgeschrieben und vor jedem Release
 geprüft.
 
@@ -50,6 +52,17 @@ Replay-Schutz und Einmalverwendung. Alternativ erzeugt die Anwendung einen
 achtstelligen E-Mail-Code, speichert nur dessen Hash in
 `two_factor_login_challenges`, begrenzt Fehlversuche und verbraucht den Datensatz
 unter Zeilensperre atomar. Die Login-Routen sind CSRF-geschützte Web-Routen.
+Die Login-Oberfläche fragt den Benutzernamen zunächst ohne Serveranfrage ab und
+zeigt anschließend allen denselben Passwortschritt. Erst nach erfolgreicher
+Passwortprüfung wird die kontoabhängige TOTP-Challenge gezeigt. Die Challenge-
+Seite erhält `Cache-Control: no-store, no-cache, must-revalidate, private` und
+`Pragma: no-cache`. Sechsstellige TOTP-Codes werden über ein zugängliches
+Sechs-Felder-Eingabefeld erfasst; E-Mail-Codes und Recovery-Codes bleiben
+ausdrückliche Alternativen.
+Fehlversuche bei der Passwortanmeldung verwenden weiterhin das Limit aus
+Benutzername und Quell-IP. Eine kontoweite Passwortsperre wird nicht ergänzt,
+um gezieltes Sperren fremder Konten zu vermeiden. Der TOTP-Dienst sperrt
+Fehlversuche dagegen kontoweit nach fünf Prüfungen pro Minute.
 TOTP-/Recovery-Eingaben werden in Telescope maskiert; die zugehörige E-Mail mit
 dem Einmalcode wird dort nicht aufgezeichnet. Der DemoBuilder entfernt
 importierte Faktor- und Login-Challenge-Daten, damit anonymisierte Konten ihre

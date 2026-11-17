@@ -36,14 +36,21 @@ Die Anmeldeseite enthält diese Elemente:
 - **Anmelden**: Prüft Ihre Eingaben und öffnet Pfarrplaner.
 - **Hinweis zur Unterstützung**: Unter dem Formular finden Sie einen kurzen Hinweis mit Links für eine einmalige oder regelmäßige freiwillige Unterstützung des Projekts.
 
-Nach erfolgreicher Anmeldung werden Sie zu der Startansicht weitergeleitet, die für Ihr Konto eingestellt ist. Häufig ist das die [Startseite](startseite.md), manchmal auch direkt der [Kalender](kalender.md) oder ein anderes Modul.
+Geben Sie zuerst Ihre E-Mailadresse ein und wählen Sie **Weiter**. Auf der
+nächsten Seite geben Sie Ihr Passwort ein. Die Anwendung prüft das Konto erst
+nachdem Sie das Passwort gesendet haben. Nach erfolgreicher Anmeldung werden
+Sie zu der Startansicht weitergeleitet, die für Ihr Konto eingestellt ist.
+Häufig ist das die [Startseite](startseite.md), manchmal auch direkt der
+[Kalender](kalender.md) oder ein anderes Modul.
 
-Wenn Sie die Zwei-Faktor-Authentifizierung eingerichtet haben, geben Sie nach
-dem Passwort zusätzlich einen aktuellen Code Ihrer Authenticator-App ein. Sie
-können stattdessen einen Anmeldecode per E-Mail anfordern. Ein Recovery-Code
-kann wie ein TOTP-Code verwendet werden; jeder Recovery-Code funktioniert nur
-einmal. Die Zwei-Faktor-Abfrage läuft nach fünf Minuten ab. Danach melden Sie
-sich erneut mit E-Mail-Adresse und Passwort an.
+Wenn Sie die Zwei-Faktor-Authentifizierung eingerichtet haben, erscheint nach
+der erfolgreichen Passwortprüfung eine zusätzliche Codeabfrage. Geben Sie den
+sechsstelligen Code Ihrer Authenticator-App in die einzelnen Ziffernfelder ein
+oder fügen Sie den vollständigen Code ein. Alternativ können Sie einen
+achtstelligen Anmeldecode per E-Mail anfordern oder einen Recovery-Code im
+Textfeld eingeben. Jeder Recovery-Code funktioniert nur einmal. Die
+Zwei-Faktor-Abfrage läuft nach fünf Minuten ab. Danach melden Sie sich erneut
+mit E-Mail-Adresse und Passwort an.
 
 Wenn Ihre Administration eine wichtige Mitteilung hinterlegt hat, erscheint direkt nach der Anmeldung zusätzlich ein Hinweisfenster über der eigentlichen Seite. So können Änderungen angekündigt werden, die alle Benutzerinnen und Benutzer oder nur bestimmte Gruppen betreffen.
 

@@ -164,22 +164,43 @@ Passwörtern.
 Der UI-Kommentar in Issue #80 ergänzt vor Passkey-Anmeldung diese
 Nutzerführung:
 
-- [ ] TOTP-Einrichtung startet über einen einzelnen Button und führt in einem
+- [x] TOTP-Einrichtung startet über einen einzelnen Button und führt in einem
   mehrstufigen Popup mit klaren, nicht-technischen Erklärungen durch App-Auswahl,
   QR-Code, Bestätigung und sichere Aufbewahrung der Recovery-Codes. Microsoft
   Authenticator und [2FAS Auth](https://2fas.com/auth/) als Open-Source-App für
   iOS und Android werden als Beispiele genannt. Der QR-Code wird lokal erzeugt;
   der TOTP-Seed darf nicht an einen externen QR-Dienst gelangen.
-- [ ] Login beginnt mit dem Benutzernamen und wird anschließend für Passwort,
-  Passkey und gegebenenfalls TOTP verständlich fortgeführt. Nach dem
-  Benutzernamen sehen alle denselben nächsten Schritt; die Passkey-Option wird
-  allgemein angeboten. Erst nach erfolgreicher Passwortprüfung wird bei
+- [x] Login beginnt mit dem Benutzernamen und führt verständlich zum
+  Passwortschritt. Nach dem Benutzernamen
+  sehen alle denselben nächsten Schritt. Der Browser fragt das Konto beim
+  Wechsel nicht ab; erst nach erfolgreicher Passwortprüfung wird bei
   entsprechend eingerichteten Konten TOTP verlangt. Unbekannte Konten und
   konfigurierte Faktoren dürfen vor erfolgreicher Anmeldung nicht erkennbar
-  sein. Die Passkey-Option wird mit Task 5 funktionsfähig umgesetzt.
-- [ ] TOTP-Eingabefelder erhalten passende Browser- und Passwortmanager-Semantik
+  sein.
+- [ ] Passkey wird als allgemeine Option in diesem gemeinsamen Login-Schritt
+  angeboten und mit Task 5 funktionsfähig umgesetzt.
+- [x] TOTP-Eingabefelder erhalten passende Browser- und Passwortmanager-Semantik
   (`autocomplete="one-time-code"`, numerische Eingabe und eindeutige
-  Beschriftung); die Erkennung mit Bitwarden wird im Browser geprüft.
+  Beschriftung). Für den
+  sechsstelligen TOTP-Code wird ein gruppiertes Sechs-Felder-Eingabefeld mit
+  Fokuswechsel, Rücksprung per Rücktaste, Ziffernfilter, vollständigem
+  Einfügen/Autofill, Live-Status für Screenreader und regulärem Absende-Button
+  verwendet. Die vollständige Eingabe wird als `code` an das Backend gesendet.
+- [ ] Die Erkennung mit Bitwarden wird in einem echten Browser geprüft.
+- [x] E-Mail-Codes und Recovery-Codes bleiben als ausdrücklich wählbare
+  Alternativen bedienbar: E-Mail-Codes verwenden acht Ziffern; Recovery-Codes
+  behalten ein unsegmentiertes Textfeld. Cache-Header verhindern die
+  Zwischenspeicherung der Challenge-Seite.
+- [x] Die bestehende TOTP-Sicherheitsbasis verifizieren und regressionssichern:
+  der gesperrte Dienst zählt Versuche pro Konto atomar (fünf pro Minute),
+  blockiert weitere Verifikationen temporär, schützt vor Replay und verwendet
+  zeitkonstante Codevergleiche; TOTP-Geheimnisse liegen verschlüsselt. Die
+  Standardkonfiguration akzeptiert höchstens ein Zeitfenster Abweichung.
+- [x] Keine zusätzliche kontoweite Sperre für falsche Passwörter einführen.
+  Passwortfehler verwenden die bestehende Begrenzung nach Benutzername und IP;
+  falsche TOTP-Prüfungen werden pro Konto nach fünf Prüfungen pro Minute
+  temporär gesperrt. So bleibt der TOTP-Kontoschutz erhalten, ohne dass Dritte
+  gezielt Konten allein durch Passwortversuche blockieren können.
 - [ ] Benutzerhandbuch und relevante Browser-/Feature-Tests aktualisieren.
 
 ### Task 5: Passkey-Anmeldung

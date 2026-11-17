@@ -3,26 +3,38 @@
         <div class="row justify-content-center">
             <div class="col-md-6 col-lg-5">
                 <h1 class="mb-4">Anmeldung bestätigen</h1>
-                <p>
-                    Für dieses Konto ist eine Zwei-Faktor-Anmeldung aktiviert. Gib den Code aus
-                    deiner Authenticator-App ein oder fordere einen Code per E-Mail an.
-                </p>
+                <p>Gib den Sicherheitscode ein, um die Anmeldung abzuschließen.</p>
                 <p class="text-muted">
                     Die Anmeldung läuft nach fünf Minuten ab. Schließe dieses Fenster und beginne
                     erneut, falls die Challenge abgelaufen ist.
                 </p>
                 <form @submit.prevent="verify">
+                    <OneTimeCodeInput
+                        v-if="codeMode !== 'recovery'"
+                        v-model="code"
+                        :length="codeMode === 'email' ? 8 : 6"
+                        :label="
+                            codeMode === 'email'
+                                ? 'Achtstelliger E-Mail-Code'
+                                : 'Sechsstelliger App-Code'
+                        "
+                        :test-id-prefix="codeMode === 'email' ? 'email-code' : 'login-totp'"
+                    />
                     <label
-                        for="code"
+                        v-else
                         class="form-label"
-                        >Authenticator- oder E-Mail-Code</label
+                        for="recovery-code"
+                        >Recovery-Code</label
                     >
                     <input
-                        id="code"
+                        v-if="codeMode === 'recovery'"
+                        id="recovery-code"
                         v-model="code"
                         class="form-control"
                         name="code"
+                        type="text"
                         autocomplete="one-time-code"
+                        maxlength="128"
                         required
                         autofocus
                     />
@@ -40,6 +52,25 @@
                         Anmeldung bestätigen
                     </button>
                 </form>
+                <div
+                    class="mt-2 d-flex flex-wrap gap-2"
+                    aria-label="Code-Art auswählen"
+                >
+                    <button
+                        type="button"
+                        class="btn btn-link px-0"
+                        @click="switchCodeMode('totp')"
+                    >
+                        Authenticator-App verwenden
+                    </button>
+                    <button
+                        type="button"
+                        class="btn btn-link px-0"
+                        @click="switchCodeMode('recovery')"
+                    >
+                        Recovery-Code verwenden
+                    </button>
+                </div>
                 <form
                     class="mt-3"
                     @submit.prevent="requestEmailCode"
@@ -76,11 +107,15 @@
 </template>
 
 <script>
+import OneTimeCodeInput from '../../components/Ui/forms/OneTimeCodeInput.vue'
+
 export default {
+    components: { OneTimeCodeInput },
     /** Initialize the one-time code form and request state. */
     data() {
         return {
             code: '',
+            codeMode: 'totp',
             processing: false,
         }
     },
@@ -89,7 +124,7 @@ export default {
         verify() {
             this.processing = true
             this.$inertia.post(
-                route('login.challenge.verify'),
+                window.route('login.challenge.verify'),
                 { code: this.code },
                 {
                     preserveState: true,
@@ -99,11 +134,18 @@ export default {
                 },
             )
         },
+        /** Clear any previous code when the user changes verification method. */
+        switchCodeMode(mode) {
+            this.codeMode = mode
+            this.code = ''
+        },
         /** Request an email fallback code for the pending login. */
         requestEmailCode() {
+            this.codeMode = 'email'
+            this.code = ''
             this.processing = true
             this.$inertia.post(
-                route('login.challenge.email'),
+                window.route('login.challenge.email'),
                 {},
                 {
                     preserveState: true,
@@ -115,7 +157,7 @@ export default {
         },
         /** Clear the pending login and return to the password form. */
         cancel() {
-            this.$inertia.post(route('login.challenge.cancel'))
+            this.$inertia.post(window.route('login.challenge.cancel'))
         },
     },
 }

@@ -51,25 +51,55 @@
                         @submit.prevent.stop="submit"
                         novalidate
                     >
-                        <form-csrf-token />
+                        <FormCsrfToken />
                         <!-- Email input -->
-                        <div v-if="!demo">
-                            <form-input
-                                v-if="!demo"
+                        <div v-if="!demo && loginStep === 1">
+                            <FormInput
                                 v-model="form.email"
                                 name="email"
                                 label="E-Mailadresse"
                                 autofocus
                                 placeholder="deine@email.de"
+                                autocomplete="username"
+                                required
                             />
-                            <form-input
+                            <button
+                                type="button"
+                                class="btn btn-primary btn-lg mt-3"
+                                data-testid="continue-login"
+                                @click="continueLogin"
+                            >
+                                Weiter
+                            </button>
+                        </div>
+
+                        <div v-else-if="!demo">
+                            <input
+                                type="hidden"
+                                name="email"
+                                :value="form.email"
+                            />
+                            <p>
+                                Weiter mit <strong>{{ form.email }}</strong>
+                            </p>
+                            <button
+                                type="button"
+                                class="btn btn-link px-0"
+                                @click="loginStep = 1"
+                            >
+                                Andere E-Mailadresse verwenden
+                            </button>
+                            <FormInput
                                 class="my-3"
                                 type="password"
                                 name="password"
                                 v-model="form.password"
                                 label="Passwort"
+                                autocomplete="current-password"
+                                autofocus
+                                required
                             />
-                            <form-check
+                            <FormCheck
                                 v-model="form.remember"
                                 label="Angemeldet bleiben"
                             />
@@ -120,7 +150,7 @@
                             </button>
                         </div>
                     </form>
-                    <donation-notice class="mt-4 pt-3 border-top" />
+                    <DonationNotice class="mt-4 pt-3 border-top" />
                 </div>
             </div>
         </div>
@@ -173,6 +203,7 @@ export default {
             demo: this.$page.props.demo,
             users: this.$page.props.users || [],
             attempts: 0,
+            loginStep: this.$page.props.demo ? 2 : 1,
             loggingIn: false,
             form: {
                 email: this.$page.props.users?.[0]?.email || '',
@@ -182,16 +213,26 @@ export default {
         }
     },
     methods: {
+        /** Advance locally so every username receives the same next screen. */
+        continueLogin() {
+            if (!this.form.email.trim()) return
+            this.loginStep = 2
+        },
+        /** Keep Enter on the username step local; submit credentials on step two. */
         submit(event) {
             if (this.loggingIn) return
+            if (!this.demo && this.loginStep === 1) {
+                this.continueLogin()
+                return
+            }
             this.loggingIn = true
             const form = event.currentTarget
-            axios
-                .get(route('csrf.keepalive'))
+            window.axios
+                .get(window.route('csrf.keepalive'))
                 .then((response) => {
-                    const data = new FormData(form)
+                    const data = new window.FormData(form)
                     data.set('_token', response.data.token)
-                    this.$inertia.post(route('login'), data, {
+                    this.$inertia.post(window.route('login'), data, {
                         preserveState: true,
                         onFinish: () => {
                             this.loggingIn = false

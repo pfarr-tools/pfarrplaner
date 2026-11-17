@@ -102,6 +102,8 @@ class UserWebFeatureTest extends TestCase
 
         $this->get(route('login.challenge'))
             ->assertOk()
+            ->assertHeader('Cache-Control', 'must-revalidate, no-cache, no-store, private')
+            ->assertHeader('Pragma', 'no-cache')
             ->assertInertia(fn (Assert $page) => $page->component('Auth/LoginChallenge'));
     }
 

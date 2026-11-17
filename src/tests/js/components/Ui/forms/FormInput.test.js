@@ -30,8 +30,23 @@ describe('FormInput', () => {
         expect(w.find('input').attributes('disabled')).toBeDefined()
     })
     it('renders placeholder attribute', () => {
-        const w = mount(FormInput, { props: { name: 'title', modelValue: '', placeholder: 'Enter title' } })
+        const w = mount(FormInput, {
+            props: { name: 'title', modelValue: '', placeholder: 'Enter title' },
+        })
         expect(w.find('input').attributes('placeholder')).toBe('Enter title')
+    })
+    it('forwards one-time-code autofill hints to the native input', () => {
+        const w = mount(FormInput, {
+            props: {
+                name: 'one-time-code',
+                modelValue: '',
+                autocomplete: 'one-time-code',
+                inputmode: 'numeric',
+            },
+        })
+
+        expect(w.find('input').attributes('autocomplete')).toBe('one-time-code')
+        expect(w.find('input').attributes('inputmode')).toBe('numeric')
     })
     it('marks input is-invalid when errors[name] is set', () => {
         const w = mount(FormInput, {

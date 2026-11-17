@@ -45,8 +45,8 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Timebox;
 use Inertia\Inertia;
-use Inertia\Response;
 use RoundlyConsulting\TwoFactor\Exceptions\TwoFactorRateLimitedException;
+use Symfony\Component\HttpFoundation\Response as HttpResponse;
 
 /**
  * Class LoginController
@@ -182,7 +182,7 @@ class LoginController extends Controller
     }
 
     /** Display the second-factor step only for a live pending login. */
-    public function showChallenge(Request $request): Response
+    public function showChallenge(Request $request): HttpResponse
     {
         $challenge = $request->session()->get('login.challenge');
         if (! is_array($challenge) || ($challenge['expires_at'] ?? 0) <= now()->timestamp) {
@@ -195,7 +195,13 @@ class LoginController extends Controller
 
         abort_unless($user && $user->hasTwoFactorEnabled(), 404);
 
-        return Inertia::render('Auth/LoginChallenge');
+        return Inertia::render('Auth/LoginChallenge')
+            ->toResponse($request)
+            ->withHeaders([
+                'Cache-Control' => 'no-store, no-cache, must-revalidate, private',
+                'Pragma' => 'no-cache',
+                'Expires' => '0',
+            ]);
     }
 
     /** Verify a TOTP, recovery code, or one-time email challenge. */

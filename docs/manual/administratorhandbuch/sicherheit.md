@@ -40,10 +40,14 @@ Protokollen; Recovery-Codes werden nur einmalig nach der Einschreibung
 angezeigt und müssen sicher außerhalb von Pfarrplaner verwahrt werden.
 
 Falsche Passwörter und Sicherheitscodes werden generisch abgewiesen. Die
-Bestätigung ist pro Benutzer begrenzt; auch die Re-Authentifizierung vor jeder
-Änderung besitzt ein eigenes Limit. Nach fünf Fehlversuchen antwortet die
-Anwendung mit einer temporären Sperre. Ein Faktorwechsel wird gegen parallele
-Start-, Bestätigungs- und Deaktivierungsanfragen serialisiert.
+Passwortanmeldung verwendet das bestehende Limit aus Benutzername und
+Quell-IP. Es gibt absichtlich keine zusätzliche kontoweite Passwortsperre, da
+sonst ein Angreifer gezielt ein fremdes Konto vorübergehend blockieren könnte.
+TOTP-Prüfungen werden dagegen pro Benutzerkonto atomar begrenzt: Nach fünf
+Prüfungen innerhalb einer Minute werden weitere TOTP-Prüfungen für dieses Konto
+vorübergehend gesperrt. Auch die Re-Authentifizierung vor jeder TOTP-Änderung
+besitzt ein eigenes Limit. Ein Faktorwechsel wird gegen parallele Start-,
+Bestätigungs- und Deaktivierungsanfragen serialisiert.
 
 Bei Verlust des Authenticator-Geräts werden die Recovery-Codes benötigt. Wenn
 auch das Postfach und alle Recovery-Codes verloren sind, gibt es derzeit keinen

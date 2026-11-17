@@ -52,8 +52,10 @@ Die geschützten Web-Endpunkte für die persönliche Einschreibung sind:
 
 Alle drei Routen liegen in der authentifizierten CSRF-geschützten Web-Gruppe.
 Passwort- und Codefehler werden ohne Konto- oder Zustandsdetails gemeldet;
-Rate-Limits gelten pro Benutzer und liefern bei einer temporären Sperre HTTP
-429. Die Antworten enthalten weder den TOTP-Secretwert als eigenes Feld noch
+TOTP-Rate-Limits gelten pro Benutzerkonto und liefern bei einer temporären
+Sperre HTTP 429. Fehlerhafte Passwortanmeldungen bleiben auf das vorhandene
+Limit nach Benutzername und Quell-IP begrenzt; es gibt keine weitere
+kontoweite Passwortsperre. Die Antworten enthalten weder den TOTP-Secretwert als eigenes Feld noch
 die sensiblen User-Modellattribute.
 
 ## Empfehlung für Integrationen

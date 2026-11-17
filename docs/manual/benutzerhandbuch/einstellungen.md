@@ -59,16 +59,19 @@ Wählen Sie ein Passwort, das Sie nicht auch für andere Dienste verwenden. Wenn
 ### Zwei-Faktor-Authentifizierung
 
 Im Bereich **Sicherheit** können Sie die Zwei-Faktor-Authentifizierung mit
-einer Authenticator-App einrichten. Geben Sie zunächst Ihr aktuelles Passwort
-ein. Fügen Sie in Ihrer Authenticator-App manuell ein zeitbasiertes
-Einmalpasswort (TOTP) hinzu. Verwenden Sie Ihre E-Mail-Adresse als Kontonamen
-und geben Sie den angezeigten TOTP-Schlüssel ein. Bewahren Sie die angezeigten
-Recovery-Codes sicher auf.
+einer Authenticator-App einrichten. Der Assistent führt Sie durch die Schritte:
+Bestätigen Sie Ihre Identität mit Ihrem aktuellen Passwort, scannen Sie den
+angezeigten QR-Code in einer Authenticator-App und speichern Sie die
+Recovery-Codes sicher. Beispiele für geeignete Apps sind Microsoft
+Authenticator und die quelloffene App 2FAS Auth. Wenn Sie den QR-Code nicht
+scannen können, zeigt der Assistent den Schlüssel für die manuelle Eingabe.
 Die Recovery-Codes sind nur während dieses Einrichtungsschritts sichtbar und
 können jeweils nur einmal verwendet werden.
 
-Geben Sie den aktuellen Code aus der Authenticator-App ein und bestätigen Sie
-die Einrichtung. Falls Sie die Seite vor der Bestätigung verlassen oder die
+Bestätigen Sie die gespeicherten Recovery-Codes und geben Sie anschließend
+Ihr aktuelles Passwort sowie den sechsstelligen Code aus der Authenticator-App
+ein. Die Codeziffern können einzeln eingegeben oder gemeinsam eingefügt werden.
+Falls Sie die Seite vor der Bestätigung verlassen oder die
 Recovery-Codes nicht gesichert haben, können Sie die noch nicht abgeschlossene
 Einrichtung neu starten. Dabei werden die vorherige URI und die vorherigen
 Recovery-Codes ungültig.

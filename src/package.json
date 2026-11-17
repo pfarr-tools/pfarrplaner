@@ -4,7 +4,7 @@
     "scripts": {
         "dev": "vite",
         "build": "vite build",
-        "format": "prettier --write resources/js scripts resources/css resources/sass public/css public/landing/assets/css public/landing/assets/scss package.json composer.json pint.json .prettierrc.json .bladeformatterrc.json .scrutinizer.yml public/openapi.json --ignore-path .prettierignore && npm run format:blade",
+        "format": "prettier --write resources/js scripts tests/js/components/Auth/Login.test.js tests/js/components/Auth/LoginChallenge.test.js tests/js/components/Profile/SecurityTab.test.js tests/js/components/Ui/forms/FormInput.test.js tests/js/components/Ui/forms/OneTimeCodeInput.test.js resources/css resources/sass public/css public/landing/assets/css public/landing/assets/scss package.json composer.json pint.json .prettierrc.json .bladeformatterrc.json .scrutinizer.yml public/openapi.json --ignore-path .prettierignore && npm run format:blade",
         "format:check": "node scripts/run-changed-tool.mjs prettier --check",
         "format:blade": "blade-formatter --write \"resources/views/**/*.blade.php\"",
         "format:blade:check": "node scripts/run-changed-blade-tool.mjs blade-formatter --check-formatted",
@@ -103,6 +103,7 @@
         "mitt": "^3.0.1",
         "puppeteer": "^24.15.0",
         "pusher-js": "^8.6.0",
+        "qrcode": "^1.5.4",
         "rrule": "^2.8.1",
         "vue-advanced-cropper": "^2.8.9",
         "vue-dataset": "^2.1.0",

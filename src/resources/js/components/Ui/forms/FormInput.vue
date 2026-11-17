@@ -27,7 +27,7 @@
   -->
 
 <template>
-    <form-group
+    <FormGroup
         :id="myId"
         :input-id="`${myId}Input`"
         :label="label"
@@ -45,6 +45,8 @@
             class="form-control"
             :class="{ 'is-invalid': field.error, 'checked-input': isCheckedItem }"
             :type="type"
+            :autocomplete="autocomplete"
+            :inputmode="inputmode"
             :placeholder="placeholder"
             :autofocus="autofocus"
             :disabled="disabled"
@@ -55,7 +57,7 @@
             :name="name"
             @input="onInput($event.target.value)"
         />
-    </form-group>
+    </FormGroup>
 </template>
 
 <script>
@@ -73,6 +75,8 @@ export default {
             type: String,
             default: 'text',
         },
+        autocomplete: String,
+        inputmode: String,
         required: {
             type: Boolean,
             default: false,
