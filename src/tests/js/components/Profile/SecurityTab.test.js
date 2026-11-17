@@ -219,7 +219,7 @@ describe('SecurityTab', () => {
     })
 
     it('offers fresh password confirmation when registration is rejected with 423', async () => {
-        vi.spyOn(Passkeys, 'register').mockRejectedValueOnce({ response: { status: 423 } })
+        vi.spyOn(Passkeys, 'register').mockRejectedValueOnce({ status: 423 })
         const wrapper = mountSecurityTab()
 
         await wrapper.find('[data-testid="passkey-name"]').setValue('Arbeitslaptop')
@@ -232,7 +232,7 @@ describe('SecurityTab', () => {
     })
 
     it('does not call other registration errors password confirmation failures', async () => {
-        vi.spyOn(Passkeys, 'register').mockRejectedValueOnce({ response: { status: 422 } })
+        vi.spyOn(Passkeys, 'register').mockRejectedValueOnce({ status: 422 })
         const wrapper = mountSecurityTab()
 
         await wrapper.find('[data-testid="passkey-name"]').setValue('Arbeitslaptop')

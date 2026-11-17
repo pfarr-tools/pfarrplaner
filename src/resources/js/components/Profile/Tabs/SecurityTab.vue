@@ -450,7 +450,7 @@ export default {
                 this.managedPasskeys.unshift({ ...result, authenticator: 'Passkey' })
                 this.newPasskeyName = ''
             } catch (error) {
-                this.passwordConfirmationRequired = error?.response?.status === 423
+                this.passwordConfirmationRequired = error?.status === 423
                 this.passkeyError = this.passwordConfirmationRequired
                     ? 'Deine Passwortbestätigung ist abgelaufen. Bestätige dein Passwort und starte die Einrichtung erneut.'
                     : 'Passkey konnte nicht eingerichtet werden. Bitte erneut versuchen.'
