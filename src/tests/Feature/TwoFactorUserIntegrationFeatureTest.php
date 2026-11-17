@@ -69,7 +69,7 @@ final class TwoFactorUserIntegrationFeatureTest extends TestCase
         self::assertFalse($user->hasPasskeysEnabled());
         self::assertSame(User::class, Passkeys::userModel());
         self::assertTrue(Schema::hasTable('passkeys'));
-        self::assertFalse(app('router')->has('passkey.login'));
+        self::assertTrue(app('router')->has('passkey.login'));
         self::assertFalse(app('router')->has('passkey.store'));
     }
 

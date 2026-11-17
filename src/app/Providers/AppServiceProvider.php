@@ -31,13 +31,16 @@
 namespace App\Providers;
 
 use App\Exceptions\Handler;
+use App\Http\Responses\Auth\PasskeyLoginResponse;
 use App\Models\People\User;
 use App\Seating\SeatingValidators;
 use App\Services\QueryLogService;
 use Carbon\Carbon;
+use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Events\MigrationsEnded;
+use Illuminate\Http\Request;
 use Illuminate\Mail\MailManager;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -46,10 +49,12 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
+use Laravel\Passkeys\Contracts\PasskeyLoginResponse as PasskeyLoginResponseContract;
 use Laravel\Passkeys\Passkeys;
 use Laravel\Telescope\TelescopeServiceProvider;
 use Spatie\Permission\PermissionRegistrar;
@@ -67,6 +72,9 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         Passkeys::useUserModel(User::class);
+        $this->app->singleton(PasskeyLoginResponseContract::class, PasskeyLoginResponse::class);
+        RateLimiter::for('passkey-login', static fn (Request $request): Limit => Limit::perMinute(6)->by('passkey-login|'.$request->ip())
+        );
 
         App::setLocale(config('app.locale'));
         Carbon::setLocale(config('app.locale'));

@@ -29,10 +29,18 @@
  */
 
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\PasskeyLoginController;
 use App\Http\Controllers\UserController;
+use App\Http\Middleware\RequireFreshPasskeyLoginChallenge;
 use Illuminate\Support\Facades\Auth;
 
 Auth::routes(['logout' => false, 'register' => false]);
+Route::get('/passkeys/login/options', [PasskeyLoginController::class, 'options'])
+    ->middleware(['guest', 'throttle:passkey-login'])
+    ->name('passkey.login-options');
+Route::post('/passkeys/login', [PasskeyLoginController::class, 'verify'])
+    ->middleware(['guest', RequireFreshPasskeyLoginChallenge::class, 'throttle:passkey-login'])
+    ->name('passkey.login');
 Route::get('/login/challenge', [LoginController::class, 'showChallenge'])->name('login.challenge');
 Route::post('/login/challenge', [LoginController::class, 'verifyChallenge'])->name('login.challenge.verify');
 Route::post('/login/challenge/email', [LoginController::class, 'sendEmailChallenge'])->name('login.challenge.email');

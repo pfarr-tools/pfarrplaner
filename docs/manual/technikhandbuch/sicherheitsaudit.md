@@ -153,13 +153,15 @@ verweist fest auf `users` und löscht zugehörige Credentials bei regulärer
 Kontolöschung. DemoBuilder entfernt importierte Passkeys bei der
 Demo-Anonymisierung.
 
-Die Paket-Routen für Anmeldung und Verwaltung sind in dieser Etappe vollständig
-deaktiviert. Sie werden erst mit der projektspezifischen Anmeldung,
-Challenge-Ablaufprüfung und Wiederherstellung freigeschaltet. Das Paketlimit
-von sechs Anfragen pro Minute ist vorbereitet. Die vollständige Login-
-Oberfläche und Einbindung in Passwortwechsel-/Recovery-Abläufe sind noch in
-Umsetzung; die installierte Paketbasis allein ist daher keine fertige
-Passkey-Anmeldung.
+Die automatischen Paket-Routen bleiben deaktiviert. Der öffentliche Login
+verwendet eigene Routen mit discoverable Credentials ohne Kontoauswahl. Die
+Paketprüfung erzwingt User Verification; Laravel bindet jede Login-Challenge
+zweckgebunden an die Session, begrenzt sie auf 60 Sekunden und verwirft sie
+nach jedem Einreichungsversuch. Beide Endpunkte sind auf sechs Anfragen pro
+Minute begrenzt. Ein erfolgreicher Passkey-Login rotiert die Session und
+durchläuft weiterhin die zentralen Passwortwechsel- und Recovery-Gates. Die
+Registrierungs- und Verwaltungsoberfläche sowie deren Routen sind noch nicht
+umgesetzt; Benutzer können in dieser Etappe noch keine Passkeys einrichten.
 
 Der produktive Routenbestand wurde geprüft und gezielt gehärtet. Dabei wurden folgende Klassen von Problemen beseitigt:
 

@@ -67,10 +67,10 @@ per Chat oder E-Mail erfragen.
 
 ### Passkey-Betrieb (Integration noch in Umsetzung)
 
-Die Passkey-Basis ist für Laravel 13 vorbereitet; die vollständige
-Anmeldeoberfläche und die zugehörigen Sicherheitsabläufe sind noch nicht
-abgeschlossen. Vor einer späteren Freigabe müssen `APP_URL`, RP-ID und
-zugelassene Origins zur tatsächlich verwendeten Browseradresse passen:
+Die Passkey-Basis und der generische Login-Endpunkt sind integriert. Für einen
+vollständigen Ablauf fehlen noch Registrierung und Benutzerverwaltung. Vor dem
+späteren Betrieb müssen `APP_URL`, RP-ID und zugelassene Origins zur tatsächlich
+verwendeten Browseradresse passen:
 
 - `PASSKEYS_RELYING_PARTY_ID`: Domain ohne `https://` und ohne Port; leer
   übernimmt den Host aus `APP_URL`.
@@ -88,8 +88,12 @@ Produktion benötigen HTTPS. Die Migration
 Sie vor dem späteren Produktiv-Update Datenbank und Anwendungsversion. Ein
 Rollback dieser Migration entfernt die Passkeys-Tabelle samt registrierten
 Credentials; Benutzer müssten Passkeys anschließend erneut einrichten. Die
-Paket-Routen für Anmeldung und Verwaltung bleiben bis zur Integration
-deaktiviert; das Paketlimit von sechs Anfragen pro Minute ist vorbereitet.
+automatischen Paket-Routen bleiben deaktiviert. Die projektspezifischen
+Login-Routen verwenden discoverable Credentials und User Verification. Ihre
+Challenges sind an die Session gebunden, nach 60 Sekunden abgelaufen und nach
+jedem Sendeversuch verbraucht. Login-Optionen und Prüfungen sind jeweils auf
+sechs Anfragen pro Minute begrenzt. Bis die Benutzeroberfläche zur Einrichtung
+umgesetzt ist, können Benutzer noch keine Passkeys registrieren.
 
 ### Wiederherstellung nach Verlust von Gerät und Recovery-Codes
 

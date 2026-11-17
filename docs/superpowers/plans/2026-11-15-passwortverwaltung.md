@@ -283,6 +283,17 @@ Senior Review 1 forderte die Routen-Härtung; Senior Re-Review 2 genehmigte die
 Etappe ohne offene Findings. Der fokussierte Test bestand mit 5 Tests und 35
 Assertions; `git diff --check` war sauber.
 
+**Task 5b — Generischer Passkey-Login:** Eigene Optionen- und Prüfendpunkte
+verwenden discoverable Credentials ohne Benutzername oder kontoabhängige
+Vorab-Auskunft. Die kryptografische Paketprüfung verlangt User Verification.
+Die Challenge ist an Session-ID und Zweck gebunden, läuft nach höchstens 60
+Sekunden ab und wird nach jedem Einreichungsversuch verbraucht; beide Endpunkte
+haben das vereinbarte Limit von sechs Anfragen pro Minute. Erfolgreicher Login
+rotiert die Session und lässt zentrale Passwortwechsel- und Recovery-Gates
+weiterwirken. Die Registrierung und Verwaltung der Credentials folgt als
+nächster Umsetzungsschritt, daher ist die Login-Option bis dahin noch nicht
+für Endbenutzer verfügbar.
+
 ### Task 6: Gesamtprüfung und Übergabe
 
 - [ ] `./planer dev format` und `./planer dev format:check` ausführen.
