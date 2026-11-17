@@ -632,6 +632,7 @@ export default {
             const vowels = 'aeiouy'
             const consonants = 'bcdfghjklmnpqrstvwxz'
             const numbers = '0123456789'
+            /** Select one unbiased character from the supplied alphabet. */
             const randomCharacter = (characters) => {
                 const limit = Math.floor(0x100000000 / characters.length) * characters.length
                 let value
