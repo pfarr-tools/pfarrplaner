@@ -30,6 +30,13 @@
 
 use Illuminate\Support\Str;
 
+$secureCookieSetting = env('SESSION_SECURE_COOKIE');
+if ($secureCookieSetting === null || $secureCookieSetting === '') {
+    $secureCookieSetting = Str::startsWith(env('APP_URL', 'http://localhost'), 'https://');
+} else {
+    $secureCookieSetting = filter_var($secureCookieSetting, FILTER_VALIDATE_BOOLEAN);
+}
+
 return [
 
     /*
@@ -189,12 +196,12 @@ return [
     |--------------------------------------------------------------------------
     |
     | By setting this option to true, session cookies will only be sent back
-    | to the server if the browser has a HTTPS connection. This will keep
-    | the cookie from being sent to you if it can not be done securely.
+    | to the server if the browser has a HTTPS connection. When the option is
+    | unset, the application URL scheme selects the default automatically.
     |
     */
 
-    'secure' => env('SESSION_SECURE_COOKIE', true),
+    'secure' => $secureCookieSetting,
 
     /*
     |--------------------------------------------------------------------------

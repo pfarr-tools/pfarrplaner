@@ -180,7 +180,9 @@ Betriebskonfiguration:
 
 Lokal ergibt `APP_URL=http://localhost:8180` die RP-ID `localhost` und die
 Origin `http://localhost:8180`. Browser behandeln `localhost` als sicheren
-Kontext; Dev und Produktion müssen HTTPS verwenden. Die Passkey-Tabelle wird
+Kontext; `http://localhost` ist die vorgesehene lokale HTTP-Ausnahme. Zugriffe
+von anderen Geräten über Rechnernamen oder IP-Adressen benötigen HTTPS. Die
+Passkey-Tabelle wird
 mit der Migration `2026_11_17_000000_create_passkeys_table` angelegt. Sie
 verweist fest auf `users` und löscht zugehörige Credentials bei regulärer
 Kontolöschung. DemoBuilder entfernt importierte Passkeys bei der

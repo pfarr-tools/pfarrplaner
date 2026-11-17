@@ -33,6 +33,10 @@ Die Anmeldeseite enthält diese Elemente:
 - **Anmeldelink per E-Mail erhalten**: Sendet einen zehn Minuten gültigen Link an die eingegebene Adresse.
 - **Hinweis zur Unterstützung**: Unter dem Formular finden Sie einen kurzen Hinweis mit Links für eine einmalige oder regelmäßige freiwillige Unterstützung des Projekts.
 
+Passkeys funktionieren nur über eine sichere HTTPS-Verbindung. Falls Ihr
+Browser oder Gerät die Passkey-Anmeldung nicht unterstützt, können Sie den
+Anmeldelink per E-Mail verwenden.
+
 Nach erfolgreicher Anmeldung werden Sie zu der Startansicht weitergeleitet,
 die für Ihr Konto eingestellt ist. Häufig ist das die
 [Startseite](startseite.md), manchmal auch direkt der [Kalender](kalender.md)

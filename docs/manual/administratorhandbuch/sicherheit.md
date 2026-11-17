@@ -106,8 +106,10 @@ verwendeten Browseradresse passen:
   eigener Wert muss auf allen App-Instanzen identisch und in der
   Wiederherstellungssicherung enthalten sein.
 
-Für lokale Entwicklung darf `http://localhost` verwendet werden; Dev und
-Produktion benötigen HTTPS. Die Migration
+Für lokale Entwicklung ist `http://localhost` die HTTP-Ausnahme. Greift ein
+anderes Gerät über einen Rechnernamen oder eine IP-Adresse zu, ist HTTPS
+erforderlich. `APP_URL`, RP-ID und zugelassene Origins müssen dann exakt zu
+dieser HTTPS-Adresse passen. Die Migration
 `2026_11_17_000000_create_passkeys_table` legt Credential-Daten an. Sichern
 Sie vor dem späteren Produktiv-Update Datenbank und Anwendungsversion. Ein
 Rollback dieser Migration entfernt die Passkeys-Tabelle samt registrierten

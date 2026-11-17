@@ -4,7 +4,16 @@ import { nextTick } from 'vue'
 import Login from '@/Pages/Auth/Login.vue'
 import { Passkeys } from '@laravel/passkeys'
 
-afterEach(() => vi.restoreAllMocks())
+const originalSecureContextDescriptor = Object.getOwnPropertyDescriptor(window, 'isSecureContext')
+
+afterEach(() => {
+    vi.restoreAllMocks()
+    if (originalSecureContextDescriptor) {
+        Object.defineProperty(window, 'isSecureContext', originalSecureContextDescriptor)
+    } else {
+        Reflect.deleteProperty(window, 'isSecureContext')
+    }
+})
 
 const mountLogin = (props = {}) =>
     mount(Login, {
@@ -110,6 +119,7 @@ describe('Login', () => {
     })
 
     it('explains when passkeys are unavailable in this browser', async () => {
+        Object.defineProperty(window, 'isSecureContext', { configurable: true, value: true })
         vi.spyOn(Passkeys, 'verify').mockRejectedValueOnce({ name: 'NotSupportedError' })
         const wrapper = mountLogin()
         await wrapper.find('[data-testid="passkey-login"]').trigger('click')
@@ -118,7 +128,18 @@ describe('Login', () => {
         )
     })
 
+    it('explains that passkeys require HTTPS outside localhost', async () => {
+        Object.defineProperty(window, 'isSecureContext', { configurable: true, value: false })
+        vi.spyOn(Passkeys, 'verify').mockRejectedValueOnce({ name: 'SecurityError' })
+        const wrapper = mountLogin()
+        await wrapper.find('[data-testid="passkey-login"]').trigger('click')
+        expect(wrapper.find('[role="alert"]').text()).toContain(
+            'Passkeys benötigen eine sichere Verbindung (HTTPS). Öffne Pfarrplaner über eine HTTPS-Adresse oder nutze den E-Mail-Link.',
+        )
+    })
+
     it('explains when the browser or device cancels passkey authentication', async () => {
+        Object.defineProperty(window, 'isSecureContext', { configurable: true, value: true })
         vi.spyOn(Passkeys, 'verify').mockRejectedValueOnce({ name: 'UserCancelledError' })
         const wrapper = mountLogin()
         await wrapper.find('[data-testid="passkey-login"]').trigger('click')

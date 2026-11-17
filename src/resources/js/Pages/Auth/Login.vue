@@ -264,6 +264,10 @@ export default {
         },
         /** Explain common browser and device failures without exposing server details. */
         passkeyErrorMessage(error) {
+            if (!window.isSecureContext) {
+                return 'Passkeys benötigen eine sichere Verbindung (HTTPS). Öffne Pfarrplaner über eine HTTPS-Adresse oder nutze den E-Mail-Link.'
+            }
+
             switch (error?.name) {
                 case 'NotSupportedError':
                     return 'Dieser Browser oder dieses Gerät unterstützt die Passkey-Anmeldung nicht.'

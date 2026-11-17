@@ -15,6 +15,14 @@ Prüfen Sie:
 - funktioniert die Datenbank?
 - ist das Benutzerkonto aktiv?
 
+Ein Fehler **419: Seite abgelaufen** bei der Anmeldung deutet oft auf ein
+fehlendes Session-Cookie hin. `SESSION_SECURE_COOKIE` darf nur dann `true`
+sein, wenn der Browser die Anwendung über HTTPS aufruft. Ist die Variable leer,
+richtet sich das Cookie nach dem Schema von `APP_URL`: lokale HTTP-URLs
+verwenden kein `Secure`-Cookie, HTTPS-Adressen schon. Nach Änderungen an
+`APP_URL` oder der Einstellung leeren Sie den Konfigurationscache mit
+`./planer dev artisan optimize:clear` und laden die Loginseite neu.
+
 ### Seiten laden, aber Speichern schlägt fehl
 
 Prüfen Sie:
