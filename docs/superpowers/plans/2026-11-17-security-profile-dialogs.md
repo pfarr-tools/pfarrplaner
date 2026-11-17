@@ -38,10 +38,10 @@
 - Ändern: `src/app/Http/Controllers/Auth/ConfirmPasswordController.php`
 - Testen: `src/tests/Feature/PasskeyManagementFeatureTest.php`
 
-- [ ] Featuretests für korrekte und falsche JSON-Passwortbestätigung ergänzen; Erfolg erwartet JSON `confirmed: true` und `auth.password_confirmed_at`, Fehler erwartet `422`, Feldfehler und keinen Zeitstempel.
-- [ ] Isolierte Tests vor der Implementierung ausführen und den Fehlernachweis festhalten.
-- [ ] `store()` für JSON-Anfragen um strukturierte Erfolgs-/Validierungsantworten ergänzen; Redirect- und Sessionfehler-Verhalten normaler Formulare unverändert lassen.
-- [ ] Fokussierte Featuretests, Formatprüfung und `git diff --check` ausführen; Senior Review, Issue-Kommentar und Commit.
+- [x] Featuretests für korrekte und falsche JSON-Passwortbestätigung ergänzen; Erfolg erwartet JSON `confirmed: true` und `auth.password_confirmed_at`, Fehler erwartet `422`, Feldfehler und keinen Zeitstempel.
+- [x] Isolierte Tests vor der Implementierung ausführen und den Fehlernachweis festhalten.
+- [x] `store()` für JSON-Anfragen um strukturierte Erfolgs-/Validierungsantworten ergänzen; Redirect- und Sessionfehler-Verhalten normaler Formulare unverändert lassen.
+- [x] Fokussierte Featuretests, Formatprüfung und `git diff --check` ausführen; Senior Review, Issue-Kommentar und Commit.
 
 ### Etappe 2: Wiederverwendbarer Passwortdialog und Profilabläufe
 
@@ -50,12 +50,12 @@
 - Ändern: `src/resources/js/components/Profile/Tabs/SecurityTab.vue`
 - Testen: `src/tests/js/components/Profile/SecurityTab.test.js`
 
-- [ ] Vitest-Fälle für Öffnen/Abbrechen/Geheimnisbereinigung, TOTP-Widerruf mit Dialog, fehlerhaftes Passwort, Throttling sowie Passkey-`423`-Bestätigung und ausdrücklichen Neustart ergänzen.
-- [ ] Tests isoliert vor der UI-Änderung ausführen und Fehlernachweis festhalten.
-- [ ] Dialog mit beschriftetem Passwortfeld, Fokussteuerung, Escape/Abbrechen, Ladezustand und Fehleranzeige erstellen; Passwort direkt nach Submit oder Abbruch löschen.
-- [ ] Inline-TOTP-Passwortfeld entfernen und Widerrufsschaltfläche an den Dialog koppeln.
-- [ ] Passkey-`423` öffnet den Dialog; erfolgreicher JSON-POST schließt ihn und zeigt den bestätigten Zustand. Die Passkey-Erstellung läuft erst nach erneutem Klick.
-- [ ] Fokussierte Vitest-Suite, Format-/Lintprüfung und `git diff --check` ausführen; Senior Review, Issue-Kommentar und Commit.
+- [x] Vitest-Fälle für Öffnen/Abbrechen/Geheimnisbereinigung, TOTP-Widerruf mit Dialog, fehlerhaftes Passwort, Throttling sowie Passkey-`423`-Bestätigung und ausdrücklichen Neustart ergänzen.
+- [x] Tests isoliert vor der UI-Änderung ausführen und Fehlernachweis festhalten.
+- [x] Dialog mit beschriftetem Passwortfeld, Fokussteuerung, Escape/Abbrechen, Ladezustand und Fehleranzeige erstellen; Passwort direkt nach Submit oder Abbruch löschen.
+- [x] Inline-TOTP-Passwortfeld entfernen und Widerrufsschaltfläche an den Dialog koppeln.
+- [x] Passkey-`423` öffnet den Dialog; erfolgreicher JSON-POST schließt ihn und zeigt den bestätigten Zustand. Die Passkey-Erstellung läuft erst nach erneutem Klick.
+- [x] Fokussierte Vitest-Suite, Formatprüfung und `git diff --check` ausführen; Senior Review, Issue-Kommentar und Commit.
 
 ### Etappe 3: Handbücher und Interstitial-Vorschau
 
@@ -64,12 +64,12 @@
 - Prüfen/ändern: `docs/superpowers/plans/2026-11-15-passwortverwaltung.md`
 - Testen: `src/tests/Unit/Services/InterstitialServiceUnitTest.php`, `src/tests/Feature/InterstitialFeatureTest.php`, falls bestehende Abdeckung den Vorschaupfad nicht bereits belegt
 
-- [ ] Bestehende Tests zur lokalen Unterdrückung und zu `?show_interstitial=1` prüfen.
+- [x] Bestehende Tests zur lokalen Unterdrückung und zu `?show_interstitial=1` prüfen.
 - [x] Interstitial-Overlay um sicher verlinkte App-Empfehlungen erweitern; Empfehlungstext in `src/config/interstitials.php` so ausformulieren, dass Passkey, Authenticator-App, sechsstelliger wechselnder Code, TOTP-Begriff und Wiederherstellungscodes ohne Vorwissen verständlich sind.
-- [ ] Benutzerhandbuch um Dialogabläufe und den erneuten Klick zum Starten der Passkey-Abfrage ergänzen.
-- [ ] Administratorenhandbuch auf geänderte Bedien- oder Betriebsanforderungen prüfen und die Nichtänderung begründen, falls nichts angepasst werden muss.
-- [ ] Technisches Handbuch um JSON-Passwortbestätigung und den lokalen Vorschauparameter ergänzen.
-- [ ] `./planer dev docs:check`, relevante fokussierte Tests, `git diff --check` und passende Formatprüfung ausführen; Senior Review, vollständigen Issue-Bericht und Commit.
+- [x] Benutzerhandbuch um Dialogabläufe und den erneuten Klick zum Starten der Passkey-Abfrage ergänzen.
+- [x] Administratorenhandbuch auf geänderte Bedien- oder Betriebsanforderungen prüfen und die Nichtänderung begründen, falls nichts angepasst werden muss.
+- [x] Technisches Handbuch um JSON-Passwortbestätigung und den lokalen Vorschauparameter ergänzen.
+- [x] `./planer dev docs:check`, relevante fokussierte Tests, `git diff --check` und passende Formatprüfung ausführen; Senior Review, vollständigen Issue-Bericht und Commit.
 
 ### Ergänzung nach UI-Rückmeldung: sichtbarer Schlüssel, Aktionszeilen und Snooze-Regressionsschutz
 
