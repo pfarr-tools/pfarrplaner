@@ -51,3 +51,33 @@ Die Passkey-Einrichtung wird nach einer erfolgreichen Passwortbestätigung nicht
 - Keine Änderung an Passkey- oder TOTP-Kryptografie, Recovery- und Rate-Limit-Regeln.
 - Keine dauerhafte Ausblendung der Sicherheitsempfehlung und keine Änderung der Laufzeitbedingungen in Produktion.
 - Kein automatischer Start der WebAuthn-Browserabfrage direkt nach dem asynchronen Passwort-POST.
+
+## Ergänzung: Passwortloser Login per Passkey oder E-Mail-Link
+
+### Ziel und UI
+
+Der reguläre Login fragt nur noch die E-Mail-Adresse ab. Darunter stehen zwei gleich breite Aktionen: zuerst **Mit Passkey anmelden** mit Fingerabdrucksymbol als primäre Schaltfläche, danach eine zentrierte Trennzeile **oder** und **Anmeldelink per E-Mail erhalten** mit Briefsymbol als sekundäre Schaltfläche. Das Passwortfeld und der Link zum Zurücksetzen des Passworts erscheinen im Login nicht. Der Demo-Login bleibt als separater Sonderfall erhalten.
+
+### Authentifizierungsregeln
+
+- Passkey-Login bleibt discoverable und funktioniert unabhängig von der eingegebenen E-Mail-Adresse.
+- Der E-Mail-Link ist ein kurzlebiger, einmalig verwendbarer Faktor für den normalen passwortlosen Login. Für Konten ohne TOTP meldet die Bestätigung des Links direkt an.
+- Für Konten mit aktiviertem TOTP führt die Linkbestätigung in die bestehende TOTP-Challenge. Dort werden nur Authenticator-Code und Recovery-Code angeboten. Der bisherige TOTP-Ersatz per E-Mail-Code wird entfernt.
+- Die Anforderung des Links verrät nicht, ob die E-Mail-Adresse ein Konto besitzt. Antworttext und Ablauf bleiben für bekannte und unbekannte Adressen gleich.
+- E-Mail-Links laufen nach 10 Minuten ab und werden nur als Hash gespeichert. Die E-Mail-Link-Ankunft per GET verbraucht den Token nicht: Ein Bestätigungsschritt per POST schützt vor Linkscannern; erst dieser POST verbraucht ihn atomar.
+- Anfragen werden pro IP und normalisierter E-Mail-Adresse begrenzt. Fehler, Ablauf und Wiederverwendung führen zurück zum Login mit einer allgemeinen Meldung.
+- Der bestehende E-Mail-Codepfad auf der TOTP-Challenge und dessen aktive Mailvorlage werden entfernt. Die existierende Challenge-Tabelle und Bereinigung bereits vorhandener Datensätze bleiben erhalten, da Migrationen auf Installationen bereits ausgeführt worden sein können.
+
+### Ansätze
+
+- Einmal-Link direkt beim GET verbrauchen: verworfen, weil E-Mail-Sicherheits- und Vorschau-Scanner den Link vor der Person öffnen können.
+- Einmal-Link im Browser bestätigen und erst per POST verbrauchen: gewählt, weil dies denselben komfortablen E-Mail-Link bietet, ohne GET-Scanner den Login zu konsumieren.
+- E-Mail-Code statt Link: verworfen, weil die gewünschte Oberfläche ausdrücklich einen Anmeldelink anbietet und der bisherige Code als TOTP-Ersatz entfallen soll.
+
+### Erfolgskriterien
+
+- Die Standard-Loginseite enthält kein Passwortfeld und keinen Passwort-zurücksetzen-Link; Reihenfolge, Breite, Beschriftung und Symbole der drei gewünschten UI-Elemente stimmen.
+- Bekannte und unbekannte E-Mail-Adressen erhalten dieselbe Antwort; nur bei einem passenden Konto wird ein kurzlebiger Link versendet.
+- Link-GET verbraucht nichts; ein gültiger Bestätigungs-POST verbraucht den gehashten Token einmalig und authentifiziert ein Konto ohne TOTP.
+- Ein Link für ein TOTP-Konto führt zur TOTP-Challenge; nur sechsstelliger Authenticator-Code oder Recovery-Code kann diese abschließen. E-Mail-Codes funktionieren dort nicht mehr.
+- Abgelaufene und wiederverwendete Links authentifizieren nicht; Passkey-Login und Demo-Login bleiben funktionsfähig.

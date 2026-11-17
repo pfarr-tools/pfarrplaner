@@ -13,6 +13,10 @@
 ## Globale Vorgaben
 
 - Bestehende Passwortprüfung, Rate-Limits, Berechtigungen, 21-Tage-Aufschub und Produktionsbedingungen bleiben erhalten.
+- Der Login-Link hat ein 10-Minuten-Limit, wird gehasht und atomar einmalig verbraucht; seine GET-Ankunft verbraucht nichts.
+- E-Mail-Link-Anforderungen verwenden identische Antworten für vorhandene und unbekannte Konten und werden pro IP und normalisierter E-Mail begrenzt.
+- Bei aktiviertem TOTP verlangt der E-Mail-Link weiterhin TOTP; im Challenge-Schritt gibt es keinen E-Mail-Code als TOTP-Ersatz.
+- Die bestehende `two_factor_login_challenges`-Migration bleibt erhalten; laufende Erzeugung/Prüfung von E-Mail-TOTP-Codes wird entfernt und Legacy-Cleanup bleibt bestehen.
 - Das Passwort wird nie dauerhaft im Parent- oder Komponentenstatus gespeichert und nach jeder Antwort bzw. jedem Abbruch gelöscht.
 - Passkey-Registrierung wird nach Bestätigung nicht automatisch neu gestartet; ein erneuter Klick löst die Browser-API aus.
 - Tests laufen ausschließlich isoliert über den vorgesehenen Docker-Workflow; keine Dev- oder Produktionsdatenbank verwenden.
@@ -29,6 +33,8 @@
 - Primärbutton speichert den Aufschub vor dem Profilaufruf; bei weiterhin Passwort-only-Konten bleiben die Interstitial-Props bis zum Ablauf leer.
 - TOTP-Schlüssel steht ohne Aufklappen direkt unter dem QR-Code; TOTP- und Login-Aktionspaare verwenden gemeinsame Flex-Zeilen.
 - Der manuelle Schlüssel hat einen eigenen Kopierbutton; Recovery-Codes stehen newline-getrennt in einem schreibgeschützten Textfeld und lassen sich zusammen kopieren.
+- Die passwortlose Loginseite zeigt Passkey zuerst, danach „oder“ und den E-Mail-Anmeldelink jeweils mit voller Eingabefeldbreite, Symbol und ohne Passwortfeld/Passwortreset-Link.
+- E-Mail-Link-GETs verbrauchen keine Tokens, unbekannte Konten werden nicht offengelegt, TOTP-Challenges akzeptieren keinen E-Mail-Code.
 
 ---
 
@@ -82,6 +88,36 @@
 - [x] TOTP-Assistent sowie Passwort-/Passkey-Login und Login-Challenge mit gemeinsamen responsiven Aktionszeilen versehen.
 - [x] Regressionstests ergänzen: Snooze-POST vor Navigation, sofortiges Ausblenden, persistente 21-Tage-Unterdrückung bei Passwort-only-Konten, sichtbarer manueller Schlüssel und gemeinsame Aktionszeilen.
 - [x] Fokussierte PHP- und JavaScript-Tests, Build, Cachebereinigung und Format-/Dokumentationsprüfung abschließen; Senior Reviews, Issue-Bericht und Commit. Letzte Kopier-UI-Prüfung: 19 SecurityTab-Tests bestanden; zwei Review-Findings (Screenreader-Live-Ansage und Clipboard-Mock-Cleanup) korrigiert und senior-reviewed **APPROVED**.
+
+### Ergänzung: Passkey- und E-Mail-Link-Login ohne Passwortfeld
+
+**Dateien:**
+- Erstellen: `src/app/Http/Controllers/Auth/EmailLoginLinkController.php`, `src/app/Mail/User/LoginLink.php`, `src/resources/js/Pages/Auth/ConfirmLoginLink.vue`, Migration für `passwordless_login_links`, Mailable-View und `src/tests/Feature/EmailLoginLinkFeatureTest.php`.
+- Ändern: `src/routes/web/Auth.php`, `src/app/Http/Controllers/Auth/LoginController.php`, `src/app/Providers/AppServiceProvider.php`, `src/app/Providers/TelescopeServiceProvider.php`, `src/resources/js/Pages/Auth/Login.vue`, `src/resources/js/Pages/Auth/LoginChallenge.vue`, vorhandene Login-/Challenge-Tests und die drei Handbücher.
+- Entfernen: Challenge-E-Mail-Code-Route und -Sender, die aktive Mailable-/View-Nutzung sowie deren Login-Challenge-UI. Die Migrationstabelle und Legacy-Bereinigung bleiben, damit bereits ausgeführte Migrationen und offene Bestandsdatensätze kompatibel bleiben.
+
+#### Etappe 4: E-Mail-Link-Backend
+
+- [ ] Featuretests zuerst schreiben: generische Antwort für bekannte/unbekannte Adressen, Rate-Limits, gehashter 10-Minuten-Token, GET ohne Verbrauch, bestätigter einmaliger Login, TOTP-Challenge, Ablauf und Replay.
+- [ ] `passwordless_login_links` mit `user_id`, `token_hash`, `expires_at`, `consumed_at` und Timestamps migrieren; alte aktive/abgelaufene Challenge-Tabelle nicht verändern.
+- [ ] `EmailLoginLinkController::request`, `open` und `confirm` sowie die `login.link.*`-Routen implementieren. GET bindet einen gültigen Link an die Session und leitet auf eine tokenfreie Bestätigungsseite; POST verbraucht ihn atomar.
+- [ ] `LoginLink`-Mailable samt No-Referrer/No-Store-Bestätigungsseite implementieren und Telescope-Redaktion für Linkgeheimnisse testen.
+- [ ] Nach Bestätigung ohne TOTP regulär anmelden; bei TOTP ausschließlich die vorhandene TOTP-Challenge starten.
+- [ ] Isolierte Featuretests, Format-/Dokumentationsprüfung, Senior Review, Issue-Kommentar und Etappen-Commit.
+
+#### Etappe 5: E-Mail-Code als TOTP-Ersatz entfernen
+
+- [ ] Tests für TOTP- und Recovery-Code-Verifikation erhalten; Tests für das E-Mail-Code-Senden/-Verifizieren entfernen und durch Regressionen ersetzen, dass die Route nicht existiert und ein E-Mail-Code die Challenge nicht abschließt.
+- [ ] `login.challenge.email`, `sendEmailChallenge`, `consumeEmailCode`, Code-Mailable/-View und E-Mail-Eingabemodus aus der Challenge entfernen.
+- [ ] Challenge-Seite und Benutzer-/Administrator-/Technikhandbuch auf Authenticator- und Recovery-Code-Abläufe reduzieren; Legacy-Tabellenbereinigung bestehen lassen.
+- [ ] Fokussierte Feature-/Vitest-Läufe, Senior Review, Issue-Bericht und Etappen-Commit.
+
+#### Etappe 6: Login-Oberfläche
+
+- [ ] Vitest zuerst ergänzen: Passwort-/Reset-Link fehlen; E-Mail-Eingabe, Passkey-Primärbutton mit Fingerabdrucksymbol, zentriertes „oder“, E-Mail-Link-Button mit Briefsymbol, gleiche volle Breite und Lade-/Erfolg-/Fehlerzustände.
+- [ ] Reguläre Loginseite auf E-Mail + zwei Aktionen reduzieren; Demo-Sonderlogin beibehalten. Passkey bleibt ohne Kontenabfrage discoverable; E-Mail-Aktion postet die Adresse an `login.link.request`.
+- [ ] Login-Link-Bestätigungsseite und TOTP-/Recovery-Challenge mit Tastaturbedienung und verständlichen deutschen Texten abschließen.
+- [ ] Handbücher aktualisieren, fokussierte PHP-/Vitest-Tests, Format, `docs:check`, Build und Cachebereinigung ausführen; Senior Review, Issue-Kommentar, Commit und Push.
 
 ## Umsetzungshinweise
 
