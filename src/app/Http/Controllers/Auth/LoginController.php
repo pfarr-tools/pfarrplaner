@@ -45,6 +45,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Timebox;
 use Inertia\Inertia;
+use Inertia\Response as InertiaResponse;
 use RoundlyConsulting\TwoFactor\Exceptions\TwoFactorRateLimitedException;
 use Symfony\Component\HttpFoundation\Response as HttpResponse;
 
@@ -156,10 +157,8 @@ class LoginController extends Controller
         $this->middleware('guest')->except(['logout', 'keepTokenAlive']);
     }
 
-    /**
-     * @return Response
-     */
-    public function showLoginForm(Request $request)
+    /** Display the generic login page or the configured demo login page. */
+    public function showLoginForm(Request $request): InertiaResponse
     {
         $request->session()->regenerateToken();
         $demo = config('app.demo_mode');
@@ -195,13 +194,14 @@ class LoginController extends Controller
 
         abort_unless($user && $user->hasTwoFactorEnabled(), 404);
 
-        return Inertia::render('Auth/LoginChallenge')
-            ->toResponse($request)
-            ->withHeaders([
-                'Cache-Control' => 'no-store, no-cache, must-revalidate, private',
-                'Pragma' => 'no-cache',
-                'Expires' => '0',
-            ]);
+        $response = Inertia::render('Auth/LoginChallenge')->toResponse($request);
+        $response->headers->add([
+            'Cache-Control' => 'no-store, no-cache, must-revalidate, private',
+            'Pragma' => 'no-cache',
+            'Expires' => '0',
+        ]);
+
+        return $response;
     }
 
     /** Verify a TOTP, recovery code, or one-time email challenge. */
