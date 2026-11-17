@@ -198,7 +198,7 @@ Gesamtprüfung. Vor der Umsetzung wird mit dem Auftraggeber abgestimmt, welche
 Sicherheitsstrategie Pfarrplaner als nächste empfehlen soll und wann ein Konto
 als ausreichend abgesichert gilt.
 
-Diskussionsvorschlag zur Reihenfolge:
+Vereinbarte Reihenfolge und Erledigungskriterium:
 
 1. Passkey als bevorzugte, phishing-resistente Anmeldung; damit ist zugleich
    passwortlose Anmeldung möglich.
@@ -208,18 +208,21 @@ Diskussionsvorschlag zur Reihenfolge:
    wo nur Passwortanmeldung eingerichtet ist, empfiehlt die Oberfläche zuerst
    Passkey und danach TOTP.
 
-Die Entscheidung muss klären, ob ein Passkey allein den Hinweis beendet oder
-ob für bestimmte Konten zusätzlich TOTP empfohlen wird, und wie Konten ohne
-Passkey-Unterstützung behandelt werden.
+- Passkey ist die bevorzugte Empfehlung und ermöglicht passwortlose Anmeldung.
+- Ein eingerichteter Passkey **oder** TOTP genügt, damit der Hinweis nicht mehr
+  als Passwort-only-Konto gilt. TOTP bleibt eine gleichwertige Möglichkeit,
+  den Hinweis zu erledigen, auch wenn Passkey zuerst empfohlen wird.
+- Nur Konten, die ausschließlich ein Passwort verwenden, erhalten den Hinweis.
+- Der Hinweis lässt sich für mehrere Wochen ausblenden und erscheint danach
+  erneut, solange weder Passkey noch TOTP eingerichtet ist.
 
-- [ ] Reihenfolge und Mindestkriterium für „zusätzlich abgesichert“ mit dem
+- [x] Reihenfolge und Mindestkriterium für „zusätzlich abgesichert“ mit dem
   Auftraggeber festlegen und im Issue dokumentieren.
 - [ ] Ein wiederkehrendes Interstitial für Konten erstellen, die ausschließlich
   ein Passwort verwenden. Es erklärt die empfohlene nächste Maßnahme und führt
   direkt zu deren Einrichtung.
 - [ ] Den Hinweis für mehrere Wochen ausblendbar machen; nach Ablauf erscheint
-  er erneut, solange keine der vereinbarten zusätzlichen Sicherheitsstrategien
-  eingerichtet ist.
+  er erneut, solange weder Passkey noch TOTP eingerichtet ist.
 - [ ] Snooze, Wiederkehr, Einrichtungslinks, Statusänderungen und bereits
   abgesicherte Konten mit fokussierten Tests abdecken und in Benutzer- sowie
   Administratorenhandbuch dokumentieren.
