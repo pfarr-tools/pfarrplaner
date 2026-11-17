@@ -80,4 +80,58 @@ class InterstitialFeatureTest extends TestCase
             $user->fresh()->getSetting('interstitials')['breaking-change']['status']
         );
     }
+
+    /** Permanent dismissal of the repeatable security reminder is rejected by the endpoint. */
+    public function test_repeatable_interstitial_rejects_permanent_dismissal(): void
+    {
+        $this->withoutMiddleware(VerifyCsrfToken::class);
+        $this->withoutMiddleware(ForceDomain::class);
+        config()->set('interstitials.items.security-beyond-password', [
+            'enabled' => true,
+            'audience' => 'password-only',
+            'repeatable' => true,
+            'dismissible' => false,
+            'snooze_days' => 21,
+            'title' => 'Sicherheit erhöhen',
+        ]);
+        $user = User::factory()->create();
+
+        $this->actingAs($user)
+            ->postJson(route('interstitial.update', ['key' => 'security-beyond-password']), [
+                'action' => InterstitialService::ACTION_DISMISS,
+            ])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('action');
+
+        $this->assertSame([], $user->fresh()->getSetting('interstitials', []));
+    }
+
+    /** A later response exposes the stored expiry so the overlay can navigate safely. */
+    public function test_repeatable_interstitial_later_response_includes_persistent_expiry(): void
+    {
+        $this->withoutMiddleware(VerifyCsrfToken::class);
+        $this->withoutMiddleware(ForceDomain::class);
+        config()->set('interstitials.items.security-beyond-password', [
+            'enabled' => true,
+            'audience' => 'password-only',
+            'repeatable' => true,
+            'dismissible' => false,
+            'snooze_days' => 21,
+            'title' => 'Sicherheit erhöhen',
+        ]);
+        $user = User::factory()->create();
+
+        $this->actingAs($user)
+            ->postJson(route('interstitial.update', ['key' => 'security-beyond-password']), [
+                'action' => InterstitialService::ACTION_LATER,
+            ])
+            ->assertOk()
+            ->assertJsonPath('status', InterstitialService::ACTION_LATER)
+            ->assertJsonPath('snoozed_until', now()->addDays(21)->toIso8601String());
+
+        $this->assertSame(
+            InterstitialService::ACTION_LATER,
+            $user->fresh()->getSetting('interstitials')['security-beyond-password']['status'],
+        );
+    }
 }

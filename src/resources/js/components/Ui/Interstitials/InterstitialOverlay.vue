@@ -43,6 +43,17 @@
                     </li>
                 </ul>
 
+                <a
+                    v-if="currentInterstitial.action_url"
+                    class="btn btn-primary mb-3"
+                    :href="currentInterstitial.action_url"
+                    data-testid="interstitial-primary-action"
+                    :aria-disabled="busy"
+                    @click.prevent="handlePrimaryAction"
+                >
+                    {{ currentInterstitial.action_label || 'Weiter' }}
+                </a>
+
                 <div class="interstitial-actions">
                     <button
                         type="button"
@@ -53,6 +64,7 @@
                         Später
                     </button>
                     <button
+                        v-if="currentInterstitial.dismissible !== false"
                         type="button"
                         class="btn btn-primary"
                         :disabled="busy"
@@ -61,6 +73,13 @@
                         Nicht wieder anzeigen
                     </button>
                 </div>
+                <p
+                    v-if="actionError"
+                    class="text-danger mt-3 mb-0"
+                    role="alert"
+                >
+                    {{ actionError }}
+                </p>
             </div>
         </div>
     </transition>
@@ -72,8 +91,12 @@ export default {
     data() {
         return {
             busy: false,
+            actionError: '',
             dismissedKeys: [],
             deferredKeys: [],
+            deferredUntil: {},
+            currentTime: Date.now(),
+            clockInterval: null,
         }
     },
     computed: {
@@ -89,7 +112,11 @@ export default {
                 this.interstitials.find((item) => {
                     return (
                         !this.dismissedKeys.includes(item.key) &&
-                        !this.deferredKeys.includes(item.key)
+                        !this.deferredKeys.includes(item.key) &&
+                        !(
+                            this.deferredUntil[item.key] &&
+                            Date.parse(this.deferredUntil[item.key]) > this.currentTime
+                        )
                     )
                 }) || null
             )
@@ -110,32 +137,61 @@ export default {
     created() {
         this.deferredKeys = this.loadDeferredKeys()
     },
+    mounted() {
+        this.clockInterval = window.setInterval(this.refreshCurrentTime, 60_000)
+    },
+    beforeUnmount() {
+        if (this.clockInterval) window.clearInterval(this.clockInterval)
+    },
     methods: {
+        /** Refresh the local clock so an expired snooze can show without a reload. */
+        refreshCurrentTime() {
+            this.currentTime = Date.now()
+        },
+        /** Snooze the reminder before visiting the recommended security settings. */
+        async handlePrimaryAction() {
+            const item = this.currentInterstitial
+            if (!item?.action_url || this.busy) return
+
+            if (item.repeatable && !(await this.handleAction('later'))) return
+
+            this.$inertia.get(item.action_url)
+        },
+        /** Load tab-scoped snoozes used by non-repeatable interstitials. */
         loadDeferredKeys() {
             try {
-                return JSON.parse(sessionStorage.getItem(this.storageKey) || '[]')
-            } catch (e) {
+                return JSON.parse(window.sessionStorage.getItem(this.storageKey) || '[]')
+            } catch {
                 return []
             }
         },
         saveDeferredKeys() {
-            sessionStorage.setItem(this.storageKey, JSON.stringify(this.deferredKeys))
+            window.sessionStorage.setItem(this.storageKey, JSON.stringify(this.deferredKeys))
         },
+        /** Persist a response action and hide the active interstitial locally. */
         async handleAction(action) {
             if (!this.currentInterstitial || this.busy) {
                 return
             }
 
             this.busy = true
+            this.actionError = ''
             const key = this.currentInterstitial.key
 
             try {
-                await this.$api().post(route('interstitial.update', { key }), { action })
+                const response = await this.$api().post(
+                    window.route('interstitial.update', { key }),
+                    { action },
+                )
 
                 if (action === 'later') {
-                    if (!this.deferredKeys.includes(key)) {
-                        this.deferredKeys.push(key)
-                        this.saveDeferredKeys()
+                    if (response.data?.snoozed_until) {
+                        this.deferredUntil[key] = response.data.snoozed_until
+                    } else {
+                        if (!this.deferredKeys.includes(key)) {
+                            this.deferredKeys.push(key)
+                            this.saveDeferredKeys()
+                        }
                     }
                 } else {
                     this.dismissedKeys.push(key)
@@ -144,6 +200,12 @@ export default {
                         [key]: { status: action },
                     }
                 }
+                return true
+            } catch {
+                this.actionError =
+                    'Der Hinweis konnte nicht gespeichert werden. Bitte versuchen Sie es erneut.'
+
+                return false
             } finally {
                 this.busy = false
             }

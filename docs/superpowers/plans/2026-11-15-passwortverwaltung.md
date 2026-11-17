@@ -361,48 +361,48 @@ unberührt.
 Die Folgekommentare vom 17. November ergänzen diese prüfbaren Anforderungen.
 Sie werden vor Task 7 bearbeitet und separat reviewed/committed.
 
-- [ ] Auf dem ersten Login-Schritt erscheint nur die Aktion „Weiter“; die
+- [x] Auf dem ersten Login-Schritt erscheint nur die Aktion „Weiter“; die
   Anmeldung per Passwort wird erst auf dem zweiten Schritt angeboten. Die
   allgemeine Passkey-Option bleibt vor der Kontenidentifikation verfügbar.
   Der Test belegt ausdrücklich, dass dort kein zweiter Passwort-Submit-Button
   gerendert wird und Enter denselben lokalen nächsten Schritt auslöst.
-- [ ] Passkey-Registrierung nach einer frischen Passwortbestätigung wird
+- [x] Passkey-Registrierung nach einer frischen Passwortbestätigung wird
   erfolgreich fortgesetzt. Der Ablauf startet mit nicht bestätigter und
   abgelaufener Session, bestätigt das Passwort genau einmal, kehrt auf den
   validierten lokalen Rücksprungpfad zurück und lädt danach Options- und
   Registrierungsendpunkt ohne erneute Bestätigungsseite. Eine innerhalb von
   `password.confirm`-Timeout frische Bestätigung bleibt gültig; die Tests
   prüfen die tatsächliche Middleware-Session-Semantik.
-- [ ] Passkey- und TOTP-Eingaben im Profil-Wizard haben eindeutige Labels,
+- [x] Passkey- und TOTP-Eingaben im Profil-Wizard haben eindeutige Labels,
   stabile Feldnamen/IDs und passende `autocomplete`-/`inputmode`-Attribute,
   sodass Passwortmanager wie Bitwarden Passwort und Einmalcode erkennen.
-- [ ] Der geführte TOTP-Dialog erhält ein zugängliches X-Schließen oben rechts
+- [x] Der geführte TOTP-Dialog erhält ein zugängliches X-Schließen oben rechts
   und eine ausdrückliche Abbrechen-Aktion. Schließen/Abbrechen löschen
   Passwort, Code, Seed, QR-Daten und Recovery-Codes aus dem clientseitigen
   UI-Zustand; beide Aktionen werden getrennt geprüft.
-- [ ] Lokale Administrator:innen dürfen einen automatisch generierten
+- [x] Lokale Administrator:innen dürfen einen automatisch generierten
   temporären Zugang nur für ein anderes Konto neu ausstellen, wenn die
   bestehende `update`-Policy den Zugriff erlaubt. Dafür wird eine eigene
   `resetPassword`-Policy mit expliziter Fremdkonto-, Zielrollen- und
   Bearbeitbarkeitsprüfung verwendet. Die Zielperson erhält die Zugangsdaten
   per bestehender AccountData-Mail und muss das Passwort ändern. Selbst-Reset,
   Super-Admin-Ziele und nicht bearbeitbare Konten bleiben ausgeschlossen.
-- [ ] Die manuelle Vergabe eines Passworts für ein bestehendes Konto bleibt
+- [x] Die manuelle Vergabe eines Passworts für ein bestehendes Konto bleibt
   Super-Administrator:innen vorbehalten. Das Formular zeigt die Aktion
   ausdrücklich an, validiert das starke Passwort serverseitig, setzt
   `must_change_password` und versendet die Zugangsdaten über den bestehenden
   Mailpfad; Passwortwerte gelangen nicht in Props, Logs oder Flashdaten.
-- [ ] Die Login-Seite verlinkt auf den Laravel-Passwort-Reset. Dessen
+- [x] Die Login-Seite verlinkt auf den Laravel-Passwort-Reset. Dessen
   tatsächliche Throttling-Konfiguration wird geprüft und nötigenfalls ergänzt.
   Bekannte und unbekannte E-Mailadressen erhalten denselben sichtbaren
   Antworttext und Status; Rate-Limit- und ungültige Token-Zustände werden
   ebenfalls getestet.
-- [ ] Neue Regressionstests decken Login-Schritte, Passwortbestätigung,
+- [x] Neue Regressionstests decken Login-Schritte, Passwortbestätigung,
   Formular-Metadaten, beide Dialog-Schließen-Pfade und Geheimnisbereinigung,
   lokale Admin-Autorisierung samt temporärer AccountData-Mail und erzwungener
   Passwortänderung, Super-Admin-Vergabe eines starken Passworts sowie
   bekannte/unbekannte Reset-Anfragen und den Login-Link getrennt ab.
-- [ ] Benutzer-, Administratoren- und Technisches Handbuch werden für
+- [x] Benutzer-, Administratoren- und Technisches Handbuch werden für
   Login, Selbst-Reset, Admin-Reset, manuelle Vergabe und 2FA-Einrichtung
   konsistent und rollenbezogen aktualisiert. Jeder Teilschritt erhält Review,
   Issue-Kommentar und eigenen Commit. Danach folgt Task 7.
@@ -439,17 +439,25 @@ Vereinbarte Reihenfolge und Erledigungskriterium:
   als Passwort-only-Konto gilt. TOTP bleibt eine gleichwertige Möglichkeit,
   den Hinweis zu erledigen, auch wenn Passkey zuerst empfohlen wird.
 - Nur Konten, die ausschließlich ein Passwort verwenden, erhalten den Hinweis.
-- Der Hinweis lässt sich für mehrere Wochen ausblenden und erscheint danach
-  erneut, solange weder Passkey noch TOTP eingerichtet ist.
+- „Später“ blendet den Hinweis 21 Tage aus und der gespeicherte Ablauf gilt
+  über Sitzungen und Geräte hinweg. Danach erscheint er erneut, solange weder
+  Passkey noch TOTP eingerichtet ist.
+- Die primäre Aktion speichert den 21-Tage-Aufschub, bevor sie direkt zur
+  Sicherheitseinstellung navigiert. Dadurch überlagert der Hinweis nicht den
+  Einrichtungsdialog. Eine dauerhafte Ausblendung ist für diese Empfehlung
+  sowohl in der Oberfläche als auch serverseitig gesperrt.
+- Ein erzwungener Passwortwechsel sowie eine ausstehende TOTP-Einrichtung
+  unterdrücken den Hinweis, damit notwendige Konto- und Recovery-Abläufe
+  erreichbar bleiben.
 
 - [x] Reihenfolge und Mindestkriterium für „zusätzlich abgesichert“ mit dem
   Auftraggeber festlegen und im Issue dokumentieren.
-- [ ] Ein wiederkehrendes Interstitial für Konten erstellen, die ausschließlich
+- [x] Ein wiederkehrendes Interstitial für Konten erstellen, die ausschließlich
   ein Passwort verwenden. Es erklärt die empfohlene nächste Maßnahme und führt
   direkt zu deren Einrichtung.
-- [ ] Den Hinweis für mehrere Wochen ausblendbar machen; nach Ablauf erscheint
+- [x] Den Hinweis für mehrere Wochen ausblendbar machen; nach Ablauf erscheint
   er erneut, solange weder Passkey noch TOTP eingerichtet ist.
-- [ ] Snooze, Wiederkehr, Einrichtungslinks, Statusänderungen und bereits
+- [x] Snooze, Wiederkehr, Einrichtungslinks, Statusänderungen und bereits
   abgesicherte Konten mit fokussierten Tests abdecken und in Benutzer- sowie
   Administratorenhandbuch dokumentieren.
 - [ ] Issue #80 nach Implementierung, Senior Review und erfolgreicher

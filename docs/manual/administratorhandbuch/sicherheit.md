@@ -33,6 +33,13 @@ Ein technischer Überblick über den Sicherheitsdurchgang und die abgesicherten 
 
 ## Zwei-Faktor-Authentifizierung
 
+Konten, die nur ein Passwort verwenden, erhalten in der Anwendung einen
+wiederkehrenden Sicherheitshinweis. Empfohlen wird zuerst ein Passkey und
+danach oder alternativ TOTP. Die Person kann den Hinweis jeweils drei Wochen
+zurückstellen; dauerhaft ausblenden lässt er sich nicht. Sobald mindestens
+ein Passkey oder TOTP eingerichtet ist, endet die Erinnerung. Ein erzwungener
+Passwortwechsel und eine laufende TOTP-Einrichtung werden nicht überlagert.
+
 Administratoren können für ein fremdes Konto, das sie bearbeiten dürfen und
 das kein Super-Administrationskonto ist, einen neuen temporären Zugang
 ausstellen. Das Konto erhält ein zufällig erzeugtes Passwort per

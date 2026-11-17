@@ -29,6 +29,14 @@ Bei einer neuen Kontoanlage wird ein bestätigter Initialwert aus dem Benutzered
 
 Das Middleware-Modul `App\Http\Middleware\RequirePasswordChange` liegt nach der Authentifizierung in der Web-Middleware-Kette. Es erlaubt nur Passwortwechsel, Logout, CSRF-Token-Erneuerung und den kontrollierten Admin-Rückweg. Alle anderen authentifizierten Webrouten werden auf `password.edit` mit einem sicheren Routennamen als Rücksprung-Hinweis umgeleitet. Eine vorhandene `adminUserSwitchBack`-Session markiert ausschließlich den bewusst kontrollierten Proxy-Fall als Ausnahme.
 
+Das konfigurierte Interstitial `security-beyond-password` gilt nur für Konten
+ohne Passkey und bestätigtes oder ausstehendes TOTP. Es wird während eines
+erzwungenen Passwortwechsels ebenfalls unterdrückt. `InterstitialService`
+speichert „Später“ pro Benutzer mit Ablaufzeit (21 Tage); die feste
+Ausblendaktion ist deaktiviert und wird serverseitig abgewiesen. Nach einem
+Passkey oder bestätigtem TOTP greift die Zielgruppe nicht mehr. Die Empfehlung
+verwendet vorhandene Benutzereinstellungen und benötigt keine Migration.
+
 Der Admin-Reset ist an dieselbe `update`-Policy wie die Benutzerbearbeitung
 gebunden und schließt Selbst-Reset sowie Super-Administrationskonten aus.
 Manuelle Passwortvergabe für bestehende Konten ist Super-Administratoren

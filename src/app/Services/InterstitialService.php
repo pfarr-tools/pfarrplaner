@@ -62,7 +62,16 @@ class InterstitialService
                 continue;
             }
 
-            if (($states[$key]['status'] ?? null) === self::ACTION_DISMISS) {
+            $state = $states[$key] ?? [];
+            if (($state['status'] ?? null) === self::ACTION_DISMISS
+                && ($item['dismissible'] ?? true)) {
+                continue;
+            }
+
+            if (($item['repeatable'] ?? false)
+                && ($state['status'] ?? null) === self::ACTION_LATER
+                && isset($state['snoozed_until'])
+                && now()->lt($state['snoozed_until'])) {
                 continue;
             }
 
@@ -72,6 +81,10 @@ class InterstitialService
                 'title' => $item['title'] ?? $key,
                 'text' => $item['text'] ?? '',
                 'details' => array_values($item['details'] ?? []),
+                'repeatable' => (bool) ($item['repeatable'] ?? false),
+                'dismissible' => (bool) ($item['dismissible'] ?? true),
+                'action_label' => $item['action_label'] ?? null,
+                'action_url' => $item['action_url'] ?? null,
             ];
         }
 
@@ -98,11 +111,21 @@ class InterstitialService
             ]);
         }
 
+        if ($action === self::ACTION_DISMISS && ! ($items[$key]['dismissible'] ?? true)) {
+            throw ValidationException::withMessages([
+                'action' => 'Dieser Hinweis muss bis zur Einrichtung eines zusätzlichen Faktors wiederholt werden.',
+            ]);
+        }
+
         $states = $this->statesForUser($user);
         $states[$key] = [
             'status' => $action,
             'updated_at' => now()->toIso8601String(),
         ];
+        if ($action === self::ACTION_LATER && ($items[$key]['repeatable'] ?? false)) {
+            $snoozeDays = max(1, (int) ($items[$key]['snooze_days'] ?? 21));
+            $states[$key]['snoozed_until'] = now()->addDays($snoozeDays)->toIso8601String();
+        }
         Settings::set($user, config('interstitials.setting_key', 'interstitials'), $states);
 
         return $states[$key];
@@ -147,6 +170,14 @@ class InterstitialService
                     break;
                 case 'writer':
                     if ($user->writableCities->isNotEmpty()) {
+                        return true;
+                    }
+                    break;
+                case 'password-only':
+                    if (! $user->must_change_password
+                        && ! $user->hasTwoFactorEnabled()
+                        && ! $user->hasPendingTwoFactor()
+                        && ! $user->passkeys()->exists()) {
                         return true;
                     }
                     break;

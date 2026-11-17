@@ -61,6 +61,16 @@ auf der Login-Seite. Die Bestätigung der Anfrage verrät nicht, ob ein Konto
 mit dieser E-Mailadresse besteht. Prüfen Sie Ihr Postfach und den Spam-Ordner;
 bei ausbleibender Nachricht wenden Sie sich an Ihre Administration.
 
+Wenn Sie nur ein Passwort zur Anmeldung verwenden, erinnert Sie Pfarrplaner
+daran, Ihr Konto zusätzlich abzusichern. Empfohlen wird zuerst ein Passkey,
+der auch eine Anmeldung ohne Passwort ermöglicht. TOTP mit einer
+Authenticator-App ist eine Alternative oder zusätzliche zweite Stufe. Ein
+starkes, nur hier verwendetes Passwort bleibt als Rückfallmöglichkeit wichtig.
+Über **Sicherheitseinstellungen öffnen** gelangen Sie direkt zur Einrichtung.
+Mit **Später** wird der Hinweis drei Wochen ausgeblendet. Solange weder ein
+Passkey noch TOTP eingerichtet ist, erscheint er danach erneut. Sobald Sie
+einen der beiden Faktoren eingerichtet haben, entfällt der Hinweis.
+
 ### Zwei-Faktor-Authentifizierung
 
 Im Bereich **Sicherheit** können Sie die Zwei-Faktor-Authentifizierung mit

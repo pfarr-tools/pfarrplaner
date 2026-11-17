@@ -43,8 +43,26 @@ return [
     | - all: für alle Benutzer:innen
     | - admin: nur für globale oder lokale Administrator:innen
     | - writer: nur für Benutzer:innen mit Schreibrechten in mind. einer Gemeinde
+    | - password-only: nur ohne Passkey, TOTP, ausstehende TOTP-Einrichtung oder erzwungenen Passwortwechsel
     */
     'items' => [
+        'security-beyond-password' => [
+            'enabled' => true,
+            'audience' => 'password-only',
+            'repeatable' => true,
+            'dismissible' => false,
+            'snooze_days' => 21,
+            'level' => 'warning',
+            'title' => 'Schützen Sie Ihr Konto zusätzlich zum Passwort',
+            'text' => 'Ein Passkey ist die empfohlene nächste Maßnahme und ermöglicht auch die Anmeldung ohne Passwort. Wenn Sie keinen Passkey nutzen können oder möchten, richten Sie die Zwei-Faktor-Authentifizierung ein.',
+            'details' => [
+                '1. Passkey: bevorzugte, phishing-resistente Anmeldung für Ihre Geräte.',
+                '2. TOTP: Alternative zum Passkey oder zusätzliche zweite Stufe.',
+                'Ein starkes, einzigartiges Passwort bleibt als Rückfallmöglichkeit wichtig.',
+            ],
+            'action_label' => 'Sicherheitseinstellungen öffnen',
+            'action_url' => '/profil?tab=security',
+        ],
         'opferzaehler-umstellung-2026-06-30' => [
             'enabled' => true,
             'audience' => 'writer',
