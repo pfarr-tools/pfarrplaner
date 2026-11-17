@@ -52,57 +52,68 @@
                         novalidate
                     >
                         <FormCsrfToken />
-                        <!-- Email input -->
-                        <div v-if="!demo && loginStep === 1">
-                            <FormInput
-                                v-model="form.email"
-                                name="email"
-                                label="E-Mailadresse"
-                                autofocus
-                                placeholder="deine@email.de"
-                                autocomplete="username"
-                                required
-                            />
-                            <button
-                                type="button"
-                                class="btn btn-primary btn-lg mt-3"
-                                data-testid="continue-login"
-                                @click="continueLogin"
+                        <div v-if="!demo">
+                            <p class="mb-2">Melde dich einfach und sicher mit einem Passkey an.</p>
+                            <div class="d-grid gap-2 mt-3">
+                                <button
+                                    type="button"
+                                    class="btn btn-primary btn-lg"
+                                    data-testid="passkey-login"
+                                    :disabled="passkeyLoading"
+                                    @click="loginWithPasskey"
+                                >
+                                    <i
+                                        class="fa fa-fingerprint me-2"
+                                        aria-hidden="true"
+                                    ></i>
+                                    {{
+                                        passkeyLoading
+                                            ? 'Passkey wird geprüft …'
+                                            : 'Mit Passkey anmelden'
+                                    }}
+                                </button>
+                                <div class="text-center text-muted my-2">oder</div>
+                                <FormInput
+                                    v-model="form.email"
+                                    name="email"
+                                    label="E-Mailadresse"
+                                    autofocus
+                                    placeholder="deine@email.de"
+                                    autocomplete="username"
+                                    required
+                                />
+                                <button
+                                    type="button"
+                                    class="btn btn-outline-primary btn-lg"
+                                    data-testid="email-login-link"
+                                    :disabled="emailLinkLoading || !form.email"
+                                    @click="requestEmailLink"
+                                >
+                                    <i
+                                        class="fa fa-envelope me-2"
+                                        aria-hidden="true"
+                                    ></i>
+                                    {{
+                                        emailLinkLoading
+                                            ? 'Anmeldelink wird angefordert …'
+                                            : 'Anmeldelink per E-Mail erhalten'
+                                    }}
+                                </button>
+                            </div>
+                            <p
+                                v-if="$page.props.flash?.status"
+                                class="text-success mt-2"
+                                role="status"
                             >
-                                Weiter
-                            </button>
-                        </div>
-
-                        <div v-else-if="!demo">
-                            <input
-                                type="hidden"
-                                name="email"
-                                :value="form.email"
-                            />
-                            <p>
-                                Weiter mit <strong>{{ form.email }}</strong>
+                                {{ $page.props.flash.status }}
                             </p>
-                            <button
-                                type="button"
-                                class="btn btn-link px-0"
-                                @click="returnToEmail"
+                            <p
+                                v-if="emailLinkError"
+                                class="text-danger mt-2"
+                                role="alert"
                             >
-                                Andere E-Mailadresse verwenden
-                            </button>
-                            <FormInput
-                                class="my-3"
-                                type="password"
-                                name="password"
-                                v-model="form.password"
-                                label="Passwort"
-                                autocomplete="current-password"
-                                autofocus
-                                required
-                            />
-                            <FormCheck
-                                v-model="form.remember"
-                                label="Angemeldet bleiben"
-                            />
+                                {{ emailLinkError }}
+                            </p>
                         </div>
 
                         <div v-else>
@@ -137,31 +148,17 @@
                             </div>
                         </div>
                         <div
+                            v-if="demo"
                             class="d-flex flex-wrap align-items-center gap-2 mt-4 pt-2"
-                            :key="attempts"
                         >
                             <button
-                                v-if="demo || loginStep === 2"
+                                v-if="demo"
                                 type="submit"
                                 class="btn btn-primary btn-lg"
                                 :disabled="loggingIn"
                                 style="padding-left: 2.5rem; padding-right: 2.5rem"
                             >
                                 Anmelden
-                            </button>
-                            <button
-                                v-if="!demo"
-                                type="button"
-                                class="btn btn-outline-primary"
-                                data-testid="passkey-login"
-                                :disabled="passkeyLoading"
-                                @click="loginWithPasskey"
-                            >
-                                {{
-                                    passkeyLoading
-                                        ? 'Passkey wird geprüft …'
-                                        : 'Mit Passkey anmelden'
-                                }}
                             </button>
                         </div>
                         <p
@@ -171,17 +168,6 @@
                         >
                             {{ passkeyError }}
                         </p>
-                        <div
-                            v-if="!demo"
-                            class="mt-3"
-                        >
-                            <a
-                                :href="route('password.request')"
-                                data-testid="forgot-password"
-                            >
-                                Passwort vergessen?
-                            </a>
-                        </div>
                     </form>
                     <DonationNotice class="mt-4 pt-3 border-top" />
                 </div>
@@ -217,14 +203,13 @@
 
 <script>
 import FormInput from '../../components/Ui/forms/FormInput.vue'
-import FormCheck from '../../components/Ui/forms/FormCheck.vue'
 import FormCsrfToken from '../../components/Ui/forms/FormCsrfToken.vue'
 import DonationNotice from '../../components/Ui/DonationNotice.vue'
 import { Passkeys } from '@laravel/passkeys'
 
 export default {
     name: 'Login',
-    components: { DonationNotice, FormCsrfToken, FormCheck, FormInput },
+    components: { DonationNotice, FormCsrfToken, FormInput },
     computed: {
         layout() {
             return this.$page.props
@@ -236,44 +221,27 @@ export default {
             dev: this.$page.props.dev,
             demo: this.$page.props.demo,
             users: this.$page.props.users || [],
-            attempts: 0,
-            loginStep: this.$page.props.demo ? 2 : 1,
             loggingIn: false,
             passkeyLoading: false,
+            emailLinkLoading: false,
             passkeyError: '',
+            emailLinkError: '',
             form: {
                 email: this.$page.props.users?.[0]?.email || '',
-                password: '',
-                remember: false,
             },
         }
     },
-    /** Focus the initial input after Vue has rendered the active login step. */
+    /** Focus the email or demo-user input after Vue has rendered. */
     mounted() {
         this.$nextTick(() => this.focusCurrentInput())
     },
     methods: {
-        /** Advance locally so every username receives the same next screen. */
-        continueLogin() {
-            if (!this.form.email.trim()) return
-            this.loginStep = 2
-            this.$nextTick(() => this.focusCurrentInput())
-        },
-        /** Return to the username step and focus its input. */
-        returnToEmail() {
-            this.loginStep = 1
-            this.$nextTick(() => this.focusCurrentInput())
-        },
-        /** Focus the input for the currently displayed login step. */
+        /** Focus the input shown for this login mode. */
         focusCurrentInput() {
-            const selector = this.demo
-                ? '#users'
-                : this.loginStep === 1
-                  ? '[name="email"]'
-                  : '[name="password"]'
+            const selector = this.demo ? '#users' : '[name="email"]'
             this.$el.querySelector(selector)?.focus()
         },
-        /** Start discoverable passkey login without sending the typed username. */
+        /** Start passkey login for the entered email address. */
         async loginWithPasskey() {
             if (this.passkeyLoading || this.demo) return
 
@@ -285,23 +253,61 @@ export default {
                         options: window.route('passkey.login-options'),
                         submit: window.route('passkey.login'),
                     },
-                    remember: () => this.form.remember,
+                    remember: () => false,
                 })
                 if (response.redirect) window.location.assign(response.redirect)
-            } catch {
-                this.passkeyError =
-                    'Passkey-Anmeldung fehlgeschlagen. Bitte erneut versuchen oder Passwort verwenden.'
+            } catch (error) {
+                this.passkeyError = this.passkeyErrorMessage(error)
             } finally {
                 this.passkeyLoading = false
             }
         },
-        /** Keep Enter on the username step local; submit credentials on step two. */
-        submit(event) {
-            if (this.loggingIn) return
-            if (!this.demo && this.loginStep === 1) {
-                this.continueLogin()
-                return
+        /** Explain common browser and device failures without exposing server details. */
+        passkeyErrorMessage(error) {
+            switch (error?.name) {
+                case 'NotSupportedError':
+                    return 'Dieser Browser oder dieses Gerät unterstützt die Passkey-Anmeldung nicht.'
+                case 'InvalidDomainError':
+                    return 'Passkeys sind für diese Webadresse nicht verfügbar. Bitte öffne Pfarrplaner über die gewohnte Adresse.'
+                case 'UserCancelledError':
+                    return 'Der Browser oder Geräteschlüssel hat die Passkey-Anmeldung abgebrochen. Prüfe, ob auf diesem Gerät ein Passkey für Pfarrplaner verfügbar ist, oder melde dich per E-Mail-Link an.'
+                case 'ServerError':
+                    return error.status === 429
+                        ? 'Zu viele Passkey-Versuche. Bitte warte kurz oder melde dich per E-Mail-Link an.'
+                        : 'Die Passkey-Anmeldung konnte nicht abgeschlossen werden. Bitte versuche es erneut oder nutze den E-Mail-Link.'
+                default:
+                    return 'Die Passkey-Anmeldung konnte nicht abgeschlossen werden. Bitte versuche es erneut oder nutze den E-Mail-Link.'
             }
+        },
+        /** Request a passwordless sign-in link for the entered email address. */
+        async requestEmailLink() {
+            if (this.emailLinkLoading || this.demo) return
+            this.emailLinkLoading = true
+            this.emailLinkError = ''
+            try {
+                const response = await window.axios.get(window.route('csrf.keepalive'))
+                this.$inertia.post(
+                    window.route('login.link.request'),
+                    { email: this.form.email, _token: response.data.token },
+                    {
+                        onError: () => {
+                            this.emailLinkError =
+                                'Der Anmeldelink konnte nicht angefordert werden. Bitte prüfen Sie die E-Mailadresse.'
+                        },
+                        onFinish: () => {
+                            this.emailLinkLoading = false
+                        },
+                    },
+                )
+            } catch {
+                this.emailLinkError =
+                    'Die Anmeldung konnte gerade nicht vorbereitet werden. Bitte lade die Seite neu und versuche es erneut.'
+                this.emailLinkLoading = false
+            }
+        },
+        /** Submit the demo account selector form. */
+        submit(event) {
+            if (this.loggingIn || !this.demo) return
             this.loggingIn = true
             const form = event.currentTarget
             window.axios

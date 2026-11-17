@@ -89,7 +89,7 @@ class InterstitialFeatureTest extends TestCase
         $this->withoutMiddleware(ForceDomain::class);
         config()->set('interstitials.items.security-beyond-password', [
             'enabled' => true,
-            'audience' => 'password-only',
+            'audience' => 'no-extra-factor',
             'repeatable' => true,
             'dismissible' => false,
             'snooze_days' => 21,
@@ -114,7 +114,7 @@ class InterstitialFeatureTest extends TestCase
         $this->withoutMiddleware(ForceDomain::class);
         config()->set('interstitials.items.security-beyond-password', [
             'enabled' => true,
-            'audience' => 'password-only',
+            'audience' => 'no-extra-factor',
             'repeatable' => true,
             'dismissible' => false,
             'snooze_days' => 21,

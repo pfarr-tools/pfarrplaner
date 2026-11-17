@@ -8,24 +8,24 @@ Ein Benutzer, der sein Authenticator-Gerät und alle Recovery-Codes verloren hat
 
 - TOTP wird über die Profil-Sicherheitsseite ein- und ausgeschaltet.
 - Der bestehende Passwortreset ist Super-Admin-beschränkt, setzt ein temporäres Passwort und erzwingt dessen Änderung. Er entfernt den TOTP-Faktor nicht.
-- Login-E-Mail-Codes liegen in `two_factor_login_challenges` und sind zeitlich begrenzt sowie einmalig verwendbar.
+- Die frühere TOTP-E-Mail-Codefunktion verwendete `two_factor_login_challenges`; Issue #98 ersetzt sie als Login-Einstieg durch E-Mail-Links und entfernt sie als TOTP-Ersatz. Die Tabelle bleibt für vorhandene Datensätze erhalten.
 - TOTP-Änderungen und Login-Challenges sperren den jeweiligen Benutzer-Datensatz mit `lockForUpdate()`.
 - Die dokumentierte Beispielkonfiguration verwendet `SESSION_DRIVER=database`; Laravel unterstützt daneben weitere Treiber, bei denen aktive Sitzungen nicht über die `sessions`-Tabelle widerrufen werden können.
 
 ## Ansätze
 
-1. **Eigener Super-Admin-Wiederherstellungsvorgang (gewählt):** Faktor widerrufen, offene Login-Codes verbrauchen und ein dauerhaftes Audit-Ereignis erfassen. Das Passwort bleibt unverändert. Das entspricht der vom Auftraggeber gewählten Variante und funktioniert ohne E-Mail-Zustellung.
+1. **Eigener Super-Admin-Wiederherstellungsvorgang (gewählt):** Faktor widerrufen, alte offene TOTP-Challenges und ausstehende Login-Links verbrauchen und ein dauerhaftes Audit-Ereignis erfassen. Das Passwort bleibt unverändert. Das entspricht der vom Auftraggeber gewählten Variante und funktioniert ohne E-Mail-Zustellung.
 2. **Mit Passwortreset koppeln:** bestehende Passwortreset-Aktion setzt auch 2FA zurück. Das bindet die Recovery an den E-Mail-Versand, obwohl verlorener E-Mail-Zugang ein möglicher Grund für den Supportfall ist, und vermischt zwei getrennte Adminaktionen.
 3. **Nur manuelle Datenbank-/Supportanleitung:** keine UI und kein Anwendungs-Audit. Das ist weniger sicher und schlechter nachvollziehbar als eine autorisierte, protokollierte Aktion.
 
 ## Vorgeschlagener Ablauf
 
-1. Support prüft die Identität außerhalb der Anwendung anhand eines bereits bekannten, organisationskontrollierten Kontaktwegs. Eine eingehende E-Mail allein gilt nicht als ausreichender Nachweis, da der E-Mail-Code selbst ein Login-Faktor ist.
+1. Support prüft die Identität außerhalb der Anwendung anhand eines bereits bekannten, organisationskontrollierten Kontaktwegs. Eine eingehende E-Mail allein gilt nicht als ausreichender Nachweis, da der E-Mail-Anmeldelink selbst ein Login-Faktor ist.
 2. Ein Super-Admin öffnet den betroffenen Benutzer in der Administration, bestätigt die Wiederherstellung, gibt sein aktuelles Passwort erneut ein und trägt eine kurze Supportfall-Referenz ein. Das Feld soll keine personenbezogenen Details aufnehmen. Die Passwortprüfung erhält ein eigenes Rate-Limit.
 3. Die Anwendung verweigert die Aktion für normale Administratoren und für den angemeldeten Super-Admin selbst. Ein anderer Super-Admin darf auch ein Super-Admin-Konto wiederherstellen.
 4. In einer Transaktion wird der Benutzer gesperrt; aktiver oder ausstehender TOTP-Zustand wird entfernt, offene E-Mail-Challenges werden als verbraucht markiert und ein unveränderlicher Audit-Datensatz mit handelndem Super-Admin, Zielkonto, Referenz, Zeitpunkt und IP-Adresse geschrieben.
 5. Persönliche API-Tokens und aktive Datenbank-Sitzungen des Zielkontos werden widerrufen. Weil andere Session-Treiber nicht zuverlässig benutzerbezogen auflistbar sind, wird die UI-Aktion nur bei `SESSION_DRIVER=database` angeboten; die Betriebsanleitung muss den Treiber als Voraussetzung für diese Wiederherstellungsfunktion benennen.
-6. Passwort und bestehender Passwortwechselstatus bleiben erhalten. Nach dem nächsten Passwort-Login darf der Benutzer ausschließlich eine eigene Wiederherstellungsseite, die erforderlichen TOTP-Einrichtungs-/Bestätigungsaktionen und Logout verwenden. Alle normalen Web- und API-Zugriffe bleiben gesperrt, bis TOTP erfolgreich neu eingerichtet und bestätigt wurde. Es gibt keinen neuen E-Mail-Code- oder Passwortversand.
+6. Passwort und bestehender Passwortwechselstatus bleiben erhalten. Nach dem nächsten Login darf der Benutzer ausschließlich eine eigene Wiederherstellungsseite, die erforderlichen TOTP-Einrichtungs-/Bestätigungsaktionen und Logout verwenden. Alle normalen Web- und API-Zugriffe bleiben gesperrt, bis TOTP erfolgreich neu eingerichtet und bestätigt wurde. Es gibt keinen neuen E-Mail-Code- oder Passwortversand.
 7. Die Administration zeigt frühere Wiederherstellungen für dieses Konto mit Zeitpunkt, handelndem Super-Admin und Supportfall-Referenz an. Geheime Faktoren, Codes und Passwörter erscheinen weder in der Oberfläche noch im Audit.
 
 ## Umfang
@@ -53,7 +53,7 @@ Ein Benutzer, der sein Authenticator-Gerät und alle Recovery-Codes verloren hat
 - Identitätsprüfung, Berechtigung und Recovery sind getrennte Schritte; die Anwendung kann die externe Identitätsprüfung nicht selbst beweisen.
 - Die Session-Widerrufsgarantie gilt für den dokumentierten Datenbank-Session-Treiber. Abweichende Session-Treiber müssen vor der Recovery auf den Datenbanktreiber umgestellt werden.
 - Das Passwort bleibt gültig. Ein Super-Admin darf die Aktion daher nur nach dem dokumentierten Identitätsnachweis und frischer Passwort-Re-Authentifizierung ausführen.
-- Die Anwendung beschränkt das Zielkonto nach dem Reset serverseitig auf den Neueinschreibungsablauf; eine reine Passwortanmeldung gewährt keinen normalen Zugriff.
+- Die Anwendung beschränkt das Zielkonto nach dem Reset serverseitig auf den Neueinschreibungsablauf; eine Anmeldung über Passkey oder E-Mail-Link gewährt vor Abschluss der TOTP-Neueinrichtung keinen normalen Zugriff.
 
 ## Festlegungen aus dem Builder-Check
 

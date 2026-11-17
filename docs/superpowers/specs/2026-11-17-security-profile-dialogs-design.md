@@ -64,7 +64,7 @@ Der reguläre Login fragt nur noch die E-Mail-Adresse ab. Darunter stehen zwei g
 - Der E-Mail-Link ist ein kurzlebiger, einmalig verwendbarer Faktor für den normalen passwortlosen Login. Für Konten ohne TOTP meldet die Bestätigung des Links direkt an.
 - Für Konten mit aktiviertem TOTP führt die Linkbestätigung in die bestehende TOTP-Challenge. Dort werden nur Authenticator-Code und Recovery-Code angeboten. Der bisherige TOTP-Ersatz per E-Mail-Code wird entfernt.
 - Die Anforderung des Links verrät nicht, ob die E-Mail-Adresse ein Konto besitzt. Antworttext und Ablauf bleiben für bekannte und unbekannte Adressen gleich.
-- E-Mail-Links laufen nach 10 Minuten ab und werden nur als Hash gespeichert. Die E-Mail-Link-Ankunft per GET verbraucht den Token nicht: Ein Bestätigungsschritt per POST schützt vor Linkscannern; erst dieser POST verbraucht ihn atomar.
+- E-Mail-Links enthalten einen kryptografisch zufälligen 256-Bit-Nonce, laufen nach 10 Minuten ab und werden in der Datenbank nur als SHA-256-Hash gespeichert. Ein Queue-Mailjob erhält den Nonce verschlüsselt. Die E-Mail-Link-Ankunft per GET verbraucht den Token nicht: Ein Bestätigungsschritt per POST schützt vor Linkscannern; erst dieser POST verbraucht ihn unter Zeilensperre atomar und genau einmal.
 - Anfragen werden pro IP und normalisierter E-Mail-Adresse begrenzt. Fehler, Ablauf und Wiederverwendung führen zurück zum Login mit einer allgemeinen Meldung.
 - Der bestehende E-Mail-Codepfad auf der TOTP-Challenge und dessen aktive Mailvorlage werden entfernt. Die existierende Challenge-Tabelle und Bereinigung bereits vorhandener Datensätze bleiben erhalten, da Migrationen auf Installationen bereits ausgeführt worden sein können.
 
@@ -78,6 +78,6 @@ Der reguläre Login fragt nur noch die E-Mail-Adresse ab. Darunter stehen zwei g
 
 - Die Standard-Loginseite enthält kein Passwortfeld und keinen Passwort-zurücksetzen-Link; Reihenfolge, Breite, Beschriftung und Symbole der drei gewünschten UI-Elemente stimmen.
 - Bekannte und unbekannte E-Mail-Adressen erhalten dieselbe Antwort; nur bei einem passenden Konto wird ein kurzlebiger Link versendet.
-- Link-GET verbraucht nichts; ein gültiger Bestätigungs-POST verbraucht den gehashten Token einmalig und authentifiziert ein Konto ohne TOTP.
+- Link-GET verbraucht nichts; ein gültiger Bestätigungs-POST verbraucht den gehashten Nonce genau einmal und authentifiziert ein Konto ohne TOTP. Ein Replay wird abgewiesen.
 - Ein Link für ein TOTP-Konto führt zur TOTP-Challenge; nur sechsstelliger Authenticator-Code oder Recovery-Code kann diese abschließen. E-Mail-Codes funktionieren dort nicht mehr.
 - Abgelaufene und wiederverwendete Links authentifizieren nicht; Passkey-Login und Demo-Login bleiben funktionsfähig.

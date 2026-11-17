@@ -187,10 +187,10 @@ Nutzerführung:
   Einfügen/Autofill, Live-Status für Screenreader und regulärem Absende-Button
   verwendet. Die vollständige Eingabe wird als `code` an das Backend gesendet.
 - [ ] Die Erkennung mit Bitwarden wird in einem echten Browser geprüft.
-- [x] E-Mail-Codes und Recovery-Codes bleiben als ausdrücklich wählbare
-  Alternativen bedienbar: E-Mail-Codes verwenden acht Ziffern; Recovery-Codes
-  behalten ein unsegmentiertes Textfeld. Cache-Header verhindern die
-  Zwischenspeicherung der Challenge-Seite.
+- [x] Historischer Stand: E-Mail-Codes und Recovery-Codes waren ausdrücklich
+  wählbare Alternativen. Die spätere Entscheidung in Issue #98 entfernt
+  E-Mail-Codes als TOTP-Ersatz; Recovery-Codes bleiben die manuelle
+  Alternative. Cache-Header verhindern die Zwischenspeicherung der Challenge.
 - [x] Die bestehende TOTP-Sicherheitsbasis verifizieren und regressionssichern:
   der gesperrte Dienst zählt Versuche pro Konto atomar (fünf pro Minute),
   blockiert weitere Verifikationen temporär, schützt vor Replay und verwendet
@@ -430,15 +430,17 @@ Vereinbarte Reihenfolge und Erledigungskriterium:
    passwortlose Anmeldung möglich.
 2. TOTP als etablierte Alternative oder zusätzliche zweite Stufe für Konten,
    die Passkeys nicht verwenden können oder wollen.
-3. Ein starkes, einzigartiges Passwort bleibt als Rückfallweg erforderlich;
-   wo nur Passwortanmeldung eingerichtet ist, empfiehlt die Oberfläche zuerst
-   Passkey und danach TOTP.
+3. Ein starkes, einzigartiges Passwort bleibt wichtig, wenn Pfarrplaner es bei
+   einer sicherheitsrelevanten Änderung abfragt. Das Login bietet Passkey und
+   passwortlosen E-Mail-Link; der Link allein gilt nicht als zusätzlicher
+   Schutz durch Passkey oder TOTP.
 
 - Passkey ist die bevorzugte Empfehlung und ermöglicht passwortlose Anmeldung.
 - Ein eingerichteter Passkey **oder** TOTP genügt, damit der Hinweis nicht mehr
-  als Passwort-only-Konto gilt. TOTP bleibt eine gleichwertige Möglichkeit,
+  erscheint. TOTP bleibt eine gleichwertige Möglichkeit,
   den Hinweis zu erledigen, auch wenn Passkey zuerst empfohlen wird.
-- Nur Konten, die ausschließlich ein Passwort verwenden, erhalten den Hinweis.
+- Konten ohne Passkey und ohne bestätigtes TOTP erhalten den Hinweis, auch wenn
+  sie den passwortlosen E-Mail-Anmeldelink verwenden.
 - „Später“ blendet den Hinweis 21 Tage aus und der gespeicherte Ablauf gilt
   über Sitzungen und Geräte hinweg. Danach erscheint er erneut, solange weder
   Passkey noch TOTP eingerichtet ist.

@@ -20,37 +20,31 @@ Ihr Administrator legt Ihr Konto an und weist Ihnen die nötigen Rechte zu. Die 
 
 Wenn Sie die Adresse von Pfarrplaner in Ihrem Browser aufrufen, erscheint zunächst die Anmeldeseite.
 
-![Anmeldeseite](media/images/login.png)
-
 ### So melden Sie sich an:
 
-1. Geben Sie im Feld **E-Mailadresse** Ihre E-Mail-Adresse ein (dieselbe, mit der Ihr Konto angelegt wurde).
-2. Geben Sie im Feld **Passwort** Ihr Passwort ein.
-3. Klicken Sie auf die Schaltfläche **Anmelden**.
+1. Für die Anmeldung mit einem Passkey klicken Sie direkt auf **Mit Passkey anmelden**. Sie müssen dafür keine E-Mail-Adresse eingeben.
+2. Für die Anmeldung per E-Mail tragen Sie Ihre Konto-Adresse in das Feld unterhalb des Passkey-Buttons ein und klicken auf **Anmeldelink per E-Mail erhalten**.
+3. Öffnen Sie den Link aus der E-Mail und bestätigen Sie die Anmeldung auf der angezeigten Seite.
 
 Die Anmeldeseite enthält diese Elemente:
 
 - **E-Mailadresse**: Ihr Benutzername für Pfarrplaner.
-- **Passwort**: Ihr persönliches Passwort.
-- **Angemeldet bleiben**: Merkt sich die Anmeldung auf diesem Gerät länger.
-- **Anmelden**: Prüft Ihre Eingaben und öffnet Pfarrplaner.
+- **Mit Passkey anmelden**: Lässt Sie Ihre Identität mit einem Passkey bestätigen, zum Beispiel mit Geräte-PIN oder Fingerabdruck.
+- **Anmeldelink per E-Mail erhalten**: Sendet einen zehn Minuten gültigen Link an die eingegebene Adresse.
 - **Hinweis zur Unterstützung**: Unter dem Formular finden Sie einen kurzen Hinweis mit Links für eine einmalige oder regelmäßige freiwillige Unterstützung des Projekts.
 
-Geben Sie zuerst Ihre E-Mailadresse ein und wählen Sie **Weiter**. Auf der
-nächsten Seite geben Sie Ihr Passwort ein. Die Anwendung prüft das Konto erst
-nachdem Sie das Passwort gesendet haben. Nach erfolgreicher Anmeldung werden
-Sie zu der Startansicht weitergeleitet, die für Ihr Konto eingestellt ist.
-Häufig ist das die [Startseite](startseite.md), manchmal auch direkt der
-[Kalender](kalender.md) oder ein anderes Modul.
+Nach erfolgreicher Anmeldung werden Sie zu der Startansicht weitergeleitet,
+die für Ihr Konto eingestellt ist. Häufig ist das die
+[Startseite](startseite.md), manchmal auch direkt der [Kalender](kalender.md)
+oder ein anderes Modul.
 
 Wenn Sie die Zwei-Faktor-Authentifizierung eingerichtet haben, erscheint nach
-der erfolgreichen Passwortprüfung eine zusätzliche Codeabfrage. Geben Sie den
+der Bestätigung des Anmeldelinks eine zusätzliche Codeabfrage. Geben Sie den
 sechsstelligen Code Ihrer Authenticator-App in die einzelnen Ziffernfelder ein
 oder fügen Sie den vollständigen Code ein. Alternativ können Sie einen
-achtstelligen Anmeldecode per E-Mail anfordern oder einen Recovery-Code im
-Textfeld eingeben. Jeder Recovery-Code funktioniert nur einmal. Die
-Zwei-Faktor-Abfrage läuft nach fünf Minuten ab. Danach melden Sie sich erneut
-mit E-Mail-Adresse und Passwort an.
+Recovery-Code im Textfeld eingeben. Jeder Recovery-Code funktioniert nur
+einmal. Die Zwei-Faktor-Abfrage läuft nach fünf Minuten ab. Danach fordern Sie
+einen neuen Anmeldelink an.
 
 Wenn Ihre Administration eine wichtige Mitteilung hinterlegt hat, erscheint direkt nach der Anmeldung zusätzlich ein Hinweisfenster über der eigentlichen Seite. So können Änderungen angekündigt werden, die alle Benutzerinnen und Benutzer oder nur bestimmte Gruppen betreffen.
 
@@ -59,7 +53,7 @@ Das Hinweisfenster enthält diese Schaltflächen:
 - **Später**: Blendet den Hinweis für die aktuelle Anmeldung aus. Nach einer späteren neuen Anmeldung kann er erneut erscheinen.
 - **Nicht wieder anzeigen**: Versteckt diesen Hinweis dauerhaft für Ihr Benutzerkonto.
 
-> **Tipp:** Wenn Sie das Häkchen bei „Angemeldet bleiben" setzen, werden Sie nicht automatisch abgemeldet, wenn Sie den Browser schließen. Nutzen Sie diese Option nur auf Ihrem eigenen Gerät, nicht auf gemeinsam genutzten Computern.
+> **Tipp:** Schützen Sie Ihr Gerät mit einer Bildschirmsperre und melden Sie sich auf gemeinsam genutzten Computern nach der Nutzung ab.
 
 ---
 

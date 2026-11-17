@@ -12,13 +12,9 @@
                     <OneTimeCodeInput
                         v-if="codeMode !== 'recovery'"
                         v-model="code"
-                        :length="codeMode === 'email' ? 8 : 6"
-                        :label="
-                            codeMode === 'email'
-                                ? 'Achtstelliger E-Mail-Code'
-                                : 'Sechsstelliger App-Code'
-                        "
-                        :test-id-prefix="codeMode === 'email' ? 'email-code' : 'login-totp'"
+                        :length="6"
+                        label="Sechsstelliger App-Code"
+                        test-id-prefix="login-totp"
                     />
                     <label
                         v-else
@@ -72,15 +68,6 @@
                     </button>
                 </div>
                 <div class="mt-3 d-flex flex-wrap align-items-center gap-2">
-                    <form @submit.prevent="requestEmailCode">
-                        <button
-                            class="btn btn-outline-primary"
-                            type="submit"
-                            :disabled="processing"
-                        >
-                            Code per E-Mail anfordern
-                        </button>
-                    </form>
                     <button
                         class="btn btn-link px-0"
                         type="button"
@@ -89,13 +76,6 @@
                         Anmeldung abbrechen
                     </button>
                 </div>
-                <p
-                    v-if="$page.props.flash?.success"
-                    class="text-success mt-2"
-                    role="status"
-                >
-                    {{ $page.props.flash.success }}
-                </p>
             </div>
         </div>
     </section>
@@ -127,7 +107,7 @@ export default {
         this.$nextTick(() => this.focusCurrentInput())
     },
     methods: {
-        /** Submit an authenticator, recovery, or email code. */
+        /** Submit an authenticator or recovery code. */
         verify() {
             if (this.processing) return
             this.processing = true
@@ -154,24 +134,7 @@ export default {
                 this.codeMode === 'recovery' ? '#recovery-code' : '[data-code-index="0"]'
             this.$el.querySelector(selector)?.focus()
         },
-        /** Request an email fallback code for the pending login. */
-        requestEmailCode() {
-            this.codeMode = 'email'
-            this.code = ''
-            this.$nextTick(() => this.focusCurrentInput())
-            this.processing = true
-            this.$inertia.post(
-                window.route('login.challenge.email'),
-                {},
-                {
-                    preserveState: true,
-                    onFinish: () => {
-                        this.processing = false
-                    },
-                },
-            )
-        },
-        /** Clear the pending login and return to the password form. */
+        /** Clear the pending login and return to the sign-in methods. */
         cancel() {
             this.$inertia.post(window.route('login.challenge.cancel'))
         },

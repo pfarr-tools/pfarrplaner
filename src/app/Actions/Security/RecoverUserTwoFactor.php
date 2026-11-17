@@ -105,6 +105,11 @@ class RecoverUserTwoFactor
                 ->whereNull('consumed_at')
                 ->update(['consumed_at' => now(), 'updated_at' => now()]);
 
+            DB::table('passwordless_login_links')
+                ->where('user_id', $lockedTarget->getKey())
+                ->whereNull('consumed_at')
+                ->update(['consumed_at' => now(), 'updated_at' => now()]);
+
             DB::connection(config('database.default'))
                 ->table(config('session.table', 'sessions'))
                 ->where('user_id', $lockedTarget->getKey())

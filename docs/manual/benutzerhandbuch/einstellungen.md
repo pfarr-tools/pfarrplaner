@@ -56,14 +56,15 @@ Hier ändern Sie Ihr Passwort.
 
 Wählen Sie ein Passwort, das Sie nicht auch für andere Dienste verwenden. Wenn das Speichern nicht klappt, prüfen Sie, ob das neue Passwort in beiden Feldern gleich geschrieben ist und alle vier Zeichenanforderungen erfüllt.
 
-Wenn Sie Ihr Passwort vergessen haben, verwenden Sie **Passwort vergessen?**
-auf der Login-Seite. Die Bestätigung der Anfrage verrät nicht, ob ein Konto
-mit dieser E-Mailadresse besteht. Prüfen Sie Ihr Postfach und den Spam-Ordner;
-bei ausbleibender Nachricht wenden Sie sich an Ihre Administration.
+Wenn Sie Ihr Passwort vergessen haben, wenden Sie sich an Ihre Administration.
+Die Login-Seite bietet absichtlich kein Passwortfeld und keinen Link zum
+Zurücksetzen des Passworts an.
 
-Wenn Sie nur ein Passwort zur Anmeldung verwenden, erinnert Sie Pfarrplaner
-daran, Ihr Konto zusätzlich abzusichern. Ein zweiter Schutz erschwert den
-Zugriff, wenn jemand Ihr Passwort erfährt.
+Wenn Sie weder Passkey noch Authenticator-App eingerichtet haben, erinnert Sie
+Pfarrplaner daran, Ihr Konto zusätzlich abzusichern. Der Anmeldelink per
+E-Mail schützt Ihr Konto über Ihr Postfach. Ein Passkey oder eine
+Authenticator-App schützt zusätzlich, falls jemand Zugriff auf dieses Postfach
+erhält.
 
 Empfohlen wird zuerst ein **Passkey**. Das ist ein digitaler Schlüssel, den
 Ihr Smartphone, Computer oder Passwortmanager sicher aufbewahrt. Bei der
@@ -75,10 +76,12 @@ Anmeldeseiten.
 Als Alternative oder zusätzlichen Schutz können Sie eine
 **Authenticator-App mit Einmalcodes** verwenden. Bei der Einrichtung scannen
 Sie einen QR-Code mit der App. Diese zeigt alle 30 Sekunden einen neuen
-sechsstelligen Zahlencode, den Sie nach Ihrem Passwort eingeben. Die App kann
-die Codes auch ohne Internetverbindung erzeugen. Dieses Verfahren heißt
-technisch TOTP (zeitbasiertes Einmalpasswort): ein Code, der nur kurze Zeit
-gilt und danach automatisch wechselt. Beispiele sind
+sechsstelligen Zahlencode. Bei der Anmeldung über einen E-Mail-Link geben Sie
+danach einen dieser Codes ein. Bei der Anmeldung mit einem Passkey ist kein
+zusätzlicher App-Code nötig.
+Die App kann die Codes auch ohne Internetverbindung erzeugen. Dieses Verfahren
+heißt technisch TOTP (zeitbasiertes Einmalpasswort): ein Code, der nur kurze
+Zeit gilt und danach automatisch wechselt. Beispiele sind
 [Microsoft Authenticator](https://support.microsoft.com/de-de/authenticator/download-microsoft-authenticator)
 und [2FAS Auth](https://2fas.com/auth/), eine quelloffene App für Android und iPhone.
 
@@ -86,13 +89,13 @@ Während der Einrichtung zeigt Pfarrplaner Wiederherstellungscodes. Bewahren
 Sie sie getrennt von Ihrem Gerät an einem sicheren Ort auf. Damit können Sie
 sich anmelden, falls Sie Ihr Gerät verlieren. Ein Passkey oder eine
 Authenticator-App genügt, um den Hinweis zu beenden; Sie können auch beides
-einrichten. Ein starkes, nur hier verwendetes Passwort bleibt als
-Rückfallmöglichkeit wichtig.
+einrichten. Ein starkes, nur hier verwendetes Passwort bleibt wichtig, falls
+Pfarrplaner es bei einer sicherheitsrelevanten Änderung abfragt.
 
 Über **Sicherheitseinstellungen öffnen** gelangen Sie direkt zur Einrichtung.
 Der Hinweis wird dann für drei Wochen ausgeblendet, auch wenn Sie noch keinen
 Passkey oder zweiten Faktor eingerichtet haben. Danach erinnert Pfarrplaner Sie
-erneut, solange das Konto nur mit Passwort geschützt ist.
+erneut, solange weder ein Passkey noch TOTP eingerichtet ist.
 Mit **Später** wird der Hinweis drei Wochen ausgeblendet. Solange weder ein
 Passkey noch ein Einmalcode-Faktor eingerichtet ist, erscheint er danach
 erneut.
@@ -119,11 +122,12 @@ Recovery-Codes nicht gesichert haben, können Sie die noch nicht abgeschlossene
 Einrichtung neu starten. Dabei werden die vorherige URI und die vorherigen
 Recovery-Codes ungültig.
 
-Nach der Einrichtung geben Sie bei jeder Anmeldung zusätzlich zum Passwort
-einen aktuellen Code aus der Authenticator-App ein. Alternativ können Sie auf
-der Anmeldeseite einen achtstelligen Code per E-Mail anfordern. Recovery-Codes
-können dort ebenfalls eingegeben werden und sind jeweils nur einmal gültig.
-Eine Login-Challenge läuft nach fünf Minuten ab.
+Nach der Einrichtung geben Sie bei Anmeldung über einen E-Mail-Link zusätzlich
+einen aktuellen Code aus der Authenticator-App ein. Der E-Mail-Link ersetzt
+diesen zweiten Faktor nicht. Bei einer Passkey-Anmeldung müssen Sie keinen
+zusätzlichen App-Code eingeben.
+Alternativ können Sie einen Recovery-Code eingeben; jeder Code ist nur einmal
+gültig. Eine Login-Challenge läuft nach fünf Minuten ab.
 
 Zum Deaktivieren wählen Sie **Zwei-Faktor-Authentifizierung deaktivieren**.
 Ein Dialog fragt nach Ihrem aktuellen Passwort. Bei zu vielen fehlerhaften
@@ -151,10 +155,11 @@ Geräte-PIN, Biometrie oder eine andere lokale Geräteverifikation zu verwenden.
 Das Gerät muss Passkeys unterstützen.
 
 Sie können einen Passkey umbenennen oder widerrufen. Beim Widerruf wird das
-Gerät sofort für künftige Anmeldungen gesperrt. Auf der Login-Seite steht
-**Mit Passkey anmelden** unabhängig von der zuvor eingegebenen E-Mailadresse
-zur Verfügung. Dabei wird keine Kontoauswahl vorab angezeigt. Passwort und
-TOTP-/E-Mail-Challenge bleiben als Anmeldewege bestehen.
+Gerät sofort für künftige Anmeldungen gesperrt. Auf der Login-Seite geben Sie
+Ihre E-Mailadresse ein und wählen **Mit Passkey anmelden**. Alternativ können
+Sie einen Anmeldelink per E-Mail anfordern. Bei aktiviertem TOTP folgt nach
+dem E-Mail-Link die Abfrage des Authenticator-Codes; ein Recovery-Code ist die
+einmalige Alternative. Der Passkey kann die Anmeldung selbstständig abschließen.
 
 ---
 

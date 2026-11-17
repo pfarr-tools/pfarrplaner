@@ -2,7 +2,7 @@
 
 namespace App\Providers;
 
-use App\Mail\User\TwoFactorLoginCode;
+use App\Mail\User\LoginLink;
 use Illuminate\Support\Facades\Gate;
 use Laravel\Telescope\IncomingEntry;
 use Laravel\Telescope\Telescope;
@@ -23,7 +23,14 @@ class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
         $isLocal = $this->app->environment('local');
 
         Telescope::filter(function (IncomingEntry $entry) use ($isLocal) {
-            if ($entry->type === 'mail' && ($entry->content['mailable'] ?? null) === TwoFactorLoginCode::class) {
+            $requestPath = $entry->type === 'request'
+                ? parse_url((string) ($entry->content['uri'] ?? ''), PHP_URL_PATH)
+                : null;
+            if (is_string($requestPath) && preg_match('#^/login/link(?:/|$)#', $requestPath)) {
+                return false;
+            }
+
+            if ($entry->type === 'mail' && ($entry->content['mailable'] ?? null) === LoginLink::class) {
                 return false;
             }
 

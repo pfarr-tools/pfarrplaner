@@ -67,29 +67,43 @@ Der Login prüft nach korrektem Passwort den Faktor, bevor ein Guard oder ein
 Remember-Cookie gesetzt wird. Der Pending-Zustand liegt in der Session und
 läuft nach fünf Minuten ab; Passwortfehlversuche werden währenddessen nicht
 zurückgesetzt. TOTP- und Recovery-Code-Prüfung verwenden die Paket-API mit
-Replay-Schutz und Einmalverwendung. Alternativ erzeugt die Anwendung einen
-achtstelligen E-Mail-Code, speichert nur dessen Hash in
-`two_factor_login_challenges`, begrenzt Fehlversuche und verbraucht den Datensatz
-unter Zeilensperre atomar. Die Login-Routen sind CSRF-geschützte Web-Routen.
-Die Login-Oberfläche fragt den Benutzernamen zunächst ohne Serveranfrage ab und
-zeigt anschließend allen denselben Passwortschritt. Erst nach erfolgreicher
-Passwortprüfung wird die kontoabhängige TOTP-Challenge gezeigt. Die Challenge-
-Seite erhält `Cache-Control: no-store, no-cache, must-revalidate, private` und
-`Pragma: no-cache`. Sechsstellige TOTP-Codes werden über ein zugängliches
-Sechs-Felder-Eingabefeld erfasst; E-Mail-Codes und Recovery-Codes bleiben
-ausdrückliche Alternativen.
+Replay-Schutz und Einmalverwendung. Der passwortlose Login-Link wird mit
+`random_bytes` erzeugt; in `passwordless_login_links` liegt ausschließlich
+sein SHA-256-Hash. Links verfallen nach zehn Minuten, werden bei einer neuen
+Anforderung für dasselbe Konto ungültig und beim Bestätigen unter
+`lockForUpdate()` atomar einmalig verbraucht. Anforderungen sind pro Quell-IP
+und mit einem HMAC-Schlüssel pro normalisierter E-Mailadresse begrenzt.
+Bekannte und unbekannte Adressen erhalten dieselbe Rückmeldung. Die
+Kontoabfrage und das Erzeugen des Mailjobs laufen in terminierender
+Middleware erst nach dem Senden dieser Antwort, damit ihre Verarbeitungszeit
+die Antwortlaufzeit nicht unterscheidet. Der Login-Link-Request lädt zuvor
+einen frischen CSRF-Token und übermittelt ihn mit dem POST.
+
+Das Öffnen des tokenhaltigen Links verbraucht ihn nicht. Es legt nur den
+Datensatz in der Sitzung ab und leitet auf eine tokenfreie Bestätigungsseite
+weiter. Erst deren CSRF-geschützter POST verbraucht den Link. Dadurch können
+E-Mail-Linkscanner keine Anmeldung allein durch einen GET auslösen. Die Seite
+setzt `Cache-Control: no-store` und `Referrer-Policy: no-referrer`. Konten mit
+aktiviertem TOTP wechseln nach Linkbestätigung in die bestehende
+TOTP-Challenge; dort sind ausschließlich Authenticator- und Recovery-Codes
+zulässig. Es gibt keinen E-Mail-Code als TOTP-Ersatz mehr. Die Challenge-Seite
+erhält `Cache-Control: no-store, no-cache, must-revalidate, private` und
+`Pragma: no-cache`.
 Fehlversuche bei der Passwortanmeldung verwenden weiterhin das Limit aus
 Benutzername und Quell-IP. Eine kontoweite Passwortsperre wird nicht ergänzt,
 um gezieltes Sperren fremder Konten zu vermeiden. Der TOTP-Dienst sperrt
 Fehlversuche dagegen kontoweit nach fünf Prüfungen pro Minute.
-TOTP-/Recovery-Eingaben werden in Telescope maskiert; die zugehörige E-Mail mit
-dem Einmalcode wird dort nicht aufgezeichnet. Der DemoBuilder entfernt
-importierte Faktor- und Login-Challenge-Daten, damit anonymisierte Konten ihre
-Demo-Zugangsdaten weiterhin verwenden können.
+TOTP-/Recovery-Eingaben werden in Telescope maskiert; E-Mails mit
+Anmeldelinks werden dort nicht aufgezeichnet. Die historische Tabelle
+`two_factor_login_challenges` bleibt für bereits ausgeführte Migrationen und
+die Bereinigung vorhandener Datensätze erhalten, wird aber nicht mehr für neue
+Anmeldungen beschrieben. Der DemoBuilder entfernt importierte Faktor- und
+Login-Challenge-Daten, damit anonymisierte Konten ihre Demo-Zugangsdaten
+weiterhin verwenden können.
 
 #### Administrative Wiederherstellung verlorener Faktoren
 
-Die Recovery ist von Passwortreset und Login per E-Mail-Code getrennt. Der
+Die Recovery ist von Passwortreset und passwortlosem Login-Link getrennt. Der
 geschützte POST-Endpunkt `user.two-factor.recover` akzeptiert das aktuelle
 Passwort des handelnden Super-Admins und eine 1 bis 100 Zeichen lange
 Supportfall-Referenz aus ASCII-Buchstaben, Ziffern, Punkt, Unterstrich oder

@@ -75,6 +75,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(PasskeyLoginResponseContract::class, PasskeyLoginResponse::class);
         RateLimiter::for('passkey-login', static fn (Request $request): Limit => Limit::perMinute(6)->by('passkey-login|'.$request->ip())
         );
+        RateLimiter::for('login-link', static fn (Request $request): Limit => Limit::perMinute(10)->by('login-link|'.$request->ip())
+        );
 
         App::setLocale(config('app.locale'));
         Carbon::setLocale(config('app.locale'));

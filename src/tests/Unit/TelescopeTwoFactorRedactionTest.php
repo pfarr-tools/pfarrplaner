@@ -2,7 +2,7 @@
 
 namespace Tests\Unit;
 
-use App\Mail\User\TwoFactorLoginCode;
+use App\Mail\User\LoginLink;
 use App\Providers\TelescopeServiceProvider;
 use Illuminate\Http\JsonResponse;
 use Laravel\Telescope\IncomingEntry;
@@ -12,8 +12,8 @@ use Tests\TestCase;
 
 class TelescopeTwoFactorRedactionTest extends TestCase
 {
-    /** Telescope must not retain rendered one-time login messages. */
-    public function test_two_factor_login_mails_are_excluded_from_telescope(): void
+    /** Telescope must not retain rendered one-time login links. */
+    public function test_passwordless_login_mails_are_excluded_from_telescope(): void
     {
         $originalFilters = Telescope::$filterUsing;
         $originalParameters = Telescope::$hiddenRequestParameters;
@@ -23,9 +23,13 @@ class TelescopeTwoFactorRedactionTest extends TestCase
             Telescope::$filterUsing = [];
             (new TelescopeServiceProvider($this->app))->register();
             $filter = Telescope::$filterUsing[array_key_last(Telescope::$filterUsing)];
-            $entry = IncomingEntry::make(['mailable' => TwoFactorLoginCode::class])->type('mail');
+            $entry = IncomingEntry::make(['mailable' => LoginLink::class])->type('mail');
 
             self::assertFalse($filter($entry));
+            $tokenRequest = IncomingEntry::make(['uri' => '/login/link/'.str_repeat('a', 64)])->type('request');
+            self::assertFalse($filter($tokenRequest));
+            $confirmationRequest = IncomingEntry::make(['uri' => '/login/link/confirm'])->type('request');
+            self::assertFalse($filter($confirmationRequest));
             self::assertContains('code', Telescope::$hiddenRequestParameters);
             self::assertContains('password', Telescope::$hiddenRequestParameters);
             self::assertContains('_old_input.code', Telescope::$hiddenRequestParameters);

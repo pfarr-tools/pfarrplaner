@@ -14,7 +14,6 @@
 namespace Tests\Feature;
 
 use App\Mail\User\AccountData;
-use App\Mail\User\TwoFactorLoginCode;
 use App\Models\People\TwoFactorRecoveryAudit;
 use App\Models\People\User;
 use App\Services\PasswordService;
@@ -23,7 +22,6 @@ use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\RateLimiter;
@@ -265,12 +263,10 @@ class UserWebFeatureTest extends TestCase
         $this->assertGuest();
     }
 
-    /** Email login codes are hashed at rest, expire, and are consumed once. */
-    public function test_two_factor_login_completes_with_a_single_use_email_code(): void
+    /** TOTP challenges offer no email-code route or substitute. */
+    public function test_two_factor_login_does_not_offer_email_code_verification(): void
     {
-        Mail::fake();
         $user = User::factory()->create(['password' => 'Correct1!']);
-        RateLimiter::clear('two-factor-email-login:'.$user->getKey());
         $setup = $user->startTwoFactorEnrolment();
         $user->confirmTwoFactor(app(TwoFactorService::class)->currentCode($setup->secret));
 
@@ -278,74 +274,13 @@ class UserWebFeatureTest extends TestCase
             'email' => $user->email,
             'password' => 'Correct1!',
         ])->assertRedirect(route('login.challenge'));
-        $this->from(route('login.challenge'))
-            ->post(route('login.challenge.email'))
-            ->assertRedirect(route('login.challenge'));
+        self::assertFalse(Route::has('login.challenge.email'));
         $this->get(route('login.challenge'))
-            ->assertInertia(fn (Assert $page) => $page
-                ->component('Auth/LoginChallenge')
-                ->where('flash.success', 'Ein Anmeldecode wurde per E-Mail versendet.')
-            );
-        $this->from(route('login.challenge'))
-            ->post(route('login.challenge.email'))
-            ->assertRedirect(route('login.challenge'));
-        $this->from(route('login.challenge'))
-            ->post(route('login.challenge.email'))
-            ->assertRedirect(route('login.challenge'))
-            ->assertSessionHasErrors('code');
-
-        $sentCode = null;
-        Mail::assertSent(TwoFactorLoginCode::class, function (TwoFactorLoginCode $mail) use (&$sentCode): bool {
-            $sentCode = $mail->code;
-
-            return true;
-        });
-        Mail::assertSent(TwoFactorLoginCode::class, 2);
-
-        $challenge = DB::table('two_factor_login_challenges')
-            ->where('user_id', $user->id)
-            ->whereNull('consumed_at')
-            ->latest('id')
-            ->first();
-        self::assertNotNull($sentCode);
-        self::assertNotSame($sentCode, $challenge->code_hash);
-        self::assertTrue(Hash::check($sentCode, $challenge->code_hash));
+            ->assertInertia(fn (Assert $page) => $page->component('Auth/LoginChallenge'));
+        $this->post('/login/challenge/email')->assertNotFound();
 
         $this->from(route('login.challenge'))
-            ->post(route('login.challenge.verify'), ['code' => $sentCode])
-            ->assertRedirect('/');
-        $this->assertAuthenticatedAs($user);
-        self::assertNotNull(DB::table('two_factor_login_challenges')->where('id', $challenge->id)->value('consumed_at'));
-    }
-
-    /** An expired email code cannot complete a pending login. */
-    public function test_two_factor_login_rejects_an_expired_email_code(): void
-    {
-        Mail::fake();
-        $user = User::factory()->create(['password' => 'Correct1!']);
-        RateLimiter::clear('two-factor-email-login:'.$user->getKey());
-        $setup = $user->startTwoFactorEnrolment();
-        $user->confirmTwoFactor(app(TwoFactorService::class)->currentCode($setup->secret));
-
-        $this->post(route('login'), [
-            'email' => $user->email,
-            'password' => 'Correct1!',
-        ])->assertRedirect(route('login.challenge'));
-        $this->from(route('login.challenge'))
-            ->post(route('login.challenge.email'))
-            ->assertRedirect(route('login.challenge'));
-
-        $code = null;
-        Mail::assertSent(TwoFactorLoginCode::class, function (TwoFactorLoginCode $mail) use (&$code): bool {
-            $code = $mail->code;
-
-            return true;
-        });
-        DB::table('two_factor_login_challenges')
-            ->where('user_id', $user->getKey())
-            ->update(['expires_at' => now()->subSecond()]);
-        $this->from(route('login.challenge'))
-            ->post(route('login.challenge.verify'), ['code' => $code])
+            ->post(route('login.challenge.verify'), ['code' => '12345678'])
             ->assertRedirect(route('login.challenge'))
             ->assertSessionHasErrors('code');
         $this->assertGuest();

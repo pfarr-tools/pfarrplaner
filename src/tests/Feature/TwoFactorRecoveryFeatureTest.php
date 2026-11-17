@@ -291,8 +291,8 @@ final class TwoFactorRecoveryFeatureTest extends TestCase
         self::assertNull($target->fresh()->two_factor_recovery_required_at);
     }
 
-    /** Pending email challenges are consumed and the audit stores no secrets. */
-    public function test_recovery_consumes_pending_email_codes_and_writes_secret_free_audit(): void
+    /** Pending login challenges and links are consumed and the audit stores no secrets. */
+    public function test_recovery_consumes_pending_login_tokens_and_writes_secret_free_audit(): void
     {
         [$admin, $target] = $this->createRecoveryPair();
         $target->startTwoFactorEnrolment();
@@ -305,12 +305,21 @@ final class TwoFactorRecoveryFeatureTest extends TestCase
             'created_at' => now(),
             'updated_at' => now(),
         ]);
+        DB::table('passwordless_login_links')->insert([
+            'user_id' => $target->getKey(),
+            'token_hash' => hash('sha256', 'single-use-login-token'),
+            'expires_at' => now()->addMinutes(10),
+            'consumed_at' => null,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
         config(['session.driver' => 'database']);
 
         $this->actingAs($admin)->post(route('user.two-factor.recover', $target), $this->validRecoveryPayload())
             ->assertRedirect();
 
         self::assertNotNull(DB::table('two_factor_login_challenges')->where('user_id', $target->getKey())->value('consumed_at'));
+        self::assertNotNull(DB::table('passwordless_login_links')->where('user_id', $target->getKey())->value('consumed_at'));
         $audit = TwoFactorRecoveryAudit::query()->sole();
         self::assertArrayNotHasKey('current_password', $audit->getAttributes());
         self::assertArrayNotHasKey('secret', $audit->getAttributes());

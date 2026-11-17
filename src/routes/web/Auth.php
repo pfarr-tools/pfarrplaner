@@ -29,10 +29,12 @@
  */
 
 use App\Http\Controllers\Auth\ConfirmPasswordController;
+use App\Http\Controllers\Auth\EmailLoginLinkController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\PasskeyLoginController;
 use App\Http\Controllers\Auth\PasskeyManagementController;
 use App\Http\Controllers\UserController;
+use App\Http\Middleware\ProcessPasswordlessLoginLinkAfterResponse;
 use App\Http\Middleware\RequireFreshPasskeyChallenge;
 use Illuminate\Support\Facades\Auth;
 
@@ -49,6 +51,19 @@ Route::get('/passkeys/login/options', [PasskeyLoginController::class, 'options']
 Route::post('/passkeys/login', [PasskeyLoginController::class, 'verify'])
     ->middleware(['guest', RequireFreshPasskeyChallenge::class.':login', 'throttle:passkey-login'])
     ->name('passkey.login');
+Route::post('/login/link', [EmailLoginLinkController::class, 'request'])
+    ->middleware(['guest', 'throttle:login-link', ProcessPasswordlessLoginLinkAfterResponse::class])
+    ->name('login.link.request');
+Route::get('/login/link/{token}', [EmailLoginLinkController::class, 'open'])
+    ->middleware('guest')
+    ->where('token', '[A-Fa-f0-9]{64}')
+    ->name('login.link.open');
+Route::get('/login/link/confirm', [EmailLoginLinkController::class, 'showConfirmation'])
+    ->middleware('guest')
+    ->name('login.link.confirm-form');
+Route::post('/login/link/confirm', [EmailLoginLinkController::class, 'confirm'])
+    ->middleware(['guest', 'throttle:6,1'])
+    ->name('login.link.confirm');
 Route::middleware(['auth', 'password.confirm'])
     ->prefix('/user/passkeys')
     ->name('user.passkeys.')
@@ -71,6 +86,5 @@ Route::middleware(['auth', 'password.confirm'])
     });
 Route::get('/login/challenge', [LoginController::class, 'showChallenge'])->name('login.challenge');
 Route::post('/login/challenge', [LoginController::class, 'verifyChallenge'])->name('login.challenge.verify');
-Route::post('/login/challenge/email', [LoginController::class, 'sendEmailChallenge'])->name('login.challenge.email');
 Route::post('/login/challenge/cancel', [LoginController::class, 'cancelChallenge'])->name('login.challenge.cancel');
 Route::match(['GET', 'POST'], '/logout', [UserController::class, 'logout'])->name('logout');

@@ -82,13 +82,13 @@ immer zusammen mit dem vorherigen Anwendungsimage und einem verifizierten
 Backup geplant werden; die TOTP-Migration besitzt keinen automatischen
 Spalten-Rollback.
 
-Für aktive TOTP-Konten kann die betroffene Person bei der Anmeldung alternativ
-einen Einmalcode per E-Mail anfordern. Die Codes sind fünf Minuten gültig,
-werden nur gehasht gespeichert und nach erfolgreicher Nutzung entwertet. Der
-Mailversand benötigt die reguläre Mailkonfiguration der Instanz. Bei Verlust
-des Postfachs und aller Recovery-Codes ist weiterhin eine administrative
-Identitätsprüfung erforderlich; Support darf keine Codes oder TOTP-Schlüssel
-per Chat oder E-Mail erfragen.
+Für Konten mit aktiviertem TOTP führt ein E-Mail-Anmeldelink nach seiner
+Bestätigung zur TOTP-Challenge. Dort sind ausschließlich der aktuelle Code aus
+der Authenticator-App und ein einmaliger Recovery-Code zulässig. Der
+E-Mail-Anmeldelink ersetzt den zweiten Faktor nicht. Bei Verlust des Postfachs
+und aller Recovery-Codes ist eine administrative Identitätsprüfung
+erforderlich; Support darf keine Codes oder TOTP-Schlüssel per Chat oder
+E-Mail erfragen.
 
 ### Passkey-Betrieb
 
@@ -149,11 +149,12 @@ ausführen. Die Anwendung prüft das aktuelle Passwort unmittelbar vor der
 fehlende Berechtigungen und nicht unterstützte Session-Konfigurationen
 verhindern die Wiederherstellung.
 
-Bei Erfolg werden der aktive oder noch nicht bestätigte TOTP-Faktor, offene
-E-Mail-Anmeldecodes, persönliche API-Tokens, den bisherigen API-/Kalendertoken,
+Bei Erfolg werden der aktive oder noch nicht bestätigte TOTP-Faktor, alte
+offene TOTP-E-Mail-Challenges und ausstehende passwortlose Anmeldelinks,
+persönliche API-Tokens, den bisherigen API-/Kalendertoken,
 Remember-me-Zugang und alle Datenbank-Sitzungen des Zielkontos widerrufen. Das
 Passwort und ein eventuell ausstehender Passwortwechsel bleiben bestehen. Nach
-der nächsten Passwortanmeldung darf das Konto nur die TOTP-Wiederherstellung,
+der nächsten Anmeldung darf das Konto nur die TOTP-Wiederherstellung,
 notwendige Passwortänderung und Logout verwenden. Erst nach erfolgreicher
 TOTP-Bestätigung wird der normale Zugriff freigegeben. Fehlgeschlagene oder
 abgebrochene TOTP-Bestätigungen lassen die Sperre bestehen. Die Person muss die

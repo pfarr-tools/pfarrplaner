@@ -482,13 +482,16 @@ die vollständige Reihenfolge steht im Abschnitt [Fehlerbehebung und
 Rollback](#fehlerbehebung-und-rollback). Ein manuelles `DROP COLUMN` ist kein
 zulässiger Rollback.
 
-Die Migration `create_two_factor_login_challenges_table` ergänzt außerdem die
-Tabelle für gehashte und befristete E-Mail-Anmeldecodes. Sie ist reversibel;
-beim Rollback werden ausschließlich Login-Challenge-Datensätze entfernt, nicht
-Benutzerkonten oder TOTP-Material. Nach Updates wird sie wie jede Laravel-
-Migration über `./planer update` ausgeführt. E-Mail-Codes benötigen den
-konfigurierten Mailversand; bei einer nicht verfügbaren Zustellung wird der
-unbestätigte Challenge-Datensatz wieder gelöscht.
+Die Migration `create_two_factor_login_challenges_table` ergänzt eine
+historisch für gehashte und befristete TOTP-E-Mail-Codes verwendete Tabelle.
+Der aktive TOTP-E-Mail-Codepfad wurde entfernt. Die Tabelle bleibt für bereits
+ausgeführte Migrationen und die Bereinigung alter Datensätze bestehen; neue
+Anmeldungen schreiben nicht mehr hinein. Beim Rollback werden ausschließlich
+Login-Challenge-Datensätze entfernt, nicht Benutzerkonten oder TOTP-Material.
+Die Migration `create_passwordless_login_links_table` speichert stattdessen
+gehashte Einmal-Tokens für den passwortlosen E-Mail-Anmeldelink. Beide
+Migrationen werden nach Updates wie jede Laravel-Migration über
+`./planer update` ausgeführt.
 
 ### Migration der administrativen 2FA-Wiederherstellung
 

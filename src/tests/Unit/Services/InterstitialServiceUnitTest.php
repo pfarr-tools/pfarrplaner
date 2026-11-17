@@ -129,13 +129,13 @@ class InterstitialServiceUnitTest extends TestCase
         $this->assertSame('admin-change', $result[0]['key']);
     }
 
-    /** Password-only reminders disappear when a user has TOTP or a passkey. */
-    public function test_password_only_audience_excludes_accounts_with_an_additional_factor(): void
+    /** Security reminders disappear when a user has TOTP or a passkey. */
+    public function test_no_extra_factor_audience_excludes_accounts_with_an_additional_factor(): void
     {
         config()->set('interstitials.items', [
             'security-beyond-password' => [
                 'enabled' => true,
-                'audience' => 'password-only',
+                'audience' => 'no-extra-factor',
                 'title' => 'Sicherheit erhöhen',
             ],
         ]);
@@ -163,7 +163,7 @@ class InterstitialServiceUnitTest extends TestCase
         config()->set('interstitials.items', [
             'security-beyond-password' => [
                 'enabled' => true,
-                'audience' => 'password-only',
+                'audience' => 'no-extra-factor',
                 'title' => 'Sicherheit erhöhen',
             ],
         ]);
@@ -200,13 +200,13 @@ class InterstitialServiceUnitTest extends TestCase
         $this->assertCount(1, $this->service->forUser($user));
     }
 
-    /** A password-only account stays snoozed after visiting security settings. */
+    /** An account without an extra factor stays snoozed after visiting security settings. */
     public function test_password_only_reminder_stays_hidden_after_opening_security_settings(): void
     {
         config()->set('interstitials.items', [
             'security-beyond-password' => [
                 'enabled' => true,
-                'audience' => 'password-only',
+                'audience' => 'no-extra-factor',
                 'repeatable' => true,
                 'dismissible' => false,
                 'snooze_days' => 21,

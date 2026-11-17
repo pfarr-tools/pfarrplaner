@@ -31,7 +31,6 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Mail\User\TwoFactorLoginCode;
 use App\Models\People\User;
 use Illuminate\Auth\Events\Attempting;
 use Illuminate\Auth\Events\Failed;
@@ -40,8 +39,6 @@ use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Timebox;
 use Inertia\Inertia;
@@ -204,7 +201,7 @@ class LoginController extends Controller
         return $response;
     }
 
-    /** Verify a TOTP, recovery code, or one-time email challenge. */
+    /** Verify an authenticator or recovery code for a pending login. */
     public function verifyChallenge(Request $request)
     {
         $challenge = $this->activeChallenge($request);
@@ -224,16 +221,10 @@ class LoginController extends Controller
                 return ['state' => 'limited', 'key' => $key, 'user' => $user];
             }
 
-            $emailChallengeId = $challenge['email_challenge_id'] ?? null;
-            $verified = $emailChallengeId !== null
-                && $this->consumeEmailCode((int) $emailChallengeId, $user->getKey(), $validated['code']);
-
-            if (! $verified) {
-                try {
-                    $verified = $user->attemptTwoFactorCode($validated['code'])->verified;
-                } catch (TwoFactorRateLimitedException) {
-                    return ['state' => 'limited', 'key' => $key, 'user' => $user];
-                }
+            try {
+                $verified = $user->attemptTwoFactorCode($validated['code'])->verified;
+            } catch (TwoFactorRateLimitedException) {
+                return ['state' => 'limited', 'key' => $key, 'user' => $user];
             }
 
             return ['state' => $verified ? 'verified' : 'invalid', 'key' => $key, 'user' => $user];
@@ -269,61 +260,6 @@ class LoginController extends Controller
         return $this->sendLoginResponse($request);
     }
 
-    /** Send a time-limited, single-use email code to a pending login. */
-    public function sendEmailChallenge(Request $request)
-    {
-        $challenge = $this->activeChallenge($request);
-        if (! $challenge) {
-            return redirect()->route('login');
-        }
-
-        $user = User::find($challenge['user_id']);
-        if (! $user || ! $user->hasTwoFactorEnabled()) {
-            $request->session()->forget('login.challenge');
-
-            return redirect()->route('login');
-        }
-
-        $key = 'two-factor-email-login:'.$user->getKey();
-        $code = str_pad((string) random_int(0, 99_999_999), 8, '0', STR_PAD_LEFT);
-        $challengeId = DB::transaction(function () use ($user, $code, $key): ?int {
-            $lockedUser = User::query()->lockForUpdate()->findOrFail($user->getKey());
-            if (! $lockedUser->hasTwoFactorEnabled() || RateLimiter::tooManyAttempts($key, 2)) {
-                return null;
-            }
-            RateLimiter::hit($key, 300);
-
-            DB::table('two_factor_login_challenges')
-                ->where('user_id', $lockedUser->getKey())
-                ->whereNull('consumed_at')
-                ->update(['consumed_at' => now(), 'updated_at' => now()]);
-
-            return (int) DB::table('two_factor_login_challenges')->insertGetId([
-                'user_id' => $lockedUser->getKey(),
-                'code_hash' => Hash::make($code),
-                'expires_at' => now()->addMinutes(5),
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
-        });
-
-        if ($challengeId === null) {
-            return back()->withErrors(['code' => 'Ein Code wurde bereits angefordert. Bitte später erneut versuchen.']);
-        }
-
-        try {
-            Mail::to($user->email)->send(new TwoFactorLoginCode($code));
-        } catch (\Throwable) {
-            DB::table('two_factor_login_challenges')->where('id', $challengeId)->delete();
-
-            return back()->withErrors(['code' => 'Der Code konnte nicht gesendet werden. Bitte erneut versuchen.']);
-        }
-
-        $request->session()->put('login.challenge.email_challenge_id', $challengeId);
-
-        return back()->with('success', 'Ein Anmeldecode wurde per E-Mail versendet.');
-    }
-
     /** Cancel a pending challenge and return to the regular login form. */
     public function cancelChallenge(Request $request)
     {
@@ -343,35 +279,5 @@ class LoginController extends Controller
         }
 
         return $challenge;
-    }
-
-    /** Atomically consume a matching one-time email challenge. */
-    private function consumeEmailCode(int $challengeId, int|string $userId, string $code): bool
-    {
-        return DB::transaction(function () use ($challengeId, $userId, $code): bool {
-            $emailChallenge = DB::table('two_factor_login_challenges')
-                ->where('id', $challengeId)
-                ->where('user_id', $userId)
-                ->lockForUpdate()
-                ->first();
-
-            if (! $emailChallenge || $emailChallenge->consumed_at || now()->greaterThan($emailChallenge->expires_at) || $emailChallenge->attempts >= 5) {
-                return false;
-            }
-
-            if (! Hash::check($code, $emailChallenge->code_hash)) {
-                DB::table('two_factor_login_challenges')
-                    ->where('id', $challengeId)
-                    ->increment('attempts');
-
-                return false;
-            }
-
-            DB::table('two_factor_login_challenges')
-                ->where('id', $challengeId)
-                ->update(['consumed_at' => now(), 'updated_at' => now()]);
-
-            return true;
-        });
     }
 }

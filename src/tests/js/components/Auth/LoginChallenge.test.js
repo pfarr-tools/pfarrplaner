@@ -1,6 +1,6 @@
 import { mount } from '@vue/test-utils'
 import { nextTick } from 'vue'
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import LoginChallenge from '@/Pages/Auth/LoginChallenge.vue'
 
 describe('LoginChallenge', () => {
@@ -56,35 +56,6 @@ describe('LoginChallenge', () => {
         expect(wrapper.vm.$inertia.post).toHaveBeenCalledOnce()
     })
 
-    it('focuses the first email-code field when switching to email verification', async () => {
-        const wrapper = mount(LoginChallenge, { attachTo: document.body })
-        await wrapper.findAll('form')[1].trigger('submit')
-        await nextTick()
-
-        expect(document.activeElement).toBe(
-            wrapper.find('[data-testid="email-code-digit-0"]').element,
-        )
-        wrapper.unmount()
-    })
-
-    it('shows a confirmation after requesting an email code', async () => {
-        const wrapper = mount(LoginChallenge, {
-            global: {
-                mocks: {
-                    $page: {
-                        props: {
-                            errors: {},
-                            flash: { success: 'Ein Anmeldecode wurde per E-Mail versendet.' },
-                        },
-                    },
-                },
-            },
-        })
-        await nextTick()
-
-        expect(wrapper.text()).toContain('Ein Anmeldecode wurde per E-Mail versendet.')
-    })
-
     it('submits the entered one-time code to the verification route', async () => {
         const wrapper = mount(LoginChallenge)
         await wrapper.find('[data-testid="login-totp-digit-0"]').setValue('123456')
@@ -108,19 +79,14 @@ describe('LoginChallenge', () => {
         expect(wrapper.find('[data-testid="login-totp-digit-0"]').exists()).toBe(false)
     })
 
-    it('places email-code and cancel actions side by side', () => {
+    it('offers cancellation without an email-code fallback', () => {
         const wrapper = mount(LoginChallenge)
-        const emailButton = wrapper
-            .findAll('button')
-            .find((button) => button.text().includes('Code per E-Mail'))
         const cancelButton = wrapper
             .findAll('button')
             .find((button) => button.text().includes('Anmeldung abbrechen'))
 
-        expect(emailButton.element.parentElement.parentElement).toBe(
-            cancelButton.element.parentElement,
-        )
-        expect(cancelButton.element.parentElement.classList.contains('d-flex')).toBe(true)
+        expect(wrapper.text()).not.toContain('E-Mail')
+        expect(cancelButton.exists()).toBe(true)
     })
 
     it('distributes a pasted six-digit code across the TOTP fields', async () => {
@@ -135,33 +101,5 @@ describe('LoginChallenge', () => {
                 .findAll('[data-testid^="login-totp-digit-"]')
                 .map((input) => input.element.value),
         ).toEqual(['1', '2', '3', '4', '5', '6'])
-    })
-
-    it('requests email codes using eight numeric fields', async () => {
-        const wrapper = mount(LoginChallenge)
-        await wrapper.findAll('form')[1].trigger('submit')
-
-        expect(wrapper.vm.codeMode).toBe('email')
-        expect(wrapper.findAll('[data-testid^="email-code-digit-"]')).toHaveLength(8)
-    })
-
-    it('can request an email code and cancel the pending login', async () => {
-        const wrapper = mount(LoginChallenge)
-        const forms = wrapper.findAll('form')
-
-        await forms[1].trigger('submit')
-        await wrapper
-            .findAll('button')
-            .find((button) => button.text().includes('Anmeldung abbrechen'))
-            .trigger('click')
-
-        expect(wrapper.vm.$inertia.post).toHaveBeenNthCalledWith(
-            1,
-            '/login.challenge.email',
-            {},
-            expect.any(Object),
-        )
-        expect(wrapper.vm.$inertia.post).toHaveBeenNthCalledWith(2, '/login.challenge.cancel')
-        expect(vi.mocked(window.route)).toHaveBeenCalled()
     })
 })
