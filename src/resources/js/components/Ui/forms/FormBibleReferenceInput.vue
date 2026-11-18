@@ -228,7 +228,7 @@ export default {
             myValue += ' [' + (this.version || this.$page.props.bible.versions[0] || '') + ']'
         let parts = myValue.split('[')
         let myVersion = parts[1].replace(']', '').trim()
-        let myReference = parts[0].trim()
+        let myReference = parts[0]
 
         return {
             myId: this.id || uid(),
@@ -258,7 +258,7 @@ export default {
             }
             let parts = newVal.split('[')
             this.myVersion = parts[1].replace(']', '').trim()
-            this.myReference = parts[0].trim()
+            this.myReference = parts[0]
         },
     },
     methods: {
