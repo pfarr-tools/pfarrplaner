@@ -74,7 +74,7 @@
                             <small
                                 id="demoUsersHelp"
                                 class="form-text text-muted"
-                                >Wählen Sie den gewünschten Demo-Benutzer aus.</small
+                                >Wähle den gewünschten Demo-Benutzer aus.</small
                             >
                         </form-group>
                         <div

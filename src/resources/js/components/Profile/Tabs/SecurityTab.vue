@@ -28,114 +28,113 @@
 
 <template>
     <div class="security-tab">
-        <h3>Zwei-Faktor-Authentifizierung</h3>
-        <p v-if="factorEnabled">Die Zwei-Faktor-Authentifizierung ist aktiviert.</p>
-        <p v-else-if="factorPending">
-            Die Einrichtung wurde begonnen. Bestätigen Sie sie mit einem Code aus Ihrer
-            Authenticator-App.
-        </p>
-        <p v-else>Schützen Sie Ihr Konto zusätzlich mit einer Authenticator-App.</p>
-
-        <button
-            v-if="!factorEnabled"
-            type="button"
-            class="btn btn-secondary"
-            :disabled="twoFactor.busy"
-            ref="setupTrigger"
-            data-testid="open-two-factor-setup"
-            @click="openSetup"
-        >
-            {{
-                factorPending
-                    ? 'Einrichtung neu starten'
-                    : 'Zwei-Faktor-Authentifizierung einrichten'
-            }}
-        </button>
-        <button
-            v-if="factorEnabled"
-            type="button"
-            class="btn btn-outline-danger"
-            :disabled="twoFactor.busy"
-            data-testid="disable-two-factor"
-            @click="disableTwoFactor"
-        >
-            Zwei-Faktor-Authentifizierung deaktivieren
-        </button>
-
-        <hr />
         <section
             class="passkey-management"
             data-testid="passkey-management"
         >
-            <h3>Passkeys</h3>
-            <p>Mit Passkeys melden Sie sich sicher mit der Geräte-PIN oder Biometrie an.</p>
-            <label for="passkey-name">Name für dieses Gerät</label>
-            <input
-                id="passkey-name"
-                v-model="newPasskeyName"
-                class="form-control mb-2"
-                maxlength="255"
-                autocomplete="off"
-                data-testid="passkey-name"
-            />
+            <h3 class="d-flex align-items-center gap-3">
+                <span class="security-option-icon">
+                    <i
+                        class="fa fa-fingerprint fa-3x text-primary"
+                        aria-hidden="true"
+                    />
+                    <i
+                        v-if="managedPasskeys.length"
+                        class="fa fa-check-circle security-option-check"
+                        aria-hidden="true"
+                    />
+                    <span
+                        v-if="managedPasskeys.length"
+                        class="visually-hidden"
+                        >Mindestens ein Passkey ist eingerichtet.</span
+                    >
+                </span>
+                <span>Passkeys</span>
+            </h3>
+            <p>
+                Ein Passkey ist die einfachste und sicherste Anmeldung. Er nutzt die Displaysperre
+                deines Geräts, zum Beispiel Fingerabdruck, Gesichtserkennung oder Geräte-PIN. Er
+                kann nicht wie ein E-Mail-Link weitergegeben oder abgefangen werden.
+            </p>
+            <p>
+                Richte nach Möglichkeit einen Passkey auf jedem Gerät ein, mit dem du dich
+                anmeldest. Danach kannst du dich direkt und ohne E-Mail-Link anmelden.
+            </p>
             <button
                 type="button"
                 class="btn btn-secondary"
                 ref="registerPasskeyTrigger"
                 data-testid="register-passkey"
-                :disabled="passkeyBusy || !newPasskeyName.trim()"
-                @click="registerPasskey"
+                :disabled="passkeyBusy"
+                @click="openPasskeyNameDialog"
             >
                 {{ passkeyBusy ? 'Passkey wird eingerichtet …' : 'Passkey einrichten' }}
             </button>
             <p
-                v-if="passkeyError"
+                v-if="passkeyError && !passkeyNameModalOpen"
                 class="alert mt-2"
                 :class="passkeyError ? 'alert-danger' : 'alert-info'"
                 role="alert"
             >
                 {{ passkeyError }}
             </p>
-            <ul
+            <section
                 v-if="managedPasskeys.length"
-                class="list-group mt-3"
+                class="mt-4"
+                data-testid="existing-passkeys"
             >
-                <li
-                    v-for="passkey in managedPasskeys"
-                    :key="passkey.id"
-                    class="list-group-item"
+                <h4 class="h5">Eingerichtete Passkeys</h4>
+                <dataset
+                    :ds-data="managedPasskeys"
+                    ds-sort-by="name"
                 >
-                    <label :for="`passkey-label-${passkey.id}`">Gerätename</label>
-                    <input
-                        :id="`passkey-label-${passkey.id}`"
-                        v-model="passkey.name"
-                        class="form-control mb-2"
-                        maxlength="255"
-                        :aria-label="`Name des Passkeys ${passkey.name}`"
-                    />
-                    <small>{{ passkey.authenticator || 'Passkey' }}</small>
-                    <div class="mt-2">
-                        <button
-                            type="button"
-                            class="btn btn-sm btn-outline-primary me-2"
-                            data-testid="rename-passkey"
-                            :disabled="passkeyBusy"
-                            @click="renamePasskey(passkey)"
-                        >
-                            Umbenennen
-                        </button>
-                        <button
-                            type="button"
-                            class="btn btn-sm btn-outline-danger"
-                            data-testid="revoke-passkey"
-                            :disabled="passkeyBusy"
-                            @click="revokePasskey(passkey)"
-                        >
-                            Widerrufen
-                        </button>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover d-md-table">
+                            <thead>
+                                <tr>
+                                    <th>Gerätename</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <dataset-item tag="tbody">
+                                <template #default="{ row }">
+                                    <tr>
+                                        <td>
+                                            <input
+                                                :id="`passkey-label-${row.id}`"
+                                                v-model="row.name"
+                                                class="form-control"
+                                                maxlength="255"
+                                                :aria-label="`Name des Passkeys ${row.name}`"
+                                            />
+                                        </td>
+                                        <td class="text-end">
+                                            <button
+                                                type="button"
+                                                class="btn btn-sm btn-outline-primary"
+                                                data-testid="rename-passkey"
+                                                :disabled="passkeyBusy"
+                                                @click="renamePasskey(row)"
+                                            >
+                                                Umbenennen
+                                            </button>
+                                            <button
+                                                type="button"
+                                                class="btn btn-sm btn-outline-danger ms-1"
+                                                data-testid="revoke-passkey"
+                                                :disabled="passkeyBusy"
+                                                @click="revokePasskey(row)"
+                                            >
+                                                Widerrufen
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </template>
+                            </dataset-item>
+                        </table>
                     </div>
-                </li>
-            </ul>
+                </dataset>
+            </section>
             <p
                 v-else
                 class="text-muted mt-3"
@@ -144,6 +143,148 @@
             </p>
         </section>
 
+        <hr />
+        <section class="two-factor-management">
+            <h3 class="d-flex align-items-center gap-3">
+                <span class="security-option-icon">
+                    <i
+                        class="fa fa-mobile-screen-button fa-3x text-primary"
+                        aria-hidden="true"
+                    />
+                    <i
+                        v-if="factorEnabled"
+                        class="fa fa-check-circle security-option-check"
+                        aria-hidden="true"
+                    />
+                    <span
+                        v-if="factorEnabled"
+                        class="visually-hidden"
+                        >Authenticator-App eingerichtet.</span
+                    >
+                </span>
+                <span>Zwei-Faktor-Authentifizierung</span>
+            </h3>
+            <p v-if="factorPending">
+                Die Einrichtung wurde begonnen. Bestätige sie mit einem Code aus deiner
+                Authenticator-App.
+            </p>
+            <p>
+                Eine Authenticator-App erzeugt alle paar Sekunden einen neuen sechsstelligen Code.
+                Nach dem E-Mail-Link gibst du diesen Code als zusätzlichen Schutz ein. Geeignete
+                Apps sind zum Beispiel
+                <a
+                    href="https://support.microsoft.com/de-de/authenticator/download-microsoft-authenticator"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    >Microsoft Authenticator</a
+                >
+                und
+                <a
+                    href="https://2fas.com/auth/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    >2FAS Auth</a
+                >, eine quelloffene App.
+            </p>
+            <p>
+                Eine Authenticator-App ist eine Alternative zum Passkey. Du kannst auch beides
+                einrichten, damit du eine weitere Anmeldemöglichkeit hast.
+            </p>
+            <button
+                v-if="!factorEnabled"
+                type="button"
+                class="btn btn-secondary"
+                :disabled="twoFactor.busy"
+                ref="setupTrigger"
+                data-testid="open-two-factor-setup"
+                @click="openSetup"
+            >
+                {{
+                    factorPending
+                        ? 'Einrichtung neu starten'
+                        : 'Zwei-Faktor-Authentifizierung einrichten'
+                }}
+            </button>
+            <button
+                v-if="factorEnabled"
+                type="button"
+                class="btn btn-outline-danger"
+                :disabled="twoFactor.busy"
+                data-testid="disable-two-factor"
+                @click="disableTwoFactor"
+            >
+                Zwei-Faktor-Authentifizierung deaktivieren
+            </button>
+        </section>
+
+        <section
+            v-if="passkeyNameModalOpen"
+            class="setup-backdrop"
+            data-testid="passkey-name-modal"
+            @click.self="closePasskeyNameDialog"
+        >
+            <div
+                class="setup-dialog"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="passkey-name-title"
+                tabindex="-1"
+                @keydown.esc.stop.prevent="closePasskeyNameDialog"
+                @keydown.tab="trapSetupFocus"
+            >
+                <div class="setup-dialog-heading">
+                    <h4 id="passkey-name-title">Passkey einrichten</h4>
+                    <button
+                        type="button"
+                        class="btn-close"
+                        aria-label="Passkey-Einrichtung schließen"
+                        :disabled="passkeyBusy"
+                        @click="closePasskeyNameDialog"
+                    />
+                </div>
+                <label
+                    for="passkey-name"
+                    class="mt-3"
+                    >Name für dieses Gerät</label
+                >
+                <input
+                    id="passkey-name"
+                    ref="passkeyNameInput"
+                    v-model="newPasskeyName"
+                    class="form-control mt-1"
+                    maxlength="255"
+                    autocomplete="off"
+                    data-testid="passkey-name"
+                    @keyup.enter="registerPasskey"
+                />
+                <p
+                    v-if="passkeyError"
+                    class="alert alert-danger mt-3"
+                    role="alert"
+                >
+                    {{ passkeyError }}
+                </p>
+                <div class="d-flex flex-wrap gap-2 mt-4">
+                    <button
+                        type="button"
+                        class="btn btn-primary"
+                        data-testid="confirm-passkey-setup"
+                        :disabled="passkeyBusy || !newPasskeyName.trim()"
+                        @click="registerPasskey"
+                    >
+                        {{ passkeyBusy ? 'Passkey wird eingerichtet …' : 'Einrichten' }}
+                    </button>
+                    <button
+                        type="button"
+                        class="btn btn-outline-secondary"
+                        :disabled="passkeyBusy"
+                        @click="closePasskeyNameDialog"
+                    >
+                        Abbrechen
+                    </button>
+                </div>
+            </div>
+        </section>
         <section
             v-if="setupModalOpen"
             class="setup-backdrop"
@@ -179,7 +320,7 @@
                 </div>
                 <div v-if="setupStep === 1">
                     <p>
-                        In wenigen Schritten richten Sie eine zusätzliche Anmeldung mit einer
+                        In wenigen Schritten richtest du eine zusätzliche Anmeldung mit einer
                         Authenticator-App ein.
                     </p>
                     <p>
@@ -192,7 +333,7 @@
                     class="two-factor-setup"
                 >
                     <p>
-                        Scannen Sie diesen QR-Code mit Microsoft Authenticator, 2FAS Auth oder einer
+                        Scanne diesen QR-Code mit Microsoft Authenticator, 2FAS Auth oder einer
                         anderen TOTP-App.
                     </p>
                     <p>
@@ -210,8 +351,8 @@
                     >
                         <h5>Einrichtungsschlüssel für die manuelle Eingabe</h5>
                         <p>
-                            Einige Apps, zum Beispiel Bitwarden, benötigen diesen Schlüssel. Geben
-                            Sie ihn dort ein, wenn die App danach fragt:
+                            Einige Apps, zum Beispiel Bitwarden, benötigen diesen Schlüssel. Gib ihn
+                            dort ein, wenn die App danach fragt:
                         </p>
                         <div class="d-flex flex-wrap align-items-center gap-2">
                             <code class="d-block text-break">{{ provisioningSecret }}</code>
@@ -228,8 +369,7 @@
                     </div>
                     <h5>Recovery-Codes</h5>
                     <p>
-                        Bewahren Sie diese Codes sicher auf. Jeder Code kann nur einmal verwendet
-                        werden.
+                        Bewahre diese Codes sicher auf. Jeder Code kann nur einmal verwendet werden.
                     </p>
                     <div class="d-flex flex-wrap align-items-start gap-2">
                         <textarea
@@ -286,8 +426,8 @@
                     @submit.prevent="confirmTwoFactor"
                 >
                     <p>
-                        Geben Sie einen aktuellen sechsstelligen Code aus Ihrer Authenticator-App
-                        ein, um die Einrichtung abzuschließen.
+                        Gib einen aktuellen sechsstelligen Code aus deiner Authenticator-App ein, um
+                        die Einrichtung abzuschließen.
                     </p>
                     <OneTimeCodeInput
                         v-model="twoFactor.code"
@@ -355,18 +495,19 @@
 <script>
 import axios from 'axios'
 import QRCode from 'qrcode'
+import { Dataset, DatasetItem } from 'vue-dataset'
 import OneTimeCodeInput from '../../Ui/forms/OneTimeCodeInput.vue'
 import { Passkeys } from '@laravel/passkeys'
 export default {
     name: 'SecurityTab',
-    components: { OneTimeCodeInput },
+    components: { Dataset, DatasetItem, OneTimeCodeInput },
     props: {
         user: { type: Object, required: true },
         twoFactorEnabled: { type: Boolean, default: false },
         twoFactorPending: { type: Boolean, default: false },
         passkeys: { type: Array, default: () => [] },
     },
-    emits: ['two-factor-enabled', 'two-factor-disabled'],
+    emits: ['two-factor-enabled', 'two-factor-disabled', 'passkey-created'],
     data() {
         return {
             setup: null,
@@ -380,6 +521,7 @@ export default {
             factorPending: this.twoFactorPending,
             managedPasskeys: this.passkeys.map((passkey) => ({ ...passkey })),
             newPasskeyName: '',
+            passkeyNameModalOpen: false,
             passkeyBusy: false,
             passkeyError: '',
             twoFactor: {
@@ -410,7 +552,7 @@ export default {
                 this.copiedField = field
             } catch {
                 this.clipboardError =
-                    'Der Inhalt konnte nicht kopiert werden. Bitte markieren Sie ihn und kopieren Sie ihn manuell.'
+                    'Der Inhalt konnte nicht kopiert werden. Bitte markiere ihn und kopiere ihn manuell.'
             }
         },
         /** Register a discoverable passkey in the authenticated session. */
@@ -429,12 +571,31 @@ export default {
                 })
                 this.managedPasskeys.unshift({ ...result, authenticator: 'Passkey' })
                 this.newPasskeyName = ''
+                this.$emit('passkey-created')
+                this.passkeyNameModalOpen = false
+                this.$nextTick(() => this.$refs.registerPasskeyTrigger?.focus())
             } catch (error) {
                 this.passkeyError =
                     'Passkey konnte nicht eingerichtet werden. Bitte erneut versuchen.'
             } finally {
                 this.passkeyBusy = false
             }
+        },
+        /** Open the passkey-name dialog and move focus to its input. */
+        openPasskeyNameDialog() {
+            this.newPasskeyName = ''
+            this.passkeyError = ''
+            this.passkeyNameModalOpen = true
+            this.$nextTick(() => this.$refs.passkeyNameInput?.focus())
+        },
+        /** Close the device-name dialog and restore focus to its trigger. */
+        closePasskeyNameDialog() {
+            if (this.passkeyBusy) return
+
+            this.passkeyNameModalOpen = false
+            this.newPasskeyName = ''
+            this.passkeyError = ''
+            this.$nextTick(() => this.$refs.registerPasskeyTrigger?.focus())
         },
         /** Persist a changed display name for one owned passkey. */
         async renamePasskey(passkey) {
@@ -627,5 +788,20 @@ export default {
     display: block;
     width: min(100%, 18rem);
     margin: 1rem auto;
+}
+
+.security-option-icon {
+    position: relative;
+    display: inline-flex;
+}
+
+.security-option-check {
+    position: absolute;
+    right: -0.15rem;
+    bottom: -0.1rem;
+    color: var(--bs-success, #198754);
+    background: var(--bs-body-bg, #fff);
+    border-radius: 50%;
+    font-size: 1rem;
 }
 </style>

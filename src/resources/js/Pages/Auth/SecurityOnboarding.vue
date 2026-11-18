@@ -1,4 +1,5 @@
 <template>
+    <Head title="Kontosicherheit" />
     <main
         class="container py-5"
         data-testid="security-onboarding"
@@ -14,58 +15,19 @@
                 deutlich schwerer, dass jemand anderes Zugriff erhält.
             </p>
 
-            <section class="card mb-4">
-                <div class="card-body">
-                    <h2 class="h4">Passkey: die einfachste Anmeldung</h2>
-                    <p>
-                        Ein Passkey nutzt die Displaysperre deines Geräts, zum Beispiel
-                        Fingerabdruck, Gesichtserkennung oder Geräte-PIN. Er ist an dein Gerät
-                        gebunden und kann nicht wie ein E-Mail-Link weitergegeben oder abgefangen
-                        werden.
-                    </p>
-                    <p class="mb-0">
-                        Richte nach Möglichkeit einen Passkey auf jedem Gerät ein, mit dem du dich
-                        anmeldest. So kannst du dich später direkt und ohne E-Mail-Link anmelden.
-                    </p>
-                </div>
-            </section>
-
-            <section class="card mb-4">
-                <div class="card-body">
-                    <h2 class="h4">Authenticator-App: Einmalcodes als zusätzlicher Schutz</h2>
-                    <p>
-                        Eine Authenticator-App erzeugt alle paar Sekunden einen neuen sechsstelligen
-                        Code. Nach dem E-Mail-Link gibst du diesen Code ein. Geeignete Apps sind
-                        <a
-                            href="https://support.microsoft.com/de-de/authenticator/download-microsoft-authenticator"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            >Microsoft Authenticator</a
-                        >
-                        und
-                        <a
-                            href="https://2fas.com/auth/"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            >2FAS Auth</a
-                        >, eine quelloffene App.
-                    </p>
-                    <p class="mb-0">
-                        Du kannst einen Passkey oder eine Authenticator-App einrichten; beides
-                        zusammen bietet zusätzliche Ausweichmöglichkeiten.
-                    </p>
-                </div>
-            </section>
-
             <SecurityTab
                 :user="user"
                 :two-factor-enabled="twoFactorEnabled"
                 :two-factor-pending="twoFactorPending"
                 :passkeys="passkeys"
+                @two-factor-enabled="showContinueButton"
+                @passkey-created="showContinueButton"
             />
 
+            <hr class="my-4" />
             <div class="d-flex flex-wrap gap-2 mt-4">
                 <a
+                    v-if="continueAvailable"
                     class="btn btn-primary"
                     :href="route('home')"
                     data-testid="continue-after-setup"
@@ -87,15 +49,17 @@
                 </form>
             </div>
             <p class="form-text mt-2">
-                Wenn du „Später erinnern“ wählst, kannst du Pfarrplaner in dieser Sitzung nutzen.
-                Der Hinweis erscheint bei einer späteren Anmeldung erneut, solange kein Passkey oder
-                keine Authenticator-App eingerichtet ist.
+                Wenn du die Einrichtung jetzt überspringen möchtest, kannst du Pfarrplaner mit
+                „Später erinnern“ bis zum Ende dieser Sitzung nutzen. Der Hinweis erscheint bei
+                einer späteren Anmeldung erneut, solange kein Passkey oder keine Authenticator-App
+                eingerichtet ist.
             </p>
         </div>
     </main>
 </template>
 
 <script>
+import { Head } from '@inertiajs/vue3'
 import SecurityTab from '@/components/Profile/Tabs/SecurityTab.vue'
 import FormCsrfToken from '@/components/Ui/forms/FormCsrfToken.vue'
 
@@ -107,12 +71,25 @@ function emptyPasskeys() {
 /** Explain and start the account's first additional security factor. */
 export default {
     name: 'SecurityOnboarding',
-    components: { SecurityTab, FormCsrfToken },
+    components: { Head, SecurityTab, FormCsrfToken },
     props: {
         user: { type: Object, required: true },
         twoFactorEnabled: { type: Boolean, default: false },
         twoFactorPending: { type: Boolean, default: false },
         passkeys: { type: Array, default: emptyPasskeys },
+    },
+    /** Track whether this session may navigate past the security reminder. */
+    data() {
+        return {
+            continueAvailable: this.twoFactorEnabled || this.passkeys.length > 0,
+        }
+    },
+    /** Reveal normal application navigation after either factor is enrolled. */
+    methods: {
+        /** Reveal application access after a passkey or TOTP factor is set up. */
+        showContinueButton() {
+            this.continueAvailable = true
+        },
     },
 }
 </script>

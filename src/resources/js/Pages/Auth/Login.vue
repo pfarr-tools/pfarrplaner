@@ -172,7 +172,7 @@
                                 <small
                                     id="usersHelp"
                                     class="form-text text-muted"
-                                    >Wählen Sie einen Demo-Benutzer aus.</small
+                                    >Wähle einen Demo-Benutzer aus.</small
                                 >
                             </div>
                         </div>
@@ -337,7 +337,7 @@ export default {
                         },
                         onError: () => {
                             this.emailLinkError =
-                                'Der Anmeldelink konnte nicht angefordert werden. Bitte prüfen Sie die E-Mailadresse.'
+                                'Der Anmeldelink konnte nicht angefordert werden. Bitte prüfe die E-Mail-Adresse.'
                         },
                         onFinish: () => {
                             this.emailLinkLoading = false
