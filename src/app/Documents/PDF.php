@@ -32,6 +32,7 @@ namespace App\Documents;
 
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\Str;
 use Spatie\Browsershot\Browsershot;
 use Spatie\Browsershot\ChromiumResult;
 use Spatie\Browsershot\Exceptions\CouldNotTakeBrowsershot;
@@ -124,13 +125,48 @@ HTML;
     }
 
     /**
+     * Ensure rendered PDF source HTML has a useful document title.
+     *
+     * @param  string  $html  Rendered document markup.
+     * @param  string  $viewName  View used to render the document.
+     * @return string Markup with a non-empty document title.
+     */
+    protected static function applyDefaultPdfTitle(string $html, string $viewName): string
+    {
+        if (preg_match('/<title\\b[^>]*>(.*?)<\\/title>/is', $html, $matches)
+            && trim(strip_tags($matches[1])) !== '') {
+            return $html;
+        }
+
+        $viewTitle = (string) preg_replace('/\\.render$/', '', $viewName);
+        $title = htmlspecialchars(
+            Str::headline(str_replace('.', ' ', $viewTitle)),
+            ENT_QUOTES | ENT_SUBSTITUTE,
+            'UTF-8'
+        );
+        $titleTag = '<title>'.$title.'</title>';
+
+        if (preg_match('/<title\\b[^>]*>.*?<\\/title>/is', $html)) {
+            return (string) preg_replace('/<title\\b[^>]*>.*?<\\/title>/is', $titleTag, $html, 1);
+        }
+
+        if (str_contains($html, '</head>')) {
+            return str_replace('</head>', $titleTag.'</head>', $html);
+        }
+
+        return $titleTag.$html;
+    }
+
+    /**
      * @param  string  $viewName
      * @param  array  $data
      * @return static
      */
     public static function fromView($viewName, $data, $header = '', $footer = '')
     {
-        $html = static::applyDefaultPdfStyles(View::make($viewName, $data)->render());
+        $html = View::make($viewName, $data)->render();
+        $html = static::applyDefaultPdfTitle($html, $viewName);
+        $html = static::applyDefaultPdfStyles($html);
 
         $pdf = static::html($html)
             ->setCustomTempPath(storage_path('app/tmp'))
