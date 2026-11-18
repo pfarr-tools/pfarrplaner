@@ -1,5 +1,7 @@
 # Sicherheitsaktionen im Profil – Entwurf
 
+> **Entscheidungsänderung vom 18.11.2026:** Die nachfolgende frühere Festlegung zu Passwortdialogen ist aufgehoben. Der Profil-Editor und sein Sicherheitsreiter enthalten keinerlei Passwortfelder, Passwortanforderungen oder Passwortbestätigungsdialoge. Die eigenständige Passwortänderungsseite unter `/passwort/aendern` bleibt erhalten. Persönliche Passkey-Aktionen erfordern nur eine angemeldete Sitzung und die bestehende Eigentumsprüfung; TOTP-Einrichtung und -Deaktivierung verlangen kein Kontopasswort. Die TOTP-Einrichtung wird weiterhin erst durch einen gültigen App-Code aktiviert; Deaktivieren verlangt eine einfache Fehlklickbestätigung. Super-Admin-Recovery bleibt ein separater, passwortgeschützter Ablauf.
+
 ## Ziel
 
 Passwortgeschützte Sicherheitsaktionen sollen direkt aus der Sicherheitsansicht mit einem verständlichen Dialog bestätigt werden. Das Profil bleibt dabei sichtbar; die Passwortbestätigung wird nicht als dauerhaftes Formular in der Seite oder als separate Navigationsseite dargestellt.

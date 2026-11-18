@@ -46,7 +46,7 @@ Dieses Kapitel beschreibt die im Anwendungscode verfügbaren Policy-Verben. Eine
 
 ## Passwörter verwalten
 
-Ein Benutzerkonto kann sein eigenes Passwort im Reiter **Sicherheit** ändern. Das neue Passwort muss mindestens acht Zeichen lang sein und je einen Großbuchstaben, Kleinbuchstaben, eine Zahl und ein Sonderzeichen enthalten.
+Ein Benutzerkonto ändert sein eigenes Passwort über den separaten Menüpunkt **Passwort ändern**. Die Funktion ist nicht Teil des Profil-Editors.
 
 Nur Super-Administrator:innen dürfen in der Benutzerverwaltung ein Passwort für ein anderes Konto setzen oder einen Passwort-Reset auslösen. Beim Zurücksetzen wird ein vorläufiges Anfangspasswort nach dem Muster „Konsonant, Vokal, Konsonant, Vokal, vier Zahlen“ erzeugt. Bei der manuellen Setzung darf die Administration ein beliebiges nichtleeres Passwort wählen. Beide Wege erzwingen den Passwortwechsel bei der nächsten Anmeldung; normale, selbst gewählte Passwörter müssen weiterhin die zentrale starke Passwortregel erfüllen.
 

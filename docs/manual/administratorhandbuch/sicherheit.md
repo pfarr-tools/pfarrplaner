@@ -55,14 +55,15 @@ Ein frei gewähltes Passwort für ein bestehendes Konto bleibt
 Super-Administratoren vorbehalten; es wird serverseitig geprüft, einmalig per
 E-Mail versendet und erzwingt ebenfalls den Passwortwechsel.
 
-Benutzer können die TOTP-Einschreibung nur nach erneuter Eingabe ihres
-aktuellen Passworts starten, bestätigen oder deaktivieren. Für das Deaktivieren
-öffnet sich die Passwortabfrage erst nach Klick auf die Schaltfläche. Eine
-abgelaufene Passwortbestätigung bei Passkey-Aktionen wird ebenfalls direkt im
-Profil abgefragt; die Aktion muss danach erneut angeklickt werden. Start und
-Bestätigung liefern keine dauerhaften Geheimnisse in Benutzerlisten oder
-Protokollen; Recovery-Codes werden nur einmalig nach der Einschreibung
-angezeigt und müssen sicher außerhalb von Pfarrplaner verwahrt werden.
+Die persönliche Passkey- und TOTP-Verwaltung befindet sich im Profil unter
+**Sicherheit**. Passkey-Aktionen setzen eine angemeldete Sitzung voraus;
+Eigentumsprüfungen verhindern die Verwaltung fremder Credentials. WebAuthn
+verlangt User Verification und die Registrierung nutzt eine frische Challenge.
+TOTP wird erst nach Eingabe eines gültigen App-Codes aktiviert. Beim Deaktivieren
+bestätigt die Person den Klick in einem Dialog. Fehlversuche bei TOTP werden
+pro Konto begrenzt. Einrichtungsschlüssel und Recovery-Codes werden nur zur
+Einrichtung angezeigt; Recovery-Codes müssen sicher außerhalb von Pfarrplaner
+verwahrt werden. Die Passwortänderung erfolgt separat über **Passwort ändern**.
 
 Falsche Passwörter und Sicherheitscodes werden generisch abgewiesen. Die
 Passwortanmeldung verwendet das bestehende Limit aus Benutzername und
@@ -70,9 +71,8 @@ Quell-IP. Es gibt absichtlich keine zusätzliche kontoweite Passwortsperre, da
 sonst ein Angreifer gezielt ein fremdes Konto vorübergehend blockieren könnte.
 TOTP-Prüfungen werden dagegen pro Benutzerkonto atomar begrenzt: Nach fünf
 Prüfungen innerhalb einer Minute werden weitere TOTP-Prüfungen für dieses Konto
-vorübergehend gesperrt. Auch die Re-Authentifizierung vor jeder TOTP-Änderung
-besitzt ein eigenes Limit. Ein Faktorwechsel wird gegen parallele Start-,
-Bestätigungs- und Deaktivierungsanfragen serialisiert.
+vorübergehend gesperrt. Ein Faktorwechsel wird gegen parallele Start-, Bestätigungs- und
+Deaktivierungsanfragen serialisiert.
 
 Bei Verlust des Authenticator-Geräts werden die Recovery-Codes benötigt. Wenn
 auch das Postfach und alle Recovery-Codes verloren sind, gibt es derzeit keinen
@@ -118,9 +118,9 @@ automatischen Paket-Routen bleiben deaktiviert. Projektspezifische Login-Routen
 verwenden discoverable Credentials und User Verification. Ihre Challenges sind
 an die Session gebunden, nach 60 Sekunden abgelaufen und nach jeder Einreichung
 verbraucht. Login-Optionen und Prüfungen teilen ein Limit von sechs Anfragen pro
-Minute je IP-Adresse. Verwaltungsrouten erfordern Anmeldung und eine frische
-Bestätigung des aktuellen Passworts. Benutzer können mehrere Credentials
-registrieren, umbenennen und widerrufen. Passkey-Anmeldungen durchlaufen
+Minute je IP-Adresse. Verwaltungsrouten erfordern eine angemeldete Sitzung.
+Benutzer können eigene Credentials registrieren, umbenennen und widerrufen;
+Stellvertretersitzungen dürfen keine Anmeldefaktoren ändern. Passkey-Anmeldungen durchlaufen
 weiterhin die erzwungene Passwortänderung und die TOTP-Recovery.
 
 ### Wiederherstellung nach Verlust von Gerät und Recovery-Codes

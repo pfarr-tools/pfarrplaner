@@ -34,7 +34,7 @@ class PasskeyManagementController extends Controller
         return response()->json(['passkeys' => $passkeys]);
     }
 
-    /** Return account-specific registration options after password confirmation. */
+    /** Return account-specific registration options for the authenticated user. */
     public function options(Request $request, GenerateRegistrationOptions $generate): JsonResponse
     {
         $user = $this->authenticatedUser($request);

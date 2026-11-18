@@ -74,11 +74,10 @@ Auf der aktuellen Anmeldeseite gibt es keinen eigenen Link **Passwort vergessen?
 Sie können Ihr Passwort jederzeit selbst ändern.
 
 1. Klicken Sie oben rechts auf Ihren **Namen** (oder das Benutzersymbol).
-2. Klicken Sie im Menü auf **Einstellungen**.
-3. Öffnen Sie den Reiter **Sicherheit**.
-4. Geben Sie Ihr aktuelles Passwort ein.
-5. Geben Sie das neue Passwort ein und wiederholen Sie es zur Bestätigung.
-6. Klicken Sie oben links auf **Speichern**.
+2. Klicken Sie im Menü auf **Passwort ändern**.
+3. Geben Sie Ihr bisheriges Passwort ein.
+4. Geben Sie das neue Passwort ein und wiederholen Sie es zur Bestätigung.
+5. Klicken Sie auf **Speichern**.
 
 > **Hinweis:** Ihr neues Passwort muss mindestens 8 Zeichen lang sein und mindestens je einen Großbuchstaben, Kleinbuchstaben, eine Zahl und ein Sonderzeichen enthalten.
 

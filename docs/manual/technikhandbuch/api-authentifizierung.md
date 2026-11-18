@@ -42,28 +42,27 @@ zulässig.
 
 Die geschützten Web-Endpunkte für die persönliche Einschreibung sind:
 
-- `POST /profil/zwei-faktor/start`: re-authentifiziert, sperrt die User-Zeile
-  und gibt die Provisionierungs-URI sowie die einmaligen Recovery-Codes zurück.
+- `POST /profil/zwei-faktor/start`: erfordert eine authentifizierte Sitzung,
+  sperrt die User-Zeile und gibt die Provisionierungs-URI sowie die einmaligen
+  Recovery-Codes zurück.
 - `POST /profil/zwei-faktor/bestaetigen`: prüft einen 6- bis 8-stelligen TOTP-
   Code, akzeptiert die vom Paket vorgesehenen Leerzeichen oder Bindestriche
   und aktiviert den Faktor nur bei einer laufenden Einschreibung.
-- `POST /profil/zwei-faktor/deaktivieren`: re-authentifiziert und löscht den
-  Faktor unter derselben Zeilensperre.
+- `POST /profil/zwei-faktor/deaktivieren`: erfordert eine authentifizierte Sitzung
+  und löscht den Faktor unter derselben Zeilensperre.
 
 Alle drei Routen liegen in der authentifizierten CSRF-geschützten Web-Gruppe.
-Passwort- und Codefehler werden ohne Konto- oder Zustandsdetails gemeldet;
-TOTP-Rate-Limits gelten pro Benutzerkonto und liefern bei einer temporären
-Sperre HTTP 429. Fehlerhafte Passwortanmeldungen bleiben auf das vorhandene
+Codefehler werden ohne Konto- oder Zustandsdetails gemeldet; TOTP-Rate-Limits
+gelten pro Benutzerkonto und liefern bei einer temporären Sperre HTTP 429. Fehlerhafte Passwortanmeldungen bleiben auf das vorhandene
 Limit nach Benutzername und Quell-IP begrenzt; es gibt keine weitere
 kontoweite Passwortsperre. Die Antworten enthalten weder den TOTP-Secretwert als eigenes Feld noch
 die sensiblen User-Modellattribute.
 
-`POST /password/confirm` behält für normale Formularanfragen das Redirect-
-Verhalten bei. JSON-Anfragen aus dem Profil erhalten bei Erfolg
-`{"confirmed": true}` und setzen denselben Session-Zeitstempel. Ein falsches
-Passwort liefert HTTP 422 mit einem Feldfehler; die Anwendung startet eine
-WebAuthn-Abfrage erst nach einem neuen ausdrücklichen Klick.
-
+Passkey- und TOTP-Verwaltungsrouten setzen eine authentifizierte Sitzung voraus.
+Sie verlangen keine Passwortbestätigung und lehnen Stellvertretersitzungen ab.
+Passkey-Registrierung bleibt an eine frische WebAuthn-Challenge und User
+Verification gebunden; der TOTP-Faktor wird erst nach erfolgreicher Codeprüfung
+aktiviert.
 ## Empfehlung für Integrationen
 
 - Neue produktive Integrationen dürfen nicht von implizit öffentlichen Endpunkten ausgehen.

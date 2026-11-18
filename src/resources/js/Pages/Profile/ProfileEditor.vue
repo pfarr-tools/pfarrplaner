@@ -88,11 +88,9 @@
             >
                 <SecurityTab
                     :user="user"
-                    :password="password"
                     :two-factor-enabled="twoFactorEnabled"
                     :two-factor-pending="twoFactorPending"
                     :passkeys="passkeys"
-                    @update:password="password = $event"
                 />
             </Tab>
             <Tab
@@ -193,7 +191,6 @@ export default {
     data() {
         return {
             activeTab: this.tab || 'profile',
-            password: { current: '', new: '', confirm: '' },
             editedUser: this.user,
             myHomeScreenTabsConfig: normalizeHomeScreenTabsConfig(this.homeScreenTabsConfig),
         }
@@ -215,11 +212,6 @@ export default {
                 own_podcast_url: this.user.own_podcast_url,
                 own_podcast_spotify: this.user.own_podcast_spotify,
                 own_podcast_itunes: this.user.own_podcast_itunes,
-            }
-            if (this.password.current && this.password.new && this.password.confirm) {
-                result['current_password'] = this.password.current
-                result['new_password'] = this.password.new
-                result['new_password_confirmation'] = this.password.confirm
             }
             this.$inertia.patch(window.route('user.profile.save'), result)
         },

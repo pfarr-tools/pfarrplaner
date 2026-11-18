@@ -2,7 +2,7 @@
 
 # Persönliche Einstellungen
 
-In den persönlichen Einstellungen verwalten Sie Ihr eigenes Benutzerprofil, Ihr Passwort und weitere Optionen für Ihr Konto.
+In den persönlichen Einstellungen verwalten Sie Ihr eigenes Benutzerprofil und weitere Optionen für Ihr Konto. Ihr Passwort ändern Sie über den eigenen Menüpunkt **Passwort ändern**.
 
 Diese Seite betrifft nur Ihr eigenes Konto. Änderungen hier können beeinflussen, wie Ihr Name angezeigt wird, wie Sie sich anmelden, welche Startseite Sie sehen und ob Pfarrplaner mit externen Kalendern verbunden ist.
 
@@ -45,16 +45,7 @@ Sie können ein Foto von sich hochladen, das oben rechts im Menü und in einigen
 
 ## Reiter: Sicherheit
 
-![Persönliche Einstellungen: Sicherheit](media/images/einstellungen-sicherheit.png)
-
-Hier ändern Sie Ihr Passwort.
-
-1. Geben Sie Ihr **aktuelles Passwort** ein.
-2. Geben Sie das **neue Passwort** ein (mindestens 8 Zeichen, mit Groß- und Kleinbuchstaben, Zahl und Sonderzeichen).
-3. Wiederholen Sie das neue Passwort im Feld **Neues Passwort wiederholen**.
-4. Klicken Sie oben links auf **Speichern**.
-
-Wählen Sie ein Passwort, das Sie nicht auch für andere Dienste verwenden. Wenn das Speichern nicht klappt, prüfen Sie, ob das neue Passwort in beiden Feldern gleich geschrieben ist und alle vier Zeichenanforderungen erfüllt.
+In diesem Reiter verwalten Sie die zusätzliche Anmeldung mit Passkeys und einer Authenticator-App. Ihr Passwort ändern Sie über den eigenen Menüpunkt **Passwort ändern** im Benutzermenü.
 
 Wenn Sie Ihr Passwort vergessen haben, wenden Sie sich an Ihre Administration.
 Die Login-Seite bietet absichtlich kein Passwortfeld und keinen Link zum
@@ -89,8 +80,7 @@ Während der Einrichtung zeigt Pfarrplaner Wiederherstellungscodes. Bewahren
 Sie sie getrennt von Ihrem Gerät an einem sicheren Ort auf. Damit können Sie
 sich anmelden, falls Sie Ihr Gerät verlieren. Ein Passkey oder eine
 Authenticator-App genügt, um den Hinweis zu beenden; Sie können auch beides
-einrichten. Ein starkes, nur hier verwendetes Passwort bleibt wichtig, falls
-Pfarrplaner es bei einer sicherheitsrelevanten Änderung abfragt.
+einrichten.
 
 Über **Sicherheitseinstellungen öffnen** gelangen Sie direkt zur Einrichtung.
 Der Hinweis wird dann für drei Wochen ausgeblendet, auch wenn Sie noch keinen
@@ -104,8 +94,7 @@ erneut.
 
 Im Bereich **Sicherheit** können Sie die Zwei-Faktor-Authentifizierung mit
 einer Authenticator-App einrichten. Der Assistent führt Sie durch die Schritte:
-Bestätigen Sie Ihre Identität mit Ihrem aktuellen Passwort, scannen Sie den
-angezeigten QR-Code in einer Authenticator-App und speichern Sie die
+Scannen Sie den angezeigten QR-Code in einer Authenticator-App und speichern Sie die
 Recovery-Codes sicher. Beispiele für geeignete Apps sind Microsoft
 Authenticator und die quelloffene App 2FAS Auth. Wenn Sie den QR-Code nicht
 scannen können oder Ihre App wie Bitwarden den Schlüssel benötigt, steht der
@@ -114,9 +103,8 @@ Schlüssel für die manuelle Eingabe direkt unter dem QR-Code. Über **Kopieren*
 Textfeld und können gemeinsam kopiert werden. Sie sind nur während dieses
 Einrichtungsschritts sichtbar und können jeweils nur einmal verwendet werden.
 
-Bestätigen Sie die gespeicherten Recovery-Codes und geben Sie anschließend
-Ihr aktuelles Passwort sowie den sechsstelligen Code aus der Authenticator-App
-ein. Die Codeziffern können einzeln eingegeben oder gemeinsam eingefügt werden.
+Bestätigen Sie, dass Sie die Recovery-Codes gespeichert haben, und geben Sie anschließend
+den sechsstelligen Code aus der Authenticator-App ein. Die Codeziffern können einzeln eingegeben oder gemeinsam eingefügt werden.
 Falls Sie die Seite vor der Bestätigung verlassen oder die
 Recovery-Codes nicht gesichert haben, können Sie die noch nicht abgeschlossene
 Einrichtung neu starten. Dabei werden die vorherige URI und die vorherigen
@@ -129,17 +117,14 @@ zusätzlichen App-Code eingeben.
 Alternativ können Sie einen Recovery-Code eingeben; jeder Code ist nur einmal
 gültig. Eine Login-Challenge läuft nach fünf Minuten ab.
 
-Zum Deaktivieren wählen Sie **Zwei-Faktor-Authentifizierung deaktivieren**.
-Ein Dialog fragt nach Ihrem aktuellen Passwort. Bei zu vielen fehlerhaften
-Versuchen wird die Aktion vorübergehend gesperrt. Wenn Sie Ihr Gerät und alle Recovery-Codes
+Zum Deaktivieren wählen Sie **Zwei-Faktor-Authentifizierung deaktivieren** und bestätigen Sie die Nachfrage. Bei zu vielen fehlerhaften Codeversuchen wird die Codeprüfung vorübergehend gesperrt. Wenn Sie Ihr Gerät und alle Recovery-Codes
 verlieren, wenden Sie sich über einen bereits bekannten Kontaktweg an Ihre
 Administration. Diese prüft Ihre Identität außerhalb von Pfarrplaner. Eine
 eingehende E-Mail allein reicht dafür nicht aus. Nach der Prüfung kann ein
-Super-Administrator den verlorenen Faktor widerrufen. Dabei wird Ihr Passwort
-nicht geändert. Bei Ihrer nächsten Anmeldung müssen Sie TOTP neu einrichten und
-bestätigen. Geben Sie dafür auf der Wiederherstellungsseite Ihr aktuelles
-Passwort erneut ein. Bis zur Bestätigung können Sie Pfarrplaner nicht normal
-verwenden. Teilen Sie Recovery-Codes niemals per E-Mail oder Chat.
+Super-Administrator den verlorenen Faktor widerrufen. Bei Ihrer nächsten
+Anmeldung müssen Sie TOTP neu einrichten und mit einem Code aus der App
+bestätigen. Bis zur Bestätigung können Sie Pfarrplaner nicht normal verwenden.
+Teilen Sie Recovery-Codes niemals per E-Mail oder Chat.
 Die Wiederherstellung meldet auch gespeicherte Sitzungen und Kalender- oder
 API-Verbindungen ab. Richten Sie diese nach der TOTP-Neueinrichtung mit Ihrem
 neuen API-Token wieder ein.
@@ -148,10 +133,8 @@ neuen API-Token wieder ein.
 
 Im Bereich **Sicherheit** können Sie mehrere Passkeys für Ihre Geräte
 einrichten. Geben Sie einen wiedererkennbaren Namen ein und wählen Sie
-**Passkey einrichten**. Bestätigen Sie bei Aufforderung Ihr Passwort. Der
-Passwortdialog erscheint direkt im Profil. Nach der Bestätigung wählen Sie
-**Passkey einrichten** noch einmal. Der Browser bittet Sie anschließend, die
-Geräte-PIN, Biometrie oder eine andere lokale Geräteverifikation zu verwenden.
+**Passkey einrichten**. Der Browser bittet Sie anschließend, die Geräte-PIN,
+Biometrie oder eine andere lokale Geräteverifikation zu verwenden.
 Das Gerät muss Passkeys unterstützen.
 
 Sie können einen Passkey umbenennen oder widerrufen. Beim Widerruf wird das

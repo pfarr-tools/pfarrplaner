@@ -28,23 +28,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-use App\Http\Controllers\Auth\ConfirmPasswordController;
 use App\Http\Controllers\Auth\EmailLoginLinkController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\PasskeyLoginController;
 use App\Http\Controllers\Auth\PasskeyManagementController;
 use App\Http\Controllers\UserController;
+use App\Http\Middleware\PreventImpersonatedSecurityChanges;
 use App\Http\Middleware\ProcessPasswordlessLoginLinkAfterResponse;
 use App\Http\Middleware\RequireFreshPasskeyChallenge;
 use Illuminate\Support\Facades\Auth;
 
-Auth::routes(['logout' => false, 'register' => false]);
-Route::get('/password/confirm', [ConfirmPasswordController::class, 'show'])
-    ->middleware('auth')
-    ->name('password.confirm');
-Route::post('/password/confirm', [ConfirmPasswordController::class, 'store'])
-    ->middleware(['auth', 'throttle:6,1'])
-    ->name('password.confirm.store');
+Auth::routes(['logout' => false, 'register' => false, 'confirm' => false]);
 Route::get('/passkeys/login/options', [PasskeyLoginController::class, 'options'])
     ->middleware(['guest', 'throttle:passkey-login'])
     ->name('passkey.login-options');
@@ -64,7 +58,7 @@ Route::get('/login/link/confirm', [EmailLoginLinkController::class, 'showConfirm
 Route::post('/login/link/confirm', [EmailLoginLinkController::class, 'confirm'])
     ->middleware(['guest', 'throttle:6,1'])
     ->name('login.link.confirm');
-Route::middleware(['auth', 'password.confirm'])
+Route::middleware(['auth', PreventImpersonatedSecurityChanges::class])
     ->prefix('/user/passkeys')
     ->name('user.passkeys.')
     ->group(function (): void {

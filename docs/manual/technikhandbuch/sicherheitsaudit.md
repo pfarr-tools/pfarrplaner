@@ -54,10 +54,10 @@ Für die TOTP-Einschreibung ist `roundly-consulting/two-factor-for-laravel` als
 Composer-Abhängigkeit installiert. Das Paket stellt RFC-6238-TOTP,
 verschlüsselte Secrets, gehashte Recovery-Codes und den Schutz vor der
 Wiederverwendung eines Zeitfensters bereit. Die Anwendung ergänzt die
-fachliche Re-Authentifizierung, Rate-Limits und CSRF-geschützte Web-Endpunkte.
+authentifizierte Sitzung, Rate-Limits und CSRF-geschützte Web-Endpunkte.
 Die Profiloberfläche führt durch einen Dialog mit lokal erzeugtem QR-Code,
-manueller Eingabealternative, Passwortbestätigung und expliziter Sicherung der
-Recovery-Codes. URI und Recovery-Codes werden ausschließlich während der noch
+manueller Eingabealternative und expliziter Sicherung der Recovery-Codes.
+TOTP wird erst nach Prüfung des ersten App-Codes aktiviert. URI und Recovery-Codes werden ausschließlich während der noch
 nicht bestätigten Einschreibung angezeigt. Ein Neustart ersetzt eine
 ausstehende Einschreibung und die zugehörigen Recovery-Codes. Die Paketversion und ihre
 Lizenz werden im Composer-Lockfile festgeschrieben und vor jedem Release
@@ -195,11 +195,13 @@ zweckgebunden an die Session, begrenzt sie auf 60 Sekunden und verwirft sie
 nach jedem Einreichungsversuch. Beide Endpunkte sind auf sechs Anfragen pro
 Minute begrenzt. Ein erfolgreicher Passkey-Login rotiert die Session und
 durchläuft weiterhin die zentralen Passwortwechsel- und Recovery-Gates.
-Eigene Registrierungs- und Verwaltungsrouten verlangen Authentifizierung und
-eine frische Passwortbestätigung. Die Registrierung verlangt discoverable
+Eigene Registrierungs- und Verwaltungsrouten verlangen Authentifizierung. Die
+Registrierung bleibt an eine frische WebAuthn-Challenge gebunden; eine erneute
+Passwortbestätigung wird nicht verlangt. Die Registrierung verlangt discoverable
 Credentials und User Verification. Listendarstellungen enthalten nur Namen,
 Gerätekennung und Zeitstempel, keine Credential-Payloads. Umbenennen und
 Widerruf prüfen die Eigentümerschaft; der Widerruf löscht das Credential.
+Faktorverwaltungsrouten lehnen Stellvertretersitzungen serverseitig ab.
 Das Profil bietet mehrere Geräte, Umbenennen und Widerruf an. Die Login-Seite
 zeigt die Passkey-Option kontoübergreifend vor einer Kontoauswahl.
 

@@ -1,10 +1,12 @@
 # Profil-Sicherheitsdialoge Umsetzungsplan
 
+> **Planänderung vom 18.11.2026:** Die nachstehenden ursprünglichen Etappen zur Passwortbestätigung im Profil sind durch die bestätigte Entscheidung ersetzt: sämtliche Passwort-UI und -Anforderungen aus dem Profil entfernen, Passwortänderung ausschließlich über `/passwort/aendern`, persönliche Passkey- und TOTP-Verwaltung ohne erneute Passwortabfrage. Anmeldung, Passkey-Eigentum, User Verification, frische Registrierungschallenge, TOTP-Codeprüfung und der getrennte Super-Admin-Recovery-Ablauf bleiben erhalten. Die historischen Etappen unten dokumentieren den bisherigen Umsetzungsstand; ihre Passwortbestätigungs-Punkte sind erledigt und werden durch die abschließenden Änderungsaufgaben ergänzt.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task. Schritte werden einzeln verifiziert, reviewed und committed.
 
-**Ziel:** Kontosicherheit verständlich und bedienbar machen: TOTP-/Passkey-Verwaltung mit Passwortdialogen, verständlicher Sicherheitshinweis und passwortloser Login über Passkey oder einmaligen E-Mail-Link.
+**Ziel:** Kontosicherheit verständlich und bedienbar machen: Passkey- und TOTP-Verwaltung ohne Passwort-UI im Profil, verständlicher Sicherheitshinweis und passwortloser Login über Passkey oder einmaligen E-Mail-Link.
 
-**Architektur:** Eine zugängliche Vue-Dialogkomponente kapselt Passwortfeld, Formularzustände und Abbrechen. `SecurityTab` nutzt sie für TOTP- und Passkey-Aktionen; der JSON-Pfad der Passwortbestätigung gibt maschinenlesbare Antworten zurück. Das Sicherheitshinweis-Interstitial erklärt Passkey und Authenticator-App und speichert den 21-Tage-Aufschub vor der Navigation. Der passwortlose Login zeigt zuerst Passkey, danach die E-Mail-Link-Option. E-Mail-Links verwenden einen einmaligen, gehashten Nonce und eine tokenfreie Bestätigungsseite; Kontoabfrage und Mailjob laufen nach der generischen Antwort. Bei TOTP-Konten folgt die bestehende TOTP-Challenge; E-Mail-Codes sind kein Ersatzfaktor.
+**Architektur:** `SecurityTab` bietet Passkey- und TOTP-Verwaltung innerhalb der angemeldeten Sitzung. TOTP wird durch einen gültigen App-Code bestätigt, die Deaktivierung durch eine einfache Klickbestätigung. Passwortänderung bleibt auf der eigenständigen Seite `/passwort/aendern`. Das Sicherheitshinweis-Interstitial erklärt Passkey und Authenticator-App und speichert den 21-Tage-Aufschub vor der Navigation. Der passwortlose Login zeigt zuerst Passkey, danach die E-Mail-Link-Option. E-Mail-Links verwenden einen einmaligen, gehashten Nonce und eine tokenfreie Bestätigungsseite; Kontoabfrage und Mailjob laufen nach der generischen Antwort. Bei TOTP-Konten folgt die bestehende TOTP-Challenge; E-Mail-Codes sind kein Ersatzfaktor.
 
 **Tech Stack:** Laravel 11, Inertia.js, Vue, Axios, PHPUnit, Vitest.
 
@@ -12,7 +14,7 @@
 
 ## Globale Vorgaben
 
-- Bestehende Passwortprüfung, Rate-Limits, Berechtigungen, 21-Tage-Aufschub und Produktionsbedingungen bleiben erhalten.
+- Authentifizierung, Passkey-Eigentumsprüfung, User Verification, frische Registrierungschallenge, TOTP-Codeprüfung, übrige Rate-Limits, Berechtigungen, 21-Tage-Aufschub und Produktionsbedingungen bleiben erhalten. Passwörter bleiben auf die eigenständigen Passwortwechsel- und Super-Admin-Recovery-Abläufe begrenzt.
 - Der Login-Link nutzt einen kryptografisch zufälligen 256-Bit-Nonce, wird in der DB nur als SHA-256-Hash und im Queue-Mailjob verschlüsselt gespeichert, läuft nach zehn Minuten ab und wird bei Bestätigung atomar genau einmal verbraucht; GET verbraucht nichts.
 - E-Mail-Link-Anforderungen verwenden identische Antworten für vorhandene und unbekannte Konten und werden pro IP und normalisierter E-Mail begrenzt.
 - Bei aktiviertem TOTP verlangt der E-Mail-Link weiterhin TOTP; im Challenge-Schritt gibt es keinen E-Mail-Code als TOTP-Ersatz.
@@ -124,3 +126,12 @@
 - Den JSON-Pfad am bestehenden `expectsJson()` festmachen; Redirectanfragen müssen ihr bisheriges Verhalten behalten.
 - Die Passkey-Schaltfläche nach bestätigtem Passwort wieder fokussieren, damit der notwendige nächste Klick klar und per Tastatur erreichbar ist.
 - Keine Passwortwerte in Fehlermeldungen, Ereignisse, Logs oder persistente Komponenten-Props übernehmen.
+
+
+### Abschließende Planänderung: Passwortfunktionen aus dem Profil entfernen
+
+- [x] Sicherheitsreiter und Profileditor von Passwortfeldern, Passwortanforderungen und Passwort-Payload befreien.
+- [x] Passwortänderung im Profil-Speicher-Endpunkt ausschließen; separates `/passwort/aendern` für reguläre und erzwungene Änderungen erhalten.
+- [x] `password.confirm`-Gate aus persönlichen Passkey-Routen entfernen; Authentifizierung, Besitzprüfung, frische Challenge und User Verification erhalten.
+- [x] TOTP Start/Bestätigung/Deaktivierung ohne Kontopasswort ermöglichen; Codeprüfung und Rate-Limit erhalten, Deaktivierung per Fehlklickbestätigung schützen.
+- [x] Veraltete Profil-Passwortdialoge, Controller, Route und Seite entfernen; Benutzer-, Administrator- und Technikhandbücher aktualisieren.

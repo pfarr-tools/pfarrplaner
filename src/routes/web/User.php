@@ -30,14 +30,21 @@
 
 use App\Http\Controllers\Auth\TwoFactorRecoveryController;
 use App\Http\Controllers\UserController;
+use App\Http\Middleware\PreventImpersonatedSecurityChanges;
 
 Route::get('/profil', [UserController::class, 'profile'])->name('user.profile');
 Route::patch('/profil', [UserController::class, 'profileSave'])->name('user.profile.save');
-Route::post('/profil/zwei-faktor/start', [UserController::class, 'startTwoFactor'])->name('user.two-factor.start');
-Route::post('/profil/zwei-faktor/bestaetigen', [UserController::class, 'confirmTwoFactor'])->name('user.two-factor.confirm');
-Route::post('/profil/zwei-faktor/deaktivieren', [UserController::class, 'disableTwoFactor'])->name('user.two-factor.disable');
+Route::post('/profil/zwei-faktor/start', [UserController::class, 'startTwoFactor'])
+    ->middleware(PreventImpersonatedSecurityChanges::class)
+    ->name('user.two-factor.start');
+Route::post('/profil/zwei-faktor/bestaetigen', [UserController::class, 'confirmTwoFactor'])
+    ->middleware(PreventImpersonatedSecurityChanges::class)
+    ->name('user.two-factor.confirm');
+Route::post('/profil/zwei-faktor/deaktivieren', [UserController::class, 'disableTwoFactor'])
+    ->middleware(PreventImpersonatedSecurityChanges::class)
+    ->name('user.two-factor.disable');
 Route::get('/profil/zwei-faktor/wiederherstellen', [TwoFactorRecoveryController::class, 'show'])
-    ->middleware('auth')
+    ->middleware(['auth', PreventImpersonatedSecurityChanges::class])
     ->name('user.two-factor.recovery');
 Route::post('/benutzer/{user}/zwei-faktor/wiederherstellen', [UserController::class, 'recoverTwoFactor'])
     ->name('user.two-factor.recover');

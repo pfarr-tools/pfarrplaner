@@ -126,6 +126,18 @@
                             </span>
                         </inertia-link>
                     </li>
+                    <li>
+                        <inertia-link
+                            :href="route('password.edit')"
+                            class="dropdown-item profile-menu-item"
+                        >
+                            <span class="profile-menu-item-icon mdi mdi-key-outline"></span>
+                            <span>
+                                <strong>Passwort ändern</strong><br />
+                                <small>Eigenes Anmeldepasswort aktualisieren</small>
+                            </span>
+                        </inertia-link>
+                    </li>
                     <li><hr class="dropdown-divider" /></li>
                     <li>
                         <button

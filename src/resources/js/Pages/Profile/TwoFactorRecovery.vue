@@ -7,14 +7,6 @@
             vollständig nutzbar.
         </p>
 
-        <FormInput
-            v-if="!complete"
-            name="current_password"
-            label="Aktuelles Passwort"
-            type="password"
-            autocomplete="current-password"
-            v-model="currentPassword"
-        />
         <button
             v-if="!setup && !complete"
             type="button"
@@ -98,13 +90,12 @@ export default {
     name: 'TwoFactorRecovery',
     components: { FormInput },
     emits: ['enrolment-complete'],
-    /** Return transient form state; credentials and TOTP material stay in memory only. */
+    /** Return transient TOTP setup state; generated setup data stays in memory only. */
     data() {
         return {
             busy: false,
             code: '',
             complete: false,
-            currentPassword: '',
             error: '',
             setup: null,
         }
@@ -118,13 +109,10 @@ export default {
         },
     },
     methods: {
-        /** Start TOTP setup after the user re-enters their password. */
+        /** Start TOTP setup for the authenticated account. */
         async startEnrolment() {
             await this.runRequest(
-                () =>
-                    axios.post(window.route('user.two-factor.start'), {
-                        current_password: this.currentPassword,
-                    }),
+                () => axios.post(window.route('user.two-factor.start'), {}),
                 (response) => {
                     this.setup = response.data
                 },
@@ -135,7 +123,6 @@ export default {
             await this.runRequest(
                 () =>
                     axios.post(window.route('user.two-factor.confirm'), {
-                        current_password: this.currentPassword,
                         code: this.code,
                     }),
                 () => {
@@ -161,7 +148,6 @@ export default {
                         ? 'Zu viele Versuche. Bitte später erneut versuchen.'
                         : 'Die Zwei-Faktor-Einrichtung konnte nicht ausgeführt werden.'
             } finally {
-                this.currentPassword = ''
                 this.busy = false
             }
         },

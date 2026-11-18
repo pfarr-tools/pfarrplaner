@@ -697,60 +697,30 @@ class UserWebFeatureTest extends TestCase
         Mail::assertQueued(AccountData::class);
     }
 
-    /** Activation and deactivation require a fresh password re-authentication. */
-    public function test_two_factor_security_actions_require_reauthentication(): void
+    /** Personal TOTP setup and removal rely on authentication and the TOTP code, not a password. */
+    public function test_two_factor_security_actions_do_not_require_a_password(): void
     {
         $this->withoutMiddleware(VerifyCsrfToken::class);
         $user = User::factory()->create(['password' => 'Current1!']);
         RateLimiter::clear('two-factor-confirm:'.$user->getKey());
-        RateLimiter::clear('two-factor-reauth:'.$user->getKey());
-
-        $this->actingAs($user)
-            ->postJson(route('user.two-factor.start'), ['current_password' => 'wrong'])
-            ->assertUnprocessable()
-            ->assertJsonValidationErrors('current_password');
 
         $setupResponse = $this->actingAs($user)
-            ->postJson(route('user.two-factor.start'), ['current_password' => 'Current1!'])
+            ->postJson(route('user.two-factor.start'), [])
             ->assertOk()
             ->assertJsonStructure(['provisioning_uri', 'recovery_codes']);
 
-        $setup = $setupResponse->json();
-        $freshUser = $user->fresh();
+        self::assertTrue($user->fresh()->hasPendingTwoFactor());
+        self::assertArrayNotHasKey('secret', $setupResponse->json());
 
-        self::assertTrue($freshUser->hasPendingTwoFactor());
-        self::assertArrayNotHasKey('secret', $setup);
-
-        $setupResponse = $this->actingAs($user)
-            ->postJson(route('user.two-factor.start'), ['current_password' => 'Current1!'])
-            ->assertOk()
-            ->assertJsonStructure(['provisioning_uri', 'recovery_codes']);
-
-        $setup = $setupResponse->json();
-        $freshUser = $user->fresh();
-
-        $code = app(TwoFactorService::class)->currentCode($freshUser->twoFactorSecret());
-
-        $formattedCode = substr($code, 0, 3).' '.substr($code, 3);
-
+        parse_str((string) parse_url($setupResponse->json('provisioning_uri'), PHP_URL_QUERY), $query);
+        self::assertNotEmpty($query['secret'] ?? null);
+        $code = app(TwoFactorService::class)->currentCode($query['secret']);
         $this->actingAs($user)
-            ->postJson(route('user.two-factor.confirm'), [
-                'current_password' => 'Current1!',
-                'code' => $formattedCode,
-            ])
+            ->postJson(route('user.two-factor.confirm'), ['code' => $code])
             ->assertOk();
-
         self::assertTrue($user->fresh()->hasTwoFactorEnabled());
 
-        $this->actingAs($user)
-            ->postJson(route('user.two-factor.disable'), ['current_password' => 'wrong'])
-            ->assertUnprocessable()
-            ->assertJsonValidationErrors('current_password');
-
-        $this->actingAs($user)
-            ->postJson(route('user.two-factor.disable'), ['current_password' => 'Current1!'])
-            ->assertOk();
-
+        $this->actingAs($user)->postJson(route('user.two-factor.disable'), [])->assertOk();
         self::assertFalse($user->fresh()->hasTwoFactorEnabled());
     }
 
@@ -758,16 +728,12 @@ class UserWebFeatureTest extends TestCase
     public function test_two_factor_confirmation_rejects_invalid_codes_generically(): void
     {
         $this->withoutMiddleware(VerifyCsrfToken::class);
-        $user = User::factory()->create(['password' => 'Current1!']);
+        $user = User::factory()->create();
         RateLimiter::clear('two-factor-confirm:'.$user->getKey());
-        RateLimiter::clear('two-factor-reauth:'.$user->getKey());
         $user->startTwoFactorEnrolment();
 
         $this->actingAs($user)
-            ->postJson(route('user.two-factor.confirm'), [
-                'current_password' => 'Current1!',
-                'code' => '000000',
-            ])
+            ->postJson(route('user.two-factor.confirm'), ['code' => '000000'])
             ->assertUnprocessable()
             ->assertJsonValidationErrors('code')
             ->assertJsonMissingPath('exception');
@@ -775,7 +741,7 @@ class UserWebFeatureTest extends TestCase
         self::assertTrue($user->fresh()->hasPendingTwoFactor());
     }
 
-    /** State-changing endpoints reject a request without a CSRF token. */
+    /** State-changing endpoints retain CSRF protection. */
     public function test_two_factor_start_requires_csrf_protection(): void
     {
         $route = Route::getRoutes()->getByName('user.two-factor.start');
@@ -789,95 +755,60 @@ class UserWebFeatureTest extends TestCase
     public function test_two_factor_confirmation_is_rate_limited(): void
     {
         $this->withoutMiddleware(VerifyCsrfToken::class);
-        $user = User::factory()->create(['password' => 'Current1!']);
+        $user = User::factory()->create();
         RateLimiter::clear('two-factor-confirm:'.$user->getKey());
         $user->startTwoFactorEnrolment();
 
         foreach (range(1, 5) as $attempt) {
             $this->actingAs($user)
-                ->postJson(route('user.two-factor.confirm'), [
-                    'current_password' => 'Current1!',
-                    'code' => '000000',
-                ])
+                ->postJson(route('user.two-factor.confirm'), ['code' => '000000'])
                 ->assertUnprocessable();
         }
 
         $this->actingAs($user)
-            ->postJson(route('user.two-factor.confirm'), [
-                'current_password' => 'Current1!',
-                'code' => '000000',
-            ])
+            ->postJson(route('user.two-factor.confirm'), ['code' => '000000'])
             ->assertStatus(429)
             ->assertJson(['message' => 'Zu viele Versuche. Bitte später erneut versuchen.']);
-    }
-
-    /** Password re-authentication itself is throttled before factor changes. */
-    public function test_two_factor_reauthentication_is_rate_limited(): void
-    {
-        $this->withoutMiddleware(VerifyCsrfToken::class);
-        $user = User::factory()->create(['password' => 'Current1!']);
-        RateLimiter::clear('two-factor-reauth:'.$user->getKey());
-
-        foreach (range(1, 5) as $attempt) {
-            $this->actingAs($user)
-                ->postJson(route('user.two-factor.start'), ['current_password' => 'wrong'])
-                ->assertUnprocessable();
-        }
-
-        $this->actingAs($user)
-            ->postJson(route('user.two-factor.start'), ['current_password' => 'wrong'])
-            ->assertStatus(429);
     }
 
     /** The personal factor routes require an authenticated user. */
     public function test_two_factor_routes_require_authentication(): void
     {
-        $this->postJson(route('user.two-factor.start'), ['current_password' => 'Current1!'])
-            ->assertUnauthorized();
+        $this->postJson(route('user.two-factor.start'), [])->assertUnauthorized();
     }
 
-    /** Re-authentication throttling is applied independently to confirmation. */
-    public function test_two_factor_confirmation_reauthentication_is_rate_limited(): void
+    /** A proxy session cannot alter the target account's personal login factors. */
+    public function test_impersonated_session_cannot_change_personal_two_factor_settings(): void
     {
         $this->withoutMiddleware(VerifyCsrfToken::class);
-        $user = User::factory()->create(['password' => 'Current1!']);
-        RateLimiter::clear('two-factor-reauth:'.$user->getKey());
+        $user = User::factory()->create();
         $user->startTwoFactorEnrolment();
 
-        foreach (range(1, 5) as $attempt) {
-            $this->actingAs($user)
-                ->postJson(route('user.two-factor.confirm'), [
-                    'current_password' => 'wrong',
-                    'code' => '000000',
-                ])
-                ->assertUnprocessable();
-        }
+        $this->actingAs($user)
+            ->withSession(['adminUserSwitchBack' => $this->user->id])
+            ->postJson(route('user.two-factor.confirm'), ['code' => '000000'])
+            ->assertForbidden();
 
         $this->actingAs($user)
-            ->postJson(route('user.two-factor.confirm'), [
-                'current_password' => 'wrong',
-                'code' => '000000',
-            ])
-            ->assertStatus(429);
+            ->withSession(['adminUserSwitchBack' => $this->user->id])
+            ->postJson(route('user.two-factor.disable'), [])
+            ->assertForbidden();
+
+        self::assertTrue($user->fresh()->hasPendingTwoFactor());
     }
 
-    /** Re-authentication throttling is applied independently to deactivation. */
-    public function test_two_factor_disable_reauthentication_is_rate_limited(): void
+    /** A nested impersonation cannot replace the original administrator session marker. */
+    public function test_impersonated_session_cannot_start_a_second_impersonation(): void
     {
         $this->withoutMiddleware(VerifyCsrfToken::class);
-        $user = User::factory()->create(['password' => 'Current1!']);
-        RateLimiter::clear('two-factor-reauth:'.$user->getKey());
-        $user->startTwoFactorEnrolment();
+        $target = User::factory()->create();
 
-        foreach (range(1, 5) as $attempt) {
-            $this->actingAs($user)
-                ->postJson(route('user.two-factor.disable'), ['current_password' => 'wrong'])
-                ->assertUnprocessable();
-        }
+        $this->actingAs($this->user)
+            ->withSession(['adminUserSwitchBack' => $this->user->id])
+            ->post(route('user.switch', $target))
+            ->assertForbidden();
 
-        $this->actingAs($user)
-            ->postJson(route('user.two-factor.disable'), ['current_password' => 'wrong'])
-            ->assertStatus(429);
+        $this->assertSame($this->user->id, session('adminUserSwitchBack'));
     }
 
     /** A string false value is not treated as an account-creation request. */
@@ -1017,44 +948,26 @@ class UserWebFeatureTest extends TestCase
         $this->assertSame($passwordHash, $target->fresh()->getRawOriginal('password'));
     }
 
-    public function test_profile_password_change_keeps_current_hash_until_validation(): void
+    /** The profile endpoint ignores password fields and never changes the account password. */
+    public function test_profile_editor_cannot_change_the_account_password(): void
     {
         $this->withoutMiddleware(VerifyCsrfToken::class);
-        $this->user->update(['password' => 'testtest', 'must_change_password' => 0]);
+        $this->user->update(['password' => 'Current1!', 'must_change_password' => 0]);
 
         $this->actingAs($this->user)
             ->patch(route('user.profile.save'), [
                 'first_name' => $this->user->first_name,
                 'last_name' => $this->user->last_name,
                 'email' => $this->user->email,
-                'current_password' => 'testtest',
+                'current_password' => 'Current1!',
                 'new_password' => 'Voca1234!',
                 'new_password_confirmation' => 'Voca1234!',
+                'password' => 'Attempted1!',
             ])
             ->assertRedirect(route('home'));
 
-        $this->assertTrue(Hash::check('Voca1234!', $this->user->fresh()->password));
-        $this->assertFalse((bool) $this->user->fresh()->must_change_password);
-    }
-
-    public function test_profile_password_change_rejects_password_without_symbol(): void
-    {
-        $this->withoutMiddleware(VerifyCsrfToken::class);
-        $this->user->update(['password' => 'Current1!']);
-
-        $response = $this->actingAs($this->user)
-            ->patch(route('user.profile.save'), [
-                'first_name' => $this->user->first_name,
-                'last_name' => $this->user->last_name,
-                'email' => $this->user->email,
-                'current_password' => 'Current1!',
-                'new_password' => 'Voca1234',
-                'new_password_confirmation' => 'Voca1234',
-            ]);
-
-        $response->assertSessionHasErrors('new_password');
-
         $this->assertTrue(Hash::check('Current1!', $this->user->fresh()->password));
+        $this->assertFalse((bool) $this->user->fresh()->must_change_password);
     }
 
     public function test_initial_password_can_be_changed_without_current_password(): void

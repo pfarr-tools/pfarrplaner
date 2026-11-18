@@ -58,7 +58,6 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
@@ -560,22 +559,13 @@ class UserController extends Controller
     {
         $user = Auth::user();
         Gate::authorize('update', $user);
+        $request->merge(['password' => null]);
         $data = $this->validateRequest($request, $user);
 
-        // An omitted or empty password means "keep the existing password".
+        // Profile updates do not change the account password.
         unset($data['password']);
 
         $user->update($data);
-
-        // change password?
-        if ($request->has('new_password')) {
-            $passwordData = $request->validate([
-                'current_password' => 'required|hash:'.Auth::user()->password,
-                'new_password' => ['required', 'string', new StrongPassword, 'confirmed', 'not_current_password', 'notIn:testtest'],
-                'new_password_confirmation' => 'required',
-            ]);
-            $user->update(['password' => $passwordData['new_password'], 'must_change_password' => false]);
-        }
 
         // set subscriptions
         $user->setSubscriptionsFromArray($request->get('subscriptions') ?: []);
@@ -595,16 +585,15 @@ class UserController extends Controller
     }
 
     /**
-     * Start a re-authenticated TOTP enrolment and return one-time setup data.
+     * Start TOTP enrollment and return one-time setup data for the authenticated user.
+     *
+     * @return JsonResponse One-time provisioning data.
      */
-    public function startTwoFactor(Request $request): JsonResponse
+    public function startTwoFactor(): JsonResponse
     {
         /** @var User $user */
         $user = Auth::user();
         Gate::authorize('update', $user);
-        $this->validateTwoFactorReauthentication($request, $user);
-
-        $rateLimitKey = 'two-factor-reauth:'.$user->getKey();
         try {
             $setup = DB::transaction(function () use ($user): TwoFactorSetup {
                 /** @var User $lockedUser */
@@ -616,10 +605,9 @@ class UserController extends Controller
 
                 return $lockedUser->startTwoFactorEnrolment();
             });
-            RateLimiter::clear($rateLimitKey);
         } catch (TwoFactorAlreadyEnabledException) {
             throw ValidationException::withMessages([
-                'current_password' => 'Die Zwei-Faktor-Einstellungen konnten nicht geändert werden.',
+                'two_factor' => 'Die Zwei-Faktor-Einstellungen konnten nicht geändert werden.',
             ]);
         }
 
@@ -629,13 +617,17 @@ class UserController extends Controller
         ]);
     }
 
-    /** Confirm a re-authenticated TOTP enrolment with the first authenticator code. */
+    /**
+     * Confirm TOTP enrollment with the first authenticator code.
+     *
+     * @param  Request  $request  Current HTTP request containing the TOTP code.
+     * @return JsonResponse Confirmation result.
+     */
     public function confirmTwoFactor(Request $request): JsonResponse
     {
         /** @var User $user */
         $user = Auth::user();
         Gate::authorize('update', $user);
-        $this->validateTwoFactorReauthentication($request, $user);
         $validated = $request->validate(['code' => ['required', 'string']]);
         $code = str_replace([' ', '-'], '', $validated['code']);
 
@@ -680,14 +672,16 @@ class UserController extends Controller
         return response()->json(['enabled' => true]);
     }
 
-    /** Disable TOTP after a fresh password re-authentication. */
-    public function disableTwoFactor(Request $request): JsonResponse
+    /**
+     * Disable TOTP for the authenticated account.
+     *
+     * @return JsonResponse Updated factor state.
+     */
+    public function disableTwoFactor(): JsonResponse
     {
         /** @var User $user */
         $user = Auth::user();
         Gate::authorize('update', $user);
-        $this->validateTwoFactorReauthentication($request, $user);
-
         try {
             DB::transaction(function () use ($user): void {
                 /** @var User $lockedUser */
@@ -696,7 +690,7 @@ class UserController extends Controller
             });
         } catch (TwoFactorNotPendingException) {
             throw ValidationException::withMessages([
-                'current_password' => 'Die Zwei-Faktor-Einstellungen konnten nicht geändert werden.',
+                'two_factor' => 'Die Zwei-Faktor-Einstellungen konnten nicht geändert werden.',
             ]);
         }
 
@@ -724,32 +718,6 @@ class UserController extends Controller
         return redirect()->route('user.edit', $user->getKey())
             ->with('message', 'Der Zwei-Faktor-Zugang wurde widerrufen. Das Konto muss TOTP erneut einrichten.')
             ->with('type', 'success');
-    }
-
-    /** Validate the current password without exposing account state in errors. */
-    private function validateTwoFactorReauthentication(Request $request, User $user): void
-    {
-        $rateLimitKey = 'two-factor-reauth:'.$user->getKey();
-        $password = $request->input('current_password');
-
-        DB::transaction(function () use ($user, $password, $rateLimitKey): void {
-            /** @var User $lockedUser */
-            $lockedUser = User::query()->lockForUpdate()->findOrFail($user->getKey());
-
-            if (RateLimiter::tooManyAttempts($rateLimitKey, 5)) {
-                throw new TooManyRequestsHttpException(null, 'Zu viele Versuche. Bitte später erneut versuchen.');
-            }
-
-            if (! is_string($password) || ! Hash::check($password, (string) $lockedUser->password)) {
-                RateLimiter::hit($rateLimitKey, 60);
-
-                throw ValidationException::withMessages([
-                    'current_password' => 'Die Anmeldedaten konnten nicht bestätigt werden.',
-                ]);
-            }
-        });
-
-        RateLimiter::clear($rateLimitKey);
     }
 
     /**
@@ -864,6 +832,7 @@ class UserController extends Controller
      */
     public function switch(Request $request, User $user)
     {
+        abort_if(Session::has('adminUserSwitchBack'), 403);
         Gate::authorize('impersonate', $user);
         $adminId = Auth::user()->id;
         Auth::logout();

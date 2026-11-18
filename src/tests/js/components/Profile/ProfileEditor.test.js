@@ -1,9 +1,10 @@
 import { mount } from '@vue/test-utils'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import ProfileEditor from '@/Pages/Profile/ProfileEditor.vue'
 
 describe('ProfileEditor security tab', () => {
     it('passes the server-provided passkeys to the security tab', () => {
+        const patch = vi.fn()
         const wrapper = mount(ProfileEditor, {
             props: {
                 tab: 'security',
@@ -29,7 +30,7 @@ describe('ProfileEditor security tab', () => {
                     tab: { template: '<div><slot /></div>' },
                     ProfileTab: true,
                     'security-tab': {
-                        props: ['passkeys'],
+                        props: ['passkeys', 'twoFactorEnabled', 'twoFactorPending', 'user'],
                         template:
                             '<div data-testid="security-passkeys">{{ passkeys[0].name }}</div>',
                     },
@@ -38,9 +39,15 @@ describe('ProfileEditor security tab', () => {
                     CalendarConnectionsTab: true,
                     ExternalContentTab: true,
                 },
+                mocks: { $inertia: { patch } },
             },
         })
 
         expect(wrapper.find('[data-testid="security-passkeys"]').text()).toBe('Laptop')
+        wrapper.vm.saveProfile()
+        expect(patch).toHaveBeenCalledOnce()
+        expect(patch.mock.calls[0][1]).not.toHaveProperty('password')
+        expect(patch.mock.calls[0][1]).not.toHaveProperty('current_password')
+        expect(patch.mock.calls[0][1]).not.toHaveProperty('new_password')
     })
 })
