@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\People\User;
+use App\Services\SecurityOnboardingService;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -70,8 +72,14 @@ class EmailLoginLinkController extends Controller
         return $response;
     }
 
-    /** Atomically consume the confirmed nonce and start login or the TOTP challenge. */
-    public function confirm(Request $request)
+    /**
+     * Atomically consume the confirmed nonce and start login or the TOTP challenge.
+     *
+     * @param  Request  $request  Current login-link confirmation request.
+     * @param  SecurityOnboardingService  $onboarding  Login reminder tracker.
+     * @return RedirectResponse Redirect to the TOTP challenge or application destination.
+     */
+    public function confirm(Request $request, SecurityOnboardingService $onboarding): RedirectResponse
     {
         $linkId = $request->session()->get('login.link.confirmation_id');
         $result = DB::transaction(function () use ($linkId): array {
@@ -117,6 +125,7 @@ class EmailLoginLinkController extends Controller
         }
 
         $request->session()->regenerate();
+        $onboarding->recordEmailLinkLogin($user);
         Auth::guard()->login($user);
 
         if ($user->two_factor_recovery_required_at) {

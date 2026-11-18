@@ -32,6 +32,7 @@ use App\Http\Controllers\Auth\EmailLoginLinkController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\PasskeyLoginController;
 use App\Http\Controllers\Auth\PasskeyManagementController;
+use App\Http\Controllers\Auth\SecurityOnboardingController;
 use App\Http\Controllers\UserController;
 use App\Http\Middleware\PreventImpersonatedSecurityChanges;
 use App\Http\Middleware\ProcessPasswordlessLoginLinkAfterResponse;
@@ -84,3 +85,9 @@ Route::get('/login/challenge', [LoginController::class, 'showChallenge'])->name(
 Route::post('/login/challenge', [LoginController::class, 'verifyChallenge'])->name('login.challenge.verify');
 Route::post('/login/challenge/cancel', [LoginController::class, 'cancelChallenge'])->name('login.challenge.cancel');
 Route::post('/logout', [UserController::class, 'logout'])->name('logout');
+Route::middleware('auth')->group(function (): void {
+    Route::get('/sicherheit/einrichten', [SecurityOnboardingController::class, 'show'])
+        ->name('security.onboarding');
+    Route::post('/sicherheit/spaeter', [SecurityOnboardingController::class, 'later'])
+        ->name('security.onboarding.later');
+});

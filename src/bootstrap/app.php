@@ -34,6 +34,7 @@ use App\Http\Middleware\Cors;
 use App\Http\Middleware\ForceDomain;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\RedirectIfAuthenticated;
+use App\Http\Middleware\RequireSecurityOnboarding;
 use App\Http\Middleware\RequireTwoFactorRecovery;
 use App\Http\Middleware\TrustProxies;
 use App\Http\Middleware\VerifyCsrfToken;
@@ -81,8 +82,12 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web(append: [
             HandleInertiaRequests::class,
             RequireTwoFactorRecovery::class,
+            RequireSecurityOnboarding::class,
         ]);
-        $middleware->api(append: [RequireTwoFactorRecovery::class]);
+        $middleware->api(append: [
+            RequireTwoFactorRecovery::class,
+            RequireSecurityOnboarding::class,
+        ]);
 
         // Add Sanctum stateful handling to api group
         $middleware->api(prepend: [EnsureFrontendRequestsAreStateful::class]);
@@ -94,6 +99,7 @@ return Application::configure(basePath: dirname(__DIR__))
             SubstituteBindings::class,
             'auth:sanctum',
             RequireTwoFactorRecovery::class,
+            RequireSecurityOnboarding::class,
         ]);
 
         // Middleware aliases

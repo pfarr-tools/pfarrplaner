@@ -67,25 +67,26 @@
 **Files:**
 - Create: `src/app/Services/SecurityOnboardingService.php`
 - Create: `src/app/Http/Middleware/RequireSecurityOnboarding.php`
+- Create: `src/app/Http/Controllers/Auth/SecurityOnboardingController.php`
+- Create: `src/resources/js/Pages/Auth/SecurityOnboarding.vue` und gezielter UI-Test
 - Modify: `src/app/Http/Controllers/Auth/EmailLoginLinkController.php`, `src/bootstrap/app.php`, Auth-/Settings-Routen
-- Test: neue Service-/Middleware-/Featuretests in `src/tests/Feature/`
+- Test: Service-/Middleware-/Featuretests und UI-Test in `src/tests/`
 
-- [ ] Schreibe Tests für vier erste E-Mail-Link-Logins, 14-Tage-Grenze, Faktor-Ausnahme, „Später erinnern“ und gesperrte Direkt-URLs.
-- [ ] Aktualisiere den Zähler beim bestätigten E-Mail-Link-Login ohne zusätzlichen Faktor.
-- [ ] Schütze authentifizierte App-Routen und erlaube nur Onboarding, Faktor-Setup, Abmelden und Aufschieben.
-- [ ] Führe isolierte Tests aus; Senior Review; committe nur Task-3-Dateien.
+- [x] Schreibe Tests für vier erste E-Mail-Link-Logins, 14-Tage-Grenze, Faktor-Ausnahme, „Später erinnern“, gesperrte Direkt-URLs und nicht gleitende Anzeigedaten.
+- [x] Aktualisiere den Zähler beim bestätigten E-Mail-Link-Login ohne zusätzlichen Faktor.
+- [x] Schütze Web-, API- und Extranet-Routen; erlaube Onboarding, Faktor-Setup, Abmelden und Aufschieben.
+- [x] Implementiere die Inertia-Onboarding-Seite mit direkter Nutzung der bestehenden Passkey-/TOTP-Einrichtung.
+- [x] Führe isolierte Tests aus; Senior Review; committe nur Task-3-Dateien.
 
-### Task 4: Fullscreen-Onboarding mit direkter Faktoreinrichtung
+**Task-3-Verifikation:** Isolierte PHP-Featuretests: 15 Tests, 157 Assertions; Vitest: 13 Tests; Vite-Produktionsbuild erfolgreich. `format:check` für die neuen Vue-Dateien und `git diff --check` erfolgreich. Senior Re-Review: **APPROVED**. `docs:check` meldet weiterhin vorhandene fehlende PHPDocs in `InstallCommand.php` und `AuthBackend.php`.
+
+### Task 4: Faktoreinrichtung im Onboarding verifizieren
 
 **Files:**
-- Create: `src/resources/js/Pages/Auth/SecurityOnboarding.vue`
-- Create/refactor as needed: gemeinsame Passkey-/TOTP-Setup-Komponenten aus `SecurityTab.vue`
-- Modify: Auth-Controller für Onboarding-Seite und Aufschieben
-- Test: `src/tests/js/Pages/Auth/SecurityOnboarding.test.js` und Faktor-Featuretests
+- Modify: bestehende UI-/Featuretests für erfolgreiche und fehlgeschlagene Faktoreinrichtung
 
-- [ ] Schreibe UI-Tests für Erklärungen, Microsoft Authenticator/2FAS-Links, Aufschieben und direkten Start beider Setup-Flows.
-- [ ] Implementiere Fullscreen-Seite mit denselben Setup-Endpunkten und Sicherheitsprüfungen wie im Profil.
-- [ ] Prüfe Freigabe nach Faktor-Setup/Aufschieben; unvollständiges TOTP darf die Sperre nicht lösen.
+- [ ] Ergänze UI-Tests, die TOTP- und Passkey-Setup direkt auf der Onboarding-Seite ausführen.
+- [ ] Prüfe Freigabe nach bestätigtem Faktor; unvollständiges TOTP darf die Sperre nicht lösen.
 - [ ] Führe gezielte PHP-/Vitest-Tests und Build aus; Senior Review; committe nur Task-4-Dateien.
 
 ### Task 5: Handbücher und Abschlussprüfung

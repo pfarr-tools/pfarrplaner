@@ -121,6 +121,7 @@ final class EmailLoginLinkFeatureTest extends TestCase
 
         $this->assertAuthenticatedAs($user);
         self::assertNotNull(DB::table('passwordless_login_links')->value('consumed_at'));
+        self::assertSame(1, $user->fresh()->security_onboarding_email_logins);
 
         auth()->logout();
         $this->withSession([])
@@ -176,6 +177,7 @@ final class EmailLoginLinkFeatureTest extends TestCase
             ->assertSessionHas('login.challenge.user_id', $user->getKey());
 
         $this->assertGuest();
+        self::assertSame(0, $user->fresh()->security_onboarding_email_logins);
         $this->from(route('login.challenge'))
             ->post(route('login.challenge.verify'), [
                 'code' => app(TwoFactorService::class)->currentCode($setup->secret),

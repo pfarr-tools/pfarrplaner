@@ -31,6 +31,17 @@ use App\Http\Middleware\VerifyCsrfToken;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+$statefulDomains = explode(',', env(
+    'SANCTUM_STATEFUL_DOMAINS',
+    'localhost,localhost:3000,127.0.0.1,127.0.0.1:8000,::1'
+));
+$appUrl = parse_url(env('APP_URL', 'http://localhost'));
+
+if (is_array($appUrl) && isset($appUrl['host'])) {
+    $appHost = str_contains($appUrl['host'], ':') ? '['.$appUrl['host'].']' : $appUrl['host'];
+    $statefulDomains[] = $appHost.(isset($appUrl['port']) ? ':'.$appUrl['port'] : '');
+}
+
 return [
 
     /*
@@ -44,10 +55,7 @@ return [
     |
     */
 
-    'stateful' => explode(',', env(
-        'SANCTUM_STATEFUL_DOMAINS',
-        'localhost,localhost:3000,127.0.0.1,127.0.0.1:8000,::1'
-    )),
+    'stateful' => array_values(array_unique(array_filter(array_map('trim', $statefulDomains)))),
 
     /*
     |--------------------------------------------------------------------------
