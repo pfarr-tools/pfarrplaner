@@ -121,7 +121,7 @@ Wenn in diesem Handbuch eine Schaltfläche beschrieben ist, die Sie nicht sehen,
 
 ## Verwandte Kapitel
 
-- [Anmeldung und Benutzerkonto](anmeldung.md): Anmelden, Passwort ändern und abmelden
+- [Anmeldung und Benutzerkonto](anmeldung.md): Mit Passkey oder E-Mail-Link anmelden und abmelden
 - [Startseite](startseite.md): Persönliche Übersicht nach der Anmeldung
 - [Persönliche Einstellungen](einstellungen.md): Profil, Startseite und Benachrichtigungen anpassen
 - [Administration](administration.md): Rechte, Rollen und Stammdaten verwalten

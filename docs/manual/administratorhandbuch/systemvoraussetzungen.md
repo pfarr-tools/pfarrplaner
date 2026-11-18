@@ -99,7 +99,8 @@ Pfarrplaner verschickt Systemmails. Deshalb brauchen Sie:
 - im Docker-Produktionsbetrieb das optionale Compose-Profil `mail`
 - ausgehender TCP-Port 25 oder ein erreichbarer authentifizierter SMTP-Relay
 
-Ohne funktionierende Mailzustellung sind Passwort-Resets, Benachrichtigungen und manche Arbeitsabläufe unzuverlässig.
+Ohne funktionierende Mailzustellung sind Anmeldelinks, Kontohinweise,
+Benachrichtigungen und manche Arbeitsabläufe unzuverlässig.
 
 ## Hintergrundaufgaben
 

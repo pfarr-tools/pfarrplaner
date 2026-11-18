@@ -17,36 +17,15 @@ Geprüft wurden insbesondere:
 
 ## Ergebnisübersicht
 
-### Passwortlebenszyklus
+### Passwortlose Konten und Sicherheits-Onboarding
 
-Die Passwortregel ist zentral in `App\Rules\StrongPassword` definiert und wird bei Profiländerungen, administrativ gesetzten Passwörtern, öffentlichen Zurücksetzungen und der Ersteinrichtung verwendet. Sie verlangt mindestens acht Zeichen sowie Großbuchstaben, Kleinbuchstaben, eine Zahl und ein Sonderzeichen. Die Regel wird serverseitig geprüft; die Hinweise in den Vue-Komponenten sind nur eine Bedienhilfe.
+Webkonten melden sich per Passkey oder einmaligem E-Mail-Anmeldelink an. Es gibt keine Passwortanmeldung, keinen Passwortwechsel und keinen Passwort-Reset. Das Modell `App\Models\People\User` nutzt `is_official_user` als persistierte boolesche Kontoklassifikation. Die Migration übernimmt für Bestandskonten den Wert `true`, wenn ein nichtleerer Legacy-Hash vorhanden ist, und setzt `must_change_password` für alle Konten auf `false`. Bestehende Hashes bleiben zunächst gespeichert, werden jedoch von keinem Authentifizierungs- oder Verwaltungsablauf verwendet.
 
-Anfangspasswörter sind eine ausdrücklich begrenzte Ausnahme: `PasswordService::temporaryInitialPassword()` erzeugt eine zufällige Kennung im dokumentierten Muster, und die aufrufenden Pfade setzen `must_change_password`. Bei der Kontoanlage akzeptiert `StrongPassword` dieses Muster zusätzlich zur normalen starken Passwortregel. Eine manuelle Super-Admin-Setzung verlangt nur einen nichtleeren String und erzwingt ebenfalls `must_change_password`; der Wert muss nicht dem Generator-Muster oder der Regel für dauerhaft gewählte Passwörter entsprechen. Normale Passwortänderungen verwenden unverändert die starke Passwortregel. Nach einem erfolgreichen Profil- oder öffentlichen Reset wird das Flag gelöscht.
+Eine Aktivierung des Login-Kontos erfolgt über die bestehende `update`-Berechtigung für die Person; die Schnellanlage verwendet die bestehende `create`-Berechtigung. Ein Super-Admin-Sonderrecht ist dafür nicht erforderlich. Beim erstmaligen Aktivieren wird eine Kontodaten-Mail mit Hinweisen zum E-Mail-Link und zur optionalen Passkey-Einrichtung versendet. Login-Links werden nur für aktivierte offizielle Konten angefordert und unmittelbar vor der Anmeldung erneut gegen den Kontostatus geprüft.
 
-Das Setzen eines Passworts für ein anderes Konto ist auf Super-Administrator:innen begrenzt. Die Autorisierung verwendet für Formularwerte die normalisierte Boolean-Auswertung, damit ein transportierter String `false` nicht als Kontoanlage missverstanden wird. Die Installationspfade rufen ebenfalls die zentrale Validierung auf; ungültige Administratorpasswörter werden vor dem Speichern abgewiesen.
+`SecurityOnboardingService` zählt erfolgreiche E-Mail-Link-Logins für offizielle Konten ohne Passkey und ohne bestätigtes TOTP. Die ersten vier passenden Logins lösen das Middleware-Gate aus; danach gilt eine Frist von mindestens 14 Tagen seit der tatsächlichen Anzeige. Eine Sitzungsfreigabe wird pro Benutzer in der Session gespeichert und endet mit ihr. Das Gate ist Teil der Web-, API- und Extranet-Middleware. Die Onboarding-Seite, Faktor-Setup, Abmelden und Aufschieben bleiben erreichbar. Der Anzeigezeitpunkt wird erst beim Rendern der Seite geschrieben, nicht durch einen API- oder Redirect-Versuch.
 
-Bei einer neuen Kontoanlage wird ein bestätigter Initialwert aus dem Benutzereditor an den bereits autorisierten Request gesendet. Der Server validiert ihn erneut, hasht ihn über das User-Modell, setzt `must_change_password` und übergibt ihn ausschließlich an die Kontodaten-Mail. Der Wert wird nicht in Redirects, Flash-Daten oder Inertia-Antworten ausgegeben.
-
-Das Middleware-Modul `App\Http\Middleware\RequirePasswordChange` liegt nach der Authentifizierung in der Web-Middleware-Kette. Es erlaubt nur Passwortwechsel, Logout, CSRF-Token-Erneuerung und den kontrollierten Admin-Rückweg. Alle anderen authentifizierten Webrouten werden auf `password.edit` mit einem sicheren Routennamen als Rücksprung-Hinweis umgeleitet. Eine vorhandene `adminUserSwitchBack`-Session markiert ausschließlich den bewusst kontrollierten Proxy-Fall als Ausnahme.
-
-Das konfigurierte Interstitial `security-beyond-password` gilt nur für Konten
-ohne Passkey und bestätigtes oder ausstehendes TOTP. Es wird während eines
-erzwungenen Passwortwechsels ebenfalls unterdrückt. `InterstitialService`
-speichert „Später“ pro Benutzer mit Ablaufzeit (21 Tage); die feste
-Ausblendaktion ist deaktiviert und wird serverseitig abgewiesen. Nach einem
-Passkey oder bestätigtem TOTP greift die Zielgruppe nicht mehr. Die Empfehlung
-erläutert Passkey und Authenticator-App in Alltagssprache und verlinkt auf
-Microsoft Authenticator sowie die quelloffene App 2FAS Auth. Sie verwendet
-vorhandene Benutzereinstellungen und benötigt keine Migration. Im `local`-
-und `dusk`-Umfeld blendet der Service Interstitials standardmäßig aus;
-`?show_interstitial=1` aktiviert die Vorschau für die aktuelle Anfrage.
-
-Der Admin-Reset ist an dieselbe `update`-Policy wie die Benutzerbearbeitung
-gebunden und schließt Selbst-Reset sowie Super-Administrationskonten aus.
-Manuelle Passwortvergabe für bestehende Konten ist Super-Administratoren
-vorbehalten; der Request validiert das Passwort erneut und versendet es nur
-über `AccountData`, während Inertia- und Flash-Antworten keine Passwörter
-enthalten.
+Die Onboarding-Inertia-Seite erklärt Passkeys und Authenticator-Apps und bindet die bestehende `SecurityTab` direkt ein. Passkey-Registrierung erfordert eine frische WebAuthn-Challenge und User Verification; TOTP wird erst nach erfolgreicher Codeprüfung aktiviert. Ein unvollständiges TOTP-Setup beendet das Gate nicht. Als Authenticator-Apps nennt die UI Microsoft Authenticator und die quelloffene App 2FAS Auth.
 
 ### Zwei-Faktor-Authentifizierung
 
@@ -63,11 +42,12 @@ ausstehende Einschreibung und die zugehörigen Recovery-Codes. Die Paketversion 
 Lizenz werden im Composer-Lockfile festgeschrieben und vor jedem Release
 geprüft.
 
-Der Login prüft nach korrektem Passwort den Faktor, bevor ein Guard oder ein
-Remember-Cookie gesetzt wird. Der Pending-Zustand liegt in der Session und
-läuft nach fünf Minuten ab; Passwortfehlversuche werden währenddessen nicht
-zurückgesetzt. TOTP- und Recovery-Code-Prüfung verwenden die Paket-API mit
-Replay-Schutz und Einmalverwendung. Der passwortlose Login-Link wird mit
+Nach erfolgreicher Bestätigung eines E-Mail-Anmeldelinks prüft die Anwendung,
+ob ein bestätigter TOTP-Faktor nötig ist. In diesem Fall liegt der Pending-
+Zustand fünf Minuten in der Session; erst ein gültiger App- oder Recovery-Code
+schließt die Anmeldung ab und setzt den Guard. TOTP- und Recovery-Code-Prüfung
+verwenden die Paket-API mit Replay-Schutz und Einmalverwendung. Der E-Mail-
+Anmeldelink wird mit
 `random_bytes` erzeugt; in `passwordless_login_links` liegt ausschließlich
 sein SHA-256-Hash. Links verfallen nach zehn Minuten, werden bei einer neuen
 Anforderung für dasselbe Konto ungültig und beim Bestätigen unter
@@ -89,10 +69,9 @@ TOTP-Challenge; dort sind ausschließlich Authenticator- und Recovery-Codes
 zulässig. Es gibt keinen E-Mail-Code als TOTP-Ersatz mehr. Die Challenge-Seite
 erhält `Cache-Control: no-store, no-cache, must-revalidate, private` und
 `Pragma: no-cache`.
-Fehlversuche bei der Passwortanmeldung verwenden weiterhin das Limit aus
-Benutzername und Quell-IP. Eine kontoweite Passwortsperre wird nicht ergänzt,
-um gezieltes Sperren fremder Konten zu vermeiden. Der TOTP-Dienst sperrt
-Fehlversuche dagegen kontoweit nach fünf Prüfungen pro Minute.
+E-Mail-Link-Anforderungen werden pro Quell-IP und normalisierter E-Mailadresse
+begrenzt. TOTP-Prüfungen werden zusätzlich pro Benutzerkonto nach fünf
+Prüfungen innerhalb einer Minute vorübergehend gesperrt.
 TOTP-/Recovery-Eingaben werden in Telescope maskiert; E-Mails mit
 Anmeldelinks werden dort nicht aufgezeichnet. Die historische Tabelle
 `two_factor_login_challenges` bleibt für bereits ausgeführte Migrationen und
@@ -103,59 +82,13 @@ weiterhin verwenden können.
 
 #### Administrative Wiederherstellung verlorener Faktoren
 
-Die Recovery ist von Passwortreset und passwortlosem Login-Link getrennt. Der
-geschützte POST-Endpunkt `user.two-factor.recover` akzeptiert das aktuelle
-Passwort des handelnden Super-Admins und eine 1 bis 100 Zeichen lange
-Supportfall-Referenz aus ASCII-Buchstaben, Ziffern, Punkt, Unterstrich oder
-Bindestrich, zum Beispiel `SUP-2026-123`. `RecoverTwoFactorRequest`, `UserPolicy::recoverTwoFactor`
-und `RecoverUserTwoFactor` prüfen die Super-Admin-Berechtigung; Selbst-Recovery
-ist sowohl in Request als auch Action ausgeschlossen. Der Passwortvergleich
-erfolgt mit `Hash::check` nach Sperren und erneutem Laden des Actor-Datensatzes.
-Nach fünf Fehlversuchen innerhalb einer gleitenden Minute wird der Vorgang
-vorübergehend gesperrt. Zähler und Zeitpunkt liegen auf dem Super-Admin-
-Datensatz. `lockForUpdate()` serialisiert das Lesen und Ändern gemeinsam mit
-der Passwortprüfung in einer Datenbanktransaktion; dadurch gilt die Grenze
-über alle App-Hosts hinweg und benötigt keinen gemeinsam genutzten Cache.
-Erfolgreiche Recovery setzt den Zähler zurück. Passwörter werden weder in
-Auditdaten noch in Logs geschrieben.
+Die administrative Wiederherstellung setzt eine außerhalb von Pfarrplaner geprüfte Identität voraus. Der geschützte POST-Endpunkt `user.two-factor.recover` akzeptiert einen aktuellen sechsstelligen TOTP-Code des handelnden Super-Admins und eine 1 bis 100 Zeichen lange Supportfall-Referenz aus ASCII-Buchstaben, Ziffern, Punkt, Unterstrich oder Bindestrich. `RecoverTwoFactorRequest`, `UserPolicy::recoverTwoFactor` und `RecoverUserTwoFactor` prüfen Super-Admin-Berechtigung, Eingaben und Replay-Schutz. Selbst-Recovery und ein Super-Admin-Zielkonto sind ausgeschlossen.
 
-Die Action verweigert die Wiederherstellung, wenn
-`config('session.driver')` nicht `database` ist. Eine gesetzte
-`session.connection` muss `database.default` entsprechen. In einer Transaktion
-werden zunächst Actor und danach Zielkonto mit `lockForUpdate()` gesperrt. Nur
-bei aktivem oder ausstehendem TOTP werden Faktor und Recovery-Codes gelöscht,
-unverbrauchte `two_factor_login_challenges` verbraucht, `remember_token` und
-`api_token` rotiert, Datensätze des Ziels in der Session-Tabelle und dessen
-persönliche Sanctum-Tokens entfernt sowie der Audit-Datensatz angelegt. Der
-Legacy-iCalendar-Tokenvalidator weist recovery-gesperrte Konten ebenfalls ab.
-Ein Fehler rollt die Aktion als Ganzes zurück.
+Fehlversuche werden am handelnden Konto mit Zeitstempel gespeichert. Nach fünf Prüfungen innerhalb einer gleitenden Minute wird der Vorgang vorübergehend gesperrt. Zähler, Actor- und Zielladung sowie Codeprüfung sind mit `lockForUpdate()` und einer Datenbanktransaktion serialisiert. Passwörter werden bei dieser Aktion weder verlangt noch verarbeitet.
 
-Die Migration `2026_11_16_000001_add_two_factor_recovery_state_and_audit_table`
-fügt `users.two_factor_recovery_required_at` und
-`two_factor_recovery_audits` hinzu. Die Migration
-`2026_11_16_000002_add_two_factor_recovery_attempt_tracking_to_users` ergänzt
-`users.two_factor_recovery_attempts` und
-`users.two_factor_recovery_attempted_at`. Die Audit-Tabelle hält
-`actor_user_id`, `target_user_id`, `support_reference`, `ip_address` und
-Zeitstempel ohne kaskadierende Fremdschlüssel. Damit bleiben Auditzeilen nach
-Kontolöschung erhalten; die numerischen IDs sind dann nicht mehr über eine
-Beziehung auflösbar. Das Audit-Modell ist aus generierten Web-/API-CRUD-Routen
-ausgeschlossen. Nur die Admin-Editor-Props für Super-Admins, die ein anderes
-Konto bearbeiten, liefern Name und ID des handelnden Kontos, Zeitpunkt und Referenz zurück; IP
-und Faktor-/Passwortdaten sind nicht Teil der Historienantwort. Die
-Demo-Anonymisierung löscht passende Audits ausdrücklich mit.
+`SESSION_DRIVER=database` ist erforderlich; eine gesetzte `SESSION_CONNECTION` muss `database.default` entsprechen. Bei Erfolg werden Faktor und Recovery-Codes des Zielkontos, offene E-Mail-Links, API-Tokens und Datenbank-Sitzungen widerrufen und ein Audit-Datensatz angelegt. `RequireTwoFactorRecovery` schützt danach Web-, API- und Extranet-Routen. Erlaubt bleiben Recovery-Seite, TOTP-Setup/-Bestätigung, Logout, kontrollierter Admin-Rückweg und CSRF-Keepalive. Nur die erfolgreiche TOTP-Bestätigung hebt die Sperre auf.
 
-Der Zielaccount erhält `two_factor_recovery_required_at`. Die Middleware
-`RequireTwoFactorRecovery` schützt Web-, API- und Extranet-Routen
-serverseitig. Per Routennamen bleiben ausschließlich die Recovery-Seite,
-TOTP-Start/-Bestätigung, Logout, der erforderliche Passwortwechsel,
-`user.switchback` und `csrf.keepalive` erlaubt. Andere Webanfragen werden auf
-`user.two-factor.recovery` umgeleitet; API- und Extranet-Anfragen erhalten
-HTTP 403. Nur die erfolgreiche Bestätigung über `user.two-factor.confirm`
-löscht den Marker innerhalb derselben Benutzerzeilen-Transaktion, die den
-neuen TOTP-Faktor aktiviert. Ein fehlgeschlagener oder unvollständiger Versuch
-lässt den Marker bestehen. Nicht markierte Konten und Gäste werden nicht
-eingeschränkt.
+Die Migrationen ergänzen `users.two_factor_recovery_required_at`, Versuchszähler und Zeitstempel sowie `two_factor_recovery_audits`. Das Audit speichert Actor-ID, Ziel-ID, Supportfall-Referenz, IP-Adresse und Zeitpunkt, jedoch keine Codes oder Geheimnisse. Die Migrationen sind vorwärtsgerichtet; Rollback erfolgt mit vorherigem Image und verifizierter Datenbanksicherung.
 
 ## Passkey-Anmeldung und Geräteverwaltung
 
@@ -193,12 +126,11 @@ verwendet eigene Routen mit discoverable Credentials ohne Kontoauswahl. Die
 Paketprüfung erzwingt User Verification; Laravel bindet jede Login-Challenge
 zweckgebunden an die Session, begrenzt sie auf 60 Sekunden und verwirft sie
 nach jedem Einreichungsversuch. Beide Endpunkte sind auf sechs Anfragen pro
-Minute begrenzt. Ein erfolgreicher Passkey-Login rotiert die Session und
-durchläuft weiterhin die zentralen Passwortwechsel- und Recovery-Gates.
+Minute begrenzt. Ein erfolgreicher Passkey-Login rotiert die Session und durchläuft weiterhin ein aktives
+TOTP-Recovery-Gate.
 Eigene Registrierungs- und Verwaltungsrouten verlangen Authentifizierung. Die
-Registrierung bleibt an eine frische WebAuthn-Challenge gebunden; eine erneute
-Passwortbestätigung wird nicht verlangt. Die Registrierung verlangt discoverable
-Credentials und User Verification. Listendarstellungen enthalten nur Namen,
+Registrierung bleibt an eine frische WebAuthn-Challenge gebunden und verlangt
+discoverable Credentials sowie User Verification. Listendarstellungen enthalten nur Namen,
 Gerätekennung und Zeitstempel, keine Credential-Payloads. Umbenennen und
 Widerruf prüfen die Eigentümerschaft; der Widerruf löscht das Credential.
 Faktorverwaltungsrouten lehnen Stellvertretersitzungen serverseitig ab.
@@ -274,7 +206,7 @@ Jetzt wird das Kindobjekt jeweils über die Elternbeziehung aufgelöst oder gege
 Nachgeschärft wurden:
 
 - Benutzer-Impersonation
-- Passwort-Reset
+- Kontoverwaltung und Benutzerwechsel
 - Stadtberechtigungen bei Benutzeränderungen
 - Einstellungen und Token-Erzeugung
 

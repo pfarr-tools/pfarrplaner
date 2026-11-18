@@ -304,7 +304,7 @@ Er kann eine Benutzerliste enthalten. Dort stehen Benutzerkonten mit Schaltfläc
 
 - **Stift**: Benutzerkonto bearbeiten.
 - **Personenwechsel-Symbol**: Zu diesem Benutzerkonto wechseln, falls erlaubt.
-- **Schloss-Symbol**: Passwort zurücksetzen.
+- **Aktivierungsaktion**: Ein noch nicht aktiviertes Konto freischalten und die Anmeldehinweise per E-Mail versenden.
 
 Dieser Reiter ist nur sichtbar, wenn Sie entsprechende Rechte haben. Weitere Hinweise stehen im Kapitel [Administration](administration.md).
 

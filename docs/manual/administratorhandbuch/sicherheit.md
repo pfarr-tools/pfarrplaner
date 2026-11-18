@@ -7,7 +7,7 @@ Pfarrplaner verarbeitet personenbezogene Daten. Darum gehören Sicherheit und Wi
 ## Zugangsschutz
 
 - Nur HTTPS nach außen
-- starke Passwörter
+- Passkeys und Authenticator-Apps für Benutzerkonten fördern
 - möglichst wenige Super-Admin-Konten
 - getrennte Konten für normale Nutzung und Administration, wenn sinnvoll
 - keine gemeinsamen Dauerpasswörter im Team
@@ -31,64 +31,33 @@ Für Pfarrplaner selbst sollten Sie besonders darauf achten:
 
 Ein technischer Überblick über den Sicherheitsdurchgang und die abgesicherten Routen liegt im [Technikhandbuch](../technikhandbuch/sicherheitsaudit.md).
 
-## Zwei-Faktor-Authentifizierung
+## Passkeys und Authenticator-App
 
-Konten, die nur ein Passwort verwenden, erhalten in der Anwendung einen
-wiederkehrenden Sicherheitshinweis. Er erklärt Passkeys als digitale
-Anmeldeschlüssel, die mit Geräte-PIN oder Biometrie verwendet werden, und
-Authenticator-Apps, die nach dem Scannen eines QR-Codes wechselnde
-sechsstellige Einmalcodes erzeugen. Als Beispiele nennt die Oberfläche
-Microsoft Authenticator und die quelloffene App 2FAS Auth. Während der
-Einrichtung angezeigte Wiederherstellungscodes müssen sicher aufbewahrt
-werden. Empfohlen wird zuerst ein Passkey; ein Passkey oder ein bestätigter
-App-Code genügt, um den Hinweis zu beenden. Die Person kann den Hinweis
-jeweils drei Wochen zurückstellen; dauerhaft ausblenden lässt er sich nicht.
-Ein erzwungener Passwortwechsel und eine laufende TOTP-Einrichtung werden
-nicht überlagert.
+Pfarrplaner authentifiziert Konten per Passkey oder E-Mail-Anmeldelink. Ein zusätzlich bestätigter Passkey oder eine Authenticator-App schützt Konten außerdem dann, wenn jemand Zugriff auf das E-Mail-Postfach erhält.
 
-Administratoren können für ein fremdes Konto, das sie bearbeiten dürfen und
-das kein Super-Administrationskonto ist, einen neuen temporären Zugang
-ausstellen. Das Konto erhält ein zufällig erzeugtes Passwort per
-Accountdaten-E-Mail und muss es bei der nächsten Anmeldung ändern. Ein
-Administrator kann den eigenen Zugang auf diesem Weg nicht zurücksetzen.
-Ein frei gewähltes Passwort für ein bestehendes Konto bleibt
-Super-Administratoren vorbehalten; es wird serverseitig geprüft, einmalig per
-E-Mail versendet und erzwingt ebenfalls den Passwortwechsel.
+Bei den ersten vier erfolgreichen E-Mail-Link-Anmeldungen ohne Passkey und ohne bestätigte Authenticator-App führt Pfarrplaner die Person zur Einrichtung. Danach erscheint die Erinnerung frühestens 14 Tage nach der letzten tatsächlichen Anzeige erneut. **Später erinnern** gibt nur die aktuelle Sitzung frei. Ein Passkey oder eine bestätigte Authenticator-App beendet die Erinnerung.
 
-Die persönliche Passkey- und TOTP-Verwaltung befindet sich im Profil unter
-**Sicherheit**. Passkey-Aktionen setzen eine angemeldete Sitzung voraus;
-Eigentumsprüfungen verhindern die Verwaltung fremder Credentials. WebAuthn
-verlangt User Verification und die Registrierung nutzt eine frische Challenge.
-TOTP wird erst nach Eingabe eines gültigen App-Codes aktiviert. Beim Deaktivieren
-bestätigt die Person den Klick in einem Dialog. Fehlversuche bei TOTP werden
-pro Konto begrenzt. Einrichtungsschlüssel und Recovery-Codes werden nur zur
-Einrichtung angezeigt; Recovery-Codes müssen sicher außerhalb von Pfarrplaner
-verwahrt werden. Die Passwortänderung erfolgt separat über **Passwort ändern**.
+Empfohlen wird zuerst ein Passkey. Die Person bestätigt die Anmeldung mit Geräte-PIN oder Biometrie. Als Alternative oder zusätzliche Möglichkeit kann sie eine Authenticator-App einrichten, zum Beispiel Microsoft Authenticator oder die quelloffene App 2FAS Auth. Die App erzeugt wechselnde sechsstellige Codes. Wiederherstellungscodes werden nur bei der Einrichtung angezeigt und müssen sicher außerhalb von Pfarrplaner verwahrt werden.
 
-Falsche Passwörter und Sicherheitscodes werden generisch abgewiesen. Die
-Passwortanmeldung verwendet das bestehende Limit aus Benutzername und
-Quell-IP. Es gibt absichtlich keine zusätzliche kontoweite Passwortsperre, da
-sonst ein Angreifer gezielt ein fremdes Konto vorübergehend blockieren könnte.
-TOTP-Prüfungen werden dagegen pro Benutzerkonto atomar begrenzt: Nach fünf
-Prüfungen innerhalb einer Minute werden weitere TOTP-Prüfungen für dieses Konto
-vorübergehend gesperrt. Ein Faktorwechsel wird gegen parallele Start-, Bestätigungs- und
-Deaktivierungsanfragen serialisiert.
+Die persönliche Verwaltung befindet sich im Profil unter **Sicherheit**. Passkey-Aktionen setzen eine angemeldete Sitzung voraus, verlangen User Verification und lehnen Stellvertretersitzungen ab. TOTP wird erst nach Eingabe eines gültigen App-Codes aktiviert. Nach fünf TOTP-Prüfungen innerhalb einer Minute werden weitere Prüfungen für dieses Konto vorübergehend gesperrt.
 
-Bei Verlust des Authenticator-Geräts werden die Recovery-Codes benötigt. Wenn
-auch das Postfach und alle Recovery-Codes verloren sind, gibt es derzeit keinen
-Selbstbedienungsweg; der Betreiber muss die Identität über einen getrennten,
-verifizierten Supportprozess prüfen. Ein Datenbank-Restore muss
-immer zusammen mit dem vorherigen Anwendungsimage und einem verifizierten
-Backup geplant werden; die TOTP-Migration besitzt keinen automatischen
-Spalten-Rollback.
+Bei aktiviertem TOTP folgt auf die Bestätigung eines E-Mail-Anmeldelinks eine Codeabfrage. Zulässig sind nur der aktuelle App-Code oder ein Recovery-Code. Ein E-Mail-Code ersetzt TOTP nicht. Eine Passkey-Anmeldung benötigt keine zusätzliche TOTP-Abfrage.
 
-Für Konten mit aktiviertem TOTP führt ein E-Mail-Anmeldelink nach seiner
-Bestätigung zur TOTP-Challenge. Dort sind ausschließlich der aktuelle Code aus
-der Authenticator-App und ein einmaliger Recovery-Code zulässig. Der
-E-Mail-Anmeldelink ersetzt den zweiten Faktor nicht. Bei Verlust des Postfachs
-und aller Recovery-Codes ist eine administrative Identitätsprüfung
-erforderlich; Support darf keine Codes oder TOTP-Schlüssel per Chat oder
-E-Mail erfragen.
+### Wiederherstellung eines verlorenen Faktors
+
+Wenn eine Person ihr Authenticator-Gerät und alle Recovery-Codes verloren hat, prüfen Sie ihre Identität außerhalb von Pfarrplaner über einen bereits bekannten, organisationskontrollierten Kontaktweg. Eine eingehende E-Mail oder der Zugriff auf das betroffene Postfach allein genügt nicht. Dokumentieren Sie in Pfarrplaner nur eine kurze Supportfall-Referenz, keine Identitätsnachweise oder weiteren personenbezogenen Angaben.
+
+Ein Super-Administrator kann anschließend den Faktor einer anderen Person widerrufen:
+
+1. Öffnen Sie das Konto in der Benutzerverwaltung und wählen Sie die Wiederherstellung.
+2. Geben Sie einen aktuellen sechsstelligen TOTP-Code aus der eigenen Super-Admin-Authenticator-App ein.
+3. Tragen Sie die Supportfall-Referenz ein und bestätigen Sie den Widerruf.
+
+Ein Super-Administrator kann den eigenen Faktor nicht wiederherstellen. Auch das Zielkonto darf kein Super-Admin-Konto sein. Fehlversuche werden begrenzt; nach fünf ungültigen Prüfungen innerhalb einer Minute wird die Aktion vorübergehend gesperrt. Die Recovery verlangt eine funktionierende TOTP-App des handelnden Super-Admins.
+
+Bei Erfolg werden aktive oder unbestätigte Faktoren, ausstehende Anmeldelinks, persönliche API-Tokens und alle Datenbank-Sitzungen des Zielkontos widerrufen. Beim nächsten Anmelden muss die betroffene Person eine Authenticator-App neu einrichten und den ersten Code bestätigen. Bis dahin bleibt der normale Anwendungszugriff gesperrt. Der Vorgang wird mit handelndem Konto, Zielkonto, Referenz, Zeitpunkt und IP-Adresse protokolliert; Codes und Geheimnisse werden nicht protokolliert.
+
+Für die Recovery muss `SESSION_DRIVER=database` gesetzt sein. Eine konfigurierte `SESSION_CONNECTION` muss dieselbe Datenbankverbindung wie die Anwendung verwenden. Vor Updates sind Datenbank und MinIO zu sichern und die Sicherung zu verifizieren. Die Faktor-Recovery-Migration ist vorwärtsgerichtet; einen Rollback führen Sie mit dem vorherigen Image und einer verifizierten Datenbanksicherung aus, nicht durch manuelles Entfernen von Spalten.
 
 ### Passkey-Betrieb
 
@@ -120,75 +89,7 @@ an die Session gebunden, nach 60 Sekunden abgelaufen und nach jeder Einreichung
 verbraucht. Login-Optionen und Prüfungen teilen ein Limit von sechs Anfragen pro
 Minute je IP-Adresse. Verwaltungsrouten erfordern eine angemeldete Sitzung.
 Benutzer können eigene Credentials registrieren, umbenennen und widerrufen;
-Stellvertretersitzungen dürfen keine Anmeldefaktoren ändern. Passkey-Anmeldungen durchlaufen
-weiterhin die erzwungene Passwortänderung und die TOTP-Recovery.
-
-### Wiederherstellung nach Verlust von Gerät und Recovery-Codes
-
-Die Wiederherstellung ist ein eigener Super-Admin-Vorgang. Sie setzt weder das
-Benutzerpasswort zurück noch versendet sie ein Ersatzpasswort oder einen
-Anmeldecode. Führen Sie sie erst aus, wenn die Identität der anfragenden Person
-über einen bereits bekannten, organisationskontrollierten Kontaktweg geprüft
-wurde. Eine eingehende E-Mail oder der Zugriff auf das betroffene Postfach
-allein ist kein ausreichender Nachweis. Pflegen Sie nur die kurze
-Supportfall-Referenz in Pfarrplaner; tragen Sie dort keine Namen,
-Identitätsnachweise oder sonstigen personenbezogenen Details ein.
-
-1. Öffnen Sie in der Benutzerverwaltung das Konto der betroffenen Person.
-2. Prüfen Sie, dass die Identität außerhalb von Pfarrplaner bestätigt wurde.
-3. Wählen Sie **Verlorene Zwei-Faktor-Anmeldung widerrufen**.
-4. Geben Sie Ihr eigenes aktuelles Super-Admin-Passwort und die
-   Supportfall-Referenz ein und bestätigen Sie den Vorgang.
-
-Die Referenz muss 1 bis 100 Zeichen enthalten. Zulässig sind ASCII-Buchstaben,
-Ziffern sowie Punkt, Unterstrich und Bindestrich. Ein gültiges Beispiel ist
-`SUP-2026-123`.
-
-Ein Super-Admin kann nicht das eigene Konto wiederherstellen. Ist das Zielkonto
-selbst ein Super-Admin-Konto, muss ein anderer Super-Admin den Vorgang
-ausführen. Die Anwendung prüft das aktuelle Passwort unmittelbar vor der
-Änderung und begrenzt Fehlversuche. Falsche Passwörter, fehlende Faktoren,
-fehlende Berechtigungen und nicht unterstützte Session-Konfigurationen
-verhindern die Wiederherstellung.
-
-Bei Erfolg werden der aktive oder noch nicht bestätigte TOTP-Faktor, alte
-offene TOTP-E-Mail-Challenges und ausstehende passwortlose Anmeldelinks,
-persönliche API-Tokens, den bisherigen API-/Kalendertoken,
-Remember-me-Zugang und alle Datenbank-Sitzungen des Zielkontos widerrufen. Das
-Passwort und ein eventuell ausstehender Passwortwechsel bleiben bestehen. Nach
-der nächsten Anmeldung darf das Konto nur die TOTP-Wiederherstellung,
-notwendige Passwortänderung und Logout verwenden. Erst nach erfolgreicher
-TOTP-Bestätigung wird der normale Zugriff freigegeben. Fehlgeschlagene oder
-abgebrochene TOTP-Bestätigungen lassen die Sperre bestehen. Die Person muss die
-bei der Einrichtung gezeigten neuen Recovery-Codes sicher verwahren und
-anschließend gespeicherte Kalender- und API-Verbindungen mit dem neuen Token
-aktualisieren.
-
-Für diese Funktion muss `SESSION_DRIVER=database` gesetzt sein. Falls
-`SESSION_CONNECTION` angegeben ist, muss sie dieselbe Datenbankverbindung wie
-die Anwendung verwenden. Mit einem Datei-, Redis- oder anderen Session-Treiber
-steht die Recovery-Aktion nicht zur Verfügung. Fehlversuche werden mit
-Zeitstempel am Super-Admin-Konto gespeichert. Eine Datenbanksperre umfasst
-Passwortprüfung und Zähleränderung; parallele Versuche werden damit über alle
-App-Hosts hinweg serialisiert. Dafür ist kein Cache-Treiber vorgeschrieben.
-Prüfen Sie vor dem Supportvorgang die wirksame Session-Konfiguration der
-Instanz.
-
-Jeder erfolgreiche Vorgang wird dauerhaft mit handelndem Konto, Zielkonto,
-Supportfall-Referenz, Zeitpunkt und IP-Adresse protokolliert. Das Protokoll
-enthält keine Passwörter, TOTP-Geheimnisse oder Recovery-Codes. Audit-Einträge
-werden bei einer regulären Kontolöschung nicht automatisch entfernt; die
-historischen numerischen Konto-IDs bleiben erhalten. Nur die lokale
-Demo-Anonymisierung entfernt Audit-Einträge zu den anonymisierten Demokonten.
-Behandeln Sie Referenz und IP-Adresse als personenbezogene Auditdaten und
-beschränken Sie den Zugriff auf die Benutzerverwaltung.
-
-Die Recovery-Migration ist vorwärtsgerichtet. Verwenden Sie für einen
-Rollback nicht `migrate:rollback` und entfernen Sie keine Spalten oder Tabellen
-manuell. Sichern und verifizieren Sie vor einem Update Datenbank und
-Objektspeicher. Bei einem notwendigen Rollback sind das vorherige
-Anwendungsimage und die verifizierte Datenbanksicherung nach dem dokumentierten
-Restore-Verfahren gemeinsam wiederherzustellen.
+Stellvertretersitzungen dürfen keine Anmeldefaktoren ändern. Passkey-Anmeldungen umgehen keine aktive TOTP-Recovery-Sperre.
 
 ## Backup
 

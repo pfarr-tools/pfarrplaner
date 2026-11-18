@@ -73,7 +73,7 @@ Dieses Stichwortverzeichnis hilft beim schnellen Finden typischer Administration
 
 ## P
 
-- **Passwort-Reset**: [Systemvoraussetzungen](systemvoraussetzungen.md), [Updates](updates.md)
+- **Passkey**: [Sicherheit](sicherheit.md), [Installation mit Docker Compose](installation-docker.md)
 - **PHP 8.4**: [Systemvoraussetzungen](systemvoraussetzungen.md)
 - **Policies**: [Berechtigungen und Policies](berechtigungen.md)
 - **Puppeteer**: [Systemvoraussetzungen](systemvoraussetzungen.md), [Installation mit Docker Compose](installation-docker.md)

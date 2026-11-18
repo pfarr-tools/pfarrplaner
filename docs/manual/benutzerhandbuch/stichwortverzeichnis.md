@@ -85,7 +85,7 @@ Dieses Stichwortverzeichnis hilft, einzelne Funktionen schnell zu finden. Die Be
 
 ## P
 
-- **Passwort**: [Anmeldung und Benutzerkonto](anmeldung.md), [Persönliche Einstellungen](einstellungen.md)
+- **Passkey**: [Anmeldung und Benutzerkonto](anmeldung.md), [Persönliche Einstellungen](einstellungen.md)
 - **Persönliche Einstellungen**: [Persönliche Einstellungen](einstellungen.md)
 - **Poolmaster:in**: [Urlaubsplan](urlaubsplan.md), [Administration](administration.md)
 - **Pools**: [Urlaubsplan](urlaubsplan.md), [Administration](administration.md)

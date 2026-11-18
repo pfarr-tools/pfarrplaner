@@ -2,7 +2,7 @@
 
 # Persönliche Einstellungen
 
-In den persönlichen Einstellungen verwalten Sie Ihr eigenes Benutzerprofil und weitere Optionen für Ihr Konto. Ihr Passwort ändern Sie über den eigenen Menüpunkt **Passwort ändern**.
+In den persönlichen Einstellungen verwalten Sie Ihr eigenes Benutzerprofil und weitere Optionen für Ihr Konto.
 
 Diese Seite betrifft nur Ihr eigenes Konto. Änderungen hier können beeinflussen, wie Ihr Name angezeigt wird, wie Sie sich anmelden, welche Startseite Sie sehen und ob Pfarrplaner mit externen Kalendern verbunden ist.
 
@@ -45,104 +45,35 @@ Sie können ein Foto von sich hochladen, das oben rechts im Menü und in einigen
 
 ## Reiter: Sicherheit
 
-In diesem Reiter verwalten Sie die zusätzliche Anmeldung mit Passkeys und einer Authenticator-App. Ihr Passwort ändern Sie über den eigenen Menüpunkt **Passwort ändern** im Benutzermenü.
+Hier richten Sie Passkeys und eine Authenticator-App ein. Ein Passkey ist ein digitaler Schlüssel, den Ihr Smartphone, Computer oder Passwortmanager sicher aufbewahrt. Bei der Anmeldung bestätigen Sie mit Fingerabdruck, Gesichtserkennung oder Geräte-PIN. Ein Passkey funktioniert nur auf der echten Pfarrplaner-Seite und schützt so auch vor gefälschten Anmeldeseiten.
 
-Wenn Sie Ihr Passwort vergessen haben, wenden Sie sich an Ihre Administration.
-Die Login-Seite bietet absichtlich kein Passwortfeld und keinen Link zum
-Zurücksetzen des Passworts an.
+Eine Authenticator-App erzeugt alle 30 Sekunden einen neuen sechsstelligen Code. Bei der Anmeldung über einen E-Mail-Link geben Sie diesen Code zusätzlich ein. Bei einer Passkey-Anmeldung ist kein zusätzlicher App-Code erforderlich. Die Codes funktionieren auch ohne Internetverbindung. Geeignete Apps sind zum Beispiel [Microsoft Authenticator](https://support.microsoft.com/de-de/authenticator/download-microsoft-authenticator) und [2FAS Auth](https://2fas.com/auth/), eine quelloffene App für Android und iPhone.
 
-Wenn Sie weder Passkey noch Authenticator-App eingerichtet haben, erinnert Sie
-Pfarrplaner daran, Ihr Konto zusätzlich abzusichern. Der Anmeldelink per
-E-Mail schützt Ihr Konto über Ihr Postfach. Ein Passkey oder eine
-Authenticator-App schützt zusätzlich, falls jemand Zugriff auf dieses Postfach
-erhält.
+Pfarrplaner empfiehlt zuerst einen Passkey. Eine Authenticator-App ist eine Alternative oder kann zusätzlich eingerichtet werden. Ein Passkey oder eine bestätigte Authenticator-App genügt, um die wiederkehrende Einrichtungserinnerung zu beenden.
 
-Empfohlen wird zuerst ein **Passkey**. Das ist ein digitaler Schlüssel, den
-Ihr Smartphone, Computer oder Passwortmanager sicher aufbewahrt. Bei der
-Anmeldung bestätigen Sie mit Fingerabdruck, Gesichtserkennung oder Geräte-PIN.
-Sie müssen kein zusätzliches Passwort eintippen. Ein Passkey funktioniert nur
-auf der echten Pfarrplaner-Seite und schützt so auch vor gefälschten
-Anmeldeseiten.
+### Einrichtungserinnerung
 
-Als Alternative oder zusätzlichen Schutz können Sie eine
-**Authenticator-App mit Einmalcodes** verwenden. Bei der Einrichtung scannen
-Sie einen QR-Code mit der App. Diese zeigt alle 30 Sekunden einen neuen
-sechsstelligen Zahlencode. Bei der Anmeldung über einen E-Mail-Link geben Sie
-danach einen dieser Codes ein. Bei der Anmeldung mit einem Passkey ist kein
-zusätzlicher App-Code nötig.
-Die App kann die Codes auch ohne Internetverbindung erzeugen. Dieses Verfahren
-heißt technisch TOTP (zeitbasiertes Einmalpasswort): ein Code, der nur kurze
-Zeit gilt und danach automatisch wechselt. Beispiele sind
-[Microsoft Authenticator](https://support.microsoft.com/de-de/authenticator/download-microsoft-authenticator)
-und [2FAS Auth](https://2fas.com/auth/), eine quelloffene App für Android und iPhone.
+Wenn Sie sich per E-Mail-Link anmelden und noch keinen Passkey oder keine Authenticator-App eingerichtet haben, zeigt Pfarrplaner eine eigene Sicherheitsseite. Dort können Sie beide Einrichtungsabläufe direkt starten. Die Erinnerung erscheint bei den ersten vier passenden E-Mail-Link-Anmeldungen. Danach erscheint sie frühestens 14 Tage nach der letzten tatsächlichen Anzeige erneut.
 
-Während der Einrichtung zeigt Pfarrplaner Wiederherstellungscodes. Bewahren
-Sie sie getrennt von Ihrem Gerät an einem sicheren Ort auf. Damit können Sie
-sich anmelden, falls Sie Ihr Gerät verlieren. Ein Passkey oder eine
-Authenticator-App genügt, um den Hinweis zu beenden; Sie können auch beides
-einrichten.
+Mit **Später erinnern** geben Sie nur die aktuelle Sitzung frei. Sie können die Einrichtung jederzeit im Profil unter **Sicherheit** nachholen. Sobald ein Passkey oder eine bestätigte Authenticator-App eingerichtet ist, wird die Erinnerung nicht mehr angezeigt.
 
-Über **Sicherheitseinstellungen öffnen** gelangen Sie direkt zur Einrichtung.
-Der Hinweis wird dann für drei Wochen ausgeblendet, auch wenn Sie noch keinen
-Passkey oder zweiten Faktor eingerichtet haben. Danach erinnert Pfarrplaner Sie
-erneut, solange weder ein Passkey noch TOTP eingerichtet ist.
-Mit **Später** wird der Hinweis drei Wochen ausgeblendet. Solange weder ein
-Passkey noch ein Einmalcode-Faktor eingerichtet ist, erscheint er danach
-erneut.
+### Zwei-Faktor-Authentifizierung mit einer Authenticator-App
 
-### Zwei-Faktor-Authentifizierung
+Wählen Sie **Zwei-Faktor-Authentifizierung einrichten**. Scannen Sie den angezeigten QR-Code mit einer Authenticator-App und speichern Sie die Recovery-Codes an einem sicheren Ort. Wenn Ihre App den QR-Code nicht direkt übernimmt oder wie Bitwarden standardmäßig einen Einrichtungsschlüssel benötigt, geben Sie den Schlüssel unter dem QR-Code manuell ein. Mit **Kopieren** übernehmen Sie ihn in die Zwischenablage. Die Recovery-Codes stehen in einem Textfeld und lassen sich gemeinsam kopieren. Sie sind nur während dieses Einrichtungsschritts sichtbar und können jeweils nur einmal verwendet werden.
 
-Im Bereich **Sicherheit** können Sie die Zwei-Faktor-Authentifizierung mit
-einer Authenticator-App einrichten. Der Assistent führt Sie durch die Schritte:
-Scannen Sie den angezeigten QR-Code in einer Authenticator-App und speichern Sie die
-Recovery-Codes sicher. Beispiele für geeignete Apps sind Microsoft
-Authenticator und die quelloffene App 2FAS Auth. Wenn Sie den QR-Code nicht
-scannen können oder Ihre App wie Bitwarden den Schlüssel benötigt, steht der
-Schlüssel für die manuelle Eingabe direkt unter dem QR-Code. Über **Kopieren**
-übernehmen Sie ihn in die Zwischenablage. Die Recovery-Codes stehen in einem
-Textfeld und können gemeinsam kopiert werden. Sie sind nur während dieses
-Einrichtungsschritts sichtbar und können jeweils nur einmal verwendet werden.
+Bestätigen Sie, dass Sie die Recovery-Codes sicher gespeichert haben, und geben Sie anschließend den aktuellen sechsstelligen Code aus Ihrer Authenticator-App ein. Die Einrichtung ist erst nach erfolgreicher Codeprüfung abgeschlossen. Wenn Sie den Dialog vor der Bestätigung schließen, können Sie die Einrichtung neu starten; dabei werden die vorherigen Einrichtungsdaten ungültig.
 
-Bestätigen Sie, dass Sie die Recovery-Codes gespeichert haben, und geben Sie anschließend
-den sechsstelligen Code aus der Authenticator-App ein. Die Codeziffern können einzeln eingegeben oder gemeinsam eingefügt werden.
-Falls Sie die Seite vor der Bestätigung verlassen oder die
-Recovery-Codes nicht gesichert haben, können Sie die noch nicht abgeschlossene
-Einrichtung neu starten. Dabei werden die vorherige URI und die vorherigen
-Recovery-Codes ungültig.
+Bei einer Anmeldung über einen E-Mail-Link benötigen Sie nach der Einrichtung zusätzlich einen aktuellen App-Code. Alternativ können Sie einen Recovery-Code eingeben. Eine Login-Codeabfrage läuft nach fünf Minuten ab.
 
-Nach der Einrichtung geben Sie bei Anmeldung über einen E-Mail-Link zusätzlich
-einen aktuellen Code aus der Authenticator-App ein. Der E-Mail-Link ersetzt
-diesen zweiten Faktor nicht. Bei einer Passkey-Anmeldung müssen Sie keinen
-zusätzlichen App-Code eingeben.
-Alternativ können Sie einen Recovery-Code eingeben; jeder Code ist nur einmal
-gültig. Eine Login-Challenge läuft nach fünf Minuten ab.
+Zum Deaktivieren wählen Sie **Zwei-Faktor-Authentifizierung deaktivieren** und bestätigen die Nachfrage. Nach zu vielen fehlerhaften Codeversuchen wird die Prüfung vorübergehend gesperrt.
 
-Zum Deaktivieren wählen Sie **Zwei-Faktor-Authentifizierung deaktivieren** und bestätigen Sie die Nachfrage. Bei zu vielen fehlerhaften Codeversuchen wird die Codeprüfung vorübergehend gesperrt. Wenn Sie Ihr Gerät und alle Recovery-Codes
-verlieren, wenden Sie sich über einen bereits bekannten Kontaktweg an Ihre
-Administration. Diese prüft Ihre Identität außerhalb von Pfarrplaner. Eine
-eingehende E-Mail allein reicht dafür nicht aus. Nach der Prüfung kann ein
-Super-Administrator den verlorenen Faktor widerrufen. Bei Ihrer nächsten
-Anmeldung müssen Sie TOTP neu einrichten und mit einem Code aus der App
-bestätigen. Bis zur Bestätigung können Sie Pfarrplaner nicht normal verwenden.
-Teilen Sie Recovery-Codes niemals per E-Mail oder Chat.
-Die Wiederherstellung meldet auch gespeicherte Sitzungen und Kalender- oder
-API-Verbindungen ab. Richten Sie diese nach der TOTP-Neueinrichtung mit Ihrem
-neuen API-Token wieder ein.
+Wenn Sie Ihr Gerät und alle Recovery-Codes verloren haben, wenden Sie sich über einen bereits bekannten Kontaktweg an Ihre Administration. Diese muss Ihre Identität außerhalb von Pfarrplaner prüfen. Ein Super-Administrator kann anschließend den verlorenen Faktor widerrufen. Gespeicherte Sitzungen und API-Verbindungen werden dabei abgemeldet. Bei Ihrer nächsten Anmeldung müssen Sie die Authenticator-App neu einrichten und mit einem gültigen Code bestätigen, bevor Sie die Anwendung wieder normal nutzen können.
 
 ### Passkeys
 
-Im Bereich **Sicherheit** können Sie mehrere Passkeys für Ihre Geräte
-einrichten. Geben Sie einen wiedererkennbaren Namen ein und wählen Sie
-**Passkey einrichten**. Der Browser bittet Sie anschließend, die Geräte-PIN,
-Biometrie oder eine andere lokale Geräteverifikation zu verwenden.
-Das Gerät muss Passkeys unterstützen.
+Geben Sie im Bereich **Passkeys** einen wiedererkennbaren Gerätenamen ein und wählen Sie **Passkey einrichten**. Der Browser bittet Sie, die Geräte-PIN, Biometrie oder eine andere lokale Geräteverifikation zu verwenden. Das Gerät muss Passkeys unterstützen.
 
-Sie können einen Passkey umbenennen oder widerrufen. Beim Widerruf wird das
-Gerät sofort für künftige Anmeldungen gesperrt. Auf der Login-Seite geben Sie
-Ihre E-Mailadresse ein und wählen **Mit Passkey anmelden**. Alternativ können
-Sie einen Anmeldelink per E-Mail anfordern. Bei aktiviertem TOTP folgt nach
-dem E-Mail-Link die Abfrage des Authenticator-Codes; ein Recovery-Code ist die
-einmalige Alternative. Der Passkey kann die Anmeldung selbstständig abschließen.
+Sie können mehrere Passkeys für Ihre Geräte einrichten, vorhandene umbenennen und widerrufen. Ein widerrufener Passkey kann sich nicht mehr anmelden. Die Login-Seite bietet Passkey und E-Mail-Link an.
 
 ---
 
@@ -215,7 +146,7 @@ Vergessen Sie nicht, Ihre Änderungen oben links mit **Speichern** zu sichern, b
 
 ## Verwandte Kapitel
 
-- [Anmeldung und Benutzerkonto](anmeldung.md): Anmelden, Passwort ändern und abmelden
+- [Anmeldung und Benutzerkonto](anmeldung.md): Mit Passkey oder E-Mail-Link anmelden und abmelden
 - [Startseite](startseite.md): Persönliche Übersicht und Reiter verstehen
 - [Kalender](kalender.md): Gottesdienste und Veranstaltungen im Monatsüberblick
 - [Administration](administration.md): Benutzerkonten und Rechte verwalten, falls Sie Administratorrechte haben

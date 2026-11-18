@@ -93,8 +93,10 @@
 
 ### Task 5: Handbücher und Abschlussprüfung
 
-**Files:** Benutzer-, Administratoren- und Technisches Handbuch unter `docs/manual/`, `docs/admin/installation-und-migration.md`, dieser Plan.
+**Files:** Benutzerhandbuch unter `docs/manual/benutzerhandbuch/`, Administratorenhandbuch unter `docs/manual/administratorhandbuch/`, Technisches Handbuch unter `docs/manual/technikhandbuch/` sowie `docs/admin/installation-und-migration.md`, dieser Plan.
 
-- [ ] Dokumentiere passwortlosen Login, Erinnerungsrhythmus, Admin-Kontoanlage und Migrations-/Rollback-Hinweise.
-- [ ] Führe Dokumentations-, Format-, Test-, Build- und Diff-Prüfungen aus.
-- [ ] Senior Review der Branch-Differenz; Issue #100 mit Umsetzung/Tests/Reviews/Commits aktualisieren; finaler Issue-Commit referenziert `Fixes #100`.
+- [x] Dokumentiere passwortlosen Login, Erinnerungsrhythmus, Admin-Kontoanlage und Migrations-/Rollback-Hinweise.
+- [x] Führe Dokumentations-, Format-, Build- und Diff-Prüfungen aus.
+- [x] Senior Review der Branch-Differenz; Issue #100 mit Umsetzung/Tests/Reviews/Commits aktualisieren; finaler Issue-Commit referenziert `Fixes #100`.
+
+**Task-5-Verifikation:** `./planer dev manual:site` hat die gemeinsame Handbuchseite und alle drei PDF-Handbücher erfolgreich gebaut. Es erscheinen bekannte Warnungen zu nicht in der Navigation enthaltenen Seiten und bestehenden Querverweisen. `git diff --check` ist sauber. Senior Review und Re-Review: **APPROVED**; die gefundenen veralteten Passwort-Reset-Verweise in Berechtigungen, Startseite, Datenschutz, Voraussetzungen, Updatecheck und Stichwortverzeichnissen wurden bereinigt. `docs/cve/` bleibt unberührt.

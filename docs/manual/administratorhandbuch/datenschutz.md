@@ -44,7 +44,7 @@ In Benutzer- und Personenkonten kommen je nach Nutzung unter anderem vor:
 - Titel
 - Vorname und Nachname
 - E-Mail-Adresse
-- Passwort beziehungsweise Passwort-Reset-Status
+- gegebenenfalls vorhandener Legacy-Passworthash; er wird für die Anmeldung nicht mehr verwendet
 - Telefonnummer
 - Adresse
 - Benutzerbild
@@ -482,7 +482,7 @@ Im technischen Betrieb kommen zusätzlich personenbezogene oder personenbeziehba
 
 - E-Mail-Adresse als Benutzername
 - API-Tokens
-- Passwort-Reset-Vorgänge
+- Anforderung und Verwendung einmaliger E-Mail-Anmeldelinks
 - Benutzerbezug in Änderungs- oder Workflow-Aktionen
 - gegebenenfalls IP-Adressen in technischen Logs
 

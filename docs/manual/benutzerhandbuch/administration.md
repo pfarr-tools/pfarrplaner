@@ -66,36 +66,27 @@ Die Liste zeigt je nach Installation **Name**, **E-Mail-Adresse**, **Rollen**, *
 
 ### Neuen Benutzer anlegen
 
-1. Klicken Sie auf **„Neuer Benutzer"**.
-2. Füllen Sie die Pflichtfelder aus:
-   - **Name**: Vollständiger Name (erscheint im Kalender und in Berichten)
-   - **E-Mail**: Diese Adresse dient als Benutzername und für Benachrichtigungen
-   - **Passwort**: Vergeben Sie ein Anfangspasswort. Die Zugangsdaten werden automatisch per E-Mail verschickt; nach der ersten Anmeldung muss die Person das Passwort ändern.
-3. Weisen Sie dem Benutzer eine oder mehrere **Rollen** zu (z. B. „Pfarrer", „Organist").
-4. Wählen Sie die **Gemeinden**, auf die der Benutzer Zugriff haben soll.
-5. Klicken Sie auf **„Speichern"**.
+1. Klicken Sie auf **Neuer Benutzer**.
+2. Tragen Sie Name und E-Mail-Adresse ein. Die E-Mail-Adresse wird für den Anmeldelink verwendet.
+3. Weisen Sie dem Benutzer eine oder mehrere Rollen zu und wählen Sie die Gemeinden aus, auf die das Konto zugreifen darf.
+4. Markieren Sie das Konto als aktiv, wenn sich die Person anmelden darf.
+5. Klicken Sie auf **Speichern**.
 
-Weitere mögliche Felder sind:
-
-- **Telefon oder Kontaktdaten**: Für interne Rückfragen, falls genutzt.
-- **Adresse**: Nur ausfüllen, wenn Ihre Gemeinde diese Angabe benötigt.
-- **Standardgemeinde**: Gemeinde, die für diesen Benutzer vorausgewählt wird.
-- **Aktiv / gesperrt**: Steuert, ob sich die Person anmelden darf.
-- **Benachrichtigungen**: Legt fest, ob die Person E-Mails aus Pfarrplaner erhält, falls angeboten.
+Beim Aktivieren eines Kontos wird eine E-Mail mit Hinweisen zur Anmeldung per Passkey oder E-Mail-Link versendet. Es wird kein Passwort ausgegeben. Weitere mögliche Felder sind Telefon, Kontaktdaten, Adresse, Standardgemeinde und Benachrichtigungseinstellungen.
 
 ### Benutzer bearbeiten
 
-Klicken Sie in der Benutzerliste auf den Namen eines Benutzers, um seine Daten zu bearbeiten.
+Klicken Sie in der Benutzerliste auf den Namen eines Benutzers, um seine Daten zu bearbeiten. Prüfen Sie besonders E-Mail-Adresse, Rollen, Gemeinden und den Kontostatus: Diese Angaben bestimmen Anmeldung, Rechte und sichtbare Daten.
 
-Prüfen Sie beim Bearbeiten besonders E-Mail-Adresse, Rollen und Gemeinden. Diese drei Angaben bestimmen Anmeldung, Rechte und sichtbare Daten.
+Die Schaltflächen im Editor dienen zum **Speichern** und – abhängig von Ihren Rechten – zum **Löschen**. Zugangsdaten oder Anmeldelinks lassen sich dort nicht zurücksetzen. Wenn die Person keinen Zugriff mehr auf ihr Postfach oder ihre Sicherheitsfaktoren hat, muss ihre Identität über einen bekannten Kontaktweg außerhalb von Pfarrplaner geprüft werden.
 
-Oben im Fenster stehen die Schaltflächen **Speichern**, **Passwort zurücksetzen** und **Löschen**. Speichern Sie Änderungen, bevor Sie den Editor verlassen. Das Passwort setzen Sie nur zurück, wenn die Person keinen Zugang mehr hat oder ein neues Anfangspasswort benötigt. Löschen Sie Personen nur, wenn sicher ist, dass sie nicht mehr in Gottesdiensten, Kasualien oder Berichten benötigt werden.
+Wer berechtigt ist, eine Person zu bearbeiten, darf auch ihr Konto aktivieren. Das gilt zum Beispiel für einen Lokaladministrator mit Bearbeitungsrecht; eine zusätzliche Super-Admin-Berechtigung ist dafür nicht erforderlich. Beim Aktivieren wird die Anleitung zur passwortlosen Anmeldung an die hinterlegte E-Mail-Adresse gesendet.
 
 Der Reiter **Person** enthält die persönlichen Stammdaten. Hier bearbeiten Sie Titel, Vorname, Nachname, Dienststelle, Adresse, Telefonnummer, E-Mail-Adresse und das Benutzerbild. Diese Angaben erscheinen an verschiedenen Stellen im Pfarrplaner, zum Beispiel in Listen, im Kalender oder in Ausgaben.
 
 ![Benutzer bearbeiten: Person](media/images/admin-benutzer-person.png)
 
-Im Reiter **Benutzerkonto** sehen Sie, ob die Person ein eigenes Login-Konto besitzt. Personen ohne Login können in Pfarrplaner trotzdem als Beteiligte vorkommen, melden sich aber nicht selbst an. Bei Personen mit Konto ist die E-Mail-Adresse zugleich der Benutzername. Außerdem ordnen Sie hier die Heimatgemeinden und, falls genutzt, die Pfarrämter der Person zu.
+Im Reiter **Benutzerkonto** sehen Sie, ob die Person ein eigenes Login-Konto besitzt. Personen ohne Login können in Pfarrplaner trotzdem als Beteiligte vorkommen, melden sich aber nicht selbst an. Bei Personen mit Konto ist die E-Mail-Adresse der Benutzername für den E-Mail-Link. Außerdem ordnen Sie hier die Heimatgemeinden und, falls genutzt, die Pfarrämter der Person zu.
 
 ![Benutzer bearbeiten: Benutzerkonto](media/images/admin-benutzer-konto.png)
 
@@ -116,10 +107,6 @@ Der Reiter **Alle Einstellungen** ist nur für Ausnahmefälle gedacht. Dort werd
 Im Reiter **Urlaub** legen Sie fest, ob für diese Person Abwesenheiten verwaltet werden. Wenn Urlaub aktiviert ist, können Sie einstellen, ob Abwesenheiten im Gottesdienstplan sichtbar sind, ob eine Vertretung benötigt wird und ob Anträge geprüft oder genehmigt werden müssen.
 
 ![Benutzer bearbeiten: Urlaub](media/images/admin-benutzer-urlaub.png)
-
-### Passwort zurücksetzen
-
-Im Benutzer-Editor finden Sie die Schaltfläche **„Passwort zurücksetzen"**. Damit erhalten Benutzer eine E-Mail mit einem Link zum Zurücksetzen ihres Passworts.
 
 ### Benutzer löschen oder sperren
 

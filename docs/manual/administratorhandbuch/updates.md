@@ -82,6 +82,6 @@ Für Docker bedeutet das meist:
 - Kalender
 - Öffnen und Speichern eines Gottesdiensts
 - ein Bericht oder Export
-- Passwort-Reset oder Testmail
+- E-Mail-Link-Anmeldung oder Testmail
 - Queue, Scheduler und Logs
 - Chromium-basierte Ausgaben

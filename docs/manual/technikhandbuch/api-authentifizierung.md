@@ -53,13 +53,12 @@ Die geschützten Web-Endpunkte für die persönliche Einschreibung sind:
 
 Alle drei Routen liegen in der authentifizierten CSRF-geschützten Web-Gruppe.
 Codefehler werden ohne Konto- oder Zustandsdetails gemeldet; TOTP-Rate-Limits
-gelten pro Benutzerkonto und liefern bei einer temporären Sperre HTTP 429. Fehlerhafte Passwortanmeldungen bleiben auf das vorhandene
-Limit nach Benutzername und Quell-IP begrenzt; es gibt keine weitere
-kontoweite Passwortsperre. Die Antworten enthalten weder den TOTP-Secretwert als eigenes Feld noch
-die sensiblen User-Modellattribute.
+gelten pro Benutzerkonto und liefern bei einer temporären Sperre HTTP 429. E-Mail-Link-Anforderungen werden nach Quell-IP und normalisierter E-Mailadresse begrenzt. Die Antworten enthalten weder den TOTP-Secretwert als eigenes Feld noch die sensiblen User-Modellattribute.
+
+Das Middleware-Gate für Sicherheits-Onboarding läuft auch in den API- und Extranet-Gruppen. Nach dem passenden E-Mail-Link-Login können API-Anfragen daher bis zur Faktoreinrichtung oder einer aktuellen Sitzungsfreigabe auf die Onboarding-Seite umgeleitet werden. `APP_URL` wird automatisch als Sanctum-Stateful-Domain ergänzt, damit gleich-originige Browseranfragen die Sitzung verwenden. Externe Bearer-Token-Clients müssen die Einrichtung im Browser abschließen.
 
 Passkey- und TOTP-Verwaltungsrouten setzen eine authentifizierte Sitzung voraus.
-Sie verlangen keine Passwortbestätigung und lehnen Stellvertretersitzungen ab.
+Sie lehnen Stellvertretersitzungen ab.
 Passkey-Registrierung bleibt an eine frische WebAuthn-Challenge und User
 Verification gebunden; der TOTP-Faktor wird erst nach erfolgreicher Codeprüfung
 aktiviert.

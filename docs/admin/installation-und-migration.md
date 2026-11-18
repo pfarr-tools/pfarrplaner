@@ -455,6 +455,22 @@ hinzufügen, dann die Anwendung ausrollen, alte Strukturen erst später
 entfernen. Nicht kompatible Änderungen erhalten eine geplante kurze
 Wartungszeit. Das vorherige Image bleibt als Rollback-Grundlage erhalten.
 
+### Migration der Kontoklassifikation und des Sicherheits-Onboardings
+
+Die Migration `2026_11_18_090000_persist_official_user_and_security_onboarding_state` ergänzt `users.is_official_user`, `users.security_onboarding_email_logins` und `users.security_onboarding_last_shown_at`. Bei Bestandskonten wird `is_official_user` auf `true` gesetzt, wenn zuvor ein nichtleerer Legacy-Passwort-Hash vorhanden war. Für alle Konten setzt die Migration `must_change_password` auf `false`. Die bisherigen Hashwerte bleiben in der Datenbank erhalten, werden nach dem Update aber von keinem Anmelde- oder Verwaltungsweg verwendet.
+
+`./planer update` führt die Migration im normalen Updateablauf aus. Vor einem Produktionsupdate sind Datenbank und MinIO zu sichern und die Sicherung zu verifizieren:
+
+```sh
+./planer backup create
+./planer backup verify
+./planer update --backup-confirmed
+```
+
+Prüfen Sie nach dem Update die Anwendungs- und Datenbankgesundheit und testen Sie den E-Mail-Link-Login sowie die Passkey- und TOTP-Einrichtung mit einem dafür vorgesehenen Konto.
+
+Die `down()`-Methode entfernt die drei neuen Spalten. Sie setzt `must_change_password` jedoch nicht auf frühere Einzelwerte zurück und rekonstruiert auch keinen vorherigen Anmeldestatus. Ein vollständiger Rückfall besteht deshalb aus dem vorherigen Anwendungsimage und der vor dem Update erstellten, verifizierten Datenbanksicherung. Führen Sie nicht lediglich `migrate:rollback` aus und starten dann die ältere Anwendung mit dem veränderten Schema. Verwenden Sie das dokumentierte Restore-Verfahren in einer quieszierten Umgebung; `.env`, Datenbank und MinIO dürfen dabei nicht mit Testdaten überschrieben werden.
+
 ### Migration der Zwei-Faktor-Spalten
 
 Die Migration `add_two_factor_columns_to_users_table` ergänzt vier nullable
@@ -509,9 +525,9 @@ löscht zugehörige Demo-Auditdaten ausdrücklich.
 Die Migration
 `2026_11_16_000002_add_two_factor_recovery_attempt_tracking_to_users` ergänzt
 den Fehlversuchszähler `users.two_factor_recovery_attempts` und den Zeitstempel
-`users.two_factor_recovery_attempted_at`. Beide Werte werden gemeinsam mit der
-Passwortprüfung unter einer Datenbanksperre aktualisiert; damit ist für die
-Begrenzung kein geteilter Cache erforderlich.
+`users.two_factor_recovery_attempted_at`. Beide Werte werden gemeinsam mit der TOTP-Codeprüfung unter einer
+Datenbanksperre aktualisiert; damit ist für die Begrenzung kein geteilter Cache
+erforderlich.
 
 Beide Migrationen werden beim regulären `./planer update` ausgeführt. Sie sind
 vorwärtsgerichtet und verweigern `migrate:rollback`, weil dadurch Recovery-
@@ -525,7 +541,7 @@ Für die Wiederherstellungsaktion ist zwingend
 `SESSION_DRIVER=database` erforderlich. Nur so kann Pfarrplaner aktive
 Sitzungen benutzerbezogen widerrufen. Fehlversuche werden mit Zeitstempel am
 Super-Admin-Konto gespeichert und unter derselben Datenbanksperre wie die
-Passwortprüfung aktualisiert; dafür ist kein geteilter Cache erforderlich.
+TOTP-Codeprüfung aktualisiert; dafür ist kein geteilter Cache erforderlich.
 Ist `SESSION_CONNECTION` gesetzt, muss
 der Verbindungsname derselbe wie `database.default` sein; eine leere Einstellung
 verwendet die Standardverbindung. Die Docker-Beispielkonfiguration setzt den

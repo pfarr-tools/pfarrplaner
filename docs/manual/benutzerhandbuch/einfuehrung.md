@@ -48,7 +48,7 @@ Pfarrplaner besteht aus mehreren Arbeitsbereichen:
 - **[Urlaubsplan](urlaubsplan.md)**: Abwesenheiten, Vertretungen und Genehmigungen.
 - **[Sammeleingaben](eingaben.md)**: Tabellen für viele ähnliche Eingaben, zum Beispiel Opferplan, Planungstabelle oder Kinderkirche.
 - **[Berichte und Ausgaben](berichte.md)**: PDF-, Word-, Excel-, CSV- und HTML-Ausgaben.
-- **[Persönliche Einstellungen](einstellungen.md)**: Profil, Passwort, E-Mailbenachrichtigungen, Startseite und Kalenderverbindungen.
+- **[Persönliche Einstellungen](einstellungen.md)**: Profil, Sicherheit, E-Mailbenachrichtigungen, Startseite und Kalenderverbindungen.
 - **[Administration](administration.md)**: Benutzer, Rollen, Gemeinden, Orte, Lieder, Texte und weitere Stammdaten.
 
 ---

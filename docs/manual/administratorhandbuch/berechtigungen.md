@@ -39,22 +39,23 @@ Dieses Kapitel beschreibt die im Anwendungscode verfügbaren Policy-Verben. Eine
 | Stichworte (`Tag`) | `viewAny`, `index`, `create`, `update`, `delete`, `forceDelete`, `restore` | Angemeldete Personen; globale Freigabe über die Tag-Policy. |
 | Teams (`Team`) | `index`, `viewAny`, `create`: mindestens eine schreibbare Gemeinde; `update`, `delete`: die Teamgemeinde ist schreibbar. | Die Team-Policy hat keinen pauschalen Zugriff für jedes angemeldete Konto. |
 | Liturgische Texte (`Text`) | `viewAny`, `view`, `create`, `update`, `delete`, `restore`, `forceDelete` | Angemeldete Personen; globale Freigabe über die Text-Policy. |
-| Benutzerkonten (`User`) | `index`: Super-/Admin, lokale Adminstadt oder `benutzerliste-lokal-sehen`/`benutzer-bearbeiten`; `view`: `benutzer-bearbeiten`; `create`: Adminstadt oder `benutzer-bearbeiten`; `update`, `resetPassword`: eigenes Konto, Admin, verwaltete Stadt oder `benutzer-bearbeiten`, niemals Ziel-Super-Admin; `delete`: Admin/`benutzer-bearbeiten` in verwalteter Zielgemeinde, niemals Ziel-Super-Admin; `restore`, `forceDelete`: `benutzer-bearbeiten`; `join`: Admin oder `benutzer-bearbeiten`; `findDuplicates`, `fixDuplicates`: Super-Administrator:in; `merge`: Admin oder gemeinsame Adminstadt, niemals Ziel-Super-Admin; `impersonate`: Admin, niemals Ziel-Super-Admin; `doJoin`: gewährt; `editAbsences`: eigenes Konto oder Fremdurlaubs-/Adminrecht in schreibbarer Zielgemeinde, nicht für Pfarrer:innen. | Selbstbearbeitung und einzelne Adminaktionen haben eigene Regeln; sie sind nicht pauschal gleichbedeutend mit `benutzer-bearbeiten`. |
+| Benutzerkonten (`User`) | `index`: Super-/Admin, lokale Adminstadt oder `benutzerliste-lokal-sehen`/`benutzer-bearbeiten`; `view`: `benutzer-bearbeiten`; `create`: Adminstadt oder `benutzer-bearbeiten`; `update`: eigenes Konto, Admin, verwaltete Stadt oder `benutzer-bearbeiten`, niemals Ziel-Super-Admin; `delete`: Admin/`benutzer-bearbeiten` in verwalteter Zielgemeinde, niemals Ziel-Super-Admin; `restore`, `forceDelete`: `benutzer-bearbeiten`; `join`: Admin oder `benutzer-bearbeiten`; `findDuplicates`, `fixDuplicates`: Super-Administrator:in; `merge`: Admin oder gemeinsame Adminstadt, niemals Ziel-Super-Admin; `impersonate`: Admin, niemals Ziel-Super-Admin; `doJoin`: gewährt; `editAbsences`: eigenes Konto oder Fremdurlaubs-/Adminrecht in schreibbarer Zielgemeinde, nicht für Pfarrer:innen. | Selbstbearbeitung und einzelne Adminaktionen haben eigene Regeln; sie sind nicht pauschal gleichbedeutend mit `benutzer-bearbeiten`. |
 | Trauungen (`Wedding`) | `index`, `create`, `update`, `delete`, `restore`, `forceDelete` | `gd-bearbeiten` und bei Verknüpfung die Berechtigung des Gottesdienstes. |
 
 ## Direkte Berechtigungen außerhalb der Modell-Policies
 
-## Passwörter verwalten
+## Benutzerkonten aktivieren
 
-Ein Benutzerkonto ändert sein eigenes Passwort über den separaten Menüpunkt **Passwort ändern**. Die Funktion ist nicht Teil des Profil-Editors.
+Die Aktivierung eines Benutzerkontos folgt der vorhandenen Personenberechtigung:
+Wer eine Person bearbeiten darf, kann auch ihr Konto aktivieren. Das gilt
+beispielsweise für einen Lokaladministrator mit Bearbeitungsrecht. Für die
+Aktivierung ist keine zusätzliche Super-Admin-Berechtigung erforderlich.
 
-Nur Super-Administrator:innen dürfen in der Benutzerverwaltung ein Passwort für ein anderes Konto setzen oder einen Passwort-Reset auslösen. Beim Zurücksetzen wird ein vorläufiges Anfangspasswort nach dem Muster „Konsonant, Vokal, Konsonant, Vokal, vier Zahlen“ erzeugt. Bei der manuellen Setzung darf die Administration ein beliebiges nichtleeres Passwort wählen. Beide Wege erzwingen den Passwortwechsel bei der nächsten Anmeldung; normale, selbst gewählte Passwörter müssen weiterhin die zentrale starke Passwortregel erfüllen.
-
-Beim Anlegen eines Kontos zeigt der Benutzereditor ein Anfangspasswort an. Die Administratorin oder der Administrator muss es vor dem Speichern ausdrücklich bestätigen; anschließend wird nur der Hash gespeichert und die Kontodaten-Mail versendet. Das Passwort kann vor dem Speichern neu vorgeschlagen oder angepasst werden. Es muss entweder die zentrale Passwortregel erfüllen oder dem dokumentierten temporären Muster entsprechen; in beiden Fällen wird der nächste Passwortwechsel erzwungen.
-
-Das öffentliche Verfahren **Passwort vergessen** verwendet denselben Passwortstandard und hebt die erzwungene Änderung nach einem erfolgreichen Reset auf. Schwache Passwörter werden bereits bei der Eingabe zurückgewiesen.
-
-Ein Konto mit erzwungenem Passwortwechsel kann keine Verwaltungs- oder Inhaltsseite öffnen. Die Sperre gilt auch für direkte URLs und interne Navigation. Eine kontrollierte Benutzerübernahme durch eine Administratorin oder einen Administrator bleibt rückkehrfähig; über **Zurück zu Admin** wird das ursprüngliche Administratorkonto wiederhergestellt.
+Beim erstmaligen Aktivieren erhält die Person eine E-Mail mit Hinweisen zur
+passwortlosen Anmeldung per Passkey oder E-Mail-Link. Passkeys und eine
+Authenticator-App können anschließend in den persönlichen
+**Sicherheitseinstellungen** eingerichtet werden. Die Anwendung bietet keine
+Passwortanmeldung und keinen Passwort-Reset.
 
 Einige Funktionen werden nicht als CRUD-Policy eines Modells geprüft. Dazu gehören insbesondere die fachlichen Berechtigungen für Gottesdienste und Eingaben:
 
