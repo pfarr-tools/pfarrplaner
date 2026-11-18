@@ -17,6 +17,8 @@ use App\Models\People\User;
 use App\Services\SecurityOnboardingService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
+use RoundlyConsulting\TwoFactor\Contracts\TwoFactorService;
 use Inertia\Testing\AssertableInertia as Assert;
 use Tests\TestCase;
 
@@ -135,6 +137,32 @@ final class SecurityOnboardingFeatureTest extends TestCase
         $this->travel(1)->day();
         $this->get(route('security.onboarding'))->assertOk();
         self::assertTrue($user->fresh()->security_onboarding_last_shown_at->equalTo($shownAt));
+    }
+
+    /** Keep onboarding active for pending TOTP and release it only after valid confirmation. */
+    public function test_totp_setup_must_be_confirmed_before_the_gate_releases(): void
+    {
+        $this->withoutMiddleware(VerifyCsrfToken::class);
+        $user = User::factory()->create(['is_official_user' => true]);
+        app(SecurityOnboardingService::class)->recordEmailLinkLogin($user);
+
+        $this->actingAs($user)
+            ->get(route('home'))
+            ->assertRedirect(route('security.onboarding'));
+        $this->postJson(route('user.two-factor.start'), [])
+            ->assertOk()
+            ->assertJsonStructure(['provisioning_uri', 'recovery_codes']);
+        $this->postJson(route('user.two-factor.confirm'), ['code' => 'invalid'])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('code');
+        $this->get(route('home'))->assertRedirect(route('security.onboarding'));
+
+        $setupResponse = $this->get(route('security.onboarding'));
+        $setupResponse->assertOk();
+        $secret = $user->fresh()->twoFactorSecret();
+        $code = app(TwoFactorService::class)->currentCode($secret);
+        $this->postJson(route('user.two-factor.confirm'), ['code' => $code])->assertOk();
+        $this->actingAs($user->fresh())->get(route('home'))->assertOk();
     }
 
     /** Protect the alternate Sanctum extranet middleware group as well as web and API. */

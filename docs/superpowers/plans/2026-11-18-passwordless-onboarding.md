@@ -85,9 +85,11 @@
 **Files:**
 - Modify: bestehende UI-/Featuretests für erfolgreiche und fehlgeschlagene Faktoreinrichtung
 
-- [ ] Ergänze UI-Tests, die TOTP- und Passkey-Setup direkt auf der Onboarding-Seite ausführen.
-- [ ] Prüfe Freigabe nach bestätigtem Faktor; unvollständiges TOTP darf die Sperre nicht lösen.
-- [ ] Führe gezielte PHP-/Vitest-Tests und Build aus; Senior Review; committe nur Task-4-Dateien.
+- [x] Ergänze UI-Tests, die TOTP- und Passkey-Setup direkt auf der Onboarding-Seite ausführen.
+- [x] Prüfe Freigabe nach bestätigtem Faktor; unvollständiges TOTP darf die Sperre nicht lösen.
+- [x] Führe gezielte PHP-/Vitest-Tests und Build aus; Senior Review; committe nur Task-4-Dateien.
+
+**Task-4-Verifikation:** Isolierte PHP-Featuretests: 16 Tests, 170 Assertions; Vitest: 15 Tests; Vite-Produktionsbuild erfolgreich. Gezielte `format:check`- und `git diff --check`-Prüfungen erfolgreich. Senior Review: **APPROVED**.
 
 ### Task 5: Handbücher und Abschlussprüfung
 
