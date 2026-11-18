@@ -62,7 +62,7 @@ class OfferingPlanReport extends AbstractPDFDocumentReport
     /**
      * @var string
      */
-    public $description = 'Übersicht aller Opferzwecke für ein Jahr';
+    public $description = 'Übersicht aller Opferzwecke für einen Zeitraum';
 
     protected $inertia = true;
 
@@ -88,16 +88,19 @@ class OfferingPlanReport extends AbstractPDFDocumentReport
                 'cities.*' => 'required|int|exists:cities,id',
                 'locations' => 'nullable|array',
                 'locations.*' => 'nullable|int|exists:locations,id',
-                'year' => 'required|int',
+                'start' => 'required|date_format:Y-m-d',
+                'end' => 'required|date_format:Y-m-d|after_or_equal:start',
                 'includeOfferingCounters' => 'bool',
                 'highlightEmpty' => 'bool',
             ]
         );
+        $data['start'] = Carbon::parse($data['start'])->startOfDay();
+        $data['end'] = Carbon::parse($data['end'])->endOfDay();
         $data['occurences'] = Occurence::with('event')->whereHas('event', function ($query) use ($data) {
             $query->servicesOnly()
                 ->inCitiesAndLocations($data['cities'], $data['locations'] ?? null)
                 ->whereDoesntHave('funerals')
-                ->between(Carbon::parse('01-01-'.$data['year'])->startOfYear(), Carbon::parse('01-01-'.$data['year'])->endOfYear())
+                ->between($data['start'], $data['end'])
                 ->ordered();
         })->orderBy('start')->get();
         $data['cities'] = City::whereIn('id', $data['cities'])->get();
@@ -115,10 +118,10 @@ class OfferingPlanReport extends AbstractPDFDocumentReport
                 static::FILE_TITLE.' '.$data['cities']->pluck('name')->join(' '),
                 'pdf',
                 static::FILE_SIGNATURE,
-                $data['year'].'-01-01',
+                [$data['start'], $data['end']],
                 false,
                 null,
-                'Y'
+                'Ymd'
             ),
             $data,
             ['format' => 'A4']

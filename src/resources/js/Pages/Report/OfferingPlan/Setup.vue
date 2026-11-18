@@ -50,11 +50,11 @@
                 v-model:city-model-value="myCities"
                 v-model:location-model-value="myLocations"
             />
-            <form-input
-                name="year"
-                label="Jahr"
-                v-model="myYear"
-                type="number"
+            <form-date-range-picker
+                label="Zeitraum"
+                v-model:from="myStart"
+                v-model:to="myEnd"
+                iso-date
             />
             <br />
             <form-check
@@ -74,29 +74,35 @@
 <script>
 import SaveButton from '../../../components/Ui/buttons/SaveButton'
 import FormCsrfToken from '../../../components/Ui/forms/FormCsrfToken'
-import FormInput from '../../../components/Ui/forms/FormInput'
+import FormDateRangePicker from '../../../components/Ui/forms/FormDateRangePicker'
 import FormCheck from '../../../components/Ui/forms/FormCheck.vue'
 import CityLocationFilter from '../../../components/Reports/CityLocationFilter.vue'
 import { submitReportForm } from '../../../helpers/submitReportForm'
 export default {
     name: 'Setup',
     props: ['cities', 'locations'],
-    components: { CityLocationFilter, FormCheck, FormInput, FormCsrfToken, SaveButton },
+    components: { CityLocationFilter, FormCheck, FormDateRangePicker, FormCsrfToken, SaveButton },
     data() {
+        const reportYear = moment().startOf('year')
+        if (moment().month() >= 6) reportYear.add(1, 'year')
+
         return {
             myCities: this.cities.length > 0 ? [this.cities[0].id] : null,
             myLocations: [],
-            myYear: moment().format('YYYY'),
+            myStart: reportYear.clone(),
+            myEnd: reportYear.clone().endOf('year'),
             myIncludeOfferingCounters: false,
             myHighlightEmpty: false,
         }
     },
     methods: {
+        /** Submit the offering plan with the selected date range and filters. */
         renderReport() {
             submitReportForm(route('reports.render', { report: 'offeringPlan' }), {
                 cities: this.myCities,
                 locations: this.myLocations,
-                year: this.myYear,
+                start: this.myStart,
+                end: this.myEnd,
                 includeOfferingCounters: this.myIncludeOfferingCounters,
                 highlightEmpty: this.myHighlightEmpty,
             })

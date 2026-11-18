@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
-    <title>Opferplan {{ $year }} für {{ $cities->pluck('name')->join(', ') }}</title>
+    <title>Opferplan {{ $start->format('d.m.Y') }} bis {{ $end->format('d.m.Y') }} für {{ $cities->pluck('name')->join(', ') }}</title>
     <style>
         body,
         * {
@@ -22,7 +22,7 @@
     </style>
 </head>
 <body>
-    <h1 style="margin-bottom: 0cm; padding-bottom: 0;">Opferplan {{ $year }}
+    <h1 style="margin-bottom: 0cm; padding-bottom: 0;">Opferplan {{ $start->format('d.m.Y') }} bis {{ $end->format('d.m.Y') }}
         für {{ $cities->pluck('name')->join(', ') }}</h1>
 
 

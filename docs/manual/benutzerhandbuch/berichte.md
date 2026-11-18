@@ -366,7 +366,7 @@ Wenn bei der öffentlichen Erfassung die Einzelaufstellung nach Scheinen und Mü
 
 ## Opferplan
 
-Der Bericht **Opferplan** gibt eine Jahresübersicht der Opferzwecke aus.
+Der Bericht **Opferplan** gibt die Opferzwecke für einen frei wählbaren Zeitraum aus.
 
 Seite: **Opferplan ausgeben**
 
@@ -374,7 +374,7 @@ Felder:
 
 - **Opferplan für folgende Kirchengemeinden erstellen**: Gemeinden.
 - **Auf folgende Orte beschränken**: Optional. Zeigt nur Orte aus den vorher gewählten Gemeinden. Leer bedeutet, dass alle Orte der gewählten Gemeinden einbezogen werden.
-- **Jahr**: Jahr des Opferplans.
+- **Zeitraum**: Anfang und Ende des gewünschten Zeitraums. Von Januar bis Juni ist das laufende Kalenderjahr voreingestellt, von Juli bis Dezember das nächste Kalenderjahr.
 - **Opferzähler mit ausgeben**: Nimmt die Namen der Opferzähler auf.
 - **Fehlende Einträge hervorheben**: Markiert Gottesdienste ohne vollständige Opferangaben.
 
