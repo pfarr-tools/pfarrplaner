@@ -41,10 +41,10 @@
 
 **Interfaces:** `User::isOfficialUser` wird aus `is_official_user` gecastet. Persistenter Erinnerungsstatus besteht aus Login-Zähler und Zeitpunkt des zuletzt gezeigten Hinweises.
 
-- [ ] Schreibe Migrationstests für leere/nichtleere Passwörter, booleschen Cast und das Zurücksetzen aller `must_change_password`-Werte.
-- [ ] Führe diese Tests mit isolierter SQLite-Datenbank aus und bestätige zunächst den Fehler.
-- [ ] Implementiere additive Spalten, Backfill und Entfernung des Passwortwechsel-Gates.
-- [ ] Führe gezielte Tests, Formatprüfung und `git diff --check` aus; Senior Review; committe nur Task-1-Dateien.
+- [x] Schreibe Migrationstests für leere/nichtleere Passwörter, booleschen Cast und das Zurücksetzen aller `must_change_password`-Werte.
+- [x] Führe diese Tests mit isolierter SQLite-Datenbank aus und bestätige zunächst den Fehler.
+- [x] Implementiere additive Spalten, Backfill und Entfernung des Passwortwechsel-Gates.
+- [x] Führe gezielte Tests, Formatprüfung und `git diff --check` aus; Senior Review; committe nur Task-1-Dateien.
 
 ### Task 2: Passwort-Authentifizierung und Administration entfernen
 

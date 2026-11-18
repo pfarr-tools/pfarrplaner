@@ -34,7 +34,6 @@ use App\Http\Middleware\Cors;
 use App\Http\Middleware\ForceDomain;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\RedirectIfAuthenticated;
-use App\Http\Middleware\RequirePasswordChange;
 use App\Http\Middleware\RequireTwoFactorRecovery;
 use App\Http\Middleware\TrustProxies;
 use App\Http\Middleware\VerifyCsrfToken;
@@ -81,7 +80,6 @@ return Application::configure(basePath: dirname(__DIR__))
         // Add Inertia to the web group
         $middleware->web(append: [
             HandleInertiaRequests::class,
-            RequirePasswordChange::class,
             RequireTwoFactorRecovery::class,
         ]);
         $middleware->api(append: [RequireTwoFactorRecovery::class]);
@@ -113,7 +111,6 @@ return Application::configure(basePath: dirname(__DIR__))
             StartSession::class,
             ShareErrorsFromSession::class,
             Authenticate::class,
-            RequirePasswordChange::class,
             RequireTwoFactorRecovery::class,
             AuthenticateSession::class,
             SubstituteBindings::class,

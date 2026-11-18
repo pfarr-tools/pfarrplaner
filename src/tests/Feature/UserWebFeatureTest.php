@@ -74,6 +74,35 @@ class UserWebFeatureTest extends TestCase
             );
     }
 
+    /** A legacy password-change flag no longer blocks passwordless account access. */
+    public function test_legacy_password_change_flag_does_not_intercept_profile_routes(): void
+    {
+        $this->user->forceFill(['must_change_password' => true])->save();
+
+        $this->actingAs($this->user)
+            ->get(route('user.profile'))
+            ->assertOk();
+    }
+
+    /** The administration can save the durable official-account classification. */
+    public function test_admin_can_persist_official_user_classification(): void
+    {
+        $this->withoutMiddleware(VerifyCsrfToken::class);
+        $target = User::factory()->create(['is_official_user' => false]);
+
+        $this->actingAs($this->user)
+            ->patch(route('user.update', $target), [
+                'id' => $target->id,
+                'first_name' => $target->first_name,
+                'last_name' => $target->last_name,
+                'email' => $target->email,
+                'isOfficialUser' => true,
+            ])
+            ->assertRedirect(route('users.index'));
+
+        self::assertTrue($target->fresh()->isOfficialUser);
+    }
+
     /** A correct password for a TOTP-enabled account must not authenticate the session yet. */
     public function test_login_with_two_factor_enabled_user_stops_at_a_challenge(): void
     {
@@ -856,6 +885,7 @@ class UserWebFeatureTest extends TestCase
         $fresh = $target->fresh();
         $this->assertTrue(Hash::check($password, $fresh->password));
         $this->assertTrue((bool) $fresh->must_change_password);
+        $this->assertTrue($fresh->isOfficialUser);
         Mail::assertQueued(AccountData::class);
         $this->assertStringNotContainsString($password, json_encode($response->getSession()->all()));
     }

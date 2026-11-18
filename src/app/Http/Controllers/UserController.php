@@ -915,6 +915,7 @@ class UserController extends Controller
             'last_name' => 'required|string|max:255',
             'title' => 'nullable|string',
             'email' => 'nullable|string|email|max:255|unique:users,email'.($user ? ','.$user->id : ''),
+            'isOfficialUser' => 'sometimes|boolean',
             'password' => ['nullable', 'string', new StrongPassword],
             'office' => 'nullable|string',
             'address' => 'nullable|string',
@@ -964,6 +965,12 @@ class UserController extends Controller
 
         if ($data['password'] != '') {
             $data['must_change_password'] = true;
+            $data['is_official_user'] = true;
+        }
+
+        if (array_key_exists('isOfficialUser', $data)) {
+            $data['is_official_user'] = (bool) $data['isOfficialUser'];
+            unset($data['isOfficialUser']);
         }
 
         return $data;

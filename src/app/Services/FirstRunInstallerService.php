@@ -121,6 +121,7 @@ class FirstRunInstallerService
             'last_name' => $data['last_name'],
             'email' => $data['email'],
             'password' => $data['password'],
+            'is_official_user' => true,
             'must_change_password' => $data['must_change_password'],
         ]);
         $user->email_verified_at = now();

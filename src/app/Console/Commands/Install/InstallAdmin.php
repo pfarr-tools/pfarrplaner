@@ -71,7 +71,13 @@ class InstallAdmin extends Command
         $domain = parse_url(url('/'), PHP_URL_HOST);
 
         $password = PasswordService::temporaryInitialPassword();
-        $user = User::create(['last_name' => 'Admin', 'email' => 'admin@'.$domain, 'password' => $password, 'must_change_password' => 1]);
+        $user = User::create([
+            'last_name' => 'Admin',
+            'email' => 'admin@'.$domain,
+            'password' => $password,
+            'is_official_user' => true,
+            'must_change_password' => 1,
+        ]);
         $user->assignRole($role);
 
         $this->line('<info>SUCCESS</info> Admin user admin@'.$domain.' with password"'.$password.'" created.');

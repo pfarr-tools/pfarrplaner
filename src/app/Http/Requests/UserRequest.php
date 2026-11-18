@@ -95,6 +95,8 @@ class UserRequest extends FormRequest
                 'string',
                 new StrongPassword($this->boolean('manualPassword') || $this->boolean('createAccount')),
             ],
+            'isOfficialUser' => 'sometimes|boolean',
+            'is_official_user' => 'sometimes|boolean',
             'manualPassword' => 'nullable|boolean',
             'office' => 'nullable|string',
             'address' => 'nullable|string',
@@ -140,6 +142,12 @@ class UserRequest extends FormRequest
     public function validated($key = null, $default = null): array
     {
         $data = parent::validated();
+        $officialStatusProvided = array_key_exists('isOfficialUser', $data)
+            || array_key_exists('is_official_user', $data);
+        if (array_key_exists('isOfficialUser', $data)) {
+            $data['is_official_user'] = (bool) $data['isOfficialUser'];
+            unset($data['isOfficialUser']);
+        }
 
         // An omitted or empty password means "keep the existing password".
         // Account removal is handled by UserController::update after this request.
@@ -154,6 +162,10 @@ class UserRequest extends FormRequest
 
         if (isset($data['password'])) {
             $data['must_change_password'] = true;
+        }
+
+        if (! $officialStatusProvided && ($this->boolean('createAccount') || isset($data['password']))) {
+            $data['is_official_user'] = true;
         }
 
         return $data;

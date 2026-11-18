@@ -94,6 +94,7 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
         'last_name',
         'title',
         'email',
+        'is_official_user',
         'password',
         'notifications',
         'office',
@@ -126,6 +127,9 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
     {
         return [
             'new_features' => 'datetime',
+            'is_official_user' => 'boolean',
+            'security_onboarding_email_logins' => 'integer',
+            'security_onboarding_last_shown_at' => 'datetime',
             ...$this->twoFactorCasts(),
         ];
     }
@@ -166,6 +170,7 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
 
     // ACCESSORS
 
+    /** Return the user's formatted full name. */
     public function getNameAttribute(): string
     {
         return $this->nameService()->format(NameService::FIRST_LAST);
@@ -214,6 +219,7 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
         return $this->hasRole(RoleService::ROLE_ADMIN) || $this->hasRole(RoleService::ROLE_SUPER_ADMIN);
     }
 
+    /** Return whether the user has the global super-administrator role. */
     public function getIsSuperAdminAttribute(): bool
     {
         return $this->hasRole(RoleService::ROLE_SUPER_ADMIN);
@@ -227,9 +233,10 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
         return (! $this->isAdmin) && (count($this->adminCities) > 0);
     }
 
-    public function getIsOfficialUserAttribute()
+    /** Return the persisted classification for an official user account. */
+    public function getIsOfficialUserAttribute(): bool
     {
-        return ! empty($this->password);
+        return (bool) ($this->attributes['is_official_user'] ?? false);
     }
 
     /**
@@ -257,6 +264,7 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
         return ($withTitle ? ($this->title ? $this->title.' ' : '') : '').$this->last_name;
     }
 
+    /** Return the family-name-first sorting label. */
     public function getSortNameAttribute()
     {
         return $this->last_name.($this->first_name ? ', '.$this->first_name : '');
@@ -291,6 +299,7 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
         return $this->belongsToMany(City::class)->withPivot('permission')->wherePivotIn('permission', ['w', 'a']);
     }
 
+    /** Return replacements currently assigned to this user. */
     public function currentReplacements()
     {
         return Replacement::with('absence')
@@ -302,6 +311,7 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
             ->get();
     }
 
+    /** Return pools currently mastered by this user. */
     public function currentlyMasteredPools()
     {
         return Poolmaster::with('currentReplacements')
@@ -435,6 +445,7 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
         return $name;
     }
 
+    /** Register the default ordering global scope. */
     protected static function boot()
     {
         parent::boot();
@@ -665,6 +676,7 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
         return null;
     }
 
+    /** Return the model field used for its profile image. */
     public function getImageField()
     {
         return 'image';
@@ -692,6 +704,7 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
         }
     }
 
+    /** Persist one user setting. */
     public function setSetting($key, $value)
     {
         return Settings::set($this, $key, $value);
@@ -885,6 +898,7 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
         return ($absences !== null) ? ($returnAbsence ? $absences : null) : ($returnAbsence ? null : false);
     }
 
+    /** Merge this user into another account and transfer its associations. */
     public function mergeInto(User $user)
     {
         if ((! $user->isOfficialUser) && $this->isOfficialUser) {
@@ -1005,7 +1019,11 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
     public function resetAccount(?string $password = null): void
     {
         $password ??= PasswordService::temporaryInitialPassword();
-        $this->update(['password' => $password, 'must_change_password' => 1]);
+        $this->update([
+            'password' => $password,
+            'must_change_password' => 1,
+            'is_official_user' => true,
+        ]);
         Mail::to($this->email)->queue(new AccountData($this, Auth::user(), $password));
     }
 
