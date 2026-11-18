@@ -137,7 +137,7 @@ Geben Sie den Link und den QR-Code nur an Personen weiter, die Opferangaben für
 
 ### Opfer eintragen
 
-Nach dem Öffnen sehen Sie die Seite **Opfer erfassen**. Sie zeigt die noch offenen Gottesdienste der aktuellen Tage. Gottesdienste, für die bereits eine Opfersumme gespeichert wurde, werden nicht mehr angeboten.
+Nach dem Öffnen sehen Sie die Seite **Opfer erfassen**. Sie zeigt die noch offenen Gottesdienste der aktuellen Tage mit Datum, Uhrzeit und Ort. Gottesdienste, für die bereits eine Opfersumme gespeichert wurde, werden nicht mehr angeboten.
 
 1. Wählen Sie einen Gottesdienst aus. Die Eingabemaske öffnet sich als eigene Seite innerhalb des Freigabelinks.
 2. Tragen Sie die **Gesamtsumme in Euro** ein. Komma oder Punkt als Dezimaltrennzeichen sind möglich.

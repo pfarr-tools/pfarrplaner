@@ -46,6 +46,7 @@
                         data-testid="service-selector"
                         @click="selectService(service)"
                     >
+                        <span class="service-date">{{ formatServiceDate(service.date) }}</span>
                         <span class="service-time">{{ service.time }}</span>
                         <span class="service-title">{{ service.title }}</span>
                         <span class="service-location">{{ service.location }}</span>
@@ -186,6 +187,8 @@
 </template>
 
 <script>
+import { formatPlannerDateForDisplay } from '../../../helpers/plannerDates'
+
 /**
  * Mobile public page for recording offerings through a signed city link.
  */
@@ -258,6 +261,15 @@ export default {
         },
     },
     methods: {
+        /**
+         * Format the service date for the public service selector.
+         *
+         * @param {string} date ISO date from the public offerings payload.
+         * @returns {string} Date formatted for German users.
+         */
+        formatServiceDate(date) {
+            return formatPlannerDateForDisplay(date)
+        },
         /**
          * Build editable form data from a service.
          *
@@ -392,6 +404,10 @@ export default {
 .service-time {
     font-size: 1.15rem;
     font-weight: 700;
+}
+
+.service-date {
+    color: var(--bs-secondary-color);
 }
 
 .service-title {
