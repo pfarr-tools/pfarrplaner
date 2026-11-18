@@ -24,13 +24,15 @@ Wenn Sie die Adresse von Pfarrplaner in Ihrem Browser aufrufen, erscheint zunäc
 
 1. Für die Anmeldung mit einem Passkey klicken Sie direkt auf **Mit Passkey anmelden**. Sie müssen dafür keine E-Mail-Adresse eingeben.
 2. Für die Anmeldung per E-Mail tragen Sie Ihre Konto-Adresse in das Feld unterhalb des Passkey-Buttons ein und klicken auf **Anmeldelink per E-Mail erhalten**.
-3. Öffnen Sie den Link aus der E-Mail und bestätigen Sie die Anmeldung auf der angezeigten Seite.
+3. Prüfen Sie Ihr Postfach und gegebenenfalls den Spam-Ordner auf eine E-Mail mit dem Anmeldelink. Wenn Sie eine andere Adresse verwenden möchten, wählen Sie auf der Anmeldeseite **Mit einer anderen E-Mail-Adresse anmelden**.
+4. Öffnen Sie den Link aus der E-Mail und wählen Sie auf der angezeigten Bestätigungsseite **Jetzt anmelden**.
 
 Die Anmeldeseite enthält diese Elemente:
 
 - **E-Mailadresse**: Ihr Benutzername für Pfarrplaner.
 - **Mit Passkey anmelden**: Lässt Sie Ihre Identität mit einem Passkey bestätigen, zum Beispiel mit Geräte-PIN oder Fingerabdruck.
 - **Anmeldelink per E-Mail erhalten**: Sendet einen zehn Minuten gültigen Link an die eingegebene Adresse.
+- **Prüfe dein Postfach**: Nach der Anforderung erklärt eine Bestätigung, wo Sie den Anmeldelink finden und wie Sie die Anmeldung abschließen. Dort können Sie auch eine andere E-Mail-Adresse eingeben.
 - **Hinweis zur Unterstützung**: Unter dem Formular finden Sie einen kurzen Hinweis mit Links für eine einmalige oder regelmäßige freiwillige Unterstützung des Projekts.
 
 Passkeys funktionieren nur über eine sichere HTTPS-Verbindung. Falls Ihr

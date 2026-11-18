@@ -74,6 +74,7 @@
                                 </button>
                                 <div class="text-center text-muted my-2">oder</div>
                                 <FormInput
+                                    v-if="!emailLinkRequested"
                                     v-model="form.email"
                                     name="email"
                                     label="E-Mailadresse"
@@ -83,6 +84,7 @@
                                     required
                                 />
                                 <button
+                                    v-if="!emailLinkRequested"
                                     type="button"
                                     class="btn btn-outline-primary btn-lg"
                                     data-testid="email-login-link"
@@ -100,8 +102,35 @@
                                     }}
                                 </button>
                             </div>
+                            <div
+                                v-if="emailLinkRequested"
+                                class="alert alert-success mt-3"
+                                role="status"
+                                data-testid="email-login-confirmation"
+                            >
+                                <h3 class="h5">Prüfe dein Postfach</h3>
+                                <p class="mb-2">
+                                    Falls die Adresse zu einem Konto gehört, das sich anmelden kann,
+                                    wurde eine E-Mail mit dem Anmeldelink verschickt. Prüfe dein
+                                    Postfach und gegebenenfalls den Spam-Ordner. Öffne den Link in
+                                    der Nachricht und wähle anschließend auf der Bestätigungsseite
+                                    „Jetzt anmelden“.
+                                </p>
+                                <button
+                                    type="button"
+                                    class="btn btn-outline-secondary"
+                                    data-testid="different-email-address"
+                                    @click="useDifferentEmailAddress"
+                                >
+                                    Mit einer anderen E-Mail-Adresse anmelden
+                                </button>
+                            </div>
                             <p
-                                v-if="$page.props.flash?.status"
+                                v-if="
+                                    $page.props.flash?.status &&
+                                    !emailLinkRequested &&
+                                    !emailLinkStatusDismissed
+                                "
                                 class="text-success mt-2"
                                 role="status"
                             >
@@ -224,6 +253,8 @@ export default {
             loggingIn: false,
             passkeyLoading: false,
             emailLinkLoading: false,
+            emailLinkRequested: false,
+            emailLinkStatusDismissed: false,
             passkeyError: '',
             emailLinkError: '',
             form: {
@@ -240,6 +271,13 @@ export default {
         focusCurrentInput() {
             const selector = this.demo ? '#users' : '[name="email"]'
             this.$el.querySelector(selector)?.focus()
+        },
+        /** Return from the sent-link confirmation to the email-address form. */
+        useDifferentEmailAddress() {
+            this.emailLinkRequested = false
+            this.emailLinkStatusDismissed = true
+            this.form.email = ''
+            this.$nextTick(() => this.$el.querySelector('[name="email"]')?.focus())
         },
         /** Start passkey login for the entered email address. */
         async loginWithPasskey() {
@@ -294,6 +332,9 @@ export default {
                     window.route('login.link.request'),
                     { email: this.form.email, _token: response.data.token },
                     {
+                        onSuccess: () => {
+                            this.emailLinkRequested = true
+                        },
                         onError: () => {
                             this.emailLinkError =
                                 'Der Anmeldelink konnte nicht angefordert werden. Bitte prüfen Sie die E-Mailadresse.'

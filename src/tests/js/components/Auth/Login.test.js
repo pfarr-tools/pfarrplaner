@@ -118,6 +118,29 @@ describe('Login', () => {
         )
     })
 
+    it('explains how to finish email sign-in and lets the user change the address', async () => {
+        const wrapper = mountLogin()
+        await wrapper.find('[name="email"]').setValue('person@example.org')
+        await wrapper.find('[data-testid="email-login-link"]').trigger('click')
+
+        const [, , options] = wrapper.vm.$inertia.post.mock.calls.at(-1)
+        options.onSuccess()
+        await nextTick()
+
+        const confirmation = wrapper.find('[data-testid="email-login-confirmation"]')
+        expect(confirmation.attributes('role')).toBe('status')
+        expect(confirmation.text()).toContain('Prüfe dein Postfach')
+        expect(confirmation.text()).toContain('Öffne den Link in der Nachricht')
+        expect(confirmation.text()).toContain('„Jetzt anmelden“')
+        expect(wrapper.find('[name="email"]').exists()).toBe(false)
+
+        await wrapper.find('[data-testid="different-email-address"]').trigger('click')
+
+        expect(wrapper.find('[data-testid="email-login-confirmation"]').exists()).toBe(false)
+        expect(wrapper.find('[name="email"]').element.value).toBe('')
+        expect(wrapper.find('[data-testid="email-login-link"]').exists()).toBe(true)
+    })
+
     it('explains when passkeys are unavailable in this browser', async () => {
         Object.defineProperty(window, 'isSecureContext', { configurable: true, value: true })
         vi.spyOn(Passkeys, 'verify').mockRejectedValueOnce({ name: 'NotSupportedError' })
