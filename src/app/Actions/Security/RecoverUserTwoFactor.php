@@ -8,9 +8,10 @@ use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use RoundlyConsulting\TwoFactor\Contracts\ReplayGuard;
+use RoundlyConsulting\TwoFactor\Contracts\TwoFactorService;
 use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
 
@@ -21,7 +22,7 @@ class RecoverUserTwoFactor
     public function execute(
         User $actor,
         User $target,
-        string $currentPassword,
+        string $code,
         string $supportReference,
         string $ipAddress,
     ): TwoFactorRecoveryAudit {
@@ -51,7 +52,7 @@ class RecoverUserTwoFactor
             &$failure,
             $actor,
             $target,
-            $currentPassword,
+            $code,
             $supportReference,
             $ipAddress,
         ): ?TwoFactorRecoveryAudit {
@@ -69,12 +70,23 @@ class RecoverUserTwoFactor
                 return null;
             }
 
-            if (! Hash::check($currentPassword, (string) $lockedActor->password)) {
+            if (! $lockedActor->hasTwoFactorEnabled()) {
+                throw ValidationException::withMessages([
+                    'code' => 'Für diese Wiederherstellung ist ein bestätigter TOTP-Faktor erforderlich.',
+                ]);
+            }
+
+            $secret = $lockedActor->twoFactorSecret();
+            $timestep = $secret === null ? false : app(TwoFactorService::class)->verify($secret, $code);
+            $codeVerified = $timestep !== false
+                && app(ReplayGuard::class)->claim($lockedActor, $timestep);
+
+            if (! $codeVerified) {
                 $lockedActor->forceFill([
                     'two_factor_recovery_attempts' => $attempts + 1,
                     'two_factor_recovery_attempted_at' => now(),
                 ])->save();
-                $failure = 'current_password';
+                $failure = 'code';
 
                 return null;
             }
@@ -129,9 +141,9 @@ class RecoverUserTwoFactor
             throw new TooManyRequestsHttpException(null, 'Zu viele Versuche. Bitte später erneut versuchen.');
         }
 
-        if ($failure === 'current_password') {
+        if ($failure === 'code') {
             throw ValidationException::withMessages([
-                'current_password' => 'Die Anmeldedaten konnten nicht bestätigt werden.',
+                'code' => 'Der Sicherheitscode ist ungültig oder nicht mehr verfügbar.',
             ]);
         }
 

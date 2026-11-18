@@ -33,15 +33,4 @@ class AuthScreenshotTest extends ManualScreenshotTestCase
             }
         });
     }
-
-    public function test_capture_password_change_page(): void
-    {
-        $this->browse(function (Browser $browser) {
-            $this->captureManualScreenshot(
-                $browser,
-                route('password.edit'),
-                'change-password'
-            );
-        });
-    }
 }

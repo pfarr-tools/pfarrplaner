@@ -20,11 +20,11 @@ class RecoverTwoFactorRequest extends FormRequest
             && $actor->can('recoverTwoFactor', $target);
     }
 
-    /** Return password confirmation and a constrained support reference. */
+    /** Return a current TOTP code and a constrained support reference. */
     public function rules(): array
     {
         return [
-            'current_password' => ['required', 'string'],
+            'code' => ['required', 'string', 'regex:/\A[0-9]{6,8}\z/'],
             'support_reference' => ['required', 'string', 'max:100', 'regex:/\A[A-Za-z0-9._-]+\z/'],
         ];
     }

@@ -81,7 +81,12 @@ class EmailLoginLinkController extends Controller
             }
 
             $user = User::query()->lockForUpdate()->find($link->user_id);
-            if (! $user) {
+            if (! $user || ! $user->isOfficialUser) {
+                DB::table('passwordless_login_links')->where('id', $link->id)->update([
+                    'consumed_at' => now(),
+                    'updated_at' => now(),
+                ]);
+
                 return ['state' => 'invalid'];
             }
 
@@ -114,9 +119,6 @@ class EmailLoginLinkController extends Controller
         $request->session()->regenerate();
         Auth::guard()->login($user);
 
-        if ($user->must_change_password) {
-            return redirect()->route('password.edit');
-        }
         if ($user->two_factor_recovery_required_at) {
             return redirect()->route('user.two-factor.recovery');
         }

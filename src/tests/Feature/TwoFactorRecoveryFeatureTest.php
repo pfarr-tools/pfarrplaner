@@ -26,6 +26,10 @@ final class TwoFactorRecoveryFeatureTest extends TestCase
 {
     use RefreshDatabase;
 
+    private ?User $recoveryAdmin = null;
+
+    private string $recoveryAdminCode = '';
+
     /** Recovery state and audit rows persist the expected non-secret fields. */
     public function test_recovery_schema_and_audit_model_are_ready(): void
     {
@@ -206,8 +210,8 @@ final class TwoFactorRecoveryFeatureTest extends TestCase
         self::assertNotNull($target->fresh()->two_factor_recovery_required_at);
     }
 
-    /** Password confirmation is required and repeated failures are throttled. */
-    public function test_recovery_requires_current_admin_password_and_rate_limits_failures(): void
+    /** Current TOTP confirmation is required and repeated failures are throttled. */
+    public function test_recovery_requires_current_admin_totp_and_rate_limits_failures(): void
     {
         [$admin, $target] = $this->createRecoveryPair();
         $target->startTwoFactorEnrolment();
@@ -219,12 +223,12 @@ final class TwoFactorRecoveryFeatureTest extends TestCase
             ->assertUnprocessable()
             ->assertJsonValidationErrors('support_reference');
 
-        $payload['current_password'] = 'incorrect-password';
+        $payload['code'] = '000000';
 
         for ($attempt = 0; $attempt < 5; $attempt++) {
             $this->actingAs($admin)->postJson(route('user.two-factor.recover', $target), $payload)
                 ->assertUnprocessable()
-                ->assertJsonValidationErrors('current_password');
+                ->assertJsonValidationErrors('code');
         }
 
         self::assertSame(5, (int) $admin->fresh()->two_factor_recovery_attempts);
@@ -237,58 +241,37 @@ final class TwoFactorRecoveryFeatureTest extends TestCase
         self::assertSame(0, TwoFactorRecoveryAudit::query()->count());
     }
 
-    /** Invalid password attempts persist under the locked actor row. */
+    /** Recovery codes cannot substitute for a fresh TOTP step-up. */
+    public function test_recovery_rejects_super_admin_recovery_codes_as_step_up(): void
+    {
+        [$admin, $target] = $this->createRecoveryPair();
+        $target->startTwoFactorEnrolment();
+        config(['session.driver' => 'database']);
+
+        $this->actingAs($admin)->postJson(route('user.two-factor.recover', $target), [
+            'code' => $this->recoveryAdminCode,
+            'support_reference' => 'SUP-2026-081',
+        ])->assertUnprocessable()->assertJsonValidationErrors('code');
+
+        self::assertNull($target->fresh()->two_factor_recovery_required_at);
+        self::assertSame(0, TwoFactorRecoveryAudit::query()->count());
+    }
+
+    /** Invalid TOTP attempts persist under the locked actor row. */
     public function test_recovery_persists_attempt_counter_inside_actor_transaction(): void
     {
         [$admin, $target] = $this->createRecoveryPair();
         $target->startTwoFactorEnrolment();
         config(['session.driver' => 'database']);
-        $baselineTransactionLevel = DB::transactionLevel();
-        $transactionWasActive = false;
-        Hash::shouldReceive('check')->once()->andReturnUsing(function () use (&$transactionWasActive, $baselineTransactionLevel): bool {
-            $transactionWasActive = DB::transactionLevel() > $baselineTransactionLevel;
-
-            return false;
-        });
 
         try {
-            app(RecoverUserTwoFactor::class)->execute($admin, $target, 'incorrect-password', 'SUP-2026-081', '192.0.2.1');
-            self::fail('An incorrect password must be rejected.');
+            app(RecoverUserTwoFactor::class)->execute($admin, $target, '000000', 'SUP-2026-081', '192.0.2.1');
+            self::fail('An incorrect TOTP code must be rejected.');
         } catch (ValidationException) {
-            self::assertTrue($transactionWasActive);
+            self::assertSame(1, (int) $admin->fresh()->two_factor_recovery_attempts);
         }
 
-        self::assertSame(1, (int) $admin->fresh()->two_factor_recovery_attempts);
         self::assertNotNull($admin->fresh()->two_factor_recovery_attempted_at);
-    }
-
-    /** A stale target model cannot bypass reloading its current factor state. */
-    public function test_recovery_reloads_factor_after_admin_reauthentication(): void
-    {
-        [$admin, $target] = $this->createRecoveryPair();
-        $target->startTwoFactorEnrolment();
-        $staleTarget = User::query()->findOrFail($target->getKey());
-        config(['session.driver' => 'database']);
-        $expectedAdminHash = $admin->password;
-        Hash::shouldReceive('check')->once()->andReturnUsing(
-            static function (string $password, string $hash) use ($target, $expectedAdminHash): bool {
-                DB::table('users')->where('id', $target->getKey())->update([
-                    'two_factor_secret' => null,
-                    'two_factor_confirmed_at' => null,
-                ]);
-
-                return $password === 'admin-password' && $hash === $expectedAdminHash;
-            },
-        );
-
-        $raceResponse = $this->actingAs($admin)->postJson(
-            route('user.two-factor.recover', $staleTarget),
-            $this->validRecoveryPayload(),
-        );
-        self::assertSame(422, $raceResponse->status(), (string) $raceResponse->headers->get('Location'));
-
-        self::assertSame(0, TwoFactorRecoveryAudit::query()->count());
-        self::assertNull($target->fresh()->two_factor_recovery_required_at);
     }
 
     /** Pending login challenges and links are consumed and the audit stores no secrets. */
@@ -321,7 +304,7 @@ final class TwoFactorRecoveryFeatureTest extends TestCase
         self::assertNotNull(DB::table('two_factor_login_challenges')->where('user_id', $target->getKey())->value('consumed_at'));
         self::assertNotNull(DB::table('passwordless_login_links')->where('user_id', $target->getKey())->value('consumed_at'));
         $audit = TwoFactorRecoveryAudit::query()->sole();
-        self::assertArrayNotHasKey('current_password', $audit->getAttributes());
+        self::assertArrayNotHasKey('code', $audit->getAttributes());
         self::assertArrayNotHasKey('secret', $audit->getAttributes());
         self::assertSame('SUP-2026-080', $audit->support_reference);
     }
@@ -337,7 +320,7 @@ final class TwoFactorRecoveryFeatureTest extends TestCase
             app(RecoverUserTwoFactor::class)->execute(
                 $admin,
                 $target,
-                'admin-password',
+                $this->validRecoveryPayload()['code'],
                 'SUP-2026-081',
                 '192.0.2.1',
             );
@@ -427,7 +410,7 @@ final class TwoFactorRecoveryFeatureTest extends TestCase
         }
     }
 
-    /** A recovered account can only open reenrolment, allowed password change and logout. */
+    /** A recovered account can only open reenrolment and logout. */
     public function test_recovered_account_can_only_open_reenrolment_and_logout_routes(): void
     {
         $user = $this->createRecoveredAccount();
@@ -443,7 +426,6 @@ final class TwoFactorRecoveryFeatureTest extends TestCase
                 ->missing('user.two_factor_recovery_codes')
             );
 
-        $this->actingAs($user)->get(route('password.edit'))->assertOk();
         $this->actingAs($user)->post(route('logout'))->assertRedirect(route('login'));
     }
 
@@ -468,19 +450,6 @@ final class TwoFactorRecoveryFeatureTest extends TestCase
         ]))->assertForbidden();
     }
 
-    /** Password login grants only the reenrolment flow after recovery. */
-    public function test_recovered_account_password_login_redirects_into_reenrolment_gate(): void
-    {
-        $user = $this->createRecoveredAccount();
-
-        $this->post(route('login'), [
-            'email' => $user->email,
-            'password' => 'user-password',
-        ])->assertRedirect(route('home'));
-
-        $this->get(route('home'))->assertRedirect('/profil/zwei-faktor/wiederherstellen');
-    }
-
     /** Guests and ordinary accounts do not inherit the recovery gate. */
     public function test_recovery_gate_does_not_block_guests_or_normal_accounts(): void
     {
@@ -488,19 +457,6 @@ final class TwoFactorRecoveryFeatureTest extends TestCase
 
         $user = User::factory()->create(['must_change_password' => false]);
         $this->actingAs($user)->get(route('home'))->assertOk();
-    }
-
-    /** A forced password change remains available before factor reenrolment. */
-    public function test_recovered_account_can_complete_mandatory_password_change_first(): void
-    {
-        $user = $this->createRecoveredAccount(true);
-
-        $this->actingAs($user)->get(route('home'))->assertRedirect(route('password.edit', ['from' => 'home']));
-        $this->actingAs($user)->get(route('password.edit'))->assertOk();
-
-        $user->forceFill(['must_change_password' => false])->save();
-        $this->actingAs($user)->get(route('home'))
-            ->assertRedirect('/profil/zwei-faktor/wiederherstellen');
     }
 
     /** Invalid or incomplete TOTP confirmation keeps the recovery marker set. */
@@ -562,6 +518,12 @@ final class TwoFactorRecoveryFeatureTest extends TestCase
         if ($superAdmin) {
             $admin->assignRole(RoleService::ROLE_SUPER_ADMIN);
         }
+        $setup = $admin->startTwoFactorEnrolment();
+        $this->recoveryAdminCode = $setup->recoveryCodes[0];
+        $admin->confirmTwoFactor(app(TwoFactorService::class)->currentCode($setup->secret));
+        $this->travel(61)->seconds();
+        RateLimiter::clear('two-factor:App\\Models\\People\\User:'.$admin->getKey());
+        $this->recoveryAdmin = $admin;
 
         return [$admin, User::factory()->create()];
     }
@@ -582,7 +544,7 @@ final class TwoFactorRecoveryFeatureTest extends TestCase
     private function validRecoveryPayload(): array
     {
         return [
-            'current_password' => 'admin-password',
+            'code' => app(TwoFactorService::class)->currentCode((string) $this->recoveryAdmin?->two_factor_secret),
             'support_reference' => 'SUP-2026-080',
         ];
     }

@@ -46,19 +46,15 @@ class AccountData extends Mailable implements ShouldQueue
     /** @var User */
     protected $author;
 
-    /** @var string */
-    protected $password;
-
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct($user, $author, $password)
+    public function __construct($user, $author)
     {
         $this->user = $user;
         $this->author = $author;
-        $this->password = $password;
     }
 
     /**
@@ -70,7 +66,7 @@ class AccountData extends Mailable implements ShouldQueue
     {
         Log::debug('AbsenceRequested mailing: build');
 
-        return $this->subject('Deine Zugangsdaten für den Pfarrplaner')
-            ->markdown('users.mail.account-data', ['user' => $this->user, 'author' => $this->author, 'password' => $this->password]);
+        return $this->subject('Dein Pfarrplaner-Zugang ist eingerichtet')
+            ->markdown('users.mail.account-data', ['user' => $this->user, 'author' => $this->author]);
     }
 }

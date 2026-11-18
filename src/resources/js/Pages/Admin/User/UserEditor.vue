@@ -34,15 +34,6 @@
         <template #navbar-left>
             <SaveButton @click="saveUser" />
             <NavButton
-                v-if="myUser.isOfficialUser && !justCreated"
-                title="Passwort zurücksetzen und Nachricht versenden"
-                @click="resetUserPassword"
-                class="ms-1"
-                type="light"
-                icon="mdi mdi-lock-reset"
-                >Passwort zurücksetzen
-            </NavButton>
-            <NavButton
                 type="danger"
                 icon="mdi mdi-account-remove"
                 title="Benutzer löschen"
@@ -179,9 +170,8 @@
                         >Für diese Person wurde bisher noch kein Benutzerkonto angelegt.</span
                     >
                     <FormCheck
-                        label="Benutzerkonto anlegen und Willkommensnachricht mit Kontodaten versenden"
+                        label="Benutzerkonto anlegen und Hinweis zur Anmeldung per E-Mail-Link versenden"
                         v-model="myUser.isOfficialUser"
-                        @input="createUserAccount"
                     />
                 </div>
                 <div v-else>
@@ -209,41 +199,6 @@
                         :options="parishes"
                         :settings="{ labelField: 'name', searchFields: ['name'] }"
                     />
-                </div>
-                <FormGroup
-                    v-if="justCreated || (canSetPassword && manualPassword)"
-                    :label="justCreated ? 'Anfangspasswort' : 'Neues Passwort'"
-                    help="Dieses Passwort wird einmalig per E-Mail versendet. Nach der nächsten Anmeldung muss es geändert werden."
-                >
-                    <div class="input-group">
-                        <FormInput
-                            name="password"
-                            type="text"
-                            autocomplete="new-password"
-                            v-model="myUser.password"
-                        />
-                        <button
-                            type="button"
-                            class="btn btn-outline-secondary"
-                            data-testid="initial-password-suggest"
-                            @click="suggestInitialPassword"
-                        >
-                            Neu vorschlagen
-                        </button>
-                    </div>
-                </FormGroup>
-                <div
-                    v-else-if="canSetPassword && !justCreated"
-                    class="mb-3"
-                >
-                    <button
-                        type="button"
-                        class="btn btn-outline-secondary"
-                        data-testid="manual-password-toggle"
-                        @click="enableManualPassword"
-                    >
-                        Passwort manuell festlegen
-                    </button>
                 </div>
                 <TwoFactorRecoveryPanel
                     v-if="
@@ -525,7 +480,6 @@ export default {
         'ministries',
         'modules',
         'twoFactorRecovery',
-        'canSetPassword',
     ],
     components: {
         HomeScreenConfigurationTab,
@@ -549,7 +503,6 @@ export default {
     },
     data() {
         const myUser = { ...this.user }
-        myUser.password = null
 
         myUser.home_cities = this.reduceToIds(myUser.home_cities)
         myUser.parishes = this.reduceToIds(myUser.parishes)
@@ -626,8 +579,6 @@ export default {
         return {
             myUser,
             cityPermission,
-            justCreated: false,
-            manualPassword: false,
             mySubscriptions,
             riskTaker: false,
             mySettings,
@@ -651,57 +602,6 @@ export default {
                 // Keep the last valid value while the user edits JSON.
             }
         },
-        /** Mark the form as an account-creation flow when the checkbox is selected. */
-        createUserAccount(e) {
-            if (e) {
-                this.justCreated = true
-                this.suggestInitialPassword()
-            }
-        },
-        /** Open manual password assignment and propose a secure temporary value. */
-        enableManualPassword() {
-            this.manualPassword = true
-            this.suggestInitialPassword()
-        },
-        /** Generate the documented initial-password pattern with browser randomness. */
-        suggestInitialPassword() {
-            const vowels = 'aeiouy'
-            const consonants = 'bcdfghjklmnpqrstvwxz'
-            const numbers = '0123456789'
-            /** Select one unbiased character from the supplied alphabet. */
-            const randomCharacter = (characters) => {
-                const limit = Math.floor(0x100000000 / characters.length) * characters.length
-                let value
-                do {
-                    const values = new Uint32Array(1)
-                    window.crypto.getRandomValues(values)
-                    value = values[0]
-                } while (value >= limit)
-
-                return characters[value % characters.length]
-            }
-
-            this.myUser.password =
-                randomCharacter(consonants).toUpperCase() +
-                randomCharacter(vowels) +
-                randomCharacter(consonants) +
-                randomCharacter(vowels) +
-                Array.from({ length: 4 }, () => randomCharacter(numbers)).join('')
-        },
-        resetUserPassword() {
-            if (
-                window.confirm(
-                    'Willst du das Passwort für ' +
-                        this.user.name +
-                        ' wirklich zurücksetzen? ' +
-                        (this.user.first_name || this.user.name) +
-                        ' erhält dann eine E-Mail mit neuen Zugangsdaten. Das bisherige Passwort ' +
-                        'ist dann ab sofort ungültig.',
-                )
-            ) {
-                this.$inertia.post(window.route('user.password.reset', this.user.id))
-            }
-        },
         saveUser() {
             const permissions = {}
             for (const city in this.cityPermission) {
@@ -719,13 +619,10 @@ export default {
                 cityPermissions: this.cityPermissions,
                 vacation_admins: this.reduceToIds(this.myUser.vacation_admins),
                 vacation_approvers: this.reduceToIds(this.myUser.vacation_approvers),
-                createAccount: this.justCreated ? 1 : 0,
                 permissions,
                 subscriptions,
             }
             if (this.myUser.id) {
-                if (!this.justCreated && !this.manualPassword) delete record.password
-                record.manualPassword = this.manualPassword ? 1 : 0
                 this.$inertia.patch(window.route('user.update', this.myUser.id), record)
             } else {
                 this.$inertia.post(window.route('user.store'), record)

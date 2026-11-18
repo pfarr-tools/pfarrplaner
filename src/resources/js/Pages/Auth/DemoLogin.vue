@@ -145,7 +145,6 @@ export default {
             loggingIn: false,
             form: {
                 email: this.users?.[0]?.email || '',
-                password: 'test',
                 remember: false,
             },
         }
@@ -156,7 +155,11 @@ export default {
             this.loggingIn = true
             axios.get(route('csrf.keepalive')).then((response) => {
                 this.form._token = response.data.token
-                this.$inertia.post(route('login'), this.form, { preserveState: false })
+                this.$inertia.post(
+                    route('login.demo'),
+                    { email: this.form.email, _token: this.form._token },
+                    { preserveState: false },
+                )
             })
         },
     },

@@ -32,15 +32,10 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\People\User;
-use Illuminate\Auth\Events\Attempting;
-use Illuminate\Auth\Events\Failed;
-use Illuminate\Auth\SessionGuard;
-use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\RateLimiter;
-use Illuminate\Support\Timebox;
 use Inertia\Inertia;
 use Inertia\Response as InertiaResponse;
 use RoundlyConsulting\TwoFactor\Exceptions\TwoFactorRateLimitedException;
@@ -62,88 +57,6 @@ class LoginController extends Controller
     |
     */
 
-    use AuthenticatesUsers;
-
-    /**
-     * Keep the pending-factor path outside Laravel's completed-login branch,
-     * which clears password attempts and marks the session password-confirmed.
-     */
-    public function login(Request $request)
-    {
-        $request->session()->forget('login.challenge');
-        $this->validateLogin($request);
-
-        if ($this->hasTooManyLoginAttempts($request)) {
-            $this->fireLockoutEvent($request);
-
-            return $this->sendLockoutResponse($request);
-        }
-
-        $credentials = $this->credentials($request);
-        /** @var SessionGuard $guard */
-        $guard = $this->guard();
-        $provider = $guard->getProvider();
-        $loginState = app(Timebox::class)->call(function () use ($request, $credentials, $provider, $guard): string {
-            return DB::transaction(function () use ($request, $credentials, $provider, $guard): string {
-                $user = User::query()
-                    ->where($this->username(), $credentials[$this->username()])
-                    ->lockForUpdate()
-                    ->first();
-
-                Event::dispatch(new Attempting(
-                    $guard->name,
-                    $credentials,
-                    $request->boolean('remember'),
-                ));
-
-                if (! $user || ! $provider->validateCredentials($user, $credentials)) {
-                    Event::dispatch(new Failed($guard->name, $user, $credentials));
-
-                    return 'failed';
-                }
-
-                if (method_exists($provider, 'rehashPasswordIfRequired')) {
-                    $provider->rehashPasswordIfRequired($user, $credentials);
-                }
-
-                if ($user->hasTwoFactorEnabled()) {
-                    $request->session()->put('login.challenge', [
-                        'user_id' => $user->getKey(),
-                        'remember' => $request->boolean('remember'),
-                        'expires_at' => now()->addMinutes(5)->timestamp,
-                        'throttle_key' => $this->throttleKey($request),
-                    ]);
-                    $request->session()->regenerate();
-
-                    return 'challenge';
-                }
-
-                $guard->login($user, $request->boolean('remember'));
-
-                return 'authenticated';
-            });
-        }, 200000);
-
-        if ($loginState === 'challenge') {
-            return redirect()->route('login.challenge');
-        }
-
-        if ($loginState === 'authenticated') {
-            return $this->sendLoginResponse($request);
-        }
-
-        $this->incrementLoginAttempts($request);
-
-        return $this->sendFailedLoginResponse($request);
-    }
-
-    /**
-     * Where to redirect users after login.
-     *
-     * @var string
-     */
-    protected $redirectTo = '/';
-
     /**
      * Create a new controller instance.
      *
@@ -159,7 +72,7 @@ class LoginController extends Controller
     {
         $request->session()->regenerateToken();
         $demo = config('app.demo_mode');
-        $users = $demo ? User::with('roles', 'homeCities')->where('password', '!=', '')->orderBy('id')->get() : [];
+        $users = $demo ? User::with('roles', 'homeCities')->where('is_official_user', true)->orderBy('id')->get() : [];
 
         if ($demo) {
             return Inertia::render('Auth/DemoLogin', compact('users'));
@@ -168,8 +81,19 @@ class LoginController extends Controller
         }
     }
 
-    /** Preserve the legacy initial-password endpoint without additional output. */
-    public function setInitialPassword() {}
+    /** Sign in as a selected sample account in demo mode only. */
+    public function demoLogin(Request $request)
+    {
+        abort_unless(config('app.demo_mode'), 404);
+        $validated = $request->validate(['email' => ['required', 'email']]);
+        $user = User::where('email', mb_strtolower(trim($validated['email'])))
+            ->where('is_official_user', true)
+            ->firstOrFail();
+        Auth::guard()->login($user);
+        $request->session()->regenerate();
+
+        return redirect()->intended('/');
+    }
 
     /** Return a current CSRF token for the login client. */
     public function keepTokenAlive()
@@ -255,9 +179,10 @@ class LoginController extends Controller
             RateLimiter::clear($challenge['throttle_key']);
         }
         $request->session()->forget('login.challenge');
-        $this->guard()->login($user, (bool) ($challenge['remember'] ?? false));
+        Auth::guard()->login($user, (bool) ($challenge['remember'] ?? false));
+        $request->session()->regenerate();
 
-        return $this->sendLoginResponse($request);
+        return redirect()->intended('/');
     }
 
     /** Cancel a pending challenge and return to the regular login form. */

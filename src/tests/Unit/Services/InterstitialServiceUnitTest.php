@@ -157,8 +157,8 @@ class InterstitialServiceUnitTest extends TestCase
         $this->assertSame([], $this->service->forUser($passkeyUser));
     }
 
-    /** Forced password changes and pending TOTP enrollment take precedence over nagging. */
-    public function test_password_change_and_pending_totp_exclude_security_recommendation(): void
+    /** Pending TOTP enrollment takes precedence over nagging. */
+    public function test_pending_totp_excludes_security_recommendation(): void
     {
         config()->set('interstitials.items', [
             'security-beyond-password' => [
@@ -171,7 +171,7 @@ class InterstitialServiceUnitTest extends TestCase
         $passwordChangeRequired = User::factory()->create(['must_change_password' => true]);
         $pendingTotp = User::factory()->create(['two_factor_secret' => 'fixture-secret']);
 
-        $this->assertSame([], $this->service->forUser($passwordChangeRequired));
+        $this->assertCount(1, $this->service->forUser($passwordChangeRequired));
         $this->assertSame([], $this->service->forUser($pendingTotp));
     }
 

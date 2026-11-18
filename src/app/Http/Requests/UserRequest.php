@@ -31,10 +31,8 @@
 namespace App\Http\Requests;
 
 use App\Models\People\User;
-use App\Rules\StrongPassword;
 use App\Services\RoleService;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Str;
 use Spatie\Permission\Models\Role;
 
 /** Authorizes and validates user profile and account-management requests. */
@@ -47,21 +45,6 @@ class UserRequest extends FormRequest
     {
         $target = $this->user;
         $actor = $this->user();
-
-        if ($this->boolean('manualPassword')
-            && ! $actor->hasRole(RoleService::ROLE_SUPER_ADMIN)) {
-            return false;
-        }
-
-        if ($this->boolean('createAccount') && ! $actor->hasRole(RoleService::ROLE_SUPER_ADMIN)) {
-            return false;
-        }
-
-        if ($this->filled('password')
-            && (! $target || $target->id !== $actor->id)
-            && ! $actor->hasRole(RoleService::ROLE_SUPER_ADMIN)) {
-            return false;
-        }
 
         if (isset($this->user)) {
             return $actor->can('update', $this->user);
@@ -90,14 +73,8 @@ class UserRequest extends FormRequest
             'title' => 'nullable|string',
             // add an exception to "unique" when an existing user account is updated
             'email' => 'nullable|string|email|max:255|unique:users,email'.(($user && $user->id) ? ','.$user->id : ''),
-            'password' => [
-                'nullable',
-                'string',
-                new StrongPassword($this->boolean('manualPassword') || $this->boolean('createAccount')),
-            ],
             'isOfficialUser' => 'sometimes|boolean',
             'is_official_user' => 'sometimes|boolean',
-            'manualPassword' => 'nullable|boolean',
             'office' => 'nullable|string',
             'address' => 'nullable|string',
             'phone' => 'nullable|phone_number',
@@ -114,26 +91,17 @@ class UserRequest extends FormRequest
             'needs_replacement' => 'nullable|bool',
         ];
 
-        // if a password is set, an email is required
-        if ($this->get('password', '') != '') {
+        if ($this->boolean('createAccount')
+            || $this->boolean('isOfficialUser')
+            || $this->boolean('is_official_user')) {
             $rules['email'] = 'required|email';
-        }
-
-        if ($this->boolean('createAccount')) {
-            $rules['email'] = 'required|email';
-            $rules['password'] = ['required', 'string', new StrongPassword(true)];
-        }
-
-        if ($this->boolean('manualPassword') && ! $this->boolean('createAccount')) {
-            // Super-Admin temporary credentials are arbitrary but must not be empty.
-            $rules['password'] = ['required', 'string'];
         }
 
         return $rules;
     }
 
     /**
-     * Normalize optional password fields and mark administrator-set passwords.
+     * Normalize the official-account classification.
      *
      * @param  string|null  $key  Optional validated value key.
      * @param  mixed  $default  Fallback value kept for FormRequest compatibility.
@@ -149,22 +117,7 @@ class UserRequest extends FormRequest
             unset($data['isOfficialUser']);
         }
 
-        // An omitted or empty password means "keep the existing password".
-        // Account removal is handled by UserController::update after this request.
-        if (($data['password'] ?? '') === '') {
-            unset($data['password']);
-        }
-
-        // api token
-        if (isset($data['password']) && (($this->user === null) || ($this->user->api_token == ''))) {
-            $data['api_token'] = Str::random(60);
-        }
-
-        if (isset($data['password'])) {
-            $data['must_change_password'] = true;
-        }
-
-        if (! $officialStatusProvided && ($this->boolean('createAccount') || isset($data['password']))) {
+        if (! $officialStatusProvided && $this->boolean('createAccount')) {
             $data['is_official_user'] = true;
         }
 

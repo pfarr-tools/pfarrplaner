@@ -26,14 +26,14 @@ class UserMailUnitTest extends TestCase
     {
         $user = User::factory()->create();
         $author = User::factory()->create();
-        $mail = new AccountData($user, $author, 'secret123');
+        $mail = new AccountData($user, $author);
         $built = $mail->build();
         $this->assertInstanceOf(AccountData::class, $built);
-        $this->assertEquals('Deine Zugangsdaten für den Pfarrplaner', $built->subject);
+        $this->assertEquals('Dein Pfarrplaner-Zugang ist eingerichtet', $built->subject);
     }
 
     /** Account credentials render as formatted HTML instead of Markdown source. */
-    public function test_account_data_renders_markdown_components_and_credentials(): void
+    public function test_account_data_renders_passwordless_sign_in_instructions(): void
     {
         config(['app.url' => 'https://pfarrplaner.example']);
         $user = User::factory()->create([
@@ -41,14 +41,14 @@ class UserMailUnitTest extends TestCase
             'email' => 'mara@example.org',
         ]);
 
-        $html = (new AccountData($user, User::factory()->create(), 'Start1234!'))->render();
+        $html = (new AccountData($user, User::factory()->create()))->render();
 
-        $this->assertMatchesRegularExpression('/<h1[^>]*>Deine Zugangsdaten für den Pfarrplaner<\/h1>/', $html);
-        $this->assertMatchesRegularExpression('/<strong[^>]*>Benutzername<\/strong>/', $html);
+        $this->assertMatchesRegularExpression('/<h1[^>]*>Dein Pfarrplaner-Zugang ist eingerichtet<\/h1>/', $html);
+        $this->assertMatchesRegularExpression('/<strong[^>]*>E-Mail-Adresse<\/strong>/', $html);
         $this->assertStringContainsString('<code>mara@example.org</code>', $html);
-        $this->assertStringContainsString('<code>Start1234!</code>', $html);
+        $this->assertStringNotContainsString('Passwort', $html);
         $this->assertStringContainsString('class="button"', $html);
         $this->assertStringNotContainsString('<pre', $html);
-        $this->assertStringNotContainsString('**Benutzername**', $html);
+        $this->assertStringNotContainsString('**E-Mail-Adresse**', $html);
     }
 }

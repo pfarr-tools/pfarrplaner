@@ -49,9 +49,9 @@ class AdminHomeScreenTab extends AbstractHomeScreenTab
 
     public function toArray($data = [])
     {
-        $data['people'] = User::select('id', 'first_name', 'last_name', 'title', 'email', 'password')
+        $data['people'] = User::select('id', 'first_name', 'last_name', 'title', 'email', 'is_official_user')
             ->whereNotNull('email')
-            ->whereNotNull('password')
+            ->where('is_official_user', true)
             ->where('id', '!=', Auth::user()->id)
             ->get();
         $data['modules'] = AdminModule::modules();

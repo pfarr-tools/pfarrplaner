@@ -16,7 +16,6 @@ namespace Tests\Unit\Services;
 use App\Models\People\User;
 use App\Services\FirstRunInstallerService;
 use App\Services\RoleService;
-use Illuminate\Validation\ValidationException;
 use Tests\TestCase;
 
 class FirstRunInstallerServiceUnitTest extends TestCase
@@ -50,31 +49,14 @@ class FirstRunInstallerServiceUnitTest extends TestCase
             'first_name' => 'Chris',
             'last_name' => 'Fischer',
             'email' => 'admin@example.com',
-            'password' => 'Geheim123!',
-            'must_change_password' => true,
         ]);
 
         $this->assertInstanceOf(User::class, $user);
         $this->assertSame('admin@example.com', $user->email);
         $this->assertSame('Chris', $user->first_name);
         $this->assertSame('Fischer', $user->last_name);
-        $this->assertTrue((bool) $user->must_change_password);
+        $this->assertFalse((bool) $user->must_change_password);
         $this->assertTrue($user->hasRole(RoleService::ROLE_SUPER_ADMIN));
-        $this->assertNotSame('Geheim123!', $user->getRawOriginal('password'));
-    }
-
-    /** Weak administrator passwords are rejected during first-run setup. */
-    public function test_create_or_update_admin_user_rejects_weak_password(): void
-    {
-        $this->expectException(ValidationException::class);
-
-        app(FirstRunInstallerService::class)->createOrUpdateAdminUser([
-            'title' => '',
-            'first_name' => 'Chris',
-            'last_name' => 'Fischer',
-            'email' => 'weak@example.com',
-            'password' => 'weak1234',
-            'must_change_password' => false,
-        ]);
+        $this->assertTrue($user->isOfficialUser);
     }
 }

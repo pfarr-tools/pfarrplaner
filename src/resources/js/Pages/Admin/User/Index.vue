@@ -162,16 +162,6 @@
                                             />
                                             <nav-button
                                                 type="light"
-                                                icon="mdi mdi-lock-reset"
-                                                title="Passwort zurücksetzen"
-                                                class="btn-sm"
-                                                v-if="canEdit(row) && row.isOfficialUser"
-                                                force-icon
-                                                force-no-text
-                                                @click="resetPassword(row)"
-                                            />
-                                            <nav-button
-                                                type="light"
                                                 icon="mdi mdi-account-switch"
                                                 title="Als diese Person anmelden"
                                                 v-if="
@@ -330,20 +320,6 @@ export default {
         },
         findDuplicates() {
             this.$inertia.get(route('users.duplicates'))
-        },
-        resetPassword(user) {
-            if (
-                confirm(
-                    'Willst du das Passwort für ' +
-                        user.name +
-                        ' wirklich zurücksetzen? ' +
-                        (user.first_name || user.name) +
-                        ' erhält dann eine E-Mail mit neuen Zugangsdaten. Das bisherige Passwort ' +
-                        'ist dann ab sofort ungültig.',
-                )
-            ) {
-                this.$inertia.post(route('user.password.reset', user.id), { preserveState: false })
-            }
         },
     },
 }

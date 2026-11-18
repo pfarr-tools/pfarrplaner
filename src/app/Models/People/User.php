@@ -32,7 +32,6 @@ namespace App\Models\People;
 
 use App\Facades\Settings;
 use App\HomeScreens\AbstractHomeScreen;
-use App\Mail\User\AccountData;
 use App\Models\Calendar\External\CalendarConnection;
 use App\Models\Comment;
 use App\Models\Leave\Absence;
@@ -46,7 +45,6 @@ use App\Models\Subscription;
 use App\Models\UserSetting;
 use App\Providers\AuthServiceProvider;
 use App\Services\NameService;
-use App\Services\PasswordService;
 use App\Services\RoleService;
 use Carbon\Carbon;
 use Exception;
@@ -60,7 +58,6 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Mail;
 use Laravel\Passkeys\Contracts\PasskeyUser;
 use Laravel\Passkeys\PasskeyAuthenticatable;
 use Laravel\Sanctum\HasApiTokens;
@@ -1005,26 +1002,6 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
     public function relatedUsers()
     {
         return $this->belongsToMany(User::class, 'user_user', 'user_id', 'related_user_id')->withPivot('relation');
-    }
-
-    /**
-     * Set an initial password and send the account data mail.
-     *
-     * If no password is supplied, the generated credential intentionally follows
-     * the documented initial-password format. The forced password change prevents
-     * either credential from becoming a permanent user-selected password.
-     *
-     * @param  string|null  $password  Validated password selected for the account.
-     */
-    public function resetAccount(?string $password = null): void
-    {
-        $password ??= PasswordService::temporaryInitialPassword();
-        $this->update([
-            'password' => $password,
-            'must_change_password' => 1,
-            'is_official_user' => true,
-        ]);
-        Mail::to($this->email)->queue(new AccountData($this, Auth::user(), $password));
     }
 
     /**

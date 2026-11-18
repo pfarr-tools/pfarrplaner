@@ -38,7 +38,9 @@ use App\Http\Middleware\ProcessPasswordlessLoginLinkAfterResponse;
 use App\Http\Middleware\RequireFreshPasskeyChallenge;
 use Illuminate\Support\Facades\Auth;
 
-Auth::routes(['logout' => false, 'register' => false, 'confirm' => false]);
+Auth::routes(['login' => false, 'logout' => false, 'register' => false, 'reset' => false, 'confirm' => false]);
+Route::get('/login', [LoginController::class, 'showLoginForm'])->middleware('guest')->name('login');
+Route::post('/login/demo', [LoginController::class, 'demoLogin'])->middleware(['guest', 'throttle:6,1'])->name('login.demo');
 Route::get('/passkeys/login/options', [PasskeyLoginController::class, 'options'])
     ->middleware(['guest', 'throttle:passkey-login'])
     ->name('passkey.login-options');
@@ -81,4 +83,4 @@ Route::middleware(['auth', PreventImpersonatedSecurityChanges::class])
 Route::get('/login/challenge', [LoginController::class, 'showChallenge'])->name('login.challenge');
 Route::post('/login/challenge', [LoginController::class, 'verifyChallenge'])->name('login.challenge.verify');
 Route::post('/login/challenge/cancel', [LoginController::class, 'cancelChallenge'])->name('login.challenge.cancel');
-Route::match(['GET', 'POST'], '/logout', [UserController::class, 'logout'])->name('logout');
+Route::post('/logout', [UserController::class, 'logout'])->name('logout');

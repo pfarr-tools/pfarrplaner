@@ -567,9 +567,6 @@ class DemoBuilder extends Command
             'email' => 'demo-user-'.$user->id.'@demo.pfarrplaner.de',
             'image' => '',
         ];
-        if ($user->password != '') {
-            $data['password'] = 'test';
-        }
         $user->update($data);
         $user->calendarConnections()->delete();
     }

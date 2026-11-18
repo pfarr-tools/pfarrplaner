@@ -40,8 +40,6 @@ class InstallCommand extends Command
         {--admin-first-name= : Vorname des ersten Super-Admins}
         {--admin-last-name= : Nachname des ersten Super-Admins}
         {--admin-email= : E-Mail-Adresse des ersten Super-Admins}
-        {--admin-password= : Passwort des ersten Super-Admins}
-        {--must-change-password : Passwortwechsel beim ersten Login erzwingen}
         {--mail-from-address= : Absenderadresse fuer Systemmails}
         {--mail-from-name= : Anzeigename fuer Systemmails}';
 
@@ -126,17 +124,12 @@ class InstallCommand extends Command
         $lastName = $this->askRequiredOption('admin-last-name', 'Nachname des ersten Super-Admins');
         $email = $administratorEmail;
         $title = $this->askOption('admin-title', 'Titel des ersten Super-Admins', '');
-        $password = $this->askSecretOption('admin-password', 'Passwort fuer den ersten Super-Admin');
-        $mustChangePassword = $this->option('must-change-password')
-            || $this->confirm('Soll beim ersten Login ein Passwortwechsel erzwungen werden?', true);
 
         return [
             'title' => $title,
             'first_name' => $firstName,
             'last_name' => $lastName,
             'email' => $email,
-            'password' => $password,
-            'must_change_password' => $mustChangePassword,
         ];
     }
 
@@ -228,30 +221,6 @@ class InstallCommand extends Command
         } while ($this->input->isInteractive());
 
         throw new \RuntimeException('Fehlende Pflichtangabe fuer --'.$option.'.');
-    }
-
-    protected function askSecretOption(string $option, string $question): string
-    {
-        $value = $this->option($option);
-
-        if (is_string($value) && $value !== '') {
-            return $value;
-        }
-
-        if (! $this->input->isInteractive()) {
-            throw new \RuntimeException('Fehlende Pflichtangabe fuer --'.$option.'.');
-        }
-
-        do {
-            $first = (string) $this->secret($question);
-            $second = (string) $this->secret('Passwort wiederholen');
-
-            if (($first !== '') && ($first === $second)) {
-                return $first;
-            }
-
-            $this->components->warn('Die Passwoerter waren leer oder stimmen nicht ueberein.');
-        } while (true);
     }
 
     protected function askChoiceOption(string $option, string $question, array $choices, string $default): string

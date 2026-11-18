@@ -31,7 +31,6 @@
 namespace App\Console\Commands\Install;
 
 use App\Models\People\User;
-use App\Services\PasswordService;
 use App\Services\RoleConfigurationSynchronizer;
 use Illuminate\Console\Command;
 use Spatie\Permission\Models\Role;
@@ -70,17 +69,14 @@ class InstallAdmin extends Command
         $role = Role::where('name', 'Super-Administrator:in')->firstOrFail();
         $domain = parse_url(url('/'), PHP_URL_HOST);
 
-        $password = PasswordService::temporaryInitialPassword();
         $user = User::create([
             'last_name' => 'Admin',
             'email' => 'admin@'.$domain,
-            'password' => $password,
             'is_official_user' => true,
-            'must_change_password' => 1,
         ]);
         $user->assignRole($role);
 
-        $this->line('<info>SUCCESS</info> Admin user admin@'.$domain.' with password"'.$password.'" created.');
+        $this->line('<info>SUCCESS</info> Admin user admin@'.$domain.' created.');
 
         return Command::SUCCESS;
     }

@@ -45,7 +45,6 @@ use Illuminate\Mail\MailManager;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Hash;
@@ -109,7 +108,6 @@ class AppServiceProvider extends ServiceProvider
         Validator::extend('zip', fn ($a, $v) => (bool) preg_match('/^([0]{1}[1-9]{1}|[1-9]{1}[0-9]{1})[0-9]{3}$/i', $v));
         Validator::extend('hash', fn ($a, $v, $p) => Hash::check($v, $p[0]));
         Validator::extend('not_hash', fn ($a, $v, $p) => ! Hash::check($v, $p[0]));
-        Validator::extend('not_current_password', fn ($a, $v) => ! Hash::check($v, Auth::user()->password));
 
         SeatingValidators::register();
 

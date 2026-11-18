@@ -7,10 +7,10 @@ use Illuminate\Support\Facades\Auth;
 use Laravel\Passkeys\Contracts\PasskeyLoginResponse as PasskeyLoginResponseContract;
 use Symfony\Component\HttpFoundation\Response;
 
-/** Redirect successful passkey logins through mandatory account security gates. */
+/** Redirect successful passkey logins through mandatory TOTP recovery gate. */
 class PasskeyLoginResponse implements PasskeyLoginResponseContract
 {
-    /** Build a response that preserves required password and TOTP recovery flows.
+    /** Build a response that preserves the required TOTP recovery flow.
      *
      * @param  Request  $request
      */
@@ -18,9 +18,7 @@ class PasskeyLoginResponse implements PasskeyLoginResponseContract
     {
         $user = Auth::guard(config('passkeys.guard'))->user();
 
-        if ($user?->must_change_password) {
-            $target = route('password.edit');
-        } elseif ($user?->two_factor_recovery_required_at) {
+        if ($user?->two_factor_recovery_required_at) {
             $target = route('user.two-factor.recovery');
         } else {
             $target = redirect()->intended(config('passkeys.redirect', '/'))->getTargetUrl();

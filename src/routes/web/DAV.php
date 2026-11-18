@@ -29,6 +29,7 @@
  */
 
 use App\Http\Controllers\DAV\DAVController;
+use App\Http\Middleware\AuthenticateDavApiToken;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Route;
@@ -60,8 +61,8 @@ Route::permanentRedirect('/.well-known/caldav', '/dav/')->withoutMiddleware([
 ]);
 
 Route::any('/dav/{any?}', [DAVController::class, 'handle'])
+    ->middleware(AuthenticateDavApiToken::class)
     ->where('any', '.*')
-    ->middleware('auth.basic')
     ->withoutMiddleware([
         'auth',
         'csrf',

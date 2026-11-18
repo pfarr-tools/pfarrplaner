@@ -134,8 +134,8 @@ final class PasskeyLoginFeatureTest extends TestCase
         self::assertSame(200, $response->getStatusCode());
     }
 
-    /** Forced password changes stay the first destination after passkey login. */
-    public function test_passkey_response_redirects_users_to_forced_password_change(): void
+    /** Legacy forced password-change flags no longer affect passkey login. */
+    public function test_passkey_response_ignores_legacy_password_change_flag(): void
     {
         /** @var User $user */
         $user = User::factory()->create(['must_change_password' => true]);
@@ -147,7 +147,7 @@ final class PasskeyLoginFeatureTest extends TestCase
         $response = (new AppPasskeyLoginResponse)->toResponse($request);
 
         $payload = json_decode((string) $response->getContent(), true, flags: JSON_THROW_ON_ERROR);
-        self::assertSame(route('password.edit'), $payload['redirect']);
+        self::assertSame(url('/'), $payload['redirect']);
     }
 
     /** Recovered accounts proceed directly to mandatory TOTP re-enrolment. */

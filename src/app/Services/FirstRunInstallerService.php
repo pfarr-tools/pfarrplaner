@@ -109,7 +109,6 @@ class FirstRunInstallerService
 
     public function createOrUpdateAdminUser(array $data): User
     {
-        PasswordService::validate((string) $data['password']);
         app(RoleConfigurationSynchronizer::class)->synchronize();
         $this->ensureRoleExists(RoleService::ROLE_SUPER_ADMIN);
 
@@ -120,9 +119,8 @@ class FirstRunInstallerService
             'first_name' => $data['first_name'],
             'last_name' => $data['last_name'],
             'email' => $data['email'],
-            'password' => $data['password'],
             'is_official_user' => true,
-            'must_change_password' => $data['must_change_password'],
+            'must_change_password' => false,
         ]);
         $user->email_verified_at = now();
         $user->remember_token = Str::random(10);

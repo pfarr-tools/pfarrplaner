@@ -138,6 +138,7 @@ class SecurityRouteAuditTest extends TestCase
             PreventRequestForgery::class,
             $route->excludedMiddleware()
         );
+        $this->assertNotContains('auth.basic', $route->middleware());
     }
 
     protected function hasAuthenticationMiddleware(Collection $middleware): bool

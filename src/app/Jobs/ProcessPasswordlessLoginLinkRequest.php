@@ -19,15 +19,20 @@ class ProcessPasswordlessLoginLinkRequest
     /** Create and queue a one-time nonce only when the address belongs to an account. */
     public function handle(): void
     {
-        $user = User::query()->whereRaw('LOWER(email) = ?', [$this->email])->first();
+        $user = User::query()->whereRaw('LOWER(email) = ?', [$this->email])
+            ->where('is_official_user', true)
+            ->first();
         if (! $user) {
             return;
         }
 
         // Keep the nonce out of both database rows and serialized mail payloads.
         $nonce = bin2hex(random_bytes(32));
-        $linkId = DB::transaction(function () use ($user, $nonce): int {
+        $linkId = DB::transaction(function () use ($user, $nonce): ?int {
             $lockedUser = User::query()->lockForUpdate()->findOrFail($user->getKey());
+            if (! $lockedUser->isOfficialUser) {
+                return null;
+            }
             DB::table('passwordless_login_links')
                 ->where('user_id', $lockedUser->getKey())
                 ->whereNull('consumed_at')
@@ -41,6 +46,10 @@ class ProcessPasswordlessLoginLinkRequest
                 'updated_at' => now(),
             ]);
         });
+
+        if ($linkId === null) {
+            return;
+        }
 
         try {
             Mail::to($user->email)->queue(new LoginLink($nonce));

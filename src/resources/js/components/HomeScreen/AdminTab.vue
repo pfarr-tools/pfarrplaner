@@ -104,16 +104,6 @@
                                             >
                                                 <span class="mdi mdi-account-switch"></span>
                                             </button>
-                                            <nav-button
-                                                type="light"
-                                                icon="mdi mdi-lock-reset"
-                                                title="Passwort zurücksetzen"
-                                                class="btn-sm mt-md-2"
-                                                v-if="canEdit(row)"
-                                                force-icon
-                                                force-no-text
-                                                @click="resetPassword(row)"
-                                            />
                                         </td>
                                     </tr>
                                 </template>
@@ -181,20 +171,6 @@ export default {
                 this.currentUser.isLocalAdmin ||
                 this.hasPermission('benutzer-bearbeiten')
             )
-        },
-        resetPassword(user) {
-            if (
-                confirm(
-                    'Willst du das Passwort für ' +
-                        user.name +
-                        ' wirklich zurücksetzen? ' +
-                        (user.first_name || user.name) +
-                        ' erhält dann eine E-Mail mit neuen Zugangsdaten. Das bisherige Passwort ' +
-                        'ist dann ab sofort ungültig.',
-                )
-            ) {
-                this.$inertia.post(route('user.password.reset', user.id), { preserveState: false })
-            }
         },
     },
 }

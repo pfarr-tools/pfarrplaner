@@ -7,7 +7,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-/** Restrict recovered accounts to password update and TOTP reenrolment routes. */
+/** Restrict recovered accounts to TOTP reenrolment routes. */
 class RequireTwoFactorRecovery
 {
     /** Enforce the recovery gate for authenticated web and API requests. */
@@ -31,7 +31,7 @@ class RequireTwoFactorRecovery
         return redirect()->route('user.two-factor.recovery');
     }
 
-    /** Allow only the dedicated setup, TOTP operations, logout, and password change flow. */
+    /** Allow only the dedicated setup, TOTP operations, and logout. */
     private function isAllowedRoute(?string $routeName): bool
     {
         return in_array($routeName, [
@@ -39,8 +39,6 @@ class RequireTwoFactorRecovery
             'user.two-factor.start',
             'user.two-factor.confirm',
             'logout',
-            'password.edit',
-            'password.change',
             'user.switchback',
             'csrf.keepalive',
         ], true);

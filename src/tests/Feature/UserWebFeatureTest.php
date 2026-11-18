@@ -13,15 +13,12 @@
 
 namespace Tests\Feature;
 
-use App\Mail\User\AccountData;
 use App\Models\People\TwoFactorRecoveryAudit;
 use App\Models\People\User;
-use App\Services\PasswordService;
 use App\Services\RoleService;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\RateLimiter;
@@ -104,262 +101,16 @@ class UserWebFeatureTest extends TestCase
     }
 
     /** A correct password for a TOTP-enabled account must not authenticate the session yet. */
-    public function test_login_with_two_factor_enabled_user_stops_at_a_challenge(): void
-    {
-        $user = User::factory()->create([
-            'email' => 'two-factor@example.test',
-            'password' => 'Correct1!',
-            'two_factor_secret' => 'secret',
-            'two_factor_confirmed_at' => now(),
-            'two_factor_recovery_codes' => ['hashed-recovery-code'],
-        ]);
-
-        $response = $this->from('/login')->post(route('login'), [
-            'email' => $user->email,
-            'password' => 'Correct1!',
-            'remember' => '1',
-        ]);
-
-        $response->assertRedirect(route('login.challenge'));
-        $this->assertGuest();
-        $response->assertSessionHas('login.challenge.user_id', $user->id);
-        $response->assertSessionHas('login.challenge.remember', true);
-        $response->assertSessionHas('login.challenge.expires_at');
-        $response->assertSessionMissing('auth.password_confirmed_at');
-        $response->assertCookieMissing(Auth::guard()->getRecallerName());
-
-        $this->get(route('login.challenge'))
-            ->assertOk()
-            ->assertHeader('Cache-Control', 'must-revalidate, no-cache, no-store, private')
-            ->assertHeader('Pragma', 'no-cache')
-            ->assertInertia(fn (Assert $page) => $page->component('Auth/LoginChallenge'));
-    }
-
     /** Invalid passwords do not create a pending factor challenge. */
-    public function test_invalid_password_does_not_create_two_factor_challenge(): void
-    {
-        $user = User::factory()->create([
-            'email' => 'two-factor@example.test',
-            'password' => 'Correct1!',
-            'two_factor_secret' => 'secret',
-            'two_factor_confirmed_at' => now(),
-            'two_factor_recovery_codes' => ['hashed-recovery-code'],
-        ]);
-
-        $this->from('/login')->post(route('login'), [
-            'email' => $user->email,
-            'password' => 'Wrong1!',
-        ])->assertRedirect('/login')->assertSessionMissing('login.challenge.user_id');
-
-        $this->assertGuest();
-    }
-
     /** Invalid login input is rejected by Laravel validation without exceptions. */
-    public function test_login_rejects_malformed_credentials(): void
-    {
-        $this->from('/login')->post(route('login'), [
-            'email' => ['not-an-email'],
-        ])->assertRedirect('/login')->assertSessionHasErrors('email');
-
-        $this->from('/login')->post(route('login'), [
-            'email' => 'existing@example.test',
-        ])->assertRedirect('/login')->assertSessionHasErrors('password');
-    }
-
     /** A valid TOTP code is required before the login session is established. */
-    public function test_two_factor_login_completes_with_a_valid_totp_code(): void
-    {
-        $user = User::factory()->create(['password' => 'Correct1!']);
-        $loginThrottleKey = strtolower($user->email).'|127.0.0.1';
-        RateLimiter::clear($loginThrottleKey);
-        $this->from('/login')->post(route('login'), [
-            'email' => $user->email,
-            'password' => 'Wrong1!',
-        ])->assertRedirect('/login');
-        self::assertEquals(1, RateLimiter::attempts($loginThrottleKey));
-
-        $setup = $user->startTwoFactorEnrolment();
-        $user->confirmTwoFactor(app(TwoFactorService::class)->currentCode($setup->secret));
-        $this->travel(31)->seconds();
-
-        $this->post(route('login'), [
-            'email' => $user->email,
-            'password' => 'Correct1!',
-        ])->assertRedirect(route('login.challenge'));
-        self::assertEquals(1, RateLimiter::attempts($loginThrottleKey));
-
-        $this->from(route('login.challenge'))->post(route('login.challenge.verify'), [
-            'code' => app(TwoFactorService::class)->currentCode($setup->secret),
-        ])->assertRedirect('/')->assertSessionHasNoErrors();
-
-        $this->assertAuthenticatedAs($user);
-        self::assertEquals(0, RateLimiter::attempts($loginThrottleKey));
-    }
-
     /** A TOTP challenge rejects an invalid factor without authenticating. */
-    public function test_two_factor_login_rejects_an_invalid_totp_code(): void
-    {
-        $user = User::factory()->create(['password' => 'Correct1!']);
-        $setup = $user->startTwoFactorEnrolment();
-        $user->confirmTwoFactor(app(TwoFactorService::class)->currentCode($setup->secret));
-
-        $this->post(route('login'), [
-            'email' => $user->email,
-            'password' => 'Correct1!',
-        ])->assertRedirect(route('login.challenge'));
-
-        $this->from(route('login.challenge'))->post(route('login.challenge.verify'), [
-            'code' => '000000',
-        ])->assertRedirect(route('login.challenge'))->assertSessionHasErrors('code');
-
-        $this->assertGuest();
-    }
-
     /** A challenge created before an enrolment change cannot verify the retired secret. */
-    public function test_two_factor_login_reloads_factor_after_it_is_disabled(): void
-    {
-        $user = User::factory()->create(['password' => 'Correct1!']);
-        $setup = $user->startTwoFactorEnrolment();
-        $user->confirmTwoFactor(app(TwoFactorService::class)->currentCode($setup->secret));
-        $this->travel(31)->seconds();
-        $code = app(TwoFactorService::class)->currentCode($setup->secret);
-
-        $this->post(route('login'), [
-            'email' => $user->email,
-            'password' => 'Correct1!',
-        ])->assertRedirect(route('login.challenge'));
-
-        $user->disableTwoFactor();
-        $this->from(route('login.challenge'))
-            ->post(route('login.challenge.verify'), ['code' => $code])
-            ->assertRedirect('/login');
-        $this->assertGuest();
-    }
-
     /** A TOTP timestep cannot be reused across separate login challenges. */
-    public function test_two_factor_login_rejects_a_replayed_totp_code(): void
-    {
-        $user = User::factory()->create(['password' => 'Correct1!']);
-        $setup = $user->startTwoFactorEnrolment();
-        $user->confirmTwoFactor(app(TwoFactorService::class)->currentCode($setup->secret));
-        $this->travel(31)->seconds();
-        $code = app(TwoFactorService::class)->currentCode($setup->secret);
-
-        $this->post(route('login'), [
-            'email' => $user->email,
-            'password' => 'Correct1!',
-        ])->assertRedirect(route('login.challenge'));
-        $this->post(route('login.challenge.verify'), ['code' => $code])->assertRedirect('/');
-
-        Auth::logout();
-        $this->post(route('login'), [
-            'email' => $user->email,
-            'password' => 'Correct1!',
-        ])->assertRedirect(route('login.challenge'));
-
-        $this->from(route('login.challenge'))
-            ->post(route('login.challenge.verify'), ['code' => $code])
-            ->assertRedirect(route('login.challenge'))
-            ->assertSessionHasErrors('code');
-        $this->assertGuest();
-    }
-
     /** A recovery code completes login and cannot be used for a second login. */
-    public function test_two_factor_login_consumes_recovery_codes_once(): void
-    {
-        $user = User::factory()->create(['password' => 'Correct1!']);
-        $setup = $user->startTwoFactorEnrolment();
-        $recoveryCode = $setup->recoveryCodes[0];
-        $user->confirmTwoFactor(app(TwoFactorService::class)->currentCode($setup->secret));
-
-        $this->post(route('login'), [
-            'email' => $user->email,
-            'password' => 'Correct1!',
-        ])->assertRedirect(route('login.challenge'));
-        $this->post(route('login.challenge.verify'), ['code' => $recoveryCode])->assertRedirect('/');
-        $this->assertAuthenticatedAs($user);
-        self::assertSame(count($setup->recoveryCodes) - 1, $user->fresh()->twoFactorRecoveryCodesRemaining());
-
-        Auth::logout();
-        $this->post(route('login'), [
-            'email' => $user->email,
-            'password' => 'Correct1!',
-        ])->assertRedirect(route('login.challenge'));
-        $this->from(route('login.challenge'))
-            ->post(route('login.challenge.verify'), ['code' => $recoveryCode])
-            ->assertRedirect(route('login.challenge'))
-            ->assertSessionHasErrors('code');
-        $this->assertGuest();
-    }
-
     /** TOTP challenges offer no email-code route or substitute. */
-    public function test_two_factor_login_does_not_offer_email_code_verification(): void
-    {
-        $user = User::factory()->create(['password' => 'Correct1!']);
-        $setup = $user->startTwoFactorEnrolment();
-        $user->confirmTwoFactor(app(TwoFactorService::class)->currentCode($setup->secret));
-
-        $this->post(route('login'), [
-            'email' => $user->email,
-            'password' => 'Correct1!',
-        ])->assertRedirect(route('login.challenge'));
-        self::assertFalse(Route::has('login.challenge.email'));
-        $this->get(route('login.challenge'))
-            ->assertInertia(fn (Assert $page) => $page->component('Auth/LoginChallenge'));
-        $this->post('/login/challenge/email')->assertNotFound();
-
-        $this->from(route('login.challenge'))
-            ->post(route('login.challenge.verify'), ['code' => '12345678'])
-            ->assertRedirect(route('login.challenge'))
-            ->assertSessionHasErrors('code');
-        $this->assertGuest();
-    }
-
     /** Pending factor state expires even while its session remains active. */
-    public function test_two_factor_login_challenge_expires(): void
-    {
-        $user = User::factory()->create([
-            'password' => 'Correct1!',
-            'two_factor_secret' => 'secret',
-            'two_factor_confirmed_at' => now(),
-            'two_factor_recovery_codes' => ['hashed-recovery-code'],
-        ]);
-
-        $this->post(route('login'), [
-            'email' => $user->email,
-            'password' => 'Correct1!',
-        ])->assertRedirect(route('login.challenge'));
-
-        $this->travel(6)->minutes();
-        $this->get(route('login.challenge'))->assertNotFound();
-        $this->assertGuest();
-    }
-
     /** A new password-only login clears an earlier pending factor challenge. */
-    public function test_password_only_login_replaces_stale_factor_challenge(): void
-    {
-        $factorUser = User::factory()->create([
-            'password' => 'Correct1!',
-            'two_factor_secret' => 'secret',
-            'two_factor_confirmed_at' => now(),
-            'two_factor_recovery_codes' => ['hashed-recovery-code'],
-        ]);
-        $passwordOnlyUser = User::factory()->create(['password' => 'Other1!']);
-
-        $this->post(route('login'), [
-            'email' => $factorUser->email,
-            'password' => 'Correct1!',
-        ])->assertRedirect(route('login.challenge'));
-
-        $this->post(route('login'), [
-            'email' => $passwordOnlyUser->email,
-            'password' => 'Other1!',
-        ])->assertRedirect('/');
-
-        $this->assertAuthenticatedAs($passwordOnlyUser);
-        $this->assertFalse(session()->has('login.challenge.user_id'));
-    }
-
     public function test_editor_loads(): void
     {
         $target = User::factory()->create();
@@ -383,7 +134,7 @@ class UserWebFeatureTest extends TestCase
         $target = User::factory()->create();
         $targetSetup = $target->startTwoFactorEnrolment();
         $target->confirmTwoFactor(app(TwoFactorService::class)->currentCode($targetSetup->secret));
-        $this->user->startTwoFactorEnrolment();
+        $this->enableTwoFactor($this->user);
         config(['session.driver' => 'database']);
         $actor = User::factory()->create();
         $actor->assignRole(RoleService::ROLE_ADMIN);
@@ -417,6 +168,7 @@ class UserWebFeatureTest extends TestCase
     {
         $target = User::factory()->create();
         $target->startTwoFactorEnrolment();
+        $this->enableTwoFactor($this->user);
         config(['session.driver' => 'file']);
 
         $this->actingAs($this->user)
@@ -433,6 +185,7 @@ class UserWebFeatureTest extends TestCase
     {
         $target = User::factory()->create();
         $target->startTwoFactorEnrolment();
+        $this->enableTwoFactor($this->user);
         config([
             'cache.default' => 'file',
             'session.driver' => 'database',
@@ -454,6 +207,7 @@ class UserWebFeatureTest extends TestCase
         $target = User::factory()->create();
         $target->startTwoFactorEnrolment();
         $this->actingAs($this->user);
+        $this->enableTwoFactor($this->user);
         config([
             'session.driver' => 'database',
             'session.connection' => 'other',
@@ -553,179 +307,13 @@ class UserWebFeatureTest extends TestCase
         $this->assertSame($passwordHash, $target->fresh()->getRawOriginal('password'));
     }
 
-    public function test_admin_password_update_requires_a_strong_password_and_forces_change(): void
-    {
-        $this->withoutMiddleware(VerifyCsrfToken::class);
-        $target = User::factory()->create(['password' => 'Current1!']);
-
-        $this->actingAs($this->user)
-            ->patch(route('user.update', $target), [
-                'id' => $target->id,
-                'first_name' => $target->first_name,
-                'last_name' => $target->last_name,
-                'email' => $target->email,
-                'password' => 'Weak1234',
-            ])
-            ->assertSessionHasErrors('password');
-
-        $this->assertTrue(Hash::check('Current1!', $target->fresh()->password));
-
-        $this->actingAs($this->user)
-            ->patch(route('user.update', $target), [
-                'id' => $target->id,
-                'first_name' => $target->first_name,
-                'last_name' => $target->last_name,
-                'email' => $target->email,
-                'password' => 'Strong1!',
-            ])
-            ->assertRedirect(route('users.index'));
-
-        $this->assertTrue(Hash::check('Strong1!', $target->fresh()->password));
-        $this->assertTrue((bool) $target->fresh()->must_change_password);
-    }
-
     /** An administrator may issue a temporary password for an editable account. */
-    public function test_admin_can_reset_another_editable_users_password(): void
-    {
-        $this->withoutMiddleware(VerifyCsrfToken::class);
-        Mail::fake();
-        $admin = User::factory()->create();
-        $admin->assignRole(RoleService::ROLE_ADMIN);
-        $target = User::factory()->create();
-
-        $this->actingAs($admin)
-            ->post(route('user.password.reset', $target))
-            ->assertRedirect(route('users.index'));
-
-        $this->assertTrue((bool) $target->fresh()->must_change_password);
-        Mail::assertQueued(AccountData::class);
-    }
-
     /** An administrator cannot reset their own password through account administration. */
-    public function test_admin_cannot_reset_their_own_password(): void
-    {
-        $this->withoutMiddleware(VerifyCsrfToken::class);
-        $admin = User::factory()->create();
-        $admin->assignRole(RoleService::ROLE_ADMIN);
-
-        $this->actingAs($admin)
-            ->post(route('user.password.reset', $admin))
-            ->assertForbidden();
-    }
-
     /** A regular administrator cannot submit another user's password field. */
-    public function test_non_super_admin_cannot_set_another_users_password(): void
-    {
-        $this->withoutMiddleware(VerifyCsrfToken::class);
-        $admin = User::factory()->create();
-        $admin->assignRole(RoleService::ROLE_ADMIN);
-        $target = User::factory()->create();
-
-        $this->actingAs($admin)
-            ->patch(route('user.update', $target), [
-                'id' => $target->id,
-                'first_name' => $target->first_name,
-                'last_name' => $target->last_name,
-                'email' => $target->email,
-                'password' => 'Strong1!',
-            ])
-            ->assertForbidden();
-    }
-
     /** The explicit manual assignment flag is forbidden outside the super-admin role. */
-    public function test_non_super_admin_cannot_use_manual_password_flag_for_self(): void
-    {
-        $this->withoutMiddleware(VerifyCsrfToken::class);
-        $admin = User::factory()->create(['password' => 'Current1!']);
-        $admin->assignRole(RoleService::ROLE_ADMIN);
-
-        $this->actingAs($admin)
-            ->patch(route('user.update', $admin), [
-                'id' => $admin->id,
-                'first_name' => $admin->first_name,
-                'last_name' => $admin->last_name,
-                'email' => $admin->email,
-                'password' => 'Manual1!Pass',
-                'manualPassword' => 1,
-            ])
-            ->assertForbidden();
-
-        $this->assertTrue(Hash::check('Current1!', $admin->fresh()->password));
-    }
-
     /** A super administrator can explicitly assign and mail a temporary password. */
-    public function test_super_admin_can_manually_set_another_users_password(): void
-    {
-        $this->withoutMiddleware(VerifyCsrfToken::class);
-        Mail::fake();
-        $superAdmin = User::factory()->create();
-        $superAdmin->assignRole(RoleService::ROLE_SUPER_ADMIN);
-        $target = User::factory()->create();
-
-        $this->actingAs($superAdmin)
-            ->patch(route('user.update', $target), [
-                'id' => $target->id,
-                'first_name' => $target->first_name,
-                'last_name' => $target->last_name,
-                'email' => $target->email,
-                'password' => 'Manual1!Pass',
-                'manualPassword' => 1,
-            ])
-            ->assertRedirect(route('users.index'));
-
-        $this->assertTrue(Hash::check('Manual1!Pass', $target->fresh()->password));
-        $this->assertTrue((bool) $target->fresh()->must_change_password);
-        Mail::assertQueued(AccountData::class);
-    }
-
     /** The generated temporary password format is accepted only for a forced password change. */
-    public function test_super_admin_can_manually_set_a_temporary_initial_password(): void
-    {
-        $this->withoutMiddleware(VerifyCsrfToken::class);
-        Mail::fake();
-        $target = User::factory()->create();
-        $password = PasswordService::temporaryInitialPassword();
-
-        $this->actingAs($this->user)
-            ->patch(route('user.update', $target), [
-                'id' => $target->id,
-                'first_name' => $target->first_name,
-                'last_name' => $target->last_name,
-                'email' => $target->email,
-                'password' => $password,
-                'manualPassword' => 1,
-            ])
-            ->assertRedirect(route('users.index'));
-
-        $this->assertTrue(Hash::check($password, $target->fresh()->password));
-        $this->assertTrue((bool) $target->fresh()->must_change_password);
-        Mail::assertQueued(AccountData::class);
-    }
-
     /** Manual Super-Admin assignment accepts any non-empty temporary password. */
-    public function test_super_admin_can_set_an_arbitrary_temporary_password(): void
-    {
-        $this->withoutMiddleware(VerifyCsrfToken::class);
-        Mail::fake();
-        $target = User::factory()->create();
-        $password = 'x';
-
-        $this->actingAs($this->user)
-            ->patch(route('user.update', $target), [
-                'id' => $target->id,
-                'first_name' => $target->first_name,
-                'last_name' => $target->last_name,
-                'email' => $target->email,
-                'password' => $password,
-                'manualPassword' => 1,
-            ])
-            ->assertRedirect(route('users.index'));
-
-        $this->assertTrue(Hash::check($password, $target->fresh()->password));
-        $this->assertTrue((bool) $target->fresh()->must_change_password);
-        Mail::assertQueued(AccountData::class);
-    }
-
     /** Personal TOTP setup and removal rely on authentication and the TOTP code, not a password. */
     public function test_two_factor_security_actions_do_not_require_a_password(): void
     {
@@ -841,124 +429,10 @@ class UserWebFeatureTest extends TestCase
     }
 
     /** A string false value is not treated as an account-creation request. */
-    public function test_false_create_account_value_does_not_reset_another_users_password(): void
-    {
-        $this->withoutMiddleware(VerifyCsrfToken::class);
-        Mail::fake();
-        $admin = User::factory()->create();
-        $admin->assignRole(RoleService::ROLE_ADMIN);
-        $target = User::factory()->create(['password' => 'Current1!']);
-
-        $this->actingAs($admin)
-            ->patch(route('user.update', $target), [
-                'id' => $target->id,
-                'first_name' => $target->first_name,
-                'last_name' => $target->last_name,
-                'email' => $target->email,
-                'createAccount' => 'false',
-            ])
-            ->assertRedirect(route('users.index'));
-
-        $this->assertFalse((bool) $target->fresh()->must_change_password);
-        Mail::assertNothingQueued();
-    }
-
     /** A confirmed initial password is hashed, forced to change, and mailed. */
-    public function test_create_account_uses_the_confirmed_initial_password(): void
-    {
-        $this->withoutMiddleware(VerifyCsrfToken::class);
-        Mail::fake();
-        $target = User::factory()->create(['password' => null]);
-        $password = PasswordService::temporaryInitialPassword();
-
-        $response = $this->actingAs($this->user)
-            ->patch(route('user.update', $target), [
-                'id' => $target->id,
-                'first_name' => $target->first_name,
-                'last_name' => $target->last_name,
-                'email' => 'new-account@example.com',
-                'createAccount' => '1',
-                'password' => $password,
-            ])
-            ->assertRedirect(route('users.index'));
-
-        $fresh = $target->fresh();
-        $this->assertTrue(Hash::check($password, $fresh->password));
-        $this->assertTrue((bool) $fresh->must_change_password);
-        $this->assertTrue($fresh->isOfficialUser);
-        Mail::assertQueued(AccountData::class);
-        $this->assertStringNotContainsString($password, json_encode($response->getSession()->all()));
-    }
-
     /** Account creation requires a password instead of generating an unseen replacement. */
-    public function test_create_account_requires_a_confirmed_password(): void
-    {
-        $this->withoutMiddleware(VerifyCsrfToken::class);
-
-        $this->actingAs($this->user)
-            ->post(route('user.store'), [
-                'first_name' => 'Neue',
-                'last_name' => 'Person',
-                'email' => 'missing-password@example.com',
-                'createAccount' => '1',
-            ])
-            ->assertSessionHasErrors('password');
-    }
-
     /** The manual-password flag cannot weaken validation while creating an account. */
-    public function test_manual_password_flag_does_not_bypass_account_creation_password_rules(): void
-    {
-        $this->withoutMiddleware(VerifyCsrfToken::class);
-        Mail::fake();
-        $target = User::factory()->create(['password' => null]);
-
-        $this->actingAs($this->user)
-            ->patch(route('user.update', $target), [
-                'id' => $target->id,
-                'first_name' => $target->first_name,
-                'last_name' => $target->last_name,
-                'email' => 'new-account@example.com',
-                'createAccount' => '1',
-                'manualPassword' => '1',
-                'password' => 'x',
-            ])
-            ->assertSessionHasErrors('password');
-
-        $this->assertNull($target->fresh()->password);
-        Mail::assertNothingQueued();
-    }
-
     /** A regular administrator cannot create a user with a password. */
-    public function test_regular_admin_cannot_store_a_password(): void
-    {
-        $this->withoutMiddleware(VerifyCsrfToken::class);
-        $admin = User::factory()->create();
-        $admin->assignRole(RoleService::ROLE_ADMIN);
-
-        $this->actingAs($admin)
-            ->post(route('user.store'), [
-                'first_name' => 'Neue',
-                'last_name' => 'Person',
-                'email' => 'regular-admin@example.com',
-                'password' => 'Voca1234!',
-            ])
-            ->assertForbidden();
-    }
-
-    public function test_super_admin_reset_uses_a_temporary_password_and_sends_account_data(): void
-    {
-        $this->withoutMiddleware(VerifyCsrfToken::class);
-        Mail::fake();
-        $target = User::factory()->create(['email' => 'target@example.com']);
-
-        $this->actingAs($this->user)
-            ->post(route('user.password.reset', $target))
-            ->assertRedirect(route('users.index'));
-
-        $this->assertTrue((bool) $target->fresh()->must_change_password);
-        Mail::assertQueued(AccountData::class);
-    }
-
     public function test_updating_profile_without_email_keeps_existing_password_hash(): void
     {
         $this->withoutMiddleware(VerifyCsrfToken::class);
@@ -1000,19 +474,11 @@ class UserWebFeatureTest extends TestCase
         $this->assertFalse((bool) $this->user->fresh()->must_change_password);
     }
 
-    public function test_initial_password_can_be_changed_without_current_password(): void
+    /** Enable the actor's TOTP factor for recovery authorization tests. */
+    private function enableTwoFactor(User $user): void
     {
-        $this->withoutMiddleware(VerifyCsrfToken::class);
-        $this->user->update(['password' => 'testtest', 'must_change_password' => 1]);
-
-        $this->actingAs($this->user)
-            ->post(route('password.change'), [
-                'new_password' => 'Voca1234!',
-                'new_password_confirmation' => 'Voca1234!',
-            ])
-            ->assertRedirect(route('home'));
-
-        $this->assertTrue(Hash::check('Voca1234!', $this->user->fresh()->password));
-        $this->assertFalse((bool) $this->user->fresh()->must_change_password);
+        $setup = $user->startTwoFactorEnrolment();
+        $user->confirmTwoFactor(app(TwoFactorService::class)->currentCode($setup->secret));
+        $this->travel(61)->seconds();
     }
 }

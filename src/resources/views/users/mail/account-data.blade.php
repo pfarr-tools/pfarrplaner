@@ -1,22 +1,17 @@
 {{-- Keep Markdown at column zero; indentation renders the email body as code. --}}
 {{-- blade-formatter-disable --}}
 @component('mail::message')
-# Deine Zugangsdaten für den Pfarrplaner
+# Dein Pfarrplaner-Zugang ist eingerichtet
 
 Hallo {{ $user->first_name }},
 
-Mit den folgenden Anmeldedaten kannst du dich am **Pfarrplaner** anmelden:
+Dein Zugang zum **Pfarrplaner** wurde eingerichtet. Öffne die Anmeldeseite und fordere dort einen Anmeldelink für diese E-Mail-Adresse an:
 
-**Anmeldeseite**: {{ config('app.url') }}
-
-**Benutzername**: `{{ $user->email }}`
-
-**Passwort**: `{{ $password }}`
+**E-Mail-Adresse**: `{{ $user->email }}`
 
 @component('mail::button', ['url' => config('app.url')])
-Jetzt anmelden
+Zur Anmeldung
 @endcomponent
 
-*Bitte beachte*: Das Passwort muss bei der nächsten Anmeldung geändert werden.
 @endcomponent
 {{-- blade-formatter-enable --}}

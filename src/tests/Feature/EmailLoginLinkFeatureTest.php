@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Jobs\ProcessPasswordlessLoginLinkRequest;
 use App\Mail\User\LoginLink;
 use App\Models\People\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -25,6 +26,35 @@ final class EmailLoginLinkFeatureTest extends TestCase
         parent::setUp();
         Mail::fake();
         $this->withoutMiddleware(ThrottleRequests::class);
+    }
+
+    public function test_non_account_records_neither_receive_nor_redeem_email_login_links(): void
+    {
+        $user = User::factory()->create([
+            'email' => 'person-only@example.test',
+            'is_official_user' => false,
+            'password' => null,
+        ]);
+
+        (new ProcessPasswordlessLoginLinkRequest($user->email))->handle();
+
+        self::assertSame(0, DB::table('passwordless_login_links')->count());
+        Mail::assertNothingQueued();
+
+        $linkId = DB::table('passwordless_login_links')->insertGetId([
+            'user_id' => $user->getKey(),
+            'token_hash' => hash('sha256', 'stale-non-account-token'),
+            'expires_at' => now()->addMinutes(5),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $this->withSession(['login.link.confirmation_id' => $linkId])
+            ->from(route('login'))
+            ->post(route('login.link.confirm'))
+            ->assertRedirect(route('login'));
+
+        $this->assertGuest();
+        self::assertNotNull(DB::table('passwordless_login_links')->where('id', $linkId)->value('consumed_at'));
     }
 
     public function test_known_and_unknown_addresses_receive_the_same_generic_response(): void

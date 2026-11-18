@@ -27,11 +27,4 @@ class AuthPageLoadTest extends AbstractPageLoadTest
                 ->assertDontSee('Whoops');
         });
     }
-
-    public function test_password_changer_loads(): void
-    {
-        $this->browse(function (Browser $browser) {
-            $this->assertPageLoads($browser, route('password.edit'));
-        });
-    }
 }

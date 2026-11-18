@@ -174,8 +174,7 @@ class InterstitialService
                     }
                     break;
                 case 'no-extra-factor':
-                    if (! $user->must_change_password
-                        && ! $user->hasTwoFactorEnabled()
+                    if (! $user->hasTwoFactorEnabled()
                         && ! $user->hasPendingTwoFactor()
                         && ! $user->passkeys()->exists()) {
                         return true;

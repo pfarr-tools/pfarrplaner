@@ -65,7 +65,7 @@ describe('TwoFactorRecoveryPanel', () => {
     it('closes an open form and blocks submission if recovery becomes unavailable', async () => {
         const { post, wrapper } = mountPanel()
         await wrapper.find('[data-testid="open-two-factor-recovery"]').trigger('click')
-        await wrapper.find('input[name="current_password"]').setValue('Current1!')
+        await wrapper.find('input[name="code"]').setValue('123456')
         await wrapper.find('input[name="support_reference"]').setValue('SUP-80-2026')
 
         await wrapper.setProps({
@@ -87,20 +87,20 @@ describe('TwoFactorRecoveryPanel', () => {
         expect(wrapper.text()).not.toContain('192.0.2.12')
 
         await wrapper.find('[data-testid="open-two-factor-recovery"]').trigger('click')
-        expect(wrapper.find('input[name="current_password"]').exists()).toBe(true)
+        expect(wrapper.find('input[name="code"]').exists()).toBe(true)
         expect(wrapper.find('input[name="support_reference"]').exists()).toBe(true)
     })
 
     it('cancels without submitting and posts only the reauthentication inputs', async () => {
         const { post, wrapper } = mountPanel()
         await wrapper.find('[data-testid="open-two-factor-recovery"]').trigger('click')
-        await wrapper.find('input[name="current_password"]').setValue('Current1!')
+        await wrapper.find('input[name="code"]').setValue('123456')
         await wrapper.find('input[name="support_reference"]').setValue('SUP-80-2026')
         await wrapper.find('[data-testid="cancel-two-factor-recovery"]').trigger('click')
         expect(post).not.toHaveBeenCalled()
 
         await wrapper.find('[data-testid="open-two-factor-recovery"]').trigger('click')
-        await wrapper.find('input[name="current_password"]').setValue('Current1!')
+        await wrapper.find('input[name="code"]').setValue('123456')
         await wrapper.find('input[name="support_reference"]').setValue('SUP-80-2026')
         await wrapper.find('form').trigger('submit.prevent')
         await flushPromises()
@@ -108,7 +108,7 @@ describe('TwoFactorRecoveryPanel', () => {
         expect(post).toHaveBeenCalledWith(
             '/user.two-factor.recover/42',
             {
-                current_password: 'Current1!',
+                code: '123456',
                 support_reference: 'SUP-80-2026',
             },
             expect.objectContaining({
@@ -117,7 +117,7 @@ describe('TwoFactorRecoveryPanel', () => {
                 onFinish: expect.any(Function),
             }),
         )
-        expect(wrapper.text()).not.toContain('Current1!')
+        expect(wrapper.text()).not.toContain('123456')
         expect(wrapper.find('[data-testid="open-two-factor-recovery"]').exists()).toBe(true)
     })
 })

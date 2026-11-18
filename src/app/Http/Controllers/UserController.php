@@ -35,6 +35,7 @@ use App\Facades\Settings;
 use App\HomeScreen\Tabs\HomeScreenTabFactory;
 use App\Http\Requests\RecoverTwoFactorRequest;
 use App\Http\Requests\UserRequest;
+use App\Mail\User\AccountData;
 use App\Models\Calendar\External\CalendarConnection;
 use App\Models\Location;
 use App\Models\Parish;
@@ -44,7 +45,6 @@ use App\Models\Places\City;
 use App\Models\Subscription;
 use App\Providers\AuthServiceProvider;
 use App\Rules\CreatedInLocalAdminDomainRule;
-use App\Rules\StrongPassword;
 use App\Services\MinistryService;
 use App\Traits\HandlesAttachedImageTrait;
 use App\Traits\HandlesAttachmentsTrait;
@@ -58,9 +58,9 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Laravel\Passkeys\Passkey;
@@ -97,7 +97,7 @@ class UserController extends Controller
     public function index()
     {
         Gate::authorize('index', User::class);
-        $userQuery = User::select(['id', 'first_name', 'last_name', 'title', 'email', 'password'])
+        $userQuery = User::select(['id', 'first_name', 'last_name', 'title', 'email', 'is_official_user'])
             ->with([
                 'homeCities:id,name',
                 'cities:id,name',
@@ -122,7 +122,7 @@ class UserController extends Controller
                 });
             } elseif (Auth::user()->can('benutzer-bearbeiten')) {
                 // Clerk: Can only see users
-                $userQuery->where('password', '!=', '');
+                $userQuery->where('is_official_user', true);
             } elseif (Auth::user()->can('benutzerliste-lokal-sehen')) {
                 // Local clerk: Can only see users from own cities
                 $cityIds = Auth::user()->writableCities->pluck('id');
@@ -219,6 +219,9 @@ class UserController extends Controller
         $data = $request->validated();
         $user = User::create($data);
         $this->updateUserDataFromRequest($request, $user);
+        if ($user->isOfficialUser && $user->email) {
+            Mail::to($user->email)->queue(new AccountData($user, Auth::user()));
+        }
 
         return redirect()->route('users.index')->with('success', 'Der neue Benutzer wurde angelegt.');
     }
@@ -282,15 +285,17 @@ class UserController extends Controller
         $sessionConnection = config('session.connection');
         $sessionRevocationSupported = config('session.driver') === 'database'
             && (! $sessionConnection || $sessionConnection === config('database.default'));
-        $canSetPassword = Auth::user()->hasRole(AuthServiceProvider::SUPER)
-            && Auth::id() !== $user['id'];
+        $actorHasTwoFactor = Auth::user()->hasTwoFactorEnabled();
         $twoFactorRecovery = [
             'canRecover' => $canViewRecoveryHistory
+                && $actorHasTwoFactor
                 && $recoveryTargetHasFactor
                 && $sessionRevocationSupported,
-            'unavailableReason' => $canViewRecoveryHistory && $recoveryTargetHasFactor && ! $sessionRevocationSupported
-                ? 'Die Wiederherstellung erfordert Datenbank-Sitzungen mit derselben Datenbankverbindung wie die Anwendung.'
-                : null,
+            'unavailableReason' => $canViewRecoveryHistory && $recoveryTargetHasFactor && ! $actorHasTwoFactor
+                ? 'Richte zuerst selbst eine Zwei-Faktor-Anmeldung ein, damit du die Wiederherstellung sicher bestätigen kannst.'
+                : ($canViewRecoveryHistory && $recoveryTargetHasFactor && ! $sessionRevocationSupported
+                    ? 'Die Wiederherstellung erfordert Datenbank-Sitzungen mit derselben Datenbankverbindung wie die Anwendung.'
+                    : null),
             'history' => [],
         ];
         if ($canViewRecoveryHistory) {
@@ -332,7 +337,6 @@ class UserController extends Controller
                 'ministries',
                 'modules',
                 'twoFactorRecovery',
-                'canSetPassword',
             )
         );
     }
@@ -559,11 +563,7 @@ class UserController extends Controller
     {
         $user = Auth::user();
         Gate::authorize('update', $user);
-        $request->merge(['password' => null]);
         $data = $this->validateRequest($request, $user);
-
-        // Profile updates do not change the account password.
-        unset($data['password']);
 
         $user->update($data);
 
@@ -697,7 +697,7 @@ class UserController extends Controller
         return response()->json(['enabled' => false]);
     }
 
-    /** Recover another account after fresh Super-Admin password confirmation. */
+    /** Recover another account after a current Super-Admin TOTP confirmation. */
     public function recoverTwoFactor(
         RecoverTwoFactorRequest $request,
         User $user,
@@ -705,12 +705,12 @@ class UserController extends Controller
     ): RedirectResponse {
         /** @var User $actor */
         $actor = $request->user();
-        /** @var array{current_password: string, support_reference: string} $validated */
+        /** @var array{code: string, support_reference: string} $validated */
         $validated = $request->validated();
         $recovery->execute(
             $actor,
             $user,
-            $validated['current_password'],
+            $validated['code'],
             $validated['support_reference'],
             (string) $request->ip(),
         );
@@ -730,19 +730,13 @@ class UserController extends Controller
     public function update(UserRequest $request, User $user)
     {
         Gate::authorize('update', $user);
+        $wasOfficialUser = $user->isOfficialUser;
         $data = $request->validated();
-        $manualPassword = $request->boolean('manualPassword') && isset($data['password']);
-        $manualPasswordValue = $manualPassword ? $data['password'] : null;
-        unset($data['manualPassword']);
-        if ($manualPassword) {
-            unset($data['password'], $data['must_change_password']);
-        }
-
         $user->update($data);
-        $this->updateUserDataFromRequest($request, $user);
-        if ($manualPassword && is_string($manualPasswordValue)) {
-            $user->resetAccount($manualPasswordValue);
+        if (! $wasOfficialUser && $user->isOfficialUser && $user->email) {
+            Mail::to($user->email)->queue(new AccountData($user, Auth::user()));
         }
+        $this->updateUserDataFromRequest($request, $user);
 
         return redirect()->route('users.index')->with('success', 'Die Änderungen wurden gespeichert.');
     }
@@ -774,9 +768,6 @@ class UserController extends Controller
         $user->setSubscriptionsFromArray($request->get('subscriptions') ?: []);
         $user->updateCityPermissions($request->get('permissions') ?: [], Auth::user());
 
-        if ($request->boolean('createAccount')) {
-            $user->resetAccount($request->get('password'));
-        }
     }
 
     /**
@@ -916,7 +907,6 @@ class UserController extends Controller
             'title' => 'nullable|string',
             'email' => 'nullable|string|email|max:255|unique:users,email'.($user ? ','.$user->id : ''),
             'isOfficialUser' => 'sometimes|boolean',
-            'password' => ['nullable', 'string', new StrongPassword],
             'office' => 'nullable|string',
             'address' => 'nullable|string',
             'phone' => 'nullable|phone_number',
@@ -944,29 +934,12 @@ class UserController extends Controller
                 // check if at least one permission is set
                 $rules['cityPermission'] = [new CreatedInLocalAdminDomainRule];
 
-                // force setting a password
+                // A passwordless account requires a reachable email address.
                 $rules['email'] = 'required|email';
-                $rules['password'] = ['required', 'string', new StrongPassword];
             }
         }
 
-        // if a password is set, an email is required
-        if ($request->get('password', '') != '') {
-            $rules['email'] = 'required|email';
-        }
-
         $data = $request->validate($rules);
-
-        // api token
-        $data['password'] = $data['password'] ?? '';
-        if ((($user === null) || ($user->api_token == '')) && ($data['password'] != '')) {
-            $data['api_token'] = Str::random(60);
-        }
-
-        if ($data['password'] != '') {
-            $data['must_change_password'] = true;
-            $data['is_official_user'] = true;
-        }
 
         if (array_key_exists('isOfficialUser', $data)) {
             $data['is_official_user'] = (bool) $data['isOfficialUser'];
@@ -985,10 +958,6 @@ class UserController extends Controller
     public function add(Request $request)
     {
         Gate::authorize('create', User::class);
-
-        if ($request->filled('password') && ! Auth::user()->hasRole(AuthServiceProvider::SUPER)) {
-            abort(403);
-        }
 
         $data = $this->validateRequest($request, null, true);
         $user = User::create($data);
@@ -1129,20 +1098,5 @@ class UserController extends Controller
         }
 
         return redirect()->route('users.index')->with('success', 'Die doppelten Personeneinträge wurden zusammengeführt.');
-    }
-
-    /**
-     * Reset a user's account password and send new credentials.
-     *
-     * @param  Request  $request  Current request.
-     * @param  User  $user  Account whose password is reset.
-     * @return RedirectResponse User-list redirect.
-     */
-    public function resetPassword(Request $request, User $user)
-    {
-        Gate::authorize('resetPassword', $user);
-        $user->resetAccount();
-
-        return redirect()->route('users.index')->with('success', 'Das Benutzerpasswort für '.$user->fullName().' wurde zurückgesetzt. Eine E-Mail mit neuen Zugangsdaten wurde an '.$user->email.' versandt.');
     }
 }

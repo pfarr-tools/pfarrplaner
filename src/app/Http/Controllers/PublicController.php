@@ -375,7 +375,7 @@ class PublicController extends Controller
     {
         $count = [
             'cities' => City::count(),
-            'users' => User::where('password', '!=', '')->count(),
+            'users' => User::where('is_official_user', true)->count(),
             'services' => Service::count(),
         ];
 

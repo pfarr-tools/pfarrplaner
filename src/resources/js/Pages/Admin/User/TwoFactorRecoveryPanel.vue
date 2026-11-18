@@ -37,16 +37,17 @@
             </div>
             <label
                 class="form-label"
-                for="two-factor-current-password"
-                >Aktuelles Passwort</label
+                for="two-factor-recovery-code"
+                >Dein aktueller Sicherheitscode</label
             >
             <input
-                id="two-factor-current-password"
-                v-model="currentPassword"
+                id="two-factor-recovery-code"
+                v-model="code"
                 class="form-control mb-3"
-                name="current_password"
-                type="password"
-                autocomplete="current-password"
+                name="code"
+                type="text"
+                inputmode="numeric"
+                autocomplete="one-time-code"
                 required
             />
             <label
@@ -67,7 +68,7 @@
                 <button
                     type="submit"
                     class="btn btn-danger"
-                    :disabled="submitting || !currentPassword || !supportReference"
+                    :disabled="submitting || !code || !supportReference"
                     data-testid="submit-two-factor-recovery"
                 >
                     Wiederherstellung auslösen
@@ -128,7 +129,7 @@ export default {
             return this.canRecover && !this.unavailableReason
         },
     },
-    /** Clear password and reference immediately when recovery becomes unavailable. */
+    /** Clear code and reference immediately when recovery becomes unavailable. */
     watch: {
         recoveryAvailable(available) {
             if (!available) {
@@ -139,7 +140,7 @@ export default {
     /** Return local form state without storing credentials in page props. */
     data() {
         return {
-            currentPassword: '',
+            code: '',
             supportReference: '',
             formOpen: false,
             submitting: false,
@@ -149,19 +150,19 @@ export default {
     methods: {
         /** Open a fresh form and clear any previous authentication input. */
         openForm() {
-            this.currentPassword = ''
+            this.code = ''
             this.supportReference = ''
             this.error = ''
             this.formOpen = true
         },
-        /** Close the form and discard the password and support reference. */
+        /** Close the form and discard the code and support reference. */
         closeForm() {
-            this.currentPassword = ''
+            this.code = ''
             this.supportReference = ''
             this.error = ''
             this.formOpen = false
         },
-        /** Submit only the required reauthentication and audit reference fields. */
+        /** Submit only the required TOTP confirmation and audit reference fields. */
         recover() {
             if (!this.recoveryAvailable) {
                 return
@@ -173,12 +174,12 @@ export default {
             this.$inertia.post(
                 this.recoveryRoute,
                 {
-                    current_password: this.currentPassword,
+                    code: this.code,
                     support_reference: this.supportReference,
                 },
                 {
                     onSuccess: function handleSuccess() {
-                        panel.currentPassword = ''
+                        panel.code = ''
                         panel.supportReference = ''
                         panel.formOpen = false
                     },
@@ -186,7 +187,7 @@ export default {
                         panel.error = 'Die Wiederherstellung konnte nicht durchgeführt werden.'
                     },
                     onFinish: function handleFinish() {
-                        panel.currentPassword = ''
+                        panel.code = ''
                         panel.submitting = false
                     },
                 },

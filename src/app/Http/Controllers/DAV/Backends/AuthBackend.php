@@ -32,7 +32,6 @@ namespace App\Http\Controllers\DAV\Backends;
 
 use App\Models\People\User;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 use Sabre\DAV\Auth\Backend\AbstractBasic;
 
 class AuthBackend extends AbstractBasic
@@ -44,11 +43,19 @@ class AuthBackend extends AbstractBasic
      */
     protected function validateUserPass($username, $password)
     {
-        $user = User::where('email', $username)->whereHas('calendarConnections')->first();
+        $email = (string) $username;
+        $token = (string) $password;
+        $user = User::where('email', $email)
+            ->where('is_official_user', true)
+            ->whereHas('calendarConnections')
+            ->first();
         if (! $user) {
             return false;
         }
-        if (! Hash::check($password, $user->password)) {
+
+        $storedToken = (string) $user->api_token;
+        if ($storedToken === ''
+            || (! hash_equals($storedToken, hash('sha256', $token)) && ! hash_equals($storedToken, $token))) {
             return false;
         }
         Auth::login($user);

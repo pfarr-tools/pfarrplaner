@@ -72,7 +72,7 @@ return [
     ],
     'einstellungen' => [
         'manual' => 'benutzerhandbuch',
-        'prefixes' => ['user.profile', 'password.edit', 'password.change', 'apitoken', 'tokens'],
+        'prefixes' => ['user.profile', 'apitoken', 'tokens'],
     ],
     'administration' => [
         'manual' => 'administratorhandbuch',

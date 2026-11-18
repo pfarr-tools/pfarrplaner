@@ -32,19 +32,15 @@ namespace App\Http\Controllers;
 
 use App\Facades\Settings;
 use App\HomeScreen\Tabs\HomeScreenTabFactory;
-use App\Rules\StrongPassword;
 use App\Services\RedirectorService;
 use Carbon\Carbon;
 use Illuminate\Contracts\Support\Renderable;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
-use Inertia\Response;
 
 /**
  * Class HomeController
@@ -73,11 +69,6 @@ class HomeController extends Controller
         }
 
         RedirectorService::saveCurrentRoute();
-        // check if the user still has a temp password
-        if (Hash::check('testtest', Auth::user()->password) || Auth::user()->must_change_password) {
-            return redirect()->route('password.edit', ['from' => 'home']);
-        }
-
         $activeTab = $request->get('tab', $activeTab);
 
         $homeScreenSetting = Auth::user()->getSetting('homeScreen', 'homescreen:configurable');
@@ -110,38 +101,6 @@ class HomeController extends Controller
             'HomeScreen',
             compact('user', 'settings', 'activeTab', 'replacements', 'tab', 'tabTitles', 'cities', 'masteredPools')
         );
-    }
-
-    /**
-     * @return Response
-     */
-    public function showChangePassword()
-    {
-        $originalPassword = Hash::check('testtest', Auth::user()->password);
-        $mustChange = Hash::check('testtest', Auth::user()->password) || Auth::user()->must_change_password;
-
-        return Inertia::render('Auth/PasswordChanger', compact('originalPassword', 'mustChange'));
-    }
-
-    /**
-     * @return RedirectResponse
-     */
-    public function changePassword(Request $request)
-    {
-        $rules = [
-            'current_password' => 'required|hash:'.Auth::user()->password,
-            'new_password' => ['required', 'string', new StrongPassword, 'confirmed', 'not_current_password', 'notIn:testtest'],
-            'new_password_confirmation' => 'required',
-        ];
-        $firstPassword = (Hash::check('testtest', Auth::user()->password));
-        if ((! $request->has('current_password')) && $firstPassword) {
-            unset($rules['current_password']);
-        }
-        $validatedData = $request->validate($rules);
-        // Change Password
-        Auth::user()->update(['password' => $validatedData['new_password'], 'must_change_password' => 0]);
-
-        return redirect()->route('home')->with('success', 'Dein Passwort wurde geändert.');
     }
 
     /** Display application metadata and the current changelog. */

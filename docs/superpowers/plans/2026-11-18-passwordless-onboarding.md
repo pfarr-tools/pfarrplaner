@@ -55,10 +55,12 @@
 - Modify: Login-, Demo-Login-, Admin-Usereditor- und Admin-Index-Vue-Seiten
 - Test: Auth-, Kontoverwaltungs- und Passwortwechsel-Feature/Browsertests
 
-- [ ] Schreibe Tests, dass Passwort-Login, Reset/Änderung und Admin-Passwortsetzen nicht verfügbar sind; E-Mail-Link und Passkey bleiben nutzbar.
-- [ ] Entferne Passwortfelder/Aktionen aus der Administration; erhalte `isOfficialUser` und sende keine Passwortdaten in Requests oder Mail.
-- [ ] Aktualisiere Kontoanlage und Kontodaten-Mail auf E-Mail-Link-Anmeldung; entferne `must_change_password`-Weiterleitungen.
-- [ ] Führe betroffene Tests aus; Senior Review; committe nur Task-2-Dateien.
+- [x] Schreibe Tests, dass Passwort-Login, Reset/Änderung und Admin-Passwortsetzen nicht verfügbar sind; E-Mail-Link und Passkey bleiben nutzbar.
+- [x] Entferne Passwortfelder/Aktionen aus der Administration; erhalte `isOfficialUser` und sende keine Passwortdaten in Requests oder Mail.
+- [x] Aktualisiere Kontoanlage und Kontodaten-Mail auf E-Mail-Link-Anmeldung; entferne `must_change_password`-Weiterleitungen.
+- [x] Führe betroffene Tests aus; Senior Review; committe nur Task-2-Dateien.
+
+**Task-2-Verifikation:** 90 fokussierte PHP-Tests mit 550 Assertions und 5 Vitest-Tests der Recovery-Oberfläche bestanden. `format:check`, `git diff --check` und der Vite-Produktionsbuild bestanden. Kontoaktivierung folgt der vorhandenen Personenberechtigung (`update` beziehungsweise `create`); sie ist nicht auf Super-Admins beschränkt. Senior Review: **APPROVED**. Der umfassendere Route-Audit meldet bestehende, unveränderte öffentliche Mutation-Routen; der Review ordnet sie als separaten Sicherheits-Follow-up ein.
 
 ### Task 3: Login-Zähler und nicht umgehbares Middleware-Gate
 

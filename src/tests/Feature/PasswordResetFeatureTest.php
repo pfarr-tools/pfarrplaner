@@ -1,110 +1,118 @@
 <?php
 
-/*
- * Pfarrplaner
- *
- * @package Pfarrplaner
- * @author Christoph Fischer <chris@toph.de>
- * @copyright (c) Christoph Fischer, https://christoph-fischer.org
- * @license https://www.gnu.org/licenses/gpl-3.0.txt GPL 3.0 or later
- * @link https://github.com/pfarr-tools/pfarrplaner
- */
-
 namespace Tests\Feature;
 
+use App\Mail\User\AccountData;
 use App\Models\People\User;
-use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
+use App\Models\Places\City;
+use App\Services\RoleService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\Route;
+use Spatie\Permission\Models\Permission;
 use Tests\TestCase;
 
-/**
- * Verify that the framework-provided password-reset routes render usable forms.
- */
+/** Verify legacy password authentication endpoints are no longer registered. */
 class PasswordResetFeatureTest extends TestCase
 {
     use RefreshDatabase;
 
-    /**
-     * The password-reset request form is available to guests.
-     */
-    public function test_password_reset_request_form_is_available(): void
+    /** Demo selection is an explicit passwordless route that is disabled outside demo mode. */
+    public function test_demo_login_route_is_disabled_outside_demo_mode(): void
     {
-        $this->get('/password/reset')
-            ->assertOk()
-            ->assertSee('Passwort zurücksetzen');
+        config(['app.demo_mode' => false]);
+
+        $this->post(route('login.demo'), ['email' => 'demo@example.com'])
+            ->assertNotFound();
     }
 
-    /**
-     * The password-reset form accepts the token supplied by the broker.
-     */
-    public function test_password_reset_form_is_available_for_a_token(): void
+    /** Admin-created accounts use an email sign-in link and never send a password. */
+    public function test_admin_can_create_an_official_account_without_a_password(): void
     {
-        $this->get('/password/reset/example-token')
-            ->assertOk()
-            ->assertSee('Neues Passwort');
-    }
-
-    /**
-     * The reset endpoint rejects a password missing the required symbol.
-     */
-    public function test_password_reset_requires_a_strong_password(): void
-    {
-        $this->withoutMiddleware(VerifyCsrfToken::class);
-
-        $this->post('/password/reset', [
-            'token' => 'example-token',
-            'email' => 'unknown@example.com',
-            'password' => 'Secure123',
-            'password_confirmation' => 'Secure123',
-        ])->assertSessionHasErrors('password');
-    }
-
-    /**
-     * A successful public reset clears the forced password-change flag.
-     */
-    public function test_successful_password_reset_clears_forced_change_flag(): void
-    {
-        $this->withoutMiddleware(VerifyCsrfToken::class);
-        $user = User::factory()->create([
-            'email' => 'reset@example.com',
-            'password' => 'Old1!',
-            'must_change_password' => true,
-        ]);
-        $token = Password::broker()->createToken($user);
-
-        $this->post('/password/reset', [
-            'token' => $token,
-            'email' => $user->email,
-            'password' => 'New1!word',
-            'password_confirmation' => 'New1!word',
-        ])->assertRedirect();
-
-        $this->assertTrue(password_verify('New1!word', $user->fresh()->password));
-        $this->assertFalse((bool) $user->fresh()->must_change_password);
-    }
-
-    /** The password reset request gives the same visible response for known and unknown accounts. */
-    public function test_password_reset_request_does_not_disclose_account_existence(): void
-    {
-        $this->withoutMiddleware(VerifyCsrfToken::class);
+        $this->withoutMiddleware();
         Mail::fake();
-        User::factory()->create(['email' => 'known@example.com']);
+        $admin = User::factory()->create();
+        $admin->assignRole(RoleService::ROLE_SUPER_ADMIN);
 
-        $known = $this->from('/password/reset')->post('/password/email', [
-            'email' => 'known@example.com',
-        ]);
-        $unknown = $this->from('/password/reset')->post('/password/email', [
-            'email' => 'unknown@example.com',
+        $this->actingAs($admin)->post(route('user.store'), [
+            'first_name' => 'Neu',
+            'last_name' => 'Konto',
+            'email' => 'new-account@example.com',
+            'isOfficialUser' => true,
+        ])->assertRedirect(route('users.index'));
+
+        $user = User::query()->where('email', 'new-account@example.com')->firstOrFail();
+        self::assertTrue($user->isOfficialUser);
+        Mail::assertQueued(AccountData::class);
+        self::assertFalse(property_exists(new AccountData($user, $admin), 'password'));
+    }
+
+    /** A person administrator may activate an account through either accepted status field. */
+    public function test_non_super_admin_can_activate_accounts_by_submitting_status_fields(): void
+    {
+        $admin = User::factory()->create();
+        $admin->assignRole(RoleService::ROLE_ADMIN);
+        $target = User::factory()->create([
+            'email' => 'person@example.test',
+            'is_official_user' => false,
         ]);
 
-        $known->assertRedirect('/password/reset')->assertSessionHasNoErrors();
-        $unknown->assertRedirect('/password/reset')->assertSessionHasNoErrors();
-        $this->assertSame(
-            $known->getSession()->get('status'),
-            $unknown->getSession()->get('status'),
-        );
-        $this->assertNotEmpty($known->getSession()->get('status'));
+        foreach ([
+            ['isOfficialUser' => true],
+            ['is_official_user' => true],
+            ['createAccount' => true],
+        ] as $accountFields) {
+            $this->actingAs($admin)
+                ->patch(route('user.update', $target), [
+                    'first_name' => $target->first_name,
+                    'last_name' => $target->last_name,
+                    'email' => $target->email,
+                    ...$accountFields,
+                ])
+                ->assertRedirect(route('users.index'));
+            self::assertTrue($target->fresh()->isOfficialUser);
+            $target->update(['is_official_user' => false]);
+        }
+    }
+
+    /** A person-management permission can create an official account through the quick-add endpoint. */
+    public function test_non_super_admin_can_create_official_account_through_quick_add(): void
+    {
+        $actor = User::factory()->create();
+        $permission = Permission::findOrCreate('benutzer-bearbeiten', 'web');
+        $actor->givePermissionTo($permission);
+        $city = City::factory()->create();
+
+        $this->actingAs($actor)
+            ->postJson(route('users.add'), [
+                'first_name' => 'Neue',
+                'last_name' => 'Person',
+                'email' => 'new-person@example.test',
+                'isOfficialUser' => true,
+                'city_id' => $city->getKey(),
+            ])
+            ->assertOk()
+            ->assertJsonPath('isOfficialUser', true);
+
+        self::assertDatabaseHas('users', [
+            'email' => 'new-person@example.test',
+            'is_official_user' => true,
+        ]);
+    }
+
+    /** Password login, reset, and change routes are unavailable. */
+    public function test_password_authentication_routes_are_not_registered(): void
+    {
+        self::assertFalse(Route::has('password.request'));
+        self::assertFalse(Route::has('password.email'));
+        self::assertFalse(Route::has('password.reset'));
+        self::assertFalse(Route::has('password.update'));
+        self::assertFalse(Route::has('password.edit'));
+        self::assertFalse(Route::has('password.change'));
+        self::assertFalse(Route::has('user.password.reset'));
+
+        $this->post('/login', ['email' => 'user@example.com', 'password' => 'anything'])
+            ->assertMethodNotAllowed();
+        $this->get('/password/reset')->assertNotFound();
     }
 }
