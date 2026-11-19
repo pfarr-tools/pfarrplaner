@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2026.22.2](https://github.com/pfarr-tools/pfarrplaner/compare/v2026.22.1...v2026.22.2) (2026-11-19)
+
+
+### Bug Fixes
+
+* **release:** Teilweise angelegte Login-Tabelle vervollständigen. Refs [#112](https://github.com/pfarr-tools/pfarrplaner/issues/112) ([e586e76](https://github.com/pfarr-tools/pfarrplaner/commit/e586e76fd34fb8742a9aa38496e3f0c2d521769d))
+
 ### [2026.22.1](https://github.com/pfarr-tools/pfarrplaner/compare/v2026.22.0...v2026.22.1) (2026-11-19)
 
 
