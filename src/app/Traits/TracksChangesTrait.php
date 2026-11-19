@@ -88,6 +88,7 @@ trait TracksChangesTrait
 
         if (property_exists($this, 'relationsToTrack') && is_array($this->relationsToTrack)) {
             foreach ($this->relationsToTrack as $relation) {
+                $this->unsetRelation($relation);
                 $snapshot[$relation] = $this->normalizeSnapshotValue($this->$relation);
             }
         }

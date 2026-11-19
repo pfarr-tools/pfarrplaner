@@ -165,6 +165,40 @@ class ServiceMailUnitTest extends TestCase
         $this->assertFalse($service->isChanged());
     }
 
+    /**
+     * Detects participant changes after the relation was loaded for tracking.
+     */
+    public function test_service_diff_detects_participant_changes_after_sync(): void
+    {
+        $service = Service::factory()->create();
+        $service->trackChanges();
+        $participant = User::factory()->create();
+
+        $service->syncParticipantsFromArray([
+            'P' => [$participant->id => ['category' => 'P']],
+        ]);
+
+        $this->assertTrue($service->isChanged());
+        $service->storeDiff();
+        $this->assertArrayHasKey('participants', $service->changed);
+    }
+
+    /**
+     * Ignores timestamp changes when participant synchronization preserves the same assignments.
+     */
+    public function test_service_diff_ignores_unchanged_participant_sync(): void
+    {
+        $service = Service::factory()->create();
+        $participant = User::factory()->create();
+        $participants = ['P' => [$participant->id => ['category' => 'P']]];
+        $service->syncParticipantsFromArray($participants);
+        $service->trackChanges();
+
+        $service->syncParticipantsFromArray($participants);
+
+        $this->assertFalse($service->isChanged());
+    }
+
     public function test_service_created_multiple_builds(): void
     {
         $user = User::factory()->create();
