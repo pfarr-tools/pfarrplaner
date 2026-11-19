@@ -36,7 +36,7 @@ Entwicklung:
   ./planer dev up|down|restart|status|logs|exec [Argumente]
   ./planer dev shell
   ./planer dev artisan <Befehl>
-  ./planer dev test [Testoptionen]
+  ./planer dev test [Datei|Verzeichnis] [Testoptionen]
   ./planer dev composer <Befehl>
   ./planer dev npm <Befehl>
   ./planer dev pint <Optionen>
@@ -74,7 +74,7 @@ run_dev() {
 
 Verwende für Tests den sicheren Befehl:
 
-  ./planer dev test [Testoptionen]
+  ./planer dev test [Datei|Verzeichnis] [Testoptionen]
 EOF
           exit 2
         fi
@@ -100,7 +100,7 @@ EOF
 
 Verwende für Tests den sicheren Befehl:
 
-  ./planer dev test [Testoptionen]
+  ./planer dev test [Datei|Verzeichnis] [Testoptionen]
 EOF
         local confirmation=''
         read -r -p 'Wirklich fortfahren? Tippe exakt "ja": ' confirmation < /dev/tty || {

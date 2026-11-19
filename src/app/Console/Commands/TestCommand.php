@@ -27,6 +27,7 @@ use Symfony\Component\Process\Process;
 class TestCommand extends Command
 {
     protected $signature = 'test
+        {testPath? : Optional PHPUnit test file or directory}
         {--without-tty : Disable output to TTY}
         {--compact : Indicates whether the compact printer should be used}
         {--coverage : Indicates whether code coverage information should be collected}
@@ -150,6 +151,11 @@ class TestCommand extends Command
             : base_path('phpunit.xml.dist');
 
         $phpunitArguments = [PHP_BINARY, $phpunit, '--configuration='.$config, '--no-output'];
+        $testPath = $this->argument('testPath');
+        if ($testPath !== null && $testPath !== '') {
+            $phpunitArguments[] = $testPath;
+        }
+
         $filter = $this->option('filter');
         if ($filter !== null && $filter !== '') {
             $phpunitArguments[] = '--filter='.$filter;
