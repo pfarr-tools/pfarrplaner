@@ -197,6 +197,10 @@ class AbstractCRUDController extends Controller
         $updater = $model->getContractedAction('update');
         $model = $updater->update($request->user(), $model, $request->all());
 
+        if ($request->boolean('_autosave')) {
+            return response()->json(['saved' => true]);
+        }
+
         return $this->returnResult($updater, $model);
     }
 

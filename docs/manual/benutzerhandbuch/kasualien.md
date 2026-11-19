@@ -6,6 +6,10 @@ Kasualien sind kirchliche Amtshandlungen an wichtigen Lebensstationen: **Taufen*
 
 Für die Arbeit im Gemeindebüro ist wichtig: Kasualien sollen grundsätzlich mit einem Gottesdienst verbunden sein. Nur **Taufanfragen** dürfen zunächst ohne konkreten Gottesdienst erfasst werden, wenn noch kein Termin feststeht. Beerdigungen und Trauungen werden beim Anlegen immer mit einem Gottesdienst verbunden; der Assistent legt diesen Gottesdienst direkt mit an.
 
+## Eingaben sichern
+
+Änderungen in Beerdigungs-, Tauf- und Trauungseditoren werden automatisch gesichert. Bei einer Internetverbindung synchronisiert Pfarrplaner sie nach kurzer Eingabepause mit dem Server. Ohne Verbindung bleibt ein Entwurf im Browser gespeichert und wird synchronisiert, sobald die Verbindung zurückkehrt. Ein nicht synchronisierter Entwurf kann beim nächsten Öffnen wiederhergestellt oder verworfen werden. Verwenden Sie auf gemeinsam genutzten Geräten die Abmeldefunktion und löschen Sie nicht benötigte Browserdaten.
+
 ---
 
 ## Wo Kasualien erscheinen
@@ -443,6 +447,7 @@ Oben im Beerdigungseditor stehen:
 - **Weitere Aktionen**: Öffnet zusätzliche Sicherungsfunktionen.
 - **Datenpaket im Browser sichern**: Speichert eine Kopie dieses Beerdigungsdatensatzes im Browser.
 - **Datenpaket auf Festplatte sichern**: Lädt die Daten als JSON-Datei herunter.
+- **Datenpaket aus Datei wiederherstellen**: Importiert eine zuvor gespeicherte JSON-Datei für dieselbe Beerdigung.
 
 Wenn im Browser eine Sicherung vorhanden ist, erscheint oberhalb des Editors ein Hinweis:
 

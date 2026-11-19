@@ -94,4 +94,23 @@ class FuneralFeatureTest extends TestCase
 
         $this->assertSame('Karl Otto', Funeral::first()->buried_name);
     }
+
+    /**
+     * Ensures autosaves update the record and return JSON to the editor.
+     */
+    public function test_funeral_autosave_returns_json_without_redirecting(): void
+    {
+        $funeral = Funeral::factory()->create();
+
+        $this->actingAs($this->user)
+            ->patchJson(route('funerals.update', ['modelId' => $funeral->id]), [
+                'buried_name' => 'Auto Gespeichert',
+                'service_id' => $funeral->service_id,
+                '_autosave' => true,
+            ])
+            ->assertOk()
+            ->assertExactJson(['saved' => true]);
+
+        $this->assertSame('Auto Gespeichert', $funeral->fresh()->buried_name);
+    }
 }

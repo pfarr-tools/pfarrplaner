@@ -28,6 +28,14 @@
 
 <template>
     <admin-layout :title="'Taufe von ' + baptism.candidate_name">
+        <template #after-flash>
+            <AutoSaveNotice
+                :draft-available="Boolean(autoSaveDraft && !autoSaveDraftHandled)"
+                :status="autoSaveStatus"
+                @restore="restoreAutoSaveDraft"
+                @discard="discardAutoSaveDraft"
+            />
+        </template>
         <template #navbar-left>
             <button
                 class="btn btn-primary"
@@ -343,6 +351,8 @@
 <script>
 import { useForm } from '@inertiajs/vue3'
 import __ from 'lodash'
+import AutoSaveNotice from '../../components/RiteEditors/AutoSaveNotice.vue'
+import { clearRiteDraft, getRiteDraft, saveRiteDraft } from '../../helpers/riteAutoSave'
 import TabHeaders from '../../components/Ui/tabs/tabHeaders'
 import TabHeader from '../../components/Ui/tabs/tabHeader'
 import FormGroup from '../../components/Ui/forms/FormGroup'
@@ -359,18 +369,34 @@ import FormBibleReferenceInput from '../../components/Ui/forms/FormBibleReferenc
 import FakeAttachment from '../../components/Ui/elements/FakeAttachment.vue'
 import FormDatePicker from '../../components/Ui/forms/FormDatePicker'
 
+/**
+ * Formats a date value for the baptism form.
+ * @param {*} value Date value.
+ * @returns {*} Formatted date value.
+ */
 function formatDateValue(value) {
     if (!value) return value
     if (typeof value === 'string' && moment(value, 'DD.MM.YYYY', true).isValid()) return value
     return moment(value).format('DD.MM.YYYY')
 }
 
+/**
+ * Formats a date and time value for the baptism form.
+ * @param {*} value Date and time value.
+ * @returns {*} Formatted date and time value.
+ */
 function formatDateTimeValue(value) {
     if (!value) return value
     if (typeof value === 'string' && moment(value, 'DD.MM.YYYY HH:mm', true).isValid()) return value
     return moment(value).format('DD.MM.YYYY HH:mm')
 }
 
+/**
+ * Prepares a baptism record for editing.
+ * @param {Object} baptism Baptism record.
+ * @param {string} currentUserName Current user's name.
+ * @returns {Object} Formatted baptism form data.
+ */
 function formatBaptismForForm(baptism, currentUserName) {
     const formData = __.cloneDeep(baptism)
     formData.attachments = formData.attachments || []
@@ -389,6 +415,7 @@ function formatBaptismForForm(baptism, currentUserName) {
 export default {
     name: 'BaptismEditor',
     components: {
+        AutoSaveNotice,
         FakeAttachment,
         FormBibleReferenceInput,
         FormDatePicker,
@@ -410,6 +437,7 @@ export default {
         const myBaptism = useForm(
             formatBaptismForForm(this.baptism, this.$page.props.currentUser.data.name),
         )
+        const autoSaveDraft = getRiteDraft('baptisms', this.baptism.id)
         return {
             myDatePickerConfig: {
                 locale: 'de',
@@ -437,9 +465,19 @@ export default {
             },
             activeTab: 'home',
             myBaptism: myBaptism,
+            autoSaveDraft,
+            autoSaveDraftHandled: !autoSaveDraft,
+            autoSaveTimer: null,
+            autoSavePending: false,
+            autoSaveQueued: false,
+            autoSaveStatus: '',
+            hasUnsavedChanges: false,
         }
     },
     computed: {
+        autoSaveSnapshot() {
+            return JSON.stringify(this.prepareBaptismForm())
+        },
         hasRegistrationForm() {
             var found = false
             this.myBaptism.attachments.forEach((attachment) => {
@@ -448,7 +486,100 @@ export default {
             return found
         },
     },
+    watch: {
+        autoSaveSnapshot(snapshot) {
+            this.queueAutoSave(snapshot)
+        },
+    },
+    mounted() {
+        window.addEventListener('online', this.retryAutoSave)
+    },
+    beforeUnmount() {
+        window.removeEventListener('online', this.retryAutoSave)
+        window.clearTimeout(this.autoSaveTimer)
+        if (this.hasUnsavedChanges) this.persistAutoSaveDraft(this.autoSaveSnapshot)
+    },
     methods: {
+        persistAutoSaveDraft(snapshot) {
+            const data = JSON.parse(snapshot)
+            saveRiteDraft('baptisms', this.myBaptism.id, data)
+            this.autoSaveDraft = { data, updatedAt: new Date().toISOString() }
+        },
+        queueAutoSave(snapshot) {
+            if (!this.autoSaveDraftHandled) return
+            this.hasUnsavedChanges = true
+            this.persistAutoSaveDraft(snapshot)
+            if (!window.navigator.onLine) {
+                this.autoSaveStatus =
+                    'Änderungen sind auf diesem Gerät gesichert und werden bei Verbindung synchronisiert.'
+                return
+            }
+            this.autoSaveStatus = 'Änderungen werden gespeichert …'
+            window.clearTimeout(this.autoSaveTimer)
+            this.autoSaveTimer = window.setTimeout(() => this.syncAutoSave(snapshot), 1000)
+        },
+        async syncAutoSave(snapshot) {
+            if (this.autoSavePending) {
+                this.autoSaveQueued = true
+                return
+            }
+            this.autoSavePending = true
+            try {
+                await window.axios.patch(
+                    window.route('baptisms.update', { modelId: this.myBaptism.id }),
+                    { ...JSON.parse(snapshot), _autosave: true },
+                    { timeout: 10000 },
+                )
+                if (clearRiteDraft('baptisms', this.myBaptism.id, snapshot)) {
+                    this.autoSaveDraft = null
+                    this.hasUnsavedChanges = false
+                    this.autoSaveStatus = 'Alle Änderungen gespeichert.'
+                }
+            } catch (error) {
+                this.autoSaveStatus =
+                    'Änderungen sind auf diesem Gerät gesichert; Synchronisierung fehlgeschlagen.'
+                if (!error.response && window.navigator.onLine) {
+                    this.autoSaveTimer = window.setTimeout(
+                        () => this.syncAutoSave(this.autoSaveSnapshot),
+                        5000,
+                    )
+                }
+            } finally {
+                this.autoSavePending = false
+                if (this.autoSaveQueued) {
+                    this.autoSaveQueued = false
+                    this.syncAutoSave(this.autoSaveSnapshot)
+                }
+            }
+        },
+        retryAutoSave() {
+            if (!this.autoSaveDraftHandled || !this.autoSaveDraft) return
+            this.syncAutoSave(JSON.stringify(this.autoSaveDraft.data))
+        },
+        restoreAutoSaveDraft() {
+            if (!this.autoSaveDraft) return
+            this.autoSaveDraftHandled = true
+            const restored = formatBaptismForForm(
+                { ...this.myBaptism.data(), ...this.autoSaveDraft.data },
+                this.$page.props.currentUser.data.name,
+            )
+            Object.keys(restored).forEach((key) => {
+                if (!['id', 'attachments'].includes(key)) this.myBaptism[key] = restored[key]
+            })
+            this.myBaptism.clearErrors()
+            this.autoSaveStatus = 'Entwurf wiederhergestellt.'
+        },
+        discardAutoSaveDraft() {
+            if (this.autoSaveDraft) {
+                clearRiteDraft(
+                    'baptisms',
+                    this.myBaptism.id,
+                    JSON.stringify(this.autoSaveDraft.data),
+                )
+            }
+            this.autoSaveDraft = null
+            this.autoSaveDraftHandled = true
+        },
         prepChecks() {
             return (
                 this.myBaptism.first_contact_with &&

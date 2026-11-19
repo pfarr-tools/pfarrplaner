@@ -28,6 +28,14 @@
 
 <template>
     <admin-layout :title="'Trauung von ' + spouseName(1) + ' &amp; ' + spouseName(2)">
+        <template #after-flash>
+            <AutoSaveNotice
+                :draft-available="Boolean(autoSaveDraft && !autoSaveDraftHandled)"
+                :status="autoSaveStatus"
+                @restore="restoreAutoSaveDraft"
+                @discard="discardAutoSaveDraft"
+            />
+        </template>
         <template #navbar-left>
             <button
                 class="btn btn-primary"
@@ -384,6 +392,8 @@
 <script>
 import { useForm } from '@inertiajs/vue3'
 import __ from 'lodash'
+import AutoSaveNotice from '../../components/RiteEditors/AutoSaveNotice.vue'
+import { clearRiteDraft, getRiteDraft, saveRiteDraft } from '../../helpers/riteAutoSave'
 import Tab from '../../components/Ui/tabs/tab'
 import Tabs from '../../components/Ui/tabs/tabs'
 import TabHeaders from '../../components/Ui/tabs/tabHeaders'
@@ -402,18 +412,33 @@ import FormBibleReferenceInput from '../../components/Ui/forms/FormBibleReferenc
 import FakeTable from '../../components/Ui/FakeTable'
 import Participants from '../../components/Calendar/Service/Participants'
 
+/**
+ * Formats a date value for the wedding form.
+ * @param {*} value Date value.
+ * @returns {*} Formatted date value.
+ */
 function formatDateValue(value) {
     if (!value) return value
     if (typeof value === 'string' && moment(value, 'DD.MM.YYYY', true).isValid()) return value
     return moment(value).format('DD.MM.YYYY')
 }
 
+/**
+ * Formats a date and time value for the wedding form.
+ * @param {*} value Date and time value.
+ * @returns {*} Formatted date and time value.
+ */
 function formatDateTimeValue(value) {
     if (!value) return value
     if (typeof value === 'string' && moment(value, 'DD.MM.YYYY HH:mm', true).isValid()) return value
     return moment(value).format('DD.MM.YYYY HH:mm')
 }
 
+/**
+ * Prepares a wedding record for editing.
+ * @param {Object} wedding Wedding record.
+ * @returns {Object} Formatted wedding form data.
+ */
 function formatWeddingForForm(wedding) {
     const formData = __.cloneDeep(wedding)
     formData.attachments = formData.attachments || []
@@ -439,6 +464,7 @@ function formatWeddingForForm(wedding) {
 export default {
     name: 'WeddingEditor',
     components: {
+        AutoSaveNotice,
         Participants,
         FakeTable,
         FormBibleReferenceInput,
@@ -458,6 +484,9 @@ export default {
         Tabs,
     },
     computed: {
+        autoSaveSnapshot() {
+            return JSON.stringify(this.prepareWeddingForm())
+        },
         hasRegistrationForm() {
             var found = false
             this.myWedding.attachments.forEach((attachment) => {
@@ -469,9 +498,17 @@ export default {
     props: ['wedding', 'tab', 'pronounSets'],
     data() {
         const myWedding = useForm(formatWeddingForForm(this.wedding))
+        const autoSaveDraft = getRiteDraft('weddings', this.wedding.id)
 
         return {
             myWedding: myWedding,
+            autoSaveDraft,
+            autoSaveDraftHandled: !autoSaveDraft,
+            autoSaveTimer: null,
+            autoSavePending: false,
+            autoSaveQueued: false,
+            autoSaveStatus: '',
+            hasUnsavedChanges: false,
             activeTab: this.tab || 'home',
             myDateTimePickerConfig: {
                 locale: 'de',
@@ -500,7 +537,104 @@ export default {
             ],
         }
     },
+    watch: {
+        autoSaveSnapshot(snapshot) {
+            this.queueAutoSave(snapshot)
+        },
+    },
+    mounted() {
+        window.addEventListener('online', this.retryAutoSave)
+    },
+    beforeUnmount() {
+        window.removeEventListener('online', this.retryAutoSave)
+        window.clearTimeout(this.autoSaveTimer)
+        if (this.hasUnsavedChanges) this.persistAutoSaveDraft(this.autoSaveSnapshot)
+    },
     methods: {
+        persistAutoSaveDraft(snapshot) {
+            const data = JSON.parse(snapshot)
+            saveRiteDraft('weddings', this.myWedding.id, data)
+            this.autoSaveDraft = { data, updatedAt: new Date().toISOString() }
+        },
+        queueAutoSave(snapshot) {
+            if (!this.autoSaveDraftHandled) return
+            this.hasUnsavedChanges = true
+            this.persistAutoSaveDraft(snapshot)
+            if (!window.navigator.onLine) {
+                this.autoSaveStatus =
+                    'Änderungen sind auf diesem Gerät gesichert und werden bei Verbindung synchronisiert.'
+                return
+            }
+            this.autoSaveStatus = 'Änderungen werden gespeichert …'
+            window.clearTimeout(this.autoSaveTimer)
+            this.autoSaveTimer = window.setTimeout(() => this.syncAutoSave(snapshot), 1000)
+        },
+        async syncAutoSave(snapshot) {
+            if (this.autoSavePending) {
+                this.autoSaveQueued = true
+                return
+            }
+            this.autoSavePending = true
+            try {
+                await window.axios.patch(
+                    window.route('weddings.update', this.myWedding.id),
+                    {
+                        ...JSON.parse(snapshot),
+                        _autosave: true,
+                    },
+                    { timeout: 10000 },
+                )
+                if (clearRiteDraft('weddings', this.myWedding.id, snapshot)) {
+                    this.autoSaveDraft = null
+                    this.hasUnsavedChanges = false
+                    this.autoSaveStatus = 'Alle Änderungen gespeichert.'
+                }
+            } catch (error) {
+                this.autoSaveStatus =
+                    'Änderungen sind auf diesem Gerät gesichert; Synchronisierung fehlgeschlagen.'
+                if (!error.response && window.navigator.onLine) {
+                    this.autoSaveTimer = window.setTimeout(
+                        () => this.syncAutoSave(this.autoSaveSnapshot),
+                        5000,
+                    )
+                }
+            } finally {
+                this.autoSavePending = false
+                if (this.autoSaveQueued) {
+                    this.autoSaveQueued = false
+                    this.syncAutoSave(this.autoSaveSnapshot)
+                }
+            }
+        },
+        retryAutoSave() {
+            if (!this.autoSaveDraftHandled || !this.autoSaveDraft) return
+            this.syncAutoSave(JSON.stringify(this.autoSaveDraft.data))
+        },
+        restoreAutoSaveDraft() {
+            if (!this.autoSaveDraft) return
+            this.autoSaveDraftHandled = true
+            const restored = formatWeddingForForm({
+                ...this.myWedding.data(),
+                ...this.autoSaveDraft.data,
+            })
+            Object.keys(restored).forEach((key) => {
+                if (!['id', 'attachments'].includes(key)) this.myWedding[key] = restored[key]
+            })
+            this.permissionState = restored.needs_permission || 0
+            this.myWedding.clearErrors()
+            this.autoSaveStatus = 'Entwurf wiederhergestellt.'
+        },
+        discardAutoSaveDraft() {
+            if (this.autoSaveDraft) {
+                clearRiteDraft(
+                    'weddings',
+                    this.myWedding.id,
+                    JSON.stringify(this.autoSaveDraft.data),
+                )
+            }
+            this.autoSaveDraft = null
+            this.autoSaveDraftHandled = true
+        },
         prepChecks() {
             return (
                 this.myWedding.appointment &&

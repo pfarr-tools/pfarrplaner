@@ -78,10 +78,30 @@
                     >
                         Datenpaket auf Festplatte sichern
                     </button>
+                    <button
+                        type="button"
+                        class="dropdown-item"
+                        @click.prevent.stop="$refs.funeralImport.click()"
+                    >
+                        Datenpaket aus Datei wiederherstellen
+                    </button>
                 </div>
             </div>
+            <input
+                ref="funeralImport"
+                class="d-none"
+                type="file"
+                accept="application/json,.json"
+                @change="importFromJson"
+            />
         </template>
         <template #after-flash>
+            <AutoSaveNotice
+                :draft-available="Boolean(autoSaveDraft && !autoSaveDraftHandled)"
+                :status="autoSaveStatus"
+                @restore="restoreAutoSaveDraft"
+                @discard="discardAutoSaveDraft"
+            />
             <div
                 v-if="inLocalStorage"
                 class="alert alert-info"
@@ -814,6 +834,8 @@
 <script>
 import { useForm } from '@inertiajs/vue3'
 import { markRaw } from 'vue'
+import AutoSaveNotice from '../../components/RiteEditors/AutoSaveNotice.vue'
+import { clearRiteDraft, getRiteDraft, saveRiteDraft } from '../../helpers/riteAutoSave'
 import { Editor, EditorContent } from '@tiptap/vue-3'
 import StarterKit from '@tiptap/starter-kit'
 import Underline from '@tiptap/extension-underline'
@@ -845,18 +867,33 @@ import Accordion from '../../components/Ui/accordion/Accordion'
 import AccordionElement from '../../components/Ui/accordion/AccordionElement'
 import QuillDropdown from '../../components/LiturgyEditor/Editors/Quill/QuillDropdown.vue'
 
+/**
+ * Formats a date value for the funeral form.
+ * @param {*} value Date value.
+ * @returns {*} Formatted date value.
+ */
 function formatDateValue(value) {
     if (!value) return value
     if (typeof value === 'string' && moment(value, 'DD.MM.YYYY', true).isValid()) return value
     return moment(value).format('DD.MM.YYYY')
 }
 
+/**
+ * Formats a date and time value for the funeral form.
+ * @param {*} value Date and time value.
+ * @returns {*} Formatted date and time value.
+ */
 function formatDateTimeValue(value) {
     if (!value) return value
     if (typeof value === 'string' && moment(value, 'DD.MM.YYYY HH:mm', true).isValid()) return value
     return moment(value).format('DD.MM.YYYY HH:mm')
 }
 
+/**
+ * Prepares a funeral record for editing.
+ * @param {Object} funeral Funeral record.
+ * @returns {Object} Formatted funeral form data.
+ */
 function formatFuneralForForm(funeral) {
     const formData = __.cloneDeep(funeral)
 
@@ -911,9 +948,13 @@ export default {
         Tabs,
         Tab,
         QuillDropdown,
+        AutoSaveNotice,
     },
     props: ['funeral', 'pronounSets', 'activeTab'],
     computed: {
+        autoSaveSnapshot() {
+            return JSON.stringify(this.prepareFuneralForm())
+        },
         pronounSetOptions() {
             return this.pronounSets.reduce((result, pronounSet) => {
                 result[pronounSet.key] = pronounSet.label
@@ -967,12 +1008,19 @@ export default {
     mounted() {
         this.refreshKey++
         this.$forceUpdate()
+        window.addEventListener('online', this.retryAutoSave)
+    },
+    watch: {
+        autoSaveSnapshot(snapshot) {
+            this.queueAutoSave(snapshot)
+        },
     },
     data() {
         const myFuneral = useForm(formatFuneralForForm(this.funeral))
 
         let ls = this.getLocalStorage()
         let inLocalStorage = undefined !== ls.funerals[this.funeral.id]
+        const autoSaveDraft = getRiteDraft('funerals', this.funeral.id)
 
         return {
             funeralDataset: {
@@ -1017,12 +1065,123 @@ export default {
                 }),
             ),
             inLocalStorage,
+            autoSaveDraft,
+            autoSaveDraftHandled: !autoSaveDraft,
+            autoSaveTimer: null,
+            autoSavePending: false,
+            autoSaveQueued: false,
+            autoSaveStatus: '',
+            hasUnsavedChanges: false,
         }
     },
     beforeUnmount() {
         this.editorText.destroy()
+        window.removeEventListener('online', this.retryAutoSave)
+        window.clearTimeout(this.autoSaveTimer)
+        if (this.hasUnsavedChanges) this.persistAutoSaveDraft(this.autoSaveSnapshot)
     },
     methods: {
+        persistAutoSaveDraft(snapshot) {
+            const data = JSON.parse(snapshot)
+            saveRiteDraft('funerals', this.myFuneral.id, data)
+            this.autoSaveDraft = { data, updatedAt: new Date().toISOString() }
+        },
+        queueAutoSave(snapshot) {
+            if (!this.autoSaveDraftHandled) return
+            this.hasUnsavedChanges = true
+            this.persistAutoSaveDraft(snapshot)
+            if (!window.navigator.onLine) {
+                this.autoSaveStatus =
+                    'Änderungen sind auf diesem Gerät gesichert und werden bei Verbindung synchronisiert.'
+                return
+            }
+            this.autoSaveStatus = 'Änderungen werden gespeichert …'
+            window.clearTimeout(this.autoSaveTimer)
+            this.autoSaveTimer = window.setTimeout(() => this.syncAutoSave(snapshot), 1000)
+        },
+        async syncAutoSave(snapshot) {
+            if (this.autoSavePending) {
+                this.autoSaveQueued = true
+                return
+            }
+            this.autoSavePending = true
+            try {
+                await window.axios.patch(
+                    window.route('funerals.update', { modelId: this.myFuneral.id }),
+                    { ...JSON.parse(snapshot), _autosave: true },
+                    { timeout: 10000 },
+                )
+                if (clearRiteDraft('funerals', this.myFuneral.id, snapshot)) {
+                    this.autoSaveDraft = null
+                    this.hasUnsavedChanges = false
+                    this.autoSaveStatus = 'Alle Änderungen gespeichert.'
+                }
+            } catch (error) {
+                this.autoSaveStatus =
+                    'Änderungen sind auf diesem Gerät gesichert; Synchronisierung fehlgeschlagen.'
+                if (!error.response && window.navigator.onLine) {
+                    this.autoSaveTimer = window.setTimeout(
+                        () => this.syncAutoSave(this.autoSaveSnapshot),
+                        5000,
+                    )
+                }
+            } finally {
+                this.autoSavePending = false
+                if (this.autoSaveQueued) {
+                    this.autoSaveQueued = false
+                    this.syncAutoSave(this.autoSaveSnapshot)
+                }
+            }
+        },
+        retryAutoSave() {
+            if (!this.autoSaveDraftHandled || !this.autoSaveDraft) return
+            this.syncAutoSave(JSON.stringify(this.autoSaveDraft.data))
+        },
+        restoreAutoSaveDraft() {
+            if (!this.autoSaveDraft) return
+            this.autoSaveDraftHandled = true
+            this.applyFormData(this.autoSaveDraft.data)
+            this.autoSaveStatus = 'Entwurf wiederhergestellt.'
+        },
+        discardAutoSaveDraft() {
+            if (this.autoSaveDraft) {
+                clearRiteDraft(
+                    'funerals',
+                    this.myFuneral.id,
+                    JSON.stringify(this.autoSaveDraft.data),
+                )
+            }
+            this.autoSaveDraft = null
+            this.autoSaveDraftHandled = true
+        },
+        async importFromJson(event) {
+            const file = event.target.files?.[0]
+            event.target.value = ''
+            if (!file) return
+            try {
+                const imported = JSON.parse(await file.text())
+                if (!imported || Array.isArray(imported) || typeof imported !== 'object') {
+                    throw new Error('Ungültiges Datenpaket')
+                }
+                if (imported.id && Number(imported.id) !== Number(this.myFuneral.id)) {
+                    throw new Error('Das Datenpaket gehört zu einer anderen Beerdigung.')
+                }
+                if (!window.confirm('Soll das Datenpaket die aktuellen Eingaben ersetzen?')) return
+                const allowed = Object.keys(this.myFuneral.data()).filter(
+                    (key) => !['id', 'attachments'].includes(key),
+                )
+                const safeData = Object.fromEntries(
+                    allowed
+                        .filter((key) => Object.prototype.hasOwnProperty.call(imported, key))
+                        .map((key) => [key, imported[key]]),
+                )
+                this.applyFormData(safeData)
+                this.autoSaveDraftHandled = true
+                this.autoSaveStatus = 'Datenpaket importiert.'
+            } catch (error) {
+                window.alert(`Die Datei konnte nicht wiederhergestellt werden: ${error.message}`)
+            }
+        },
         copyAddress() {
             this.myFuneral.relative_address = this.myFuneral.buried_address
             this.myFuneral.relative_zip = this.myFuneral.buried_zip
@@ -1136,13 +1295,13 @@ export default {
                 return prefix + 'ca. ' + String(date.diff(startDate, 'months')) + ' Monate' + suffix
             return prefix + String(date.diff(startDate, 'years')) + ' Jahre' + suffix
         },
-        downloadAsJson(exportObj, exportName) {
+        downloadAsJson() {
             var dataStr =
                 'data:text/json;charset=utf-8,' +
                 encodeURIComponent(JSON.stringify(this.myFuneral.data()))
             var downloadAnchorNode = document.createElement('a')
             downloadAnchorNode.setAttribute('href', dataStr)
-            downloadAnchorNode.setAttribute('download', exportName + '.json')
+            downloadAnchorNode.setAttribute('download', `beerdigung-${this.myFuneral.id}.json`)
             document.body.appendChild(downloadAnchorNode) // required for firefox
             downloadAnchorNode.click()
             downloadAnchorNode.remove()
