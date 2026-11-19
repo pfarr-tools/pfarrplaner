@@ -42,6 +42,8 @@ RUN printf '%s\n' \
   'mkdir -p /var/www/html/storage/logs /var/www/html/storage/framework/cache /var/www/html/storage/framework/sessions /var/www/html/storage/framework/views /var/www/html/bootstrap/cache /var/backups/pfarrplaner' \
   'chown -R www-data:www-data /var/www/html/storage/framework /var/www/html/storage/logs /var/www/html/bootstrap/cache' \
   'chmod -R a+rwX /var/www/html/storage /var/www/html/bootstrap/cache /var/backups/pfarrplaner' \
+  'touch /var/www/html/storage/logs/query.log' \
+  'chmod 666 /var/www/html/storage/logs/query.log' \
   '(cd /var/www/html && php artisan config:clear >/dev/null 2>&1 || true)' \
   '(cd /var/www/html && php artisan permission:cache-reset >/dev/null 2>&1)' \
   'exec "$@"' \

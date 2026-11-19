@@ -63,11 +63,16 @@ class QueryLogService
     }
 
     /**
-     * Put a query into the query log
+     * Append an encrypted query and restore cross-container write permissions.
+     *
+     * @param  string  $query  SQL query to record.
+     * @return void
      */
     public static function put($query)
     {
-        File::append(self::file(), time().'|||||||'.Crypt::encryptString($query).self::SEPARATOR);
+        $file = self::file();
+        File::append($file, time().'|||||||'.Crypt::encryptString($query).self::SEPARATOR);
+        @chmod($file, 0666);
     }
 
     /**
@@ -133,12 +138,16 @@ class QueryLogService
     }
 
     /**
-     * Clear the query log
+     * Clear the query log and restore cross-container write permissions.
+     *
+     * @return void
      */
     public static function clear()
     {
-        File::delete(self::file());
-        File::append(self::file(), '');
+        $file = self::file();
+        File::delete($file);
+        File::append($file, '');
+        @chmod($file, 0666);
     }
 
     /**

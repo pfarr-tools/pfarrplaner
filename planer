@@ -6,6 +6,10 @@ cd "$ROOT"
 source "$ROOT/scripts/quality-files.sh"
 
 compose() { docker compose -f "$ROOT/compose.yaml" "$@"; }
+repair_dev_query_log_permissions() {
+  compose exec -T -u 0 app sh -c \
+    'if [ -e storage/logs/query.log ]; then chmod 666 storage/logs/query.log; fi'
+}
 production_compose() {
   local args=( -f "$ROOT/compose.production.yaml" )
   if [[ "${MAIL_POSTFIX_ENABLED:-}" == true ]] || grep -q '^MAIL_POSTFIX_ENABLED=true$' "$ROOT/.env" 2>/dev/null; then
@@ -75,6 +79,14 @@ EOF
           exit 2
         fi
       done
+      for ((exec_arg_index = 0; exec_arg_index < ${#exec_args[@]} - 2; exec_arg_index++)); do
+        if [[ "${exec_args[exec_arg_index]}" == app \
+          && "${exec_args[exec_arg_index + 1]}" == php \
+          && "${exec_args[exec_arg_index + 2]}" == artisan ]]; then
+          compose exec --user www-data "${exec_args[@]}"
+          return
+        fi
+      done
       compose exec "${exec_args[@]}"
       ;;
     shell) compose exec app bash "$@" ;;
@@ -101,6 +113,7 @@ EOF
       ;;
     test)
       local test_status=0
+      repair_dev_query_log_permissions
       compose exec \
         --user www-data \
         -e APP_ENV=testing \
@@ -108,8 +121,7 @@ EOF
         -e DB_DATABASE=:memory: \
         -e APP_KEY='base64:MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTI=' \
         app php artisan test "$@" || test_status=$?
-      compose exec -T -u 0 app sh -c \
-        'if [ -e storage/logs/query.log ]; then chmod 666 storage/logs/query.log; fi'
+      repair_dev_query_log_permissions
       return "$test_status"
       ;;
     composer) compose exec --user www-data app composer "$@" ;;
@@ -178,9 +190,21 @@ run_production() {
     restart) production_compose restart "$@" ;;
     status|ps) production_compose ps "$@" ;;
     logs) production_compose logs -f "$@" ;;
-    exec) production_compose exec "$@" ;;
+    exec)
+      local exec_args=("$@")
+      local exec_arg_index
+      for ((exec_arg_index = 0; exec_arg_index < ${#exec_args[@]} - 2; exec_arg_index++)); do
+        if [[ "${exec_args[exec_arg_index]}" == app \
+          && "${exec_args[exec_arg_index + 1]}" == php \
+          && "${exec_args[exec_arg_index + 2]}" == artisan ]]; then
+          production_compose exec --user www-data "${exec_args[@]}"
+          return
+        fi
+      done
+      production_compose exec "${exec_args[@]}"
+      ;;
     shell) production_compose exec app bash "$@" ;;
-    artisan) production_compose exec -e XDG_CONFIG_HOME=/tmp/config app php artisan "$@" ;;
+    artisan) production_compose exec --user www-data -e XDG_CONFIG_HOME=/tmp/config app php artisan "$@" ;;
     data) PLANER_PRODUCTION=1 exec "$ROOT/scripts/data-sync.sh" "$@" ;;
     backup) PLANER_PRODUCTION=1 exec "$ROOT/scripts/backup.sh" "${1:-help}" "${@:2}" ;;
     release) exec "$ROOT/scripts/release.sh" "$@" ;;
