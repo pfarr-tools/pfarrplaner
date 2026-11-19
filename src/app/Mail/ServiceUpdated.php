@@ -32,6 +32,7 @@ namespace App\Mail;
 
 use App\Models\People\User;
 use App\Models\Service;
+use App\Services\ServiceChangeFormatter;
 
 /**
  * Class ServiceUpdated
@@ -57,7 +58,7 @@ class ServiceUpdated extends AbstractServiceMailable
         $participants = [];
         if (isset($this->changed['participants'])) {
             foreach (['original', 'changed'] as $type) {
-                foreach ($this->changed['participants'][$type] as $participant) {
+                foreach ($this->changed['participants'][$type] ?? [] as $participant) {
                     $category = $participant['pivot']['category'];
                     switch ($category) {
                         case 'P':
@@ -84,6 +85,8 @@ class ServiceUpdated extends AbstractServiceMailable
             }
         }
 
+        $displayChanges = ServiceChangeFormatter::format($this->service, $this->changed);
+
         $ics = view(
             'ical/ical',
             ['services' => [$this->service], 'token' => null, 'action' => null, 'key' => null]
@@ -99,7 +102,7 @@ class ServiceUpdated extends AbstractServiceMailable
             ->view('mail.notifications.service-update')->with(
                 [
                     'service' => $this->service,
-                    'changes' => $this->changed,
+                    'displayChanges' => $displayChanges,
                     'participants' => $participants,
                     'user' => $this->user,
                     'originatingUser' => $this->originatingUser,

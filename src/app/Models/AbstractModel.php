@@ -30,6 +30,7 @@
 
 namespace App\Models;
 
+use App\Traits\HasAttributeLabels;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -38,8 +39,12 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Pluralizer;
 use Illuminate\Support\Str;
 
+/**
+ * Base model for application models with shared administrative behavior.
+ */
 class AbstractModel extends Model
 {
+    use HasAttributeLabels;
     use HasFactory;
 
     public static array $exceptRoutes = [];

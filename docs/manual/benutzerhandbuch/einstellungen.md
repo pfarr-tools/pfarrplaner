@@ -84,7 +84,7 @@ Sie können mehrere Passkeys für Ihre Geräte einrichten, vorhandene umbenennen
 Hier legen Sie fest, welche Nachrichten Pfarrplaner Ihnen per E-Mail schicken darf. Je nach Installation sehen Sie verschiedene Optionen.
 
 - **Dienstanfragen**: Benachrichtigung, wenn Sie für einen Gottesdienst oder Dienst angefragt werden.
-- **Änderungen an Gottesdiensten**: Hinweis, wenn sich ein für Sie wichtiger Eintrag ändert.
+- **Änderungen an Gottesdiensten**: E-Mail mit den geänderten Angaben, wenn sich ein für Sie wichtiger Eintrag ändert. Die Angaben werden nach Feld benannt; verschachtelte Werte erscheinen einzeln.
 - **Kommentare oder Rückfragen**: E-Mail, wenn jemand Sie in einer internen Abstimmung informiert.
 - **Zusammenfassungen**: Regelmäßige Übersichten, falls diese Funktion eingerichtet ist.
 

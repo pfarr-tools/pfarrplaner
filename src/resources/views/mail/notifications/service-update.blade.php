@@ -38,48 +38,13 @@
                 @endcomponent
             @endslot
 
-            @foreach ([
-                    'dateText' => 'Datum',
-                    'timeText' => 'Uhrzeit',
-                    'locationText' => 'Ort',
-                    'descriptionText' => 'Beschreibung',
-                    'internal_remarks' => 'Interne Anmerkungen',
-                ] as $attribute => $title)
-                @if (isset($changes[$attribute]))
-                    @include('mail.notifications.service.changed-attribute', [
-                        'title' => $title,
-                        'old' => $changes[$attribute]['original'],
-                        'new' => $changes[$attribute]['changed'],
-                    ])
-                @endif
+            @foreach ($displayChanges as $change)
+                @include('mail.notifications.service.changed-attribute', [
+                    'title' => $change['label'],
+                    'old' => $change['original'],
+                    'new' => $change['changed'],
+                ])
             @endforeach
-
-            @if (isset($changes['hidden']))
-                @include('mail.notifications.service.changed-attribute', [
-                    'title' => 'In öffentlichen Listen verbergen',
-                    'key' => 'hidden',
-                    'old' => $changes['hidden']['original'] ? '✔' : '✘',
-                    'new' => $changes['hidden']['changed'] ? '✔' : '✘',
-                ])
-            @endif
-
-            @if (isset($changes['city_id']))
-                @include('mail.notifications.service.changed-attribute', [
-                    'title' => 'Kirchengemeinde',
-                    'key' => 'city_id',
-                    'old' => \App\Models\Places\City::find($changes['city_id']['original'])->name,
-                    'new' => $service->city->name,
-                ])
-            @endif
-
-            @if (isset($changes['need_predicant']))
-                @include('mail.notifications.service.changed-attribute', [
-                    'title' => config('label.predicant') . ' benötigt',
-                    'key' => 'need_predicant',
-                    'old' => $changes['need_predicant']['original'] ? '✔' : '✘',
-                    'new' => $changes['need_predicant']['changed'] ? '✔' : '✘',
-                ])
-            @endif
 
             @foreach ($participants as $category => $categoryParticipants)
                 @include('mail.notifications.service.changed-ministries', [
@@ -87,126 +52,6 @@
                     'ministry' => $categoryParticipants,
                 ])
             @endforeach
-
-            @if (isset($changes['baptism']))
-                @include('mail.notifications.service.changed-attribute', [
-                    'title' => 'Taufgottesdienst',
-                    'key' => 'baptism',
-                    'old' => $changes['baptism']['original'] ? '✔' : '✘',
-                    'new' => $changes['baptism']['changed'] ? '✔' : '✘',
-                ])
-            @endif
-
-            @if (isset($changes['eucharist']))
-                @include('mail.notifications.service.changed-attribute', [
-                    'title' => 'Abendmahlsgottesdienst',
-                    'key' => 'eucharist',
-                    'old' => $changes['eucharist']['original'] ? '✔' : '✘',
-                    'new' => $changes['eucharist']['changed'] ? '✔' : '✘',
-                ])
-            @endif
-
-
-            @foreach ([
-                    'offerings_counter1' => 'Opferzähler 1',
-                    'offerings_counter2' => 'Opferzähler 2',
-                    'offering_goal' => 'Opferzweck',
-                    'offering_description' => 'Beschreibung zum Opfer',
-                    'offering_type' => 'Opfertyp',
-                    'offering_type' => 'Opfertyp',
-                    'offering_amount' => 'Opfersumme',
-                ] as $attribute => $title)
-                @if (isset($changes[$attribute]))
-                    @include('mail.notifications.service.changed-attribute', [
-                        'title' => $title,
-                        'old' => $changes[$attribute]['original'],
-                        'new' => $changes[$attribute]['changed'],
-                    ])
-                @endif
-            @endforeach
-
-            @if (isset($changes['cc']))
-                @include('mail.notifications.service.changed-attribute', [
-                    'title' => 'Kinderkirche',
-                    'key' => 'cc',
-                    'old' => $changes['cc']['original'] ? '✔' : '✘',
-                    'new' => $changes['cc']['changed'] ? '✔' : '✘',
-                ])
-            @endif
-
-            @foreach ([
-                    'cc_alt_time' => 'Uhrzeit der Kinderkirche',
-                    'cc_location' => 'Ort der Kinderkirche',
-                    'cc_lession' => 'Lektion für die Kinderkirche',
-                    'cc_staff' => 'Mitarbeiter in der Kinderkirche',
-                    'youtube_url' => 'Streaming-URL (youtube)',
-                    'cc_streaming_url' => 'URL für das Streaming der Kinderkirche',
-                    'offerings_url' => 'URL für Onlinespenden',
-                    'meeting_url' => 'URL für ein "virtuelles Kirchencafé"',
-                    'recording_url' => 'URL zur Audioaufzeichnung',
-                    'songsheet' => 'URL zum Liedblatt',
-                    'external_url' => 'Externe Seite zum Gottesdienst',
-                    'youtube_prefix_description' => 'Einleitender Text zur Beschreibung auf YouTube',
-                    'youtube_postfix_description' => 'Ergänzender Text zur Beschreibung auf YouTube',
-                    'sermon_title' => 'Titel der Predigt',
-                    'sermon_reference' => 'Predigttext',
-                    'sermon_image' => 'Titelbild der Predigt',
-                    'sermon_description' => 'Beschreibungstext zur Predigt',
-                ] as $attribute => $title)
-                @if (isset($changes[$attribute]))
-                    @include('mail.notifications.service.changed-attribute', [
-                        'title' => $title,
-                        'key' => $attribute,
-                        'old' => $changes[$attribute]['original'],
-                        'new' => $changes[$attribute]['changed'],
-                    ])
-                @endif
-            @endforeach
-
-            @if (isset($changes['needs_reservations']))
-                @include('mail.notifications.service.changed-attribute', [
-                    'title' => 'Anmeldung benötigt',
-                    'key' => 'needs_reservations',
-                    'old' => $changes['needs_reservations']['original'] ? '✔' : '✘',
-                    'new' => $changes['needs_reservations']['changed'] ? '✔' : '✘',
-                ])
-            @endif
-
-            @if (isset($changes['registration_active']))
-                @include('mail.notifications.service.changed-attribute', [
-                    'title' => 'Online-Anmeldung aktiv',
-                    'key' => 'registration_active',
-                    'old' => $changes['registration_active']['original'] ? '✔' : '✘',
-                    'new' => $changes['registration_active']['changed'] ? '✔' : '✘',
-                ])
-            @endif
-
-            @if (isset($changes['exclude_sections']))
-                @include('mail.notifications.service.changed-attribute', [
-                    'title' => 'Sitzplätze in folgenden Zonen nicht belegen',
-                    'key' => 'exclude_sections',
-                    'old' => $changes['exclude_sections']['original'],
-                    'new' => $changes['exclude_sections']['changed'],
-                ])
-            @endif
-
-            @if (isset($changes['exclude_places']))
-                @include('mail.notifications.service.changed-attribute', [
-                    'title' => 'Folgende Sitzplätze nicht belegen',
-                    'key' => 'exclude_places',
-                    'old' => $changes['exclude_places']['original'],
-                    'new' => $changes['exclude_places']['changed'],
-                ])
-            @endif
-
-            @if (isset($changes['registration_phone']))
-                @include('mail.notifications.service.changed-attribute', [
-                    'title' => 'Nummer für telefonische Anmeldung',
-                    'key' => 'registration_phone',
-                    'old' => $changes['registration_phone']['original'],
-                    'new' => $changes['registration_phone']['changed'],
-                ])
-            @endif
         @endcomponent
     @endcomponent
 

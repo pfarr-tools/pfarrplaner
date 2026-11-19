@@ -54,6 +54,7 @@ use App\Services\LiturgyService;
 use App\Services\NameService;
 use App\Tools\StringTool;
 use App\Traits\HasAttachmentsTrait;
+use App\Traits\HasAttributeLabels;
 use App\Traits\HasCommentsTrait;
 use App\Traits\HasLiturgicalInfo;
 use App\Traits\IncludesPermissionAttributes;
@@ -83,6 +84,7 @@ use Throwable;
 class Service extends Model implements HasDAVCalendarItems
 {
     use HasAttachmentsTrait;
+    use HasAttributeLabels;
     use HasCommentsTrait;
     use HasFactory;
     use HasLiturgicalInfo;
@@ -234,9 +236,15 @@ class Service extends Model implements HasDAVCalendarItems
     /**
      * @var string[]
      */
-    protected $appendsToTracking = [
-        'ministriesByCategory',
-    ];
+    protected $appendsToTracking = ['dateText', 'timeText', 'locationText'];
+
+    /** @var string[] */
+    protected $attributesToSkipTracking = ['date', 'time', 'location_id', 'special_location', 'slug'];
+
+    /**
+     * @var string[]
+     */
+    protected $relationsToTrack = ['participants'];
 
     /**
      * @var string[]

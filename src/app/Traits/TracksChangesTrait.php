@@ -30,6 +30,10 @@
 
 namespace App\Traits;
 
+use DateTimeInterface;
+use Illuminate\Contracts\Support\Arrayable;
+use JsonSerializable;
+
 /**
  * Trait TracksChangesTrait
  */
@@ -57,38 +61,92 @@ trait TracksChangesTrait
     }
 
     /**
-     * @return mixed
+     * Creates a normalized snapshot of tracked model attributes.
+     *
+     * @return array<string, mixed> Snapshot indexed by attribute path.
      */
-    public function createSnapshot()
+    public function createSnapshot(): array
     {
-        $snapshot = $this->removeTimestamps(json_decode(json_encode($this), true));
+        $snapshot = [];
+        $excludedAttributes = ['id', 'created_at', 'updated_at', 'deleted_at'];
+        if (property_exists($this, 'attributesToSkipTracking') && is_array($this->attributesToSkipTracking)) {
+            $excludedAttributes = array_merge($excludedAttributes, $this->attributesToSkipTracking);
+        }
+
+        foreach ($this->getAttributes() as $attribute => $value) {
+            if (in_array($attribute, $excludedAttributes, true)) {
+                continue;
+            }
+            $snapshot[$attribute] = $this->normalizeSnapshotValue($this->getAttributeValue($attribute));
+        }
+
         if (property_exists($this, 'appendsToTracking') && is_array($this->appendsToTracking)) {
             foreach ($this->appendsToTracking as $attribute) {
-                if (! isset($snapshot[$attribute])) {
-                    $snapshot[$attribute] = $this->$attribute;
-                }
+                $snapshot[$attribute] = $this->normalizeSnapshotValue($this->$attribute);
             }
         }
 
-        return $snapshot;
+        if (property_exists($this, 'relationsToTrack') && is_array($this->relationsToTrack)) {
+            foreach ($this->relationsToTrack as $relation) {
+                $snapshot[$relation] = $this->normalizeSnapshotValue($this->$relation);
+            }
+        }
+
+        return $this->normalizeSnapshotValue($snapshot);
     }
 
     /**
-     * @return mixed
+     * Normalizes values so snapshots compare independently of key and relation order.
+     *
+     * @param  mixed  $value  Snapshot value.
+     * @return mixed Normalized value.
      */
-    protected function removeTimestamps($array)
+    protected function normalizeSnapshotValue(mixed $value): mixed
     {
-        foreach ($array as $key => $value) {
-            if (is_array($value)) {
-                $array[$key] = $this->removeTimestamps($value);
-            } elseif ($key == 'updated_at') {
-                unset($array[$key]);
-            } elseif ($key == 'created_at') {
-                unset($array[$key]);
+        if ($value instanceof DateTimeInterface) {
+            return $value->format('Y-m-d\TH:i:s.uP');
+        }
+        if ($value instanceof Arrayable) {
+            $value = $value->toArray();
+        } elseif ($value instanceof JsonSerializable) {
+            $value = $value->jsonSerialize();
+        }
+
+        if (is_array($value)) {
+            foreach ($value as $key => $nestedValue) {
+                if (in_array($key, ['created_at', 'updated_at'], true)) {
+                    unset($value[$key]);
+
+                    continue;
+                }
+                $value[$key] = $this->normalizeSnapshotValue($nestedValue);
+            }
+
+            if (array_is_list($value) && $value !== [] && $this->containsIdentifiableRecords($value)) {
+                usort($value, fn (array $left, array $right): int => $left['id'] <=> $right['id']);
+            } else {
+                ksort($value, SORT_STRING);
             }
         }
 
-        return $array;
+        return $value;
+    }
+
+    /**
+     * Determines whether a list contains records that can be sorted by their stable IDs.
+     *
+     * @param  array<int, mixed>  $values  List to inspect.
+     * @return bool Whether all values have an ID.
+     */
+    protected function containsIdentifiableRecords(array $values): bool
+    {
+        foreach ($values as $value) {
+            if (! is_array($value) || ! array_key_exists('id', $value)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -98,12 +156,15 @@ trait TracksChangesTrait
     {
         $snapshot = $this->createSnapshot();
         $original = $this->dataBeforeChanges;
-        unset($original['updated_at']);
-        unset($snapshot['updated_at']);
 
-        return json_encode($snapshot) != json_encode($original);
+        return $snapshot !== $original;
     }
 
+    /**
+     * Stores the current diff after a model has been saved.
+     *
+     * @return void
+     */
     public function storeDiff()
     {
         $this->changed = $this->diff();
@@ -111,37 +172,61 @@ trait TracksChangesTrait
 
     /**
      * Return all changed attributes and relations
-     *
-     * @return array
      */
-    public function diff()
+    public function diff(): array
     {
         $this->refresh();
 
         $diff = [];
-        $snapshot = $this->createSnapshot();
-        $original = $this->dataBeforeChanges;
-
-        // set previously unset keys
-        foreach ($snapshot as $key => $value) {
-            if (! isset($original[$key])) {
-                $original[$key] = '';
-            }
-        }
-
-        foreach ($original as $key => $value) {
-            // reset unset keys
-            if (! isset($snapshot[$key])) {
-                $snapshot[$key] = '';
-            }
-            if (print_r($value, 1) != print_r($snapshot[$key], 1)) {
-                $diff[$key] = [
-                    'original' => $original[$key],
-                    'changed' => $snapshot[$key],
-                ];
-            }
-        }
+        $this->collectChanges($this->dataBeforeChanges, $this->createSnapshot(), '', $diff);
 
         return $diff;
+    }
+
+    /**
+     * Recursively records changed scalar values under stable dot-separated paths.
+     *
+     * @param  mixed  $original  Value before the update.
+     * @param  mixed  $changed  Value after the update.
+     * @param  string  $path  Current field path.
+     * @param  array<string, array{original: mixed, changed: mixed}>  $diff  Collected changes.
+     */
+    protected function collectChanges(mixed $original, mixed $changed, string $path, array &$diff): void
+    {
+        if ($original === $changed) {
+            return;
+        }
+
+        if ($this->isAssociativeArray($original) || $this->isAssociativeArray($changed)) {
+            $originalValues = is_array($original) ? $original : [];
+            $changedValues = is_array($changed) ? $changed : [];
+            $keys = array_unique(array_merge(array_keys($originalValues), array_keys($changedValues)));
+            sort($keys, SORT_STRING);
+
+            foreach ($keys as $key) {
+                $childPath = $path === '' ? (string) $key : $path.'.'.$key;
+                $this->collectChanges(
+                    $originalValues[$key] ?? null,
+                    $changedValues[$key] ?? null,
+                    $childPath,
+                    $diff,
+                );
+            }
+
+            return;
+        }
+
+        $diff[$path] = ['original' => $original, 'changed' => $changed];
+    }
+
+    /**
+     * Checks if a non-list array should be traversed as a nested field map.
+     *
+     * @param  mixed  $value  Value to inspect.
+     * @return bool Whether the value is an associative array.
+     */
+    protected function isAssociativeArray(mixed $value): bool
+    {
+        return is_array($value) && $value !== [] && ! array_is_list($value);
     }
 }
