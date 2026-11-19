@@ -21,6 +21,9 @@ use Illuminate\Support\Env;
 use Symfony\Component\Process\Exception\ProcessSignaledException;
 use Symfony\Component\Process\Process;
 
+/**
+ * Run the isolated PHP, JavaScript, and browser test suites.
+ */
 class TestCommand extends Command
 {
     protected $signature = 'test
@@ -41,12 +44,22 @@ class TestCommand extends Command
 
     protected $description = 'Run the application tests (PHPUnit, JavaScript, and browser)';
 
+    /**
+     * Configure the custom test runner to allow additional PHPUnit options.
+     *
+     * @return void
+     */
     public function __construct()
     {
         parent::__construct();
         $this->ignoreValidationErrors();
     }
 
+    /**
+     * Run the requested test suites and preserve the highest failure status.
+     *
+     * @return int Process exit status.
+     */
     public function handle(): int
     {
         $exitCode = 0;
@@ -118,6 +131,11 @@ class TestCommand extends Command
         );
     }
 
+    /**
+     * Run PHPUnit with the configured options, including an optional test filter.
+     *
+     * @return int PHPUnit process exit status.
+     */
     protected function runPhpUnit(): int
     {
         $this->newLine();
@@ -160,6 +178,11 @@ class TestCommand extends Command
         }
     }
 
+    /**
+     * Run the JavaScript test suite.
+     *
+     * @return int Vitest process exit status.
+     */
     protected function runVitest(): int
     {
         $this->newLine();
@@ -188,6 +211,11 @@ class TestCommand extends Command
         }
     }
 
+    /**
+     * Run the browser test suite.
+     *
+     * @return int Dusk process exit status.
+     */
     protected function runDusk(): int
     {
         $this->newLine();
