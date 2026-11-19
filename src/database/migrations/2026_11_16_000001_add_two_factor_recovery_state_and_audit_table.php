@@ -24,9 +24,9 @@ return new class extends Migration
         });
 
         Schema::create('two_factor_recovery_audits', function (Blueprint $table): void {
-            $table->increments('id');
-            $table->unsignedInteger('actor_user_id');
-            $table->unsignedInteger('target_user_id');
+            $table->bigIncrements('id');
+            $table->unsignedBigInteger('actor_user_id');
+            $table->unsignedBigInteger('target_user_id');
             $table->string('support_reference', 100);
             $table->string('ip_address', 45);
             $table->timestamps();
