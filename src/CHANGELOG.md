@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2026.22.1](https://github.com/pfarr-tools/pfarrplaner/compare/v2026.22.0...v2026.22.1) (2026-11-19)
+
+
+### Bug Fixes
+
+* **release:** Fremdschlüssel an BIGINT-Benutzer-IDs anpassen. Refs [#112](https://github.com/pfarr-tools/pfarrplaner/issues/112) ([65786e1](https://github.com/pfarr-tools/pfarrplaner/commit/65786e141b7694b457cd9d38653c9a6131e9dc55))
+
 ## [2026.22.0](https://github.com/pfarr-tools/pfarrplaner/compare/v2026.21.1...v2026.22.0) (2026-11-19)
 
 
