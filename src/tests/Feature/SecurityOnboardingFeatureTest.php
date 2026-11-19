@@ -15,11 +15,11 @@ namespace Tests\Feature;
 
 use App\Models\People\User;
 use App\Services\SecurityOnboardingService;
+use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
-use RoundlyConsulting\TwoFactor\Contracts\TwoFactorService;
 use Inertia\Testing\AssertableInertia as Assert;
+use RoundlyConsulting\TwoFactor\Contracts\TwoFactorService;
 use Tests\TestCase;
 
 /** Verify the security onboarding reminder cadence and route gate. */
