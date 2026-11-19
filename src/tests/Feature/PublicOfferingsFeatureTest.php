@@ -83,6 +83,39 @@ class PublicOfferingsFeatureTest extends TestCase
     }
 
     /**
+     * Nearby dates are sent separately when today's services are available.
+     */
+    public function test_guest_can_access_nearby_services_when_today_has_services(): void
+    {
+        $city = City::factory()->create();
+        $today = Carbon::now('Europe/Berlin')->startOfDay();
+        $todayService = Service::factory()->create([
+            'city_id' => $city->id,
+            'date' => $today->copy()->setTime(10, 0),
+            'offering_amount' => '',
+        ]);
+        $nearbyService = Service::factory()->create([
+            'city_id' => $city->id,
+            'date' => $today->copy()->addDays(3)->setTime(10, 0),
+            'offering_amount' => '',
+        ]);
+        Service::factory()->create([
+            'city_id' => $city->id,
+            'date' => $today->copy()->addDays(8)->setTime(10, 0),
+            'offering_amount' => '',
+        ]);
+
+        $response = $this->get(URL::signedRoute('offerings.public', ['city' => $city]));
+
+        $response->assertOk()
+            ->assertInertia(fn ($page) => $page
+                ->where('services.0.id', $todayService->id)
+                ->where('nearbyServices.0.id', $nearbyService->id)
+                ->has('nearbyServices', 1)
+                ->where('fallback', false));
+    }
+
+    /**
      * The signed city boundary prevents updating another city's service.
      */
     public function test_guest_cannot_save_a_service_from_another_city(): void

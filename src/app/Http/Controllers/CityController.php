@@ -158,14 +158,23 @@ class CityController extends AbstractCRUDController
         $today = Carbon::now('Europe/Berlin')->startOfDay();
         $services = $this->offeringServicesForDate($city, $today);
         $fallback = $services->isEmpty();
+        $nearbyServices = collect();
 
         if ($fallback) {
             $services = $this->offeringServicesNearDate($city, $today);
+        } else {
+            $nearbyServices = $this->offeringServicesNearDate($city, $today)
+                ->reject(fn (Service $service): bool => $service->date
+                    ?->copy()
+                    ->setTimezone('Europe/Berlin')
+                    ->toDateString() === $today->toDateString())
+                ->values();
         }
 
         return Inertia::render('Public/City/Offerings', [
             'city' => $city->only(['id', 'name', 'official_name']),
             'services' => $services->map(fn (Service $service): array => $this->publicOfferingService($service))->values(),
+            'nearbyServices' => $nearbyServices->map(fn (Service $service): array => $this->publicOfferingService($service))->values(),
             'fallback' => $fallback,
             'denominations' => $this->offeringDenominations(),
         ]);

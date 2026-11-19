@@ -35,7 +35,7 @@
             data-testid="service-selection-view"
         >
             <section
-                v-for="service in availableServices"
+                v-for="service in serviceSelectionList"
                 :key="service.id"
                 class="card mb-3 service-card"
             >
@@ -59,6 +59,20 @@
                     </p>
                 </div>
             </section>
+            <button
+                v-if="availableNearbyServices.length"
+                type="button"
+                class="btn btn-link px-0"
+                data-testid="nearby-services-toggle"
+                :aria-expanded="nearbyServicesExpanded"
+                @click="nearbyServicesExpanded = !nearbyServicesExpanded"
+            >
+                {{
+                    nearbyServicesExpanded
+                        ? 'Weitere Gottesdienste ausblenden'
+                        : 'Weitere Gottesdienste in der Umgebung anzeigen'
+                }}
+            </button>
         </div>
 
         <section
@@ -190,6 +204,15 @@
 import { formatPlannerDateForDisplay } from '../../../helpers/plannerDates'
 
 /**
+ * Create a fresh empty array for nearby services.
+ *
+ * @returns {Array} Empty nearby service list.
+ */
+function defaultNearbyServices() {
+    return []
+}
+
+/**
  * Mobile public page for recording offerings through a signed city link.
  */
 export default {
@@ -197,6 +220,7 @@ export default {
     props: {
         city: { type: Object, required: true },
         services: { type: Array, default: () => [] },
+        nearbyServices: { type: Array, default: defaultNearbyServices },
         fallback: { type: Boolean, default: false },
         denominations: { type: Object, default: () => ({}) },
     },
@@ -204,6 +228,7 @@ export default {
         return {
             denominationsExpanded: false,
             confirmationDismissed: false,
+            nearbyServicesExpanded: false,
             form: this.createForm(),
             selectedServiceId: null,
         }
@@ -215,7 +240,9 @@ export default {
          * @returns {Object|undefined} Selected service.
          */
         selectedService() {
-            return this.services.find((service) => service.id === this.selectedServiceId)
+            return [...this.services, ...this.nearbyServices].find(
+                (service) => service.id === this.selectedServiceId,
+            )
         },
         /**
          * Return services without a previously recorded offering amount.
@@ -224,6 +251,24 @@ export default {
          */
         availableServices() {
             return this.services.filter((service) => !service.offering_amount)
+        },
+        /**
+         * Return nearby services without a previously recorded offering amount.
+         *
+         * @returns {Array} Additional services that can still be entered.
+         */
+        availableNearbyServices() {
+            return this.nearbyServices.filter((service) => !service.offering_amount)
+        },
+        /**
+         * Return the current and optionally expanded nearby service list.
+         *
+         * @returns {Array} Services visible in the selection list.
+         */
+        serviceSelectionList() {
+            return this.nearbyServicesExpanded
+                ? [...this.availableServices, ...this.availableNearbyServices]
+                : this.availableServices
         },
         /**
          * Calculate the denomination total in cents.
@@ -369,11 +414,11 @@ export default {
          * @returns {string} Signed save URL.
          */
         signedSaveUrl() {
-            const saveUrl = new URL(
-                route('offerings.save', { city: this.city.id }),
+            const saveUrl = new window.URL(
+                window.route('offerings.save', { city: this.city.id }),
                 window.location.origin,
             )
-            const currentUrl = new URL(window.location.href)
+            const currentUrl = new window.URL(window.location.href)
 
             ;['expires', 'signature'].forEach((parameter) => {
                 const value = currentUrl.searchParams.get(parameter)

@@ -111,6 +111,28 @@ describe('Public offerings page', () => {
         expect(wrapper.text()).toContain('Heute finden keine Gottesdienste statt')
     })
 
+    it('keeps nearby services collapsed until the user expands the list', async () => {
+        const nearbyService = {
+            ...service,
+            id: 11,
+            date: '2026-11-17',
+            title: 'Gottesdienst am Nachbarort',
+        }
+        const wrapper = mountPage({ nearbyServices: [nearbyService] })
+
+        expect(wrapper.find('[data-testid="nearby-services-toggle"]').exists()).toBe(true)
+        expect(wrapper.text()).not.toContain(nearbyService.title)
+
+        await wrapper.get('[data-testid="nearby-services-toggle"]').trigger('click')
+
+        expect(wrapper.text()).toContain(nearbyService.title)
+        expect(wrapper.findAll('[data-testid="service-selector"]')).toHaveLength(2)
+
+        await wrapper.findAll('[data-testid="service-selector"]')[1].trigger('click')
+
+        expect(wrapper.find('[data-testid="offering-entry-view"]').exists()).toBe(true)
+    })
+
     it('does not offer a saved service for editing', () => {
         const wrapper = mountPage({
             services: [{ ...service, offering_amount: '12.50' }],
