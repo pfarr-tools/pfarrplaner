@@ -35,6 +35,23 @@ class MinistryMailUnitTest extends TestCase
         $this->assertStringContainsString('Anfrage', $built->subject);
     }
 
+    /** Ensures a ministry request renders Markdown and its action button as HTML. */
+    public function test_ministry_request_renders_markdown_and_button_as_html(): void
+    {
+        $user = User::factory()->create();
+        $sender = User::factory()->create();
+        $services = Service::factory()->count(1)->create();
+        $mail = new MinistryRequest($user, $sender, 'P', $services, 'Test text');
+
+        $html = $mail->render();
+
+        $this->assertStringNotContainsString('<pre', $html);
+        $this->assertStringContainsString('<h1', $html);
+        $this->assertMatchesRegularExpression('/<p[^>]*>Hallo/', $html);
+        $this->assertStringContainsString('class="action"', $html);
+        $this->assertStringNotContainsString('&lt;table', $html);
+    }
+
     public function test_ministry_request_filled_builds(): void
     {
         $user = User::factory()->create();
