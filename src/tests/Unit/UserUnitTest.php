@@ -14,6 +14,8 @@
 namespace Tests\Unit;
 
 use App\Models\People\User;
+use App\Models\Service;
+use App\Models\Subscription;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Tests\AbstractSimpleModelUnitTest;
 
@@ -49,6 +51,35 @@ class UserUnitTest extends AbstractSimpleModelUnitTest
         $user = User::factory()->create();
         $this->assertCount(1, User::all());
         $this->assertNotEmpty($user->last_name);
+    }
+
+    /**
+     * Includes time-change subscribers when service diffs use their current field names.
+     */
+    public function test_time_change_subscribers_receive_time_and_day_changes(): void
+    {
+        $service = Service::factory()->create();
+        $subscriber = User::factory()->create();
+        $subscriber->subscriptions()->create([
+            'city_id' => $service->city_id,
+            'subscription_type' => Subscription::SUBSCRIBE_TIME_CHANGES,
+        ]);
+
+        foreach ([
+            'timeText' => ['original' => '10:00 Uhr', 'changed' => '11:00 Uhr'],
+            'day_id' => ['original' => null, 'changed' => 1],
+        ] as $attribute => $change) {
+            $service->changed = [$attribute => $change];
+
+            $this->assertTrue(
+                User::subscribedTo($service)->whereKey($subscriber->id)->exists(),
+                'Expected time-only subscribers to receive a '.$attribute.' notification.'
+            );
+        }
+
+        $service->changed = ['description' => ['original' => 'Alt', 'changed' => 'Neu']];
+
+        $this->assertFalse(User::subscribedTo($service)->whereKey($subscriber->id)->exists());
     }
 
     protected function setUp(): void

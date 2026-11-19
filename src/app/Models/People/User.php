@@ -373,7 +373,8 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
         );
 
         // some users only get notified when time or day_id change
-        if ($isNew || isset($service->changes['time']) || isset($service->changes['day_id'])) {
+        $changed = $service->changed ?? [];
+        if ($isNew || isset($changed['time']) || isset($changed['timeText']) || isset($changed['day_id'])) {
             $query->orWhereHas(
                 'subscriptions',
                 function ($query) use ($service) {
