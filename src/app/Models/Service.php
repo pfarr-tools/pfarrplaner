@@ -570,15 +570,18 @@ class Service extends Model implements HasDAVCalendarItems
     }
 
     /**
-     * @return string
+     * Build the service-title text for attached funerals, preserving the urn-only wording.
+     *
+     * @return string Formatted funeral titles separated by semicolons.
      */
     public function funeralsText()
     {
         $funerals = [];
         foreach ($this->funerals as $funeral) {
-            $funerals[] = ($funeral->type ?: 'Bestattung').' von '.NameService::fromName(
-                $funeral->buried_name
-            )->format(NameService::FIRST_LAST);
+            $name = NameService::fromName($funeral->buried_name)->format(NameService::FIRST_LAST);
+            $funerals[] = $funeral->type === 'Urnenbeisetzung'
+                ? 'Urnenbeisetzung von '.$name
+                : 'Trauerfeier für '.$name;
         }
 
         return implode('; ', $funerals);
