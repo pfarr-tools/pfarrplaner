@@ -27,6 +27,7 @@ class TestCommand extends Command
         {--without-tty : Disable output to TTY}
         {--compact : Indicates whether the compact printer should be used}
         {--coverage : Indicates whether code coverage information should be collected}
+        {--filter= : Run only tests matching the PHPUnit filter expression}
         {--min= : Indicates the minimum threshold enforcement for code coverage}
         {--p|parallel : Indicates if the tests should run in parallel}
         {--profile : Lists top 10 slowest tests}
@@ -130,8 +131,14 @@ class TestCommand extends Command
             ? base_path('phpunit.xml')
             : base_path('phpunit.xml.dist');
 
+        $phpunitArguments = [PHP_BINARY, $phpunit, '--configuration='.$config, '--no-output'];
+        $filter = $this->option('filter');
+        if ($filter !== null && $filter !== '') {
+            $phpunitArguments[] = '--filter='.$filter;
+        }
+
         $process = (new Process(
-            [PHP_BINARY, $phpunit, '--configuration='.$config, '--no-output'],
+            $phpunitArguments,
             null,
             ['COLLISION_PRINTER' => 'DefaultPrinter'],
         ))->setTimeout(null);

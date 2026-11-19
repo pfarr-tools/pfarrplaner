@@ -246,10 +246,13 @@ Produktion verlangt `APP_ENV=production`.
 
 ```sh
 ./planer dev test
+./planer dev test --filter=test_index_loads
 ./planer artisan <befehl>
 ```
 
-`./planer dev test` erzwingt SQLite im Speicher. `./planer dev artisan test` wird mit
+`--filter` wird an PHPUnit weitergereicht und kann einen fokussierten Testlauf
+nach Testname oder regulärem Ausdruck auswählen. `./planer dev test` erzwingt
+SQLite im Speicher. `./planer dev artisan test` wird mit
 einer Warnung blockiert; auch `./planer dev exec app php artisan test` wird ohne
 Ausführung blockiert. Für beide Fälle ist `./planer dev test` zu verwenden.
 `./planer dev fresh` benötigt zusätzlich `--force`.

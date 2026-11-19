@@ -10,6 +10,16 @@ use Tests\TestCase;
 
 class TestCommandTest extends TestCase
 {
+    /**
+     * The safe test command must recognize PHPUnit's focused test filter.
+     */
+    public function test_filter_option_is_available_on_the_safe_test_command(): void
+    {
+        $command = new TestCommand;
+
+        $this->assertTrue($command->getDefinition()->hasOption('filter'));
+    }
+
     public function test_query_log_permissions_are_restored_before_following_test_suites(): void
     {
         $file = QueryLogService::file();
