@@ -69,7 +69,7 @@ trait TracksChangesTrait
     {
         $snapshot = [];
         $excludedAttributes = ['id', 'created_at', 'updated_at', 'deleted_at'];
-        if (property_exists($this, 'attributesToSkipTracking') && is_array($this->attributesToSkipTracking)) {
+        if (is_array($this->attributesToSkipTracking)) {
             $excludedAttributes = array_merge($excludedAttributes, $this->attributesToSkipTracking);
         }
 
@@ -80,13 +80,13 @@ trait TracksChangesTrait
             $snapshot[$attribute] = $this->normalizeSnapshotValue($this->getAttributeValue($attribute));
         }
 
-        if (property_exists($this, 'appendsToTracking') && is_array($this->appendsToTracking)) {
+        if (is_array($this->appendsToTracking)) {
             foreach ($this->appendsToTracking as $attribute) {
                 $snapshot[$attribute] = $this->normalizeSnapshotValue($this->$attribute);
             }
         }
 
-        if (property_exists($this, 'relationsToTrack') && is_array($this->relationsToTrack)) {
+        if (is_array($this->relationsToTrack)) {
             foreach ($this->relationsToTrack as $relation) {
                 $this->unsetRelation($relation);
                 $snapshot[$relation] = $this->normalizeSnapshotValue($this->$relation);

@@ -162,12 +162,23 @@ class AbstractModel extends Model
         return static::relatedClass('App\\Events\\'.ucfirst($verb).'###');
     }
 
+    /**
+     * Build the Inertia page path for a model controller view.
+     *
+     * @param  string  $page  Page name relative to the model view directory.
+     * @return string Inertia page component path.
+     */
     public static function getVuePath(string $page)
     {
         return (static::$path ? Str::ucfirst(static::$path).'/' : '')
             .Str::ucfirst(static::relatedName('###/'.Str::ucfirst($page)));
     }
 
+    /**
+     * Resolve route definitions for this model, including configured overrides.
+     *
+     * @return array<string, array<string, array<string, mixed>>> Routes grouped by route class and name.
+     */
     public static function getRoutes()
     {
         $routeClassPrefixes = ['web' => static::$path];
@@ -248,6 +259,13 @@ class AbstractModel extends Model
         return $routeName ? route($routeName) : '';
     }
 
+    /**
+     * Register configured routes whose controller methods exist.
+     *
+     * @param  string  $routeClass  Route group name.
+     * @param  class-string  $controllerClass  Controller handling the routes.
+     * @return void
+     */
     protected static function registerDefaultRoutes($routeClass, $controllerClass)
     {
         foreach (static::getRoutes()[$routeClass] ?? [] as $routeKey => $routeData) {
@@ -270,6 +288,7 @@ class AbstractModel extends Model
         });
     }
 
+    /** Register the model's authenticated API routes. */
     public static function registerApiRoutes(): void
     {
         Route::middleware([
@@ -279,6 +298,12 @@ class AbstractModel extends Model
         });
     }
 
+    /**
+     * Bind available action contracts to their concrete action classes.
+     *
+     * @param  Application  $app  Application container receiving the bindings.
+     * @return void
+     */
     public static function registerContracts(Application $app)
     {
         foreach (['create', 'update', 'delete'] as $verb) {
@@ -290,11 +315,13 @@ class AbstractModel extends Model
         }
     }
 
+    /** Return the web controller class name derived from this model. */
     public static function controllerClass(): string
     {
         return 'App\\Http\\Controllers\\'.static::modelName().'Controller';
     }
 
+    /** Return the API controller class name derived from this model. */
     public static function apiControllerClass(): string
     {
         return 'App\\Http\\Controllers\\Api\\'.static::modelName().'Controller';
@@ -324,6 +351,7 @@ class AbstractModel extends Model
         return Str::camel(static::modelName());
     }
 
+    /** Return a display label derived from the model's name attribute. */
     public function getLabelAttribute(): string
     {
         return $this->name ?? '';

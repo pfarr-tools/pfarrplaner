@@ -13,21 +13,20 @@ afterEach(() => {
     vi.restoreAllMocks()
 })
 
-/** Mount the account security onboarding page with the shared factor setup UI stubbed. */
-const mountOnboarding = () =>
+/** Mount the account security onboarding page with its external page chrome stubbed. */
+const mountOnboarding = (props = {}) =>
     mount(SecurityOnboarding, {
         props: {
             user: { firstName: 'Ada', email: 'ada@example.org' },
             twoFactorEnabled: false,
             twoFactorPending: false,
             passkeys: [],
+            ...props,
         },
         global: {
             stubs: {
-                SecurityTab: {
-                    props: ['user', 'twoFactorEnabled', 'twoFactorPending', 'passkeys'],
-                    template: '<div data-testid="factor-setup" />',
-                },
+                Head: true,
+                FormCsrfToken: true,
             },
         },
     })
@@ -36,11 +35,12 @@ describe('SecurityOnboarding', () => {
     it('explains both options and embeds the direct setup controls', () => {
         const wrapper = mountOnboarding()
 
-        expect(wrapper.text()).toContain('Passkey: die einfachste Anmeldung')
-        expect(wrapper.text()).toContain('Authenticator-App: Einmalcodes als zusätzlicher Schutz')
+        expect(wrapper.text()).toContain('Ein Passkey ist die einfachste und sicherste Anmeldung')
+        expect(wrapper.text()).toContain('Eine Authenticator-App erzeugt alle paar Sekunden')
         expect(wrapper.text()).toContain('Microsoft Authenticator')
         expect(wrapper.text()).toContain('2FAS Auth')
-        expect(wrapper.find('[data-testid="factor-setup"]').exists()).toBe(true)
+        expect(wrapper.find('[data-testid="register-passkey"]').exists()).toBe(true)
+        expect(wrapper.find('[data-testid="open-two-factor-setup"]').exists()).toBe(true)
     })
 
     it('starts and confirms TOTP from the onboarding page itself', async () => {
@@ -59,7 +59,7 @@ describe('SecurityOnboarding', () => {
                 twoFactorPending: false,
                 passkeys: [],
             },
-            global: { stubs: { FormCsrfToken: true } },
+            global: { stubs: { FormCsrfToken: true, Head: true } },
         })
 
         await wrapper.find('[data-testid="open-two-factor-setup"]').trigger('click')
@@ -90,11 +90,12 @@ describe('SecurityOnboarding', () => {
                 twoFactorPending: false,
                 passkeys: [],
             },
-            global: { stubs: { FormCsrfToken: true } },
+            global: { stubs: { FormCsrfToken: true, Head: true } },
         })
 
-        await wrapper.find('[data-testid="passkey-name"]').setValue('Arbeitslaptop')
         await wrapper.find('[data-testid="register-passkey"]').trigger('click')
+        await wrapper.find('[data-testid="passkey-name"]').setValue('Arbeitslaptop')
+        await wrapper.find('[data-testid="confirm-passkey-setup"]').trigger('click')
         await flushPromises()
 
         expect(register).toHaveBeenCalledWith({
@@ -107,7 +108,7 @@ describe('SecurityOnboarding', () => {
     })
 
     it('offers application access after setup and a session-only deferral', () => {
-        const wrapper = mountOnboarding()
+        const wrapper = mountOnboarding({ passkeys: [{ id: 1, name: 'Arbeitslaptop' }] })
 
         expect(wrapper.find('[data-testid="continue-after-setup"]').attributes('href')).toBe(
             '/home',

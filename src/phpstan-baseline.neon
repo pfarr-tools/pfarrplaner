@@ -1045,12 +1045,6 @@ parameters:
 			path: app/Http/Controllers/AbstractCRUDController.php
 
 		-
-			message: '#^Method App\\Http\\Controllers\\AbstractCRUDController\:\:update\(\) should return Illuminate\\Http\\Response but returns Illuminate\\Http\\RedirectResponse\.$#'
-			identifier: return.type
-			count: 1
-			path: app/Http/Controllers/AbstractCRUDController.php
-
-		-
 			message: '#^Access to an undefined property App\\Models\\Calendar\\Occurence\:\:\$adStart\.$#'
 			identifier: property.notFound
 			count: 1
@@ -1189,12 +1183,6 @@ parameters:
 			path: app/Http/Controllers/Api/PsalmController.php
 
 		-
-			message: '#^Method App\\Http\\Controllers\\Api\\PsalmController\:\:update\(\) should return Illuminate\\Http\\Response but returns Illuminate\\Http\\JsonResponse\.$#'
-			identifier: return.type
-			count: 1
-			path: app/Http/Controllers/Api/PsalmController.php
-
-		-
 			message: '#^Access to an undefined property App\\Models\\Rites\\Baptism\:\:\$buried_name\.$#'
 			identifier: property.notFound
 			count: 1
@@ -1292,12 +1280,6 @@ parameters:
 
 		-
 			message: '#^Return type \(Illuminate\\Http\\JsonResponse\) of method App\\Http\\Controllers\\Api\\SongController\:\:store\(\) should be compatible with return type \(Illuminate\\Http\\Response\) of method App\\Http\\Controllers\\AbstractCRUDController\:\:store\(\)$#'
-			identifier: method.childReturnType
-			count: 1
-			path: app/Http/Controllers/Api/SongController.php
-
-		-
-			message: '#^Return type \(Illuminate\\Http\\JsonResponse\) of method App\\Http\\Controllers\\Api\\SongController\:\:update\(\) should be compatible with return type \(Illuminate\\Http\\Response\) of method App\\Http\\Controllers\\AbstractCRUDController\:\:update\(\)$#'
 			identifier: method.childReturnType
 			count: 1
 			path: app/Http/Controllers/Api/SongController.php
@@ -1653,7 +1635,7 @@ parameters:
 		-
 			message: '#^Method App\\Http\\Controllers\\HomeController\:\:index\(\) should return Illuminate\\Contracts\\Support\\Renderable but returns Illuminate\\Http\\RedirectResponse\.$#'
 			identifier: return.type
-			count: 3
+			count: 2
 			path: app/Http/Controllers/HomeController.php
 
 		-
@@ -5083,12 +5065,6 @@ parameters:
 			path: app/Models/Service.php
 
 		-
-			message: '#^Parameter \#2 \$return of function print_r expects bool, int given\.$#'
-			identifier: argument.type
-			count: 2
-			path: app/Models/Service.php
-
-		-
 			message: '#^Parameter \#4 \$not of method Illuminate\\Database\\Eloquent\\Relations\\BelongsToMany\<App\\Models\\People\\User,\$this\(App\\Models\\Service\),Illuminate\\Database\\Eloquent\\Relations\\Pivot,string\>\:\:wherePivotIn\(\) expects bool, string given\.$#'
 			identifier: argument.type
 			count: 1
@@ -6323,12 +6299,6 @@ parameters:
 			identifier: trait.unused
 			count: 1
 			path: app/Traits/TestWithCredentialsTrait.php
-
-		-
-			message: '#^Call to function property_exists\(\) with \$this\(App\\Models\\Service\) and ''appendsToTracking'' will always evaluate to true\.$#'
-			identifier: function.alreadyNarrowedType
-			count: 1
-			path: app/Traits/TracksChangesTrait.php
 
 		-
 			message: '#^Parameter \#2 \$default of method App\\Models\\People\\User\:\:getSetting\(\) expects null, array given\.$#'

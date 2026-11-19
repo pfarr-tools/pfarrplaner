@@ -34,6 +34,7 @@ use App\Models\People\User;
 use Illuminate\Support\Facades\Auth;
 use Sabre\DAV\Auth\Backend\AbstractBasic;
 
+/** Authenticate SabreDAV requests with Pfarrplaner calendar API tokens. */
 class AuthBackend extends AbstractBasic
 {
     /**

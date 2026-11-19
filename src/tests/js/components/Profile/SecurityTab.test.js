@@ -8,14 +8,14 @@ vi.mock('qrcode', () => ({
     default: { toDataURL: vi.fn(() => 'data:image/png;base64,local-qr-code') },
 }))
 
-const originalClipboardDescriptor = Object.getOwnPropertyDescriptor(navigator, 'clipboard')
+const originalClipboardDescriptor = Object.getOwnPropertyDescriptor(window.navigator, 'clipboard')
 
 afterEach(() => {
     vi.restoreAllMocks()
     if (originalClipboardDescriptor) {
-        Object.defineProperty(navigator, 'clipboard', originalClipboardDescriptor)
+        Object.defineProperty(window.navigator, 'clipboard', originalClipboardDescriptor)
     } else {
-        delete navigator.clipboard
+        delete window.navigator.clipboard
     }
 })
 
@@ -38,6 +38,12 @@ describe('SecurityTab', () => {
     })
 
     it('starts TOTP setup without sending account-password data', async () => {
+        /** Build a TOTP setup response fixture.
+         *
+         * @param {string} secret Provisioning secret.
+         * @param {string} code Recovery code.
+         * @returns {{ data: { provisioning_uri: string, recovery_codes: string[] } }}
+         */
         const setupResponse = (secret, code) => ({
             data: {
                 provisioning_uri: `otpauth://totp/Pfarrplaner:test@example.com?secret=${secret}`,
@@ -149,7 +155,10 @@ describe('SecurityTab', () => {
 
     it('copies setup keys and recovery codes and reports clipboard failures', async () => {
         const writeText = vi.fn().mockResolvedValue(undefined)
-        Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText } })
+        Object.defineProperty(window.navigator, 'clipboard', {
+            configurable: true,
+            value: { writeText },
+        })
         const wrapper = mountSecurityTab()
         wrapper.vm.setup = {
             provisioning_uri: 'otpauth://totp/Pfarrplaner:test@example.com?secret=SECRETKEY',
@@ -168,7 +177,7 @@ describe('SecurityTab', () => {
         writeText.mockRejectedValueOnce(new Error('denied'))
         await wrapper.find('[data-testid="copy-recovery-codes"]').trigger('click')
         await flushPromises()
-        expect(wrapper.find('[role="alert"]').text()).toContain('Bitte markieren Sie ihn')
+        expect(wrapper.find('[role="alert"]').text()).toContain('Bitte markiere ihn')
         expect(wrapper.find('[role="status"]').text()).toBe('')
     })
 
@@ -259,8 +268,9 @@ describe('SecurityTab', () => {
         })
         const wrapper = mountSecurityTab()
 
-        await wrapper.find('[data-testid="passkey-name"]').setValue('Arbeitslaptop')
         await wrapper.find('[data-testid="register-passkey"]').trigger('click')
+        await wrapper.find('[data-testid="passkey-name"]').setValue('Arbeitslaptop')
+        await wrapper.find('[data-testid="confirm-passkey-setup"]').trigger('click')
         await flushPromises()
 
         expect(register).toHaveBeenCalledWith({

@@ -60,7 +60,9 @@ class ServiceChangeFormatter
     private static function formatAttributeValue(Service $service, string $path, mixed $value): string
     {
         if ($path === 'city_id' && $value !== null) {
-            return (string) (City::find($value)?->name ?? $value);
+            $city = City::find($value);
+
+            return (string) ($city ? $city->name : $value);
         }
 
         return self::formatValue($value);

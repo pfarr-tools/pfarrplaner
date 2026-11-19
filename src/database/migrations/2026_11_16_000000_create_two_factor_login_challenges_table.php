@@ -11,7 +11,7 @@ return new class extends Migration
     {
         Schema::create('two_factor_login_challenges', function (Blueprint $table): void {
             $table->id();
-            $table->unsignedBigInteger('user_id');
+            $table->unsignedInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users')->cascadeOnDelete();
             $table->string('code_hash');
             $table->timestamp('expires_at');

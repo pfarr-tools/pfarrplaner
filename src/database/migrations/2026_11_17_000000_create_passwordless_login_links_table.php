@@ -11,7 +11,8 @@ return new class extends Migration
     {
         Schema::create('passwordless_login_links', function (Blueprint $table): void {
             $table->id();
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->unsignedInteger('user_id');
+            $table->foreign('user_id')->references('id')->on('users')->cascadeOnDelete();
             $table->char('token_hash', 64)->unique();
             $table->timestamp('expires_at');
             $table->timestamp('consumed_at')->nullable();

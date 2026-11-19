@@ -14,6 +14,7 @@
 namespace App\Services;
 
 use App\Models\People\User;
+use Carbon\Carbon;
 
 /** Track email-link sign-ins and decide when an account-security prompt is due. */
 class SecurityOnboardingService
@@ -65,7 +66,7 @@ class SecurityOnboardingService
 
         $lastShownAt = $user->security_onboarding_last_shown_at;
 
-        return $lastShownAt === null || $lastShownAt->lte(now()->subDays(self::REMINDER_INTERVAL_DAYS));
+        return $lastShownAt === null || Carbon::parse($lastShownAt)->lte(now()->subDays(self::REMINDER_INTERVAL_DAYS));
     }
 
     /**

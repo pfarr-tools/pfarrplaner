@@ -31,6 +31,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\AbstractModel;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -40,6 +41,7 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 
+/** Provides shared CRUD actions and response handling for application models. */
 class AbstractCRUDController extends Controller
 {
     protected string $modelClass;
@@ -189,7 +191,7 @@ class AbstractCRUDController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @return Response
+     * @return Response|JsonResponse|RedirectResponse
      */
     public function update(Request $request, $modelId)
     {

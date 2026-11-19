@@ -45,11 +45,21 @@ class InstallCommand extends Command
 
     protected $description = 'Installiere Pfarrplaner fuer die erste Inbetriebnahme';
 
+    /**
+     * Create the installation command with its configuration service.
+     *
+     * @param  FirstRunInstallerService  $installer  Service that prepares and persists installation settings.
+     */
     public function __construct(protected FirstRunInstallerService $installer)
     {
         parent::__construct();
     }
 
+    /**
+     * Run the interactive installation and initialize the configured database.
+     *
+     * @return int Command exit status.
+     */
     public function handle(): int
     {
         $templatePath = base_path('.env.example');
@@ -118,6 +128,12 @@ class InstallCommand extends Command
         return Command::SUCCESS;
     }
 
+    /**
+     * Collect the initial super-administrator's profile values.
+     *
+     * @param  string  $administratorEmail  Email address assigned to the administrator.
+     * @return array{title: string, first_name: string, last_name: string, email: string} Administrator profile.
+     */
     protected function collectAdminData(string $administratorEmail): array
     {
         $firstName = $this->askRequiredOption('admin-first-name', 'Vorname des ersten Super-Admins');
@@ -133,6 +149,12 @@ class InstallCommand extends Command
         ];
     }
 
+    /**
+     * Collect application and mail settings, including the selected database configuration.
+     *
+     * @param  array<string, string>  $defaults  Values parsed from the environment template.
+     * @return array<string, mixed> Complete environment values for installation.
+     */
     protected function collectEnvironmentValues(array $defaults): array
     {
         $appName = $this->askRequiredOption('app-name', 'Anwendungsname', $defaults['APP_NAME'] ?? 'Pfarrplaner');
@@ -159,6 +181,13 @@ class InstallCommand extends Command
         ], $databaseValues);
     }
 
+    /**
+     * Collect the settings required by the selected database connection.
+     *
+     * @param  string  $connection  Selected database connection name.
+     * @param  array<string, string>  $defaults  Values parsed from the environment template.
+     * @return array<string, string> Database environment values.
+     */
     protected function collectDatabaseValues(string $connection, array $defaults): array
     {
         if ($connection === 'sqlite') {
@@ -187,11 +216,25 @@ class InstallCommand extends Command
         ];
     }
 
+    /**
+     * Generate an application encryption key for the given cipher.
+     *
+     * @param  string  $cipher  Cipher configured for the key.
+     * @return string Base64-encoded encryption key.
+     */
     protected function generateKey(string $cipher): string
     {
         return 'base64:'.base64_encode(Encrypter::generateKey($cipher));
     }
 
+    /**
+     * Resolve an optional command-line value or ask for it interactively.
+     *
+     * @param  string  $option  Option name.
+     * @param  string  $question  Prompt shown in interactive mode.
+     * @param  string  $default  Value used when no answer is provided.
+     * @return string Resolved option value.
+     */
     protected function askOption(string $option, string $question, string $default = ''): string
     {
         $value = $this->option($option);
@@ -207,6 +250,14 @@ class InstallCommand extends Command
         return (string) $this->ask($question, $default);
     }
 
+    /**
+     * Resolve a required option, repeating the prompt until a value is supplied.
+     *
+     * @param  string  $option  Option name.
+     * @param  string  $question  Prompt shown in interactive mode.
+     * @param  string  $default  Initial value used when no answer is provided.
+     * @return string Non-empty resolved option value.
+     */
     protected function askRequiredOption(string $option, string $question, string $default = ''): string
     {
         do {
@@ -223,6 +274,15 @@ class InstallCommand extends Command
         throw new \RuntimeException('Fehlende Pflichtangabe fuer --'.$option.'.');
     }
 
+    /**
+     * Resolve an option constrained to a list of allowed choices.
+     *
+     * @param  string  $option  Option name.
+     * @param  string  $question  Prompt shown in interactive mode.
+     * @param  array<int, string>  $choices  Allowed values.
+     * @param  string  $default  Value used when no answer is provided.
+     * @return string Selected choice.
+     */
     protected function askChoiceOption(string $option, string $question, array $choices, string $default): string
     {
         $value = $this->option($option);
@@ -238,6 +298,14 @@ class InstallCommand extends Command
         return (string) $this->choice($question, $choices, $default);
     }
 
+    /**
+     * Resolve a boolean option from input or an interactive confirmation.
+     *
+     * @param  string  $option  Option name.
+     * @param  string  $question  Prompt shown in interactive mode.
+     * @param  bool  $default  Value used when no answer is provided.
+     * @return bool Resolved boolean value.
+     */
     protected function askBooleanOption(string $option, string $question, bool $default): bool
     {
         $value = $this->option($option);
@@ -253,6 +321,12 @@ class InstallCommand extends Command
         return $this->confirm($question, $default);
     }
 
+    /**
+     * Build a default sender address from the configured application URL.
+     *
+     * @param  string  $appUrl  Public base URL of the application.
+     * @return string Default sender email address.
+     */
     protected function defaultMailFromAddress(string $appUrl): string
     {
         $host = parse_url($appUrl, PHP_URL_HOST);
@@ -264,6 +338,12 @@ class InstallCommand extends Command
         return 'noreply@'.preg_replace('/^www\./', '', $host);
     }
 
+    /**
+     * Resolve an absolute or application-relative environment file path.
+     *
+     * @param  string  $path  Configured environment file path.
+     * @return string Absolute path to the environment file.
+     */
     protected function resolveEnvironmentPath(string $path): string
     {
         if (Str::startsWith($path, DIRECTORY_SEPARATOR)) {
@@ -273,6 +353,12 @@ class InstallCommand extends Command
         return base_path($path);
     }
 
+    /**
+     * Parse simple key-value defaults from an environment template.
+     *
+     * @param  string  $template  Environment template contents.
+     * @return array<string, string> Parsed default values.
+     */
     protected function extractDefaults(string $template): array
     {
         $defaults = [];

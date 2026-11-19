@@ -43,6 +43,7 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
 
+/** Render PDFs with the application's configured Chromium executable. */
 class PDF extends Browsershot
 {
     /**
