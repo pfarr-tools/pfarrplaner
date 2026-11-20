@@ -88,7 +88,16 @@ class UnpublishYoutubeBroadcasts extends Command
         foreach ($cities as $city) {
 
             $this->output('Checking videos for "'.$city->name.'"');
-            $youtube = YoutubeIntegration::get($city);
+            try {
+                $youtube = YoutubeIntegration::get($city);
+            } catch (\Throwable $exception) {
+                Log::warning(
+                    'YouTube unpublish skipped for city ID '.$city->id
+                    .' after authentication failure ('.$exception::class.').'
+                );
+
+                continue;
+            }
             $channelId = YoutubeHelper::getChannelId($city->youtube_channel_url);
 
             $this->output('Configured cut-off after '.$city->youtube_cutoff_days.' days');
@@ -105,7 +114,17 @@ class UnpublishYoutubeBroadcasts extends Command
 
             foreach ($services as $service) {
                 $this->output('Checking broadcast for service #'.$service->id);
-                if ($broadcastRecord = Broadcast::get($service)) {
+                try {
+                    $broadcastRecord = Broadcast::get($service);
+                } catch (\Throwable $exception) {
+                    Log::warning(
+                        'YouTube unpublish skipped for service ID '.$service->id
+                        .' after authentication failure ('.$exception::class.').'
+                    );
+
+                    continue;
+                }
+                if ($broadcastRecord) {
                     $broadcast = $broadcastRecord->getLiveBroadcast();
                     $pubDate = (new Carbon($broadcast->getSnippet()->getScheduledStartTime()))
                         ->shiftTimezone('UTC')->setTimezone('Europe/Berlin');

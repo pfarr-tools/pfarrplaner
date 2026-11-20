@@ -88,11 +88,9 @@ class YoutubeIntegration extends AbstractIntegration
      *
      * @param  City  $city  City whose Google credentials should be used.
      */
-    public function authenticate(City $city)
+    public function authenticate(City $city): void
     {
-        $this->client->setAccessToken($city->google_access_token);
-        $token = $this->client->refreshToken($city->google_refresh_token);
-        $this->client->setAccessToken($token);
+        $this->client->refreshToken($city->google_refresh_token);
     }
 
     /**

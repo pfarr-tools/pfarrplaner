@@ -2761,12 +2761,6 @@ parameters:
 			path: app/Integrations/Youtube/Commands/UpdateYoutubeStream.php
 
 		-
-			message: '#^Parameter \#1 \$city of static method App\\Integrations\\Youtube\\YoutubeIntegration\:\:get\(\) expects App\\Models\\Places\\City, Illuminate\\Database\\Eloquent\\Model\|null given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/Integrations/Youtube/Commands/UpdateYoutubeStream.php
-
-		-
 			message: '#^Parameter \#1 \$enableAutoStart of method Google\\Service\\YouTube\\LiveBroadcastContentDetails\:\:setEnableAutoStart\(\) expects bool, string given\.$#'
 			identifier: argument.type
 			count: 1

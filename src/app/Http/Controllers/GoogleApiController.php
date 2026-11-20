@@ -42,6 +42,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 
 /**
@@ -90,11 +91,20 @@ class GoogleApiController extends Controller
 
         if (! $request->has('code')) {
             if (($city->google_access_token != '') && ($city->google_refresh_token != '')) {
-                $client->setAccessToken($city->google_access_token);
-                $client->refreshToken($city->google_refresh_token);
-                $city->update(['google_access_token' => $client->getAccessToken()['access_token']]);
+                try {
+                    $token = $client->refreshToken($city->google_refresh_token);
+                    if (isset($token['access_token'])) {
+                        $city->update(['google_access_token' => $token['access_token']]);
 
-                return redirect($nextStep);
+                        return redirect($nextStep);
+                    }
+                } catch (\Throwable $exception) {
+                    Log::warning(
+                        'Google OAuth refresh failed for city ID '.$city->id
+                        .' ('.$exception::class.'). Starting authorization again.'
+                    );
+                }
+
             }
             if (! $client->getAccessToken()) {
                 $auth_url = $client->createAuthUrl();

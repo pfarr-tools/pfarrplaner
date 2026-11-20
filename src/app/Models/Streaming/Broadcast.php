@@ -40,6 +40,7 @@ use Google_Exception;
 use Google_Service_YouTube;
 use Google_Service_YouTube_LiveBroadcast;
 use Google_Service_YouTube_LiveBroadcastStatus;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Class Broadcast
@@ -120,7 +121,16 @@ class Broadcast
         }
 
         $instance = new Broadcast($service);
-        $instance->authenticate($service->city);
+        try {
+            $instance->authenticate($service->city);
+        } catch (\Exception $exception) {
+            Log::warning(
+                'YouTube broadcast lookup skipped for city ID '.$service->city_id
+                .' after authentication failure ('.$exception::class.').'
+            );
+
+            return null;
+        }
         $broadcast = null;
 
         $broadcastsResponse = $instance->getYoutube()->liveBroadcasts->listLiveBroadcasts(
@@ -141,14 +151,12 @@ class Broadcast
      *
      * @param  City  $city  City whose credentials should be used.
      */
-    public function authenticate(City $city)
+    public function authenticate(City $city): void
     {
         if ($this->getCity() != $city) {
             $this->setCity($city);
         }
-        $this->client->setAccessToken($city->google_access_token);
-        $token = $this->client->refreshToken($city->google_refresh_token);
-        $this->client->setAccessToken($token);
+        $this->client->refreshToken($city->google_refresh_token);
     }
 
     /**

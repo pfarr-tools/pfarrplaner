@@ -106,7 +106,16 @@ class UpdateYoutubeStream extends Command
                 ->ordered()
                 ->get();
             $current = null;
-            $youtube = YoutubeIntegration::get($city);
+            try {
+                $youtube = YoutubeIntegration::get($city);
+            } catch (\Throwable $exception) {
+                Log::warning(
+                    'YouTube stream updates skipped for city ID '.$city->id
+                    .' after authentication failure ('.$exception::class.').'
+                );
+
+                continue;
+            }
             foreach ($services as $service) {
                 $dt = $service->dateTime();
                 if ($dt < Carbon::now()) {
@@ -125,12 +134,12 @@ class UpdateYoutubeStream extends Command
                             }
 
                             $this->output('Next Service #'.$service->id.' ('.$service->formatTime('YYYY-MM-DD HH:mm').')...');
-                            $this->setBroadcastOptions($service, true);
+                            $this->setBroadcastOptions($service, $youtube, true);
                         }
 
                     } else {
                         $this->output('Future Service #'.$service->id.' ('.$service->formatTime('YYYY-MM-DD HH:mm').')...');
-                        $this->setBroadcastOptions($service, false);
+                        $this->setBroadcastOptions($service, $youtube, false);
                     }
                 }
 
@@ -155,12 +164,12 @@ class UpdateYoutubeStream extends Command
      * Configure the broadcast for a service with specific options
      *
      * @param  Service  $service  Service
+     * @param  YoutubeIntegration  $youtube  Authenticated YouTube integration for the service city.
      * @param  bool  $active  Set active or inactive
      */
-    private function setBroadcastOptions(Service $service, $active = true)
+    private function setBroadcastOptions(Service $service, YoutubeIntegration $youtube, $active = true)
     {
         $autoStartStop = $active;
-        $youtube = YoutubeIntegration::get($service->city);
         $broadcasts = $youtube->getYoutube()->liveBroadcasts->listLiveBroadcasts(
             'id,contentDetails',
             ['id' => YoutubeHelper::getCode($service->youtube_url)]);
