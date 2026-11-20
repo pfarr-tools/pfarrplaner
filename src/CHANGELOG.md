@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2026.22.3](https://github.com/pfarr-tools/pfarrplaner/compare/v2026.22.2...v2026.22.3) (2026-11-20)
+
+
+### Features
+
+* **auth:** Manuellen Super-Admin-Anmeldelink bereitstellen ([6991173](https://github.com/pfarr-tools/pfarrplaner/commit/6991173bbbc883bdf4d56c3da960f8828f592eea)), closes [#125](https://github.com/pfarr-tools/pfarrplaner/issues/125)
+
+
+### Bug Fixes
+
+* **auth:** Anmeldelink-Drosselung isolieren. ([4548e36](https://github.com/pfarr-tools/pfarrplaner/commit/4548e36a4003a5869f55a4ccbafa3b4302bc0798)), closes [#125](https://github.com/pfarr-tools/pfarrplaner/issues/125)
+* **auth:** Super-Admin-Konten sicher verwalten. ([7eef6c6](https://github.com/pfarr-tools/pfarrplaner/commit/7eef6c6bdc42f51fa37628fcb9e931b8a859f30e)), closes [#113](https://github.com/pfarr-tools/pfarrplaner/issues/113)
+* **calendar:** iCal-Verbindung absichern. Fixes [#121](https://github.com/pfarr-tools/pfarrplaner/issues/121) ([3261bd9](https://github.com/pfarr-tools/pfarrplaner/commit/3261bd94bab0a4785c0a5feb1422e00f0f19aec3))
+* **deploy:** Bereinigt lokale Images nach erfolgreichen Updates. ([fbef019](https://github.com/pfarr-tools/pfarrplaner/commit/fbef019d33b8cc6b8ea4ca824ccaff31c28f4ebf)), closes [#114](https://github.com/pfarr-tools/pfarrplaner/issues/114)
+* **liturgy:** Fehlende Psalm-Daten überspringen. Fixes [#119](https://github.com/pfarr-tools/pfarrplaner/issues/119) ([fa8a561](https://github.com/pfarr-tools/pfarrplaner/commit/fa8a561799ac82a1528485bae70a95341ab170d1))
+* **ops:** Soketi beim Produktionsupdate starten. Fixes [#118](https://github.com/pfarr-tools/pfarrplaner/issues/118) ([07febcc](https://github.com/pfarr-tools/pfarrplaner/commit/07febcc02433204a0bc371a515d0914f6739adeb))
+* **queue:** Fehlende failed_jobs-Tabelle reparieren. Fixes [#117](https://github.com/pfarr-tools/pfarrplaner/issues/117) ([09e5a1d](https://github.com/pfarr-tools/pfarrplaner/commit/09e5a1d5a074b08e7bedfed575395d97a85b5553))
+* **streaming:** Fehlende YouTube-Übertragung tolerieren. Fixes [#120](https://github.com/pfarr-tools/pfarrplaner/issues/120) ([e944ebc](https://github.com/pfarr-tools/pfarrplaner/commit/e944ebc0c6d8b7237e138c35eae7f328bb128e1b))
+* **youtube:** Fehlende Live-Streaming-Details behandeln. Fixes [#115](https://github.com/pfarr-tools/pfarrplaner/issues/115) ([ae794d7](https://github.com/pfarr-tools/pfarrplaner/commit/ae794d71b54593562f47f9b807787757d10c44eb))
+* **youtube:** Rohzugriffstoken korrekt erneuern. Fixes [#116](https://github.com/pfarr-tools/pfarrplaner/issues/116) ([3d50f40](https://github.com/pfarr-tools/pfarrplaner/commit/3d50f407e1271f1755ffa7566f4d0cc2563b3f34))
+* **youtube:** Teilweise erstellte Broadcasts bereinigen. Fixes [#126](https://github.com/pfarr-tools/pfarrplaner/issues/126) ([4270881](https://github.com/pfarr-tools/pfarrplaner/commit/4270881d2bc84c189942f9b04a7d6e7bc9b8df82))
+
 ### [2026.22.2](https://github.com/pfarr-tools/pfarrplaner/compare/v2026.22.1...v2026.22.2) (2026-11-19)
 
 
