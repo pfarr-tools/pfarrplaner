@@ -64,8 +64,18 @@ class ServiceUpdated
         // update youtube if necessary
         if (($service->youtube_url != '') && ($service->city->google_access_token != '')
             && YoutubeIntegration::isConfigured()) {
-            Broadcast::get($service)->update();
+            $this->updateBroadcastIfAvailable(Broadcast::get($service));
         }
 
+    }
+
+    /**
+     * Update a YouTube broadcast when the service still has a matching broadcast.
+     *
+     * @param  Broadcast|null  $broadcast  Broadcast found for the updated service.
+     */
+    private function updateBroadcastIfAvailable(?Broadcast $broadcast): void
+    {
+        $broadcast?->update();
     }
 }
