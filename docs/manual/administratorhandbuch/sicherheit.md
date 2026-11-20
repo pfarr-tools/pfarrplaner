@@ -74,6 +74,14 @@ Passkeys, Zwei-Faktor-Faktoren, persönliche API-Tokens, DAV-Zugangsdaten,
 ausstehende Anmeldungen und Datenbank-Sitzungen werden widerrufen. Die Person
 kann später erneut mit einem Benutzerkonto ausgestattet werden.
 
+Für ein aktives, nicht gesperrtes Konto können Super-Administratoren außerdem
+im Abschnitt **Kontosicherheit** einen manuellen Anmeldelink erstellen. Der
+Link wird nicht per E-Mail versendet, kann direkt kopiert werden und ist einmalig
+verwendbar. Nach 60 Minuten läuft er ab. Eine eingerichtete Zwei-Faktor-Anmeldung
+bleibt auch bei diesem Link erforderlich. Behandeln Sie den Link wie ein
+Passwort und geben Sie ihn erst nach Identitätsprüfung über einen bekannten,
+vertrauenswürdigen Kontaktweg weiter.
+
 ### Passkey-Betrieb
 
 Passkey-Login und die Einrichtung sowie Verwaltung registrierter Geräte sind

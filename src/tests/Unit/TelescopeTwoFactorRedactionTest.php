@@ -30,11 +30,17 @@ class TelescopeTwoFactorRedactionTest extends TestCase
             self::assertFalse($filter($tokenRequest));
             $confirmationRequest = IncomingEntry::make(['uri' => '/login/link/confirm'])->type('request');
             self::assertFalse($filter($confirmationRequest));
+            $manualLinkRequest = IncomingEntry::make([
+                'uri' => '/admin/benutzer/42/login-link',
+                'response_status' => 500,
+            ])->type('request');
+            self::assertFalse($filter($manualLinkRequest));
             self::assertContains('code', Telescope::$hiddenRequestParameters);
             self::assertContains('password', Telescope::$hiddenRequestParameters);
             self::assertContains('_old_input.code', Telescope::$hiddenRequestParameters);
             self::assertContains('provisioning_uri', Telescope::$hiddenResponseParameters);
             self::assertContains('recovery_codes', Telescope::$hiddenResponseParameters);
+            self::assertContains('manual_login_url', Telescope::$hiddenResponseParameters);
 
             $watcher = new RequestWatcher;
             $payload = new \ReflectionMethod($watcher, 'payload');
@@ -56,10 +62,12 @@ class TelescopeTwoFactorRedactionTest extends TestCase
             $recordedResponse = $response->invoke($watcher, new JsonResponse([
                 'provisioning_uri' => 'otpauth://secret',
                 'recovery_codes' => ['plain-recovery-code'],
+                'manual_login_url' => 'https://example.test/login/link/plain-token',
                 'enabled' => true,
             ]));
             self::assertSame('********', $recordedResponse['provisioning_uri']);
             self::assertSame('********', $recordedResponse['recovery_codes']);
+            self::assertSame('********', $recordedResponse['manual_login_url']);
             self::assertTrue($recordedResponse['enabled']);
         } finally {
             Telescope::$filterUsing = $originalFilters;

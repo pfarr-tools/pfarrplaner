@@ -26,7 +26,10 @@ class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
             $requestPath = $entry->type === 'request'
                 ? parse_url((string) ($entry->content['uri'] ?? ''), PHP_URL_PATH)
                 : null;
-            if (is_string($requestPath) && preg_match('#^/login/link(?:/|$)#', $requestPath)) {
+            if (is_string($requestPath) && (
+                preg_match('#^/login/link(?:/|$)#', $requestPath)
+                || preg_match('#^/admin/benutzer/\d+/login-link$#', $requestPath)
+            )) {
                 return false;
             }
 
@@ -49,7 +52,7 @@ class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
     protected function hideSensitiveRequestDetails(): void
     {
         Telescope::hideRequestParameters(['_token', 'password', 'current_password', 'code']);
-        Telescope::hideResponseParameters(['provisioning_uri', 'recovery_codes']);
+        Telescope::hideResponseParameters(['provisioning_uri', 'recovery_codes', 'manual_login_url']);
         Telescope::hideRequestParameters(['_old_input.code', '_old_input.password']);
 
         if ($this->app->environment('local')) {

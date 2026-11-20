@@ -30,6 +30,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Security\CreateManualLoginLink;
 use App\Actions\Security\ManageUserAccount;
 use App\Actions\Security\RecoverUserTwoFactor;
 use App\Facades\Settings;
@@ -769,6 +770,29 @@ class UserController extends Controller
         return redirect()->route('user.edit', $user->getKey())
             ->with('message', 'Das Benutzerkonto wurde entfernt; die Person bleibt erhalten.')
             ->with('type', 'success');
+    }
+
+    /**
+     * Create a one-hour login URL for a target account without sending email.
+     *
+     * @param  Request  $request  Current authenticated request.
+     * @param  User  $user  Account that will receive the link.
+     * @param  CreateManualLoginLink  $createManualLoginLink  Authorized link generator.
+     * @return JsonResponse Non-cacheable URL and expiration timestamp.
+     */
+    public function createManualLoginLink(
+        Request $request,
+        User $user,
+        CreateManualLoginLink $createManualLoginLink,
+    ): JsonResponse {
+        /** @var User $actor */
+        $actor = $request->user();
+        $link = $createManualLoginLink->execute($actor, $user);
+
+        return response()->json($link)
+            ->header('Cache-Control', 'no-store')
+            ->header('Pragma', 'no-cache')
+            ->header('Referrer-Policy', 'no-referrer');
     }
 
     /**

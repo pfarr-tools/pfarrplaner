@@ -211,6 +211,10 @@
                     :unavailable-reason="twoFactorRecovery.unavailableReason"
                     :recovery-route="route('user.two-factor.recover', myUser.id)"
                 />
+                <ManualLoginLinkControl
+                    v-if="canManageAccount && myUser.isOfficialUser && !myUser.isLocked"
+                    :user-id="myUser.id"
+                />
                 <section
                     v-if="canManageAccount && myUser.isOfficialUser"
                     class="mt-4 border-top pt-3"
@@ -499,6 +503,7 @@ import FakeTable from '../../../components/Ui/FakeTable'
 import CityPermissionToggle from '../../../components/Ui/elements/Person/CityPermissionToggle'
 import FormGroup from '../../../components/Ui/forms/FormGroup'
 import TwoFactorRecoveryPanel from './TwoFactorRecoveryPanel.vue'
+import ManualLoginLinkControl from './ManualLoginLinkControl.vue'
 import PeopleSelect from '../../../components/Ui/elements/PeopleSelect'
 import HomeScreenConfigurationTab from '../../../components/Profile/Tabs/HomeScreenConfigurationTab'
 import VueJsonPretty from 'vue-json-pretty'
@@ -528,6 +533,7 @@ export default {
         PeopleSelect,
         FormGroup,
         TwoFactorRecoveryPanel,
+        ManualLoginLinkControl,
         CityPermissionToggle,
         FakeTable,
         FormSelectize,

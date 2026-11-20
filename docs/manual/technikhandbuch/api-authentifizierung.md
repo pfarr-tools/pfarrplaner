@@ -69,6 +69,15 @@ separat gespeicherte API-Zugangsdaten und bleibt bei einer Web-Kontosperre
 unverändert. Beim Zurücksetzen eines Kontos auf eine Person ohne Konto werden
 dagegen `api_token`, persönliche API-Tokens, Passkeys, TOTP-Faktoren und offene
 Web-Anmeldungen widerrufen.
+
+Der Super-Admin-Endpunkt `POST /admin/benutzer/{user}/login-link` erzeugt für
+ein aktives, nicht gesperrtes Nicht-Super-Admin-Konto einen 256-Bit-Nonce und
+verbraucht vorherige offene Login-Links dieses Kontos. In der Tabelle
+`passwordless_login_links` wird nur der SHA-256-Hash gespeichert; die Antwort
+enthält einmalig die Login-URL und den UTC-Ablaufzeitpunkt nach 60 Minuten. Die
+Antwort ist nicht cachebar, wird nicht per E-Mail versendet und der Endpunkt
+wird von Telescope ausgeschlossen. Die URL führt durch denselben Bestätigungs-
+und TOTP-Ablauf wie ein per E-Mail versendeter Link.
 ## Empfehlung für Integrationen
 
 - Neue produktive Integrationen dürfen nicht von implizit öffentlichen Endpunkten ausgehen.
