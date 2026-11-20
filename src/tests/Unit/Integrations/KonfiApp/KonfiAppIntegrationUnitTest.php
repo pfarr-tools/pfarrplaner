@@ -36,16 +36,21 @@ class KonfiAppIntegrationUnitTest extends TestCase
 
     public function test_event_types_are_cached_after_a_successful_request(): void
     {
+        Cache::setDefaultDriver('array');
+        $history = [];
         $handler = new MockHandler([
             new Response(200, [], json_encode(['data' => ['veranstaltungen' => [['id' => 7]]]])),
         ]);
-        $integration = $this->integrationWithHandler('cache-token', $handler);
+        $stack = HandlerStack::create($handler);
+        $stack->push(Middleware::history($history));
+        $integration = new KonfiAppIntegration('cache-token');
+        $integration->setClient(new Client(['handler' => $stack]));
 
         $first = $integration->listEventTypes();
         $second = $integration->listEventTypes();
 
         $this->assertJsonStringEqualsJsonString($first->toJson(), $second->toJson());
-        $this->assertCount(1, $handler);
+        $this->assertCount(1, $history);
     }
 
     public function test_stale_event_types_are_used_when_the_api_is_unavailable(): void

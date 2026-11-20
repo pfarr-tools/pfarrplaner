@@ -88,6 +88,15 @@ class Broadcast
         $this->setYoutube($youtube);
     }
 
+    /**
+     * Load a YouTube broadcast and its linked service by the YouTube broadcast ID.
+     *
+     * @param  string  $id  YouTube broadcast ID.
+     * @param  City  $city  City whose YouTube credentials should be used.
+     * @return Broadcast|null
+     *
+     * @throws Google_Exception
+     */
     public static function getFromId($id, $city)
     {
         if (! YoutubeIntegration::isConfigured()) {
