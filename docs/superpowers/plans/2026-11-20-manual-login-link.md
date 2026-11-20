@@ -64,4 +64,4 @@
 - [x] Ergänze Admin- und Technikhandbuch um Ablauf, Einmalverwendung, 60-Minuten-Frist und fortbestehende TOTP-/Sperrprüfungen.
 - [x] Prüfe die geänderten Dateien mit Pint, Prettier, JSDoc-Prüfung, PHPStan und `git diff --check`.
 - [x] Führe die relevanten isolierten PHPUnit- und Vitest-Suites aus und prüfe den vollständigen Diff.
-- [ ] Committe mit deutschem Conventional Commit und `Fixes #125`, pushe den Branch und schließe Issue #125 nach erfolgreicher Verifikation.
+- [x] Committe mit deutschem Conventional Commit und `Fixes #125`, pushe den Branch und schließe Issue #125 nach erfolgreicher Verifikation.
