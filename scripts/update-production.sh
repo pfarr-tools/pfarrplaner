@@ -66,21 +66,23 @@ if (( build_local )); then
   image_ref="pfarrplaner-app:$local_tag"
 else
   image_ref="$image_repository:$ref"
-  echo "1/6 Produktionsimage holen: $image_ref"
+  echo "1/7 Produktionsimage holen: $image_ref"
   PFARRPLANER_IMAGE="$image_ref" "${COMPOSE[@]}" pull app
 fi
 
-echo '2/6 Migrationen mit dem neuen Image ausführen.'
+echo '2/7 Migrationen mit dem neuen Image ausführen.'
 PFARRPLANER_IMAGE="$image_ref" "${COMPOSE[@]}" run --rm app php artisan migrate --force
-echo '3/6 Öffentliche Assets aktualisieren.'
+echo '3/7 Öffentliche Assets aktualisieren.'
 PFARRPLANER_IMAGE="$image_ref" "${COMPOSE[@]}" up -d --no-deps public-assets
-echo '4/6 App, Worker und Scheduler mit dem neuen Image starten.'
+echo '4/7 Soketi starten und Erreichbarkeit abwarten.'
+PFARRPLANER_IMAGE="$image_ref" "${COMPOSE[@]}" up -d --wait soketi
+echo '5/7 App, Worker und Scheduler mit dem neuen Image starten.'
 PFARRPLANER_IMAGE="$image_ref" "${COMPOSE[@]}" up -d --no-deps app horizon scheduler "${postfix_services[@]}"
-echo '5/6 Gesundheitsstatus prüfen.'
+echo '6/7 Gesundheitsstatus prüfen.'
 PFARRPLANER_IMAGE="$image_ref" "${COMPOSE[@]}" up -d --wait web
 PFARRPLANER_IMAGE="$image_ref" "${COMPOSE[@]}" ps
 
-echo '6/6 Alte lokale Images und Build-Cache bereinigen.'
+echo '7/7 Alte lokale Images und Build-Cache bereinigen.'
 if ! "$ROOT/scripts/cleanup-build-artifacts.sh" --tag "$ref" --repository "$image_repository"; then
   echo 'Fehler: Das Produktionsupdate ist aktiv, aber die Bereinigung lokaler Docker-Artefakte ist fehlgeschlagen.' >&2
   exit 1

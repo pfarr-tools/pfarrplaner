@@ -20,6 +20,7 @@ x-app: &app
     mariadb: {condition: service_healthy}
     redis: {condition: service_healthy}
     create-buckets: {condition: service_completed_successfully}
+    soketi: {condition: service_healthy}
   networks: [backend, sentry-egress]
 
 services:
@@ -142,6 +143,15 @@ services:
       SOKETI_DEFAULT_APP_KEY: ${PUSHER_APP_KEY:?PUSHER_APP_KEY muss gesetzt sein}
       SOKETI_DEFAULT_APP_SECRET: ${PUSHER_APP_SECRET:?PUSHER_APP_SECRET muss gesetzt sein}
     networks: [backend]
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "const socket = require('node:net').connect(6001, '127.0.0.1'); socket.on('connect', () => socket.end()); socket.on('error', () => process.exit(1));"
+      interval: 10s
+      timeout: 5s
+      retries: 6
   mailpit:
     image: axllent/mailpit:latest
     restart: unless-stopped

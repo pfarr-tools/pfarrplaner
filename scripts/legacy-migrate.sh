@@ -223,7 +223,7 @@ if remote 'test -d resources/bible'; then
 fi
 sha256sum "${legacy_archives[@]}" > "$ROOT/backups/legacy/legacy-$stamp.sha256"
 
-compose_up_args=(up -d --force-recreate app web horizon scheduler)
+compose_up_args=(up -d --force-recreate app web horizon scheduler soketi)
 if [[ "$target" == demo ]]; then
   set_env_value DEMO_MODE true
   set_env_value MAIL_MAILER smtp

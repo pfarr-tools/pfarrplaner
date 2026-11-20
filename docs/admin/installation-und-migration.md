@@ -269,7 +269,10 @@ mehr erreichen.
 
 Die App verwendet intern `soketi:6001`; der Browser verwendet den in
 `SOKETI_PORT` veröffentlichten Host-Port. App-ID, Key und Secret müssen in
-Laravel und im Soketi-Container identisch sein. Die Prüfung darf keine
+Laravel und im Soketi-Container identisch sein. Produktionsupdates starten
+Soketi vor App und Workern und warten auf den TCP-Gesundheitscheck. App und
+Worker werden erst anschließend gestartet; sie verwenden den internen Namen
+`soketi` im privaten Backend-Netzwerk. Die Prüfung darf keine
 Produktionsdatenbank verwenden:
 
 ```sh
