@@ -62,6 +62,13 @@ Sie lehnen Stellvertretersitzungen ab.
 Passkey-Registrierung bleibt an eine frische WebAuthn-Challenge und User
 Verification gebunden; der TOTP-Faktor wird erst nach erfolgreicher Codeprüfung
 aktiviert.
+
+Das separate Sperrkennzeichen `users.is_locked` wird von Web-Anmeldungen und
+dem authentifizierten Web-Middleware-Gate ausgewertet. DAV verwendet weiterhin
+separat gespeicherte API-Zugangsdaten und bleibt bei einer Web-Kontosperre
+unverändert. Beim Zurücksetzen eines Kontos auf eine Person ohne Konto werden
+dagegen `api_token`, persönliche API-Tokens, Passkeys, TOTP-Faktoren und offene
+Web-Anmeldungen widerrufen.
 ## Empfehlung für Integrationen
 
 - Neue produktive Integrationen dürfen nicht von implizit öffentlichen Endpunkten ausgehen.

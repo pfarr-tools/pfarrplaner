@@ -57,6 +57,21 @@ Ein Super-Administrator kann den eigenen Faktor nicht wiederherstellen. Auch das
 
 Bei Erfolg werden aktive oder unbestätigte Faktoren, ausstehende Anmeldelinks, persönliche API-Tokens und alle Datenbank-Sitzungen des Zielkontos widerrufen. Beim nächsten Anmelden muss die betroffene Person eine Authenticator-App neu einrichten und den ersten Code bestätigen. Bis dahin bleibt der normale Anwendungszugriff gesperrt. Der Vorgang wird mit handelndem Konto, Zielkonto, Referenz, Zeitpunkt und IP-Adresse protokolliert; Codes und Geheimnisse werden nicht protokolliert.
 
+### Benutzerkonten sperren und entfernen
+
+Super-Administratoren können im Reiter **Benutzerkonto** eines anderen Kontos
+alle registrierten Passkeys widerrufen, das Web-Konto sperren oder das Konto
+entfernen. Eine Kontosperre verhindert neue Web-Anmeldungen und beendet den
+Zugriff über bestehende Web-Sitzungen. Sie ändert den separaten DAV-Zugang
+nicht. Für eine vollständige Entziehung des DAV-Zugangs muss das Konto entfernt
+werden.
+
+**Konto entfernen** wandelt das Konto in eine Person ohne Benutzerkonto um.
+Personenstammdaten und Zuordnungen bleiben erhalten. Anmeldeinformationen,
+Passkeys, Zwei-Faktor-Faktoren, persönliche API-Tokens, DAV-Zugangsdaten,
+ausstehende Anmeldungen und Datenbank-Sitzungen werden widerrufen. Die Person
+kann später erneut mit einem Benutzerkonto ausgestattet werden.
+
 Für die Recovery muss `SESSION_DRIVER=database` gesetzt sein. Eine konfigurierte `SESSION_CONNECTION` muss dieselbe Datenbankverbindung wie die Anwendung verwenden. Vor Updates sind Datenbank und MinIO zu sichern und die Sicherung zu verifizieren. Die Faktor-Recovery-Migration ist vorwärtsgerichtet; einen Rollback führen Sie mit dem vorherigen Image und einer verifizierten Datenbanksicherung aus, nicht durch manuelles Entfernen von Spalten.
 
 ### Passkey-Betrieb

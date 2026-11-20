@@ -30,6 +30,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Security\ManageUserAccount;
 use App\Actions\Security\RecoverUserTwoFactor;
 use App\Facades\Settings;
 use App\HomeScreen\Tabs\HomeScreenTabFactory;
@@ -394,6 +395,8 @@ class UserController extends Controller
             'show_vacations_with_services' => $user->show_vacations_with_services,
             'needs_replacement' => $user->needs_replacement,
             'isOfficialUser' => $user->isOfficialUser,
+            'isLocked' => $user->isLocked,
+            'isSuperAdmin' => $user->hasRole(AuthServiceProvider::SUPER),
             'home_cities' => $this->compactIds($user->getRelation('homeCities')),
             'parishes' => $this->compactIds($user->getRelation('parishes')),
             'roles' => $this->compactIds($user->getRelation('roles')),
@@ -717,6 +720,54 @@ class UserController extends Controller
 
         return redirect()->route('user.edit', $user->getKey())
             ->with('message', 'Der Zwei-Faktor-Zugang wurde widerrufen. Das Konto muss TOTP erneut einrichten.')
+            ->with('type', 'success');
+    }
+
+    /** Block a target account from web sign-in. */
+    public function lockAccount(Request $request, User $user, ManageUserAccount $accounts): RedirectResponse
+    {
+        /** @var User $actor */
+        $actor = $request->user();
+        $accounts->setLocked($actor, $user, true);
+
+        return redirect()->route('user.edit', $user->getKey())
+            ->with('message', 'Das Benutzerkonto wurde gesperrt.')
+            ->with('type', 'success');
+    }
+
+    /** Restore a target account's ability to sign in through the web application. */
+    public function unlockAccount(Request $request, User $user, ManageUserAccount $accounts): RedirectResponse
+    {
+        /** @var User $actor */
+        $actor = $request->user();
+        $accounts->setLocked($actor, $user, false);
+
+        return redirect()->route('user.edit', $user->getKey())
+            ->with('message', 'Das Benutzerkonto wurde entsperrt.')
+            ->with('type', 'success');
+    }
+
+    /** Revoke all of a target account's registered passkeys. */
+    public function revokePasskeys(Request $request, User $user, ManageUserAccount $accounts): RedirectResponse
+    {
+        /** @var User $actor */
+        $actor = $request->user();
+        $accounts->revokePasskeys($actor, $user);
+
+        return redirect()->route('user.edit', $user->getKey())
+            ->with('message', 'Alle Passkeys des Benutzerkontos wurden widerrufen.')
+            ->with('type', 'success');
+    }
+
+    /** Remove authentication credentials while retaining the target person. */
+    public function resetAccount(Request $request, User $user, ManageUserAccount $accounts): RedirectResponse
+    {
+        /** @var User $actor */
+        $actor = $request->user();
+        $accounts->resetToPerson($actor, $user);
+
+        return redirect()->route('user.edit', $user->getKey())
+            ->with('message', 'Das Benutzerkonto wurde entfernt; die Person bleibt erhalten.')
             ->with('type', 'success');
     }
 

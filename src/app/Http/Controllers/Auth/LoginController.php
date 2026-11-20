@@ -113,7 +113,7 @@ class LoginController extends Controller
         $userId = $challenge['user_id'] ?? null;
         $user = $userId ? User::find($userId) : null;
 
-        abort_unless($user && $user->hasTwoFactorEnabled(), 404);
+        abort_unless($user && $user->isOfficialUser && ! $user->isLocked && $user->hasTwoFactorEnabled(), 404);
 
         $response = Inertia::render('Auth/LoginChallenge')->toResponse($request);
         $response->headers->add([
@@ -136,7 +136,7 @@ class LoginController extends Controller
         $validated = $request->validate(['code' => ['required', 'string', 'max:128']]);
         $result = DB::transaction(function () use ($challenge, $validated, $request): array {
             $user = User::query()->lockForUpdate()->find($challenge['user_id']);
-            if (! $user || ! $user->hasTwoFactorEnabled()) {
+            if (! $user || ! $user->isOfficialUser || $user->isLocked || ! $user->hasTwoFactorEnabled()) {
                 return ['state' => 'inactive'];
             }
 

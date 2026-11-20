@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\People\User;
 use Illuminate\Contracts\Auth\StatefulGuard;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -56,12 +57,17 @@ class PasskeyLoginController extends Controller
             return response()->json(['message' => 'Passkey konnte nicht bestätigt werden. Bitte erneut versuchen.'], 422);
         }
 
+        $user = $passkey->user;
+        if (! $user instanceof User || ! $user->isOfficialUser || $user->isLocked) {
+            return response()->json(['message' => 'Passkey konnte nicht bestätigt werden. Bitte erneut versuchen.'], 422);
+        }
+
         $guard = Auth::guard(Config::string('passkeys.guard'));
         if (! $guard instanceof StatefulGuard) {
             throw new RuntimeException('Passkeys requires a stateful authentication guard.');
         }
 
-        $guard->login($passkey->user);
+        $guard->login($user);
         $request->session()->regenerate();
 
         return app(PasskeyLoginResponse::class)->toResponse($request);

@@ -211,6 +211,47 @@
                     :unavailable-reason="twoFactorRecovery.unavailableReason"
                     :recovery-route="route('user.two-factor.recover', myUser.id)"
                 />
+                <section
+                    v-if="canManageAccount && myUser.isOfficialUser"
+                    class="mt-4 border-top pt-3"
+                >
+                    <h3>Kontosicherheit</h3>
+                    <p
+                        v-if="myUser.isLocked"
+                        class="alert alert-warning"
+                    >
+                        Dieses Konto ist gesperrt und kann sich nicht im Web anmelden. DAV-Zugriff
+                        bleibt davon unberührt.
+                    </p>
+                    <div class="d-flex flex-wrap gap-2">
+                        <button
+                            type="button"
+                            class="btn btn-outline-warning"
+                            @click="setAccountLock(!myUser.isLocked)"
+                        >
+                            {{ myUser.isLocked ? 'Konto entsperren' : 'Konto sperren' }}
+                        </button>
+                        <button
+                            type="button"
+                            class="btn btn-outline-danger"
+                            @click="revokeAllPasskeys"
+                        >
+                            Alle Passkeys widerrufen
+                        </button>
+                        <button
+                            type="button"
+                            class="btn btn-danger"
+                            @click="resetAccount"
+                        >
+                            Konto entfernen
+                        </button>
+                    </div>
+                    <p class="form-text mt-2">
+                        Konto entfernen behält die Personendaten, widerruft aber alle
+                        Anmeldefaktoren, API-Zugangsdaten und offenen Anmeldungen. Auch der
+                        DAV-Zugriff wird entfernt.
+                    </p>
+                </section>
             </Tab>
             <Tab
                 v-if="myUser.isOfficialUser"
@@ -442,6 +483,7 @@
 </template>
 
 <script>
+import { router } from '@inertiajs/vue3'
 import TabHeaders from '../../../components/Ui/tabs/tabHeaders'
 import TabHeader from '../../../components/Ui/tabs/tabHeader'
 import Tabs from '../../../components/Ui/tabs/tabs'
@@ -587,6 +629,15 @@ export default {
         }
     },
     computed: {
+        /** Determine whether the current Super-Admin may manage this account. */
+        canManageAccount() {
+            const currentUser = this.$page.props.currentUser?.data
+            return Boolean(
+                currentUser?.isSuperAdmin &&
+                Number(currentUser.id) !== Number(this.myUser.id) &&
+                !this.myUser.isSuperAdmin,
+            )
+        },
         /** Return user setting keys that currently have a value. */
         settingsKeys() {
             return Object.keys(this.mySettings)
@@ -595,6 +646,37 @@ export default {
         },
     },
     methods: {
+        /**
+         * Submit an account lock or unlock request after confirmation.
+         * @param {boolean} locked Whether the account should be locked.
+         */
+        setAccountLock(locked) {
+            const action = locked ? 'sperren' : 'entsperren'
+            if (!window.confirm(`Soll dieses Konto wirklich ${action} werden?`)) return
+            router.post(
+                window.route(locked ? 'user.account.lock' : 'user.account.unlock', this.myUser.id),
+                {},
+                { onSuccess: this.reloadAccountEditor },
+            )
+        },
+        /** Revoke every passkey registered for this account. */
+        revokeAllPasskeys() {
+            if (!window.confirm('Alle Passkeys dieses Kontos widerrufen?')) return
+            router.delete(window.route('user.passkeys.revoke-all', this.myUser.id), {
+                onSuccess: this.reloadAccountEditor,
+            })
+        },
+        /** Remove account access while retaining the person's data. */
+        resetAccount() {
+            if (!window.confirm('Konto entfernen und alle Zugangsdaten widerrufen?')) return
+            router.delete(window.route('user.account.reset', this.myUser.id), {
+                onSuccess: this.reloadAccountEditor,
+            })
+        },
+        /** Reload account editor data after a security control succeeds. */
+        reloadAccountEditor() {
+            window.location.reload()
+        },
         updateJsonSetting(key, jsonText) {
             try {
                 this.mySettings[key] = JSON.parse(jsonText)
