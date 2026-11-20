@@ -69,15 +69,23 @@ class PsalmLiturgySheet extends AbstractLiturgySheet
         return $doc->sendToBrowser($this->getFileName($service));
     }
 
-    protected function renderPsalmItem(DefaultWordDocument $doc, Item $item)
+    /**
+     * Render Psalm text when the liturgy item contains usable Psalm data.
+     *
+     * @param  DefaultWordDocument  $doc  Document receiving the Psalm content.
+     * @param  Item  $item  Liturgy item whose Psalm data should be rendered.
+     */
+    protected function renderPsalmItem(DefaultWordDocument $doc, Item $item): void
     {
-        if (! $item->data['psalm']['text']) {
+        $psalmData = $item->data['psalm'] ?? null;
+        if (! is_array($psalmData) || empty($psalmData['text'])) {
             return;
         }
         /** @var PsalmItemHelper $helper */
         $helper = $item->getHelper();
-        $doc->getSection()->addTitle($item->data['psalm']['title'], 1);
-        $doc->renderNormalText($item->data['psalm']['text']);
-        $this->fileName = $item->data['psalm']['title'];
+        $title = $psalmData['title'] ?? 'Psalm';
+        $doc->getSection()->addTitle($title, 1);
+        $doc->renderNormalText($psalmData['text']);
+        $this->fileName = $title;
     }
 }
