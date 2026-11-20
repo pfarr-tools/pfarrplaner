@@ -59,6 +59,21 @@ Bei Erfolg werden aktive oder unbestätigte Faktoren, ausstehende Anmeldelinks, 
 
 Für die Recovery muss `SESSION_DRIVER=database` gesetzt sein. Eine konfigurierte `SESSION_CONNECTION` muss dieselbe Datenbankverbindung wie die Anwendung verwenden. Vor Updates sind Datenbank und MinIO zu sichern und die Sicherung zu verifizieren. Die Faktor-Recovery-Migration ist vorwärtsgerichtet; einen Rollback führen Sie mit dem vorherigen Release-Image aus der Registry und einer verifizierten Datenbanksicherung aus, nicht durch manuelles Entfernen von Spalten.
 
+### Benutzerkonten sperren und entfernen
+
+Super-Administratoren können im Reiter **Benutzerkonto** eines anderen Kontos
+alle registrierten Passkeys widerrufen, das Web-Konto sperren oder das Konto
+entfernen. Eine Kontosperre verhindert neue Web-Anmeldungen und beendet den
+Zugriff über bestehende Web-Sitzungen. Sie ändert den separaten DAV-Zugang
+nicht. Für eine vollständige Entziehung des DAV-Zugangs muss das Konto entfernt
+werden.
+
+**Konto entfernen** wandelt das Konto in eine Person ohne Benutzerkonto um.
+Personenstammdaten und Zuordnungen bleiben erhalten. Anmeldeinformationen,
+Passkeys, Zwei-Faktor-Faktoren, persönliche API-Tokens, DAV-Zugangsdaten,
+ausstehende Anmeldungen und Datenbank-Sitzungen werden widerrufen. Die Person
+kann später erneut mit einem Benutzerkonto ausgestattet werden.
+
 ### Passkey-Betrieb
 
 Passkey-Login und die Einrichtung sowie Verwaltung registrierter Geräte sind

@@ -128,10 +128,10 @@ class AuthServiceProvider extends ServiceProvider
     {
         $this->registerPolicies();
 
-        // Super-Administrator:in can do everything
+        // Super-Administrator:in can do everything except subject-specific account management.
         Gate::before(
             function ($user, $ability) {
-                if ($user->hasRole(self::SUPER)) {
+                if ($user->hasRole(self::SUPER) && $ability !== 'manageAccount') {
                     return true;
                 }
             }

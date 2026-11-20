@@ -89,7 +89,7 @@ class EmailLoginLinkController extends Controller
             }
 
             $user = User::query()->lockForUpdate()->find($link->user_id);
-            if (! $user || ! $user->isOfficialUser) {
+            if (! $user || ! $user->isOfficialUser || $user->isLocked) {
                 DB::table('passwordless_login_links')->where('id', $link->id)->update([
                     'consumed_at' => now(),
                     'updated_at' => now(),

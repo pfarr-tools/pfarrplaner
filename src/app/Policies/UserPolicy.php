@@ -219,6 +219,14 @@ class UserPolicy
             && $user->getKey() !== $model->getKey();
     }
 
+    /** Permit Super-Admins to manage security controls on another non-Super-Admin account. */
+    public function manageAccount(User $user, User $model): bool
+    {
+        return $user->hasRole(RoleService::ROLE_SUPER_ADMIN)
+            && $user->getKey() !== $model->getKey()
+            && ! $model->hasRole(RoleService::ROLE_SUPER_ADMIN);
+    }
+
     /**
      * Determine whether the user can merge this user into another one
      *

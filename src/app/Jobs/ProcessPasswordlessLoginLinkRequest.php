@@ -21,6 +21,7 @@ class ProcessPasswordlessLoginLinkRequest
     {
         $user = User::query()->whereRaw('LOWER(email) = ?', [$this->email])
             ->where('is_official_user', true)
+            ->where('is_locked', false)
             ->first();
         if (! $user) {
             return;
@@ -30,7 +31,7 @@ class ProcessPasswordlessLoginLinkRequest
         $nonce = bin2hex(random_bytes(32));
         $linkId = DB::transaction(function () use ($user, $nonce): ?int {
             $lockedUser = User::query()->lockForUpdate()->findOrFail($user->getKey());
-            if (! $lockedUser->isOfficialUser) {
+            if (! $lockedUser->isOfficialUser || $lockedUser->isLocked) {
                 return null;
             }
             DB::table('passwordless_login_links')

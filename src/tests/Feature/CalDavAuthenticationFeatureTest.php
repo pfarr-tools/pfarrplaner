@@ -64,4 +64,28 @@ final class CalDavAuthenticationFeatureTest extends TestCase
         self::assertFalse($method->invoke($backend, $user->email, 'legacy-password'));
         self::assertGuest();
     }
+
+    /** A web account lock does not change the dedicated DAV credential. */
+    public function test_caldav_login_remains_available_when_web_account_is_locked(): void
+    {
+        $token = 'dav-token-remains-valid-while-web-locked';
+        $user = User::factory()->create([
+            'email' => 'calendar@example.test',
+            'is_official_user' => true,
+            'is_locked' => true,
+            'api_token' => hash('sha256', $token),
+        ]);
+        DB::table('calendar_connections')->insert([
+            'user_id' => $user->getKey(),
+            'title' => 'Kalender',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $this->withServerVariables([
+            'PHP_AUTH_USER' => $user->email,
+            'PHP_AUTH_PW' => $token,
+        ])->get('/dav/')
+            ->assertSuccessful();
+    }
 }

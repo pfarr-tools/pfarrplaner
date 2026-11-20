@@ -125,6 +125,7 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
         return [
             'new_features' => 'datetime',
             'is_official_user' => 'boolean',
+            'is_locked' => 'boolean',
             'security_onboarding_email_logins' => 'integer',
             'security_onboarding_last_shown_at' => 'datetime',
             ...$this->twoFactorCasts(),
@@ -234,6 +235,12 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
     public function getIsOfficialUserAttribute(): bool
     {
         return (bool) ($this->attributes['is_official_user'] ?? false);
+    }
+
+    /** Return whether an administrator has blocked this account's web access. */
+    public function getIsLockedAttribute(): bool
+    {
+        return (bool) ($this->attributes['is_locked'] ?? false);
     }
 
     /**

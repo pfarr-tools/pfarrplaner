@@ -134,6 +134,28 @@ final class PasskeyLoginFeatureTest extends TestCase
         self::assertSame(200, $response->getStatusCode());
     }
 
+    /** A verified passkey cannot authenticate an account locked from web sign-in. */
+    public function test_locked_account_cannot_sign_in_with_a_passkey(): void
+    {
+        /** @var User $user */
+        $user = User::factory()->create(['is_official_user' => true]);
+        $user->forceFill(['is_locked' => true])->save();
+        $passkey = new Passkey;
+        $passkey->setRelation('user', $user);
+        /** @var Store $session */
+        $session = app('session.store');
+        $session->put('passkey.login.challenge', ['purpose' => 'login']);
+        $credential = new PublicKeyCredential('public-key', 'opaque-id', new TestAuthenticatorResponse);
+        $options = PublicKeyCredentialRequestOptions::create('challenge');
+        $request = new TestPasskeyVerificationRequest($session, $credential, $options);
+
+        Auth::guard('web')->logout();
+        $response = app(PasskeyLoginController::class)->verify($request, new TestVerifyPasskey($passkey));
+
+        self::assertSame(422, $response->getStatusCode());
+        $this->assertGuest();
+    }
+
     /** Legacy forced password-change flags no longer affect passkey login. */
     public function test_passkey_response_ignores_legacy_password_change_flag(): void
     {

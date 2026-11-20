@@ -54,6 +54,10 @@ Route::post('/person/neu', [UserController::class, 'add'])->name('users.add');
 // single user
 Route::post('/benutzer', [UserController::class, 'store'])->name('user.store');
 Route::get('/benutzer/neu', [UserController::class, 'create'])->name('user.create');
+Route::post('/benutzer/{user}/konto/sperren', [UserController::class, 'lockAccount'])->name('user.account.lock');
+Route::post('/benutzer/{user}/konto/entsperren', [UserController::class, 'unlockAccount'])->name('user.account.unlock');
+Route::delete('/benutzer/{user}/konto', [UserController::class, 'resetAccount'])->name('user.account.reset');
+Route::delete('/benutzer/{user}/passkeys', [UserController::class, 'revokePasskeys'])->name('user.passkeys.revoke-all');
 Route::get('/benutzer/{user}', [UserController::class, 'edit'])->name('user.edit');
 Route::patch('/benutzer/{user}', [UserController::class, 'update'])->name('user.update');
 Route::delete('/benutzer/{user}', [UserController::class, 'destroy'])->name('user.destroy');
