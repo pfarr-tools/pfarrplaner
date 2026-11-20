@@ -347,7 +347,7 @@ Die Inbox ist ein Eingang und kein Ersatz für MinIO. Noch nicht verarbeitete
 Dateien werden nicht in den MinIO-/Restic-Satz aufgenommen; vor dem Löschen
 des `ftp_inbox`-Volumes müssen sie verarbeitet oder separat gesichert werden.
 
-## Lokale Build-Artefakte nach Releases
+## Lokale Docker-Artefakte nach Builds und Produktionsupdates
 
 `scripts/build-production.sh` bereinigt nach jedem Produktionsbuild den
 Docker-BuildKit-Cache und nicht mehr referenzierte Images. Zusätzlich bleiben
@@ -356,6 +356,20 @@ aktuellen lokalen und veröffentlichten Image-Namen erhalten. Ältere Releases
 bleiben im konfigurierten Docker-Registry-Repository verfügbar und werden nicht
 aus der Registry gelöscht. Docker-Volumes, Container anderer Projekte und
 Pfarrplaner-Laufzeitdaten werden von dieser Bereinigung nicht verändert.
+
+`scripts/update-production.sh` führt dieselbe Bereinigung nach einem
+erfolgreichen Healthcheck aus und behält dabei das gerade aktualisierte
+Release-Tag. Scheitert das Update vor dem Healthcheck, bleiben die bisherigen
+lokalen Release-Images als Rückfallpunkt erhalten. Scheitert die Bereinigung,
+meldet der Update-Befehl einen Fehler; die bereits gestartete neue Version
+bleibt aktiv und die Bereinigung kann mit demselben Skript erneut ausgeführt
+werden.
+
+Der GitHub-Actions-Produktionsworkflow aktualisiert den Root-Checkout des Hosts
+vor Backup und Update mit `git pull --ff-only`. Dadurch verwendet das Update
+den aktuellen Betriebs- und Bereinigungscode aus `main`; bei lokalen
+Änderungen, die den Fast-Forward verhindern, bricht der Rollout vor dem Backup
+und der Aktualisierung ab.
 
 Die Bereinigung läuft auch nach einem fehlgeschlagenen Build oder Push. Der
 ursprüngliche Fehlercode bleibt dabei erhalten; falls das neue Image nicht
@@ -460,7 +474,8 @@ auflösbar. Bei einem externen SMTP-Server bleibt das Profil deaktiviert.
 Migrationen müssen expand-and-contract-kompatibel sein: erst neue Strukturen
 hinzufügen, dann die Anwendung ausrollen, alte Strukturen erst später
 entfernen. Nicht kompatible Änderungen erhalten eine geplante kurze
-Wartungszeit. Das vorherige Image bleibt als Rollback-Grundlage erhalten.
+Wartungszeit. Das vorherige Release bleibt in der Registry als Rollback-
+Grundlage verfügbar und wird bei Bedarf erneut lokal gezogen.
 
 ### Migration der Kontoklassifikation und des Sicherheits-Onboardings
 
@@ -499,8 +514,9 @@ Sicherung zu verifizieren:
 Die Migration ist vorwärtsgerichtet. `migrate:rollback` verweigert deshalb die
 automatische Entfernung der Spalten, damit aktive TOTP-Geheimnisse und
 Recovery-Codes nicht versehentlich gelöscht werden. Für einen Rückfall wird
-das vorherige Image gestartet und die verifizierte Datenbanksicherung mit dem
-separaten Restore-Verfahren in einer quieszierten Umgebung wiederhergestellt;
+das vorherige Release-Image bei Bedarf aus der Registry gezogen und gestartet;
+die verifizierte Datenbanksicherung wird mit dem separaten Restore-Verfahren
+in einer quieszierten Umgebung wiederhergestellt;
 die vollständige Reihenfolge steht im Abschnitt [Fehlerbehebung und
 Rollback](#fehlerbehebung-und-rollback). Ein manuelles `DROP COLUMN` ist kein
 zulässiger Rollback.
@@ -541,8 +557,8 @@ vorwärtsgerichtet und verweigern `migrate:rollback`, weil dadurch Recovery-
 Marker, Fehlversuchszähler und Audit-Historie verloren gingen. Entfernen Sie
 Spalten oder Tabelle nicht manuell. Erstellen und verifizieren Sie vor einem Update ein
 Backup der Datenbank und des MinIO-Bestands. Ein erforderlicher Rollback muss
-das vorherige Image mit einer verifizierten Datenbanksicherung im
-quieszierten Restore-Verfahren kombinieren.
+das vorherige Release-Image aus der Registry mit einer verifizierten
+Datenbanksicherung im quieszierten Restore-Verfahren kombinieren.
 
 Für die Wiederherstellungsaktion ist zwingend
 `SESSION_DRIVER=database` erforderlich. Nur so kann Pfarrplaner aktive

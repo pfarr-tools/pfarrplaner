@@ -45,11 +45,11 @@ if [[ -n "$ref" ]]; then
   git -C "$ROOT" show-ref --verify --quiet "refs/tags/$ref" || die "Release-Tag nicht gefunden: $ref"
 elif (( build_local )); then
   command -v git >/dev/null || die 'Für das Update wird git benötigt.'
-  echo '0/5 Aktuellen Git-Stand holen.'
+  echo '0/6 Aktuellen Git-Stand holen.'
   git -C "$ROOT" pull --ff-only
 else
   command -v git >/dev/null || die 'Für das Update wird git benötigt.'
-  echo '0/5 Aktuellen Git-Stand holen.'
+  echo '0/6 Aktuellen Git-Stand holen.'
   git -C "$ROOT" pull --ff-only
   ref="$(git -C "$ROOT" describe --tags --exact-match HEAD 2>/dev/null || true)"
   [[ -n "$ref" ]] || die 'HEAD ist kein veröffentlichter Release. Verwende --ref <tag|commit> oder --build.'
@@ -66,17 +66,24 @@ if (( build_local )); then
   image_ref="pfarrplaner-app:$local_tag"
 else
   image_ref="$image_repository:$ref"
-  echo "1/5 Produktionsimage holen: $image_ref"
+  echo "1/6 Produktionsimage holen: $image_ref"
   PFARRPLANER_IMAGE="$image_ref" "${COMPOSE[@]}" pull app
 fi
 
-echo '2/5 Migrationen mit dem neuen Image ausführen.'
+echo '2/6 Migrationen mit dem neuen Image ausführen.'
 PFARRPLANER_IMAGE="$image_ref" "${COMPOSE[@]}" run --rm app php artisan migrate --force
-echo '3/5 Öffentliche Assets aktualisieren.'
+echo '3/6 Öffentliche Assets aktualisieren.'
 PFARRPLANER_IMAGE="$image_ref" "${COMPOSE[@]}" up -d --no-deps public-assets
-echo '4/5 App, Worker und Scheduler mit dem neuen Image starten.'
+echo '4/6 App, Worker und Scheduler mit dem neuen Image starten.'
 PFARRPLANER_IMAGE="$image_ref" "${COMPOSE[@]}" up -d --no-deps app horizon scheduler "${postfix_services[@]}"
-echo '5/5 Gesundheitsstatus prüfen.'
+echo '5/6 Gesundheitsstatus prüfen.'
 PFARRPLANER_IMAGE="$image_ref" "${COMPOSE[@]}" up -d --wait web
 PFARRPLANER_IMAGE="$image_ref" "${COMPOSE[@]}" ps
+
+echo '6/6 Alte lokale Images und Build-Cache bereinigen.'
+if ! "$ROOT/scripts/cleanup-build-artifacts.sh" --tag "$ref" --repository "$image_repository"; then
+  echo 'Fehler: Das Produktionsupdate ist aktiv, aber die Bereinigung lokaler Docker-Artefakte ist fehlgeschlagen.' >&2
+  exit 1
+fi
+
 echo 'Produktionsupdate abgeschlossen. Bei kompatiblen Migrationen bleibt die Unterbrechung auf den Containerwechsel begrenzt.'

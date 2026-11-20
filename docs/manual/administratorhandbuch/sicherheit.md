@@ -57,7 +57,7 @@ Ein Super-Administrator kann den eigenen Faktor nicht wiederherstellen. Auch das
 
 Bei Erfolg werden aktive oder unbestätigte Faktoren, ausstehende Anmeldelinks, persönliche API-Tokens und alle Datenbank-Sitzungen des Zielkontos widerrufen. Beim nächsten Anmelden muss die betroffene Person eine Authenticator-App neu einrichten und den ersten Code bestätigen. Bis dahin bleibt der normale Anwendungszugriff gesperrt. Der Vorgang wird mit handelndem Konto, Zielkonto, Referenz, Zeitpunkt und IP-Adresse protokolliert; Codes und Geheimnisse werden nicht protokolliert.
 
-Für die Recovery muss `SESSION_DRIVER=database` gesetzt sein. Eine konfigurierte `SESSION_CONNECTION` muss dieselbe Datenbankverbindung wie die Anwendung verwenden. Vor Updates sind Datenbank und MinIO zu sichern und die Sicherung zu verifizieren. Die Faktor-Recovery-Migration ist vorwärtsgerichtet; einen Rollback führen Sie mit dem vorherigen Image und einer verifizierten Datenbanksicherung aus, nicht durch manuelles Entfernen von Spalten.
+Für die Recovery muss `SESSION_DRIVER=database` gesetzt sein. Eine konfigurierte `SESSION_CONNECTION` muss dieselbe Datenbankverbindung wie die Anwendung verwenden. Vor Updates sind Datenbank und MinIO zu sichern und die Sicherung zu verifizieren. Die Faktor-Recovery-Migration ist vorwärtsgerichtet; einen Rollback führen Sie mit dem vorherigen Release-Image aus der Registry und einer verifizierten Datenbanksicherung aus, nicht durch manuelles Entfernen von Spalten.
 
 ### Passkey-Betrieb
 

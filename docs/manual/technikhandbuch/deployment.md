@@ -23,8 +23,10 @@ Ein Release und seine Auslieferung laufen über:
 Tag. GitHub Actions baut daraufhin das versionierte Image
 `pfarrtools/pfarrplaner:vVERSION` und veröffentlicht das Handbuch. `update`
 zieht dieses Image, führt Migrationen aus, aktualisiert die öffentlichen Assets
-und startet App, Horizon und Scheduler mit Health-Check neu. Der alte Image-
-Stand bleibt als Rollback-Grundlage erhalten. Wenn `MAIL_POSTFIX_ENABLED=true` gesetzt ist,
+und startet App, Horizon und Scheduler mit Health-Check neu. Nach erfolgreichem
+Health-Check entfernt es alte lokale Release-Images und den ungenutzten
+Build-Cache; ältere Release-Tags bleiben in der Registry für Rollbacks
+verfügbar. Wenn `MAIL_POSTFIX_ENABLED=true` gesetzt ist,
 aktiviert der Updatepfad automatisch das Compose-Profil `mail` und startet
 Postfix gemeinsam mit App, Horizon und Scheduler. Dadurch bleibt der interne
 Hostname `postfix` auch nach einem Containerwechsel erreichbar.
@@ -83,10 +85,11 @@ Hostnamen und Pfade werden dadurch nicht im Repository versioniert:
 
 Der Job verwendet das geschützte Environment `production` sowie die Secrets
 `PRODUCTION_DEPLOY_SSH_KEY` und `PRODUCTION_DEPLOY_KNOWN_HOSTS`. Pro Host
-werden per SSH `./planer prod backup create` und anschließend
-`./planer prod update --ref <Release-Tag> --backup-confirmed` ausgeführt. Der
-vorhandene Updatepfad wartet danach auf den Produktions-Health-Check; ein
-Fehler stoppt den seriellen Rollout.
+wird der Root-Checkout zuerst mit `git pull --ff-only` aktualisiert, danach
+werden per SSH `./planer prod backup create` und
+`./planer prod update --ref <Release-Tag> --backup-confirmed` ausgeführt. Das
+Update wartet auf den Produktions-Health-Check und bereinigt danach alte lokale
+Images und den Build-Cache; ein Fehler stoppt den seriellen Rollout.
 
 ## Health und Monitoring
 

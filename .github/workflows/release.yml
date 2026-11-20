@@ -161,5 +161,5 @@ jobs:
           RELEASE_TAG: ${{ github.ref_name }}
         run: |
           printf -v quoted_path '%q' "$DEPLOY_PATH"
-          remote_command="cd -- $quoted_path && ./planer prod backup create && ./planer prod update --ref '$RELEASE_TAG' --backup-confirmed && ./planer prod ps"
+          remote_command="cd -- $quoted_path && bootstrap_ui_mode=\$(stat -c '%a' scripts/bootstrap-ui.sh) && git -c core.filemode=false pull --ff-only origin main && chmod \"\$bootstrap_ui_mode\" scripts/bootstrap-ui.sh && ./planer prod backup create && ./planer prod update --ref '$RELEASE_TAG' --backup-confirmed && ./planer prod ps"
           ssh -o BatchMode=yes "$DEPLOY_USER@$DEPLOY_HOST" "$remote_command"

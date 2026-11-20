@@ -88,7 +88,7 @@ Fehlversuche werden am handelnden Konto mit Zeitstempel gespeichert. Nach fünf 
 
 `SESSION_DRIVER=database` ist erforderlich; eine gesetzte `SESSION_CONNECTION` muss `database.default` entsprechen. Bei Erfolg werden Faktor und Recovery-Codes des Zielkontos, offene E-Mail-Links, API-Tokens und Datenbank-Sitzungen widerrufen und ein Audit-Datensatz angelegt. `RequireTwoFactorRecovery` schützt danach Web-, API- und Extranet-Routen. Erlaubt bleiben Recovery-Seite, TOTP-Setup/-Bestätigung, Logout, kontrollierter Admin-Rückweg und CSRF-Keepalive. Nur die erfolgreiche TOTP-Bestätigung hebt die Sperre auf.
 
-Die Migrationen ergänzen `users.two_factor_recovery_required_at`, Versuchszähler und Zeitstempel sowie `two_factor_recovery_audits`. Das Audit speichert Actor-ID, Ziel-ID, Supportfall-Referenz, IP-Adresse und Zeitpunkt, jedoch keine Codes oder Geheimnisse. Die Migrationen sind vorwärtsgerichtet; Rollback erfolgt mit vorherigem Image und verifizierter Datenbanksicherung.
+Die Migrationen ergänzen `users.two_factor_recovery_required_at`, Versuchszähler und Zeitstempel sowie `two_factor_recovery_audits`. Das Audit speichert Actor-ID, Ziel-ID, Supportfall-Referenz, IP-Adresse und Zeitpunkt, jedoch keine Codes oder Geheimnisse. Die Migrationen sind vorwärtsgerichtet; ein Rollback erfolgt mit dem vorherigen Release-Image aus der Registry und einer verifizierten Datenbanksicherung.
 
 ## Passkey-Anmeldung und Geräteverwaltung
 

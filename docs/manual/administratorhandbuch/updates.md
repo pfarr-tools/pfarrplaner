@@ -26,14 +26,20 @@ baut das neue Image vor dem Umschalten, führt die Migration aus, aktualisiert
 
 Ohne `--ref` wird der aktuelle Checkout verwendet. Für ein Release sollte ein
 veröffentlichter Tag verwendet werden. Das Update verlangt eine produktive
-`.env`, verhindert parallele Ausrollungen und wartet auf den Health-Check.
+`.env`, verhindert parallele Ausrollungen und wartet auf den Health-Check. Nach
+erfolgreichem Health-Check entfernt es alte lokale Release-Images und den
+ungenutzten Build-Cache. Das aktuelle Image und ältere Tags in der Registry
+bleiben erhalten.
 
 ### Rollback
 
-Das vorherige Image und das vorherige Release-Tag bleiben als Rückfallbasis
-erhalten. Bei kompatiblen Migrationen wird zunächst auf das vorherige Image
-zurückgestellt. Bei nicht kompatiblen Migrationen ist zusätzlich der
-dokumentierte Datenbank- und MinIO-Restore aus dem Backup erforderlich.
+Vor dem erfolgreichen Health-Check bleiben die bisherigen lokalen
+Release-Images als Rückfallbasis erhalten. Nach erfolgreichem Update werden
+ältere Images nur lokal entfernt; das vorherige Release bleibt in der
+konfigurierten Registry verfügbar und kann bei kompatiblen Migrationen mit
+`./planer update --ref <vorheriges-Release-Tag> --backup-confirmed`
+wiederhergestellt werden. Bei nicht kompatiblen Migrationen ist zusätzlich
+der dokumentierte Datenbank- und MinIO-Restore aus dem Backup erforderlich.
 
 ### Typischer produktiver Ablauf
 
@@ -71,7 +77,7 @@ Ein gutes Update ist erst dann sauber geplant, wenn Sie auch den Rückweg kennen
 
 Für Docker bedeutet das meist:
 
-- vorheriges Image-Tag behalten
+- vorheriges Release-Tag für einen möglichen erneuten Abruf aus der Registry dokumentieren
 - alte Compose-Version oder Image-Referenz dokumentieren
 - Datenbank-Backup vorhalten
 
