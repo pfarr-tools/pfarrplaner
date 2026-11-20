@@ -76,6 +76,9 @@ class AppServiceProvider extends ServiceProvider
         );
         RateLimiter::for('login-link', static fn (Request $request): Limit => Limit::perMinute(10)->by('login-link|'.$request->ip())
         );
+        RateLimiter::for('manual-login-link', static fn (Request $request): Limit => Limit::perMinute(6)
+            ->by('manual-login-link|'.($request->user()?->getAuthIdentifier() ?? $request->ip()))
+        );
 
         App::setLocale(config('app.locale'));
         Carbon::setLocale(config('app.locale'));

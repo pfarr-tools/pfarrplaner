@@ -57,7 +57,7 @@ Route::get('/benutzer/neu', [UserController::class, 'create'])->name('user.creat
 Route::post('/benutzer/{user}/konto/sperren', [UserController::class, 'lockAccount'])->name('user.account.lock');
 Route::post('/benutzer/{user}/konto/entsperren', [UserController::class, 'unlockAccount'])->name('user.account.unlock');
 Route::post('/benutzer/{user}/login-link', [UserController::class, 'createManualLoginLink'])
-    ->middleware('throttle:6,1')
+    ->middleware('throttle:manual-login-link')
     ->name('user.account.login-link');
 Route::delete('/benutzer/{user}/konto', [UserController::class, 'resetAccount'])->name('user.account.reset');
 Route::delete('/benutzer/{user}/passkeys', [UserController::class, 'revokePasskeys'])->name('user.passkeys.revoke-all');

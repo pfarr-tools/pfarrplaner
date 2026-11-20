@@ -17,6 +17,7 @@ use App\Models\People\User;
 use App\Services\RoleService;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use RoundlyConsulting\TwoFactor\Contracts\TwoFactorService;
@@ -25,6 +26,20 @@ use Tests\TestCase;
 /** Cover creation and redemption of Super-Admin-issued passwordless links. */
 final class ManualLoginLinkFeatureTest extends TestCase
 {
+    /** Isolate rate-limit state from other tests that reuse database user IDs. */
+    protected function setUp(): void
+    {
+        parent::setUp();
+        Cache::flush();
+    }
+
+    /** Leave no rate-limit state for subsequent feature tests. */
+    protected function tearDown(): void
+    {
+        Cache::flush();
+        parent::tearDown();
+    }
+
     /**
      * A Super-Admin receives a one-hour URL while only its token hash is stored.
      */
@@ -102,6 +117,24 @@ final class ManualLoginLinkFeatureTest extends TestCase
             ->assertForbidden();
 
         self::assertDatabaseCount('passwordless_login_links', 0);
+    }
+
+    /**
+     * Passkey-management throttles do not consume manual-link request capacity.
+     */
+    public function test_manual_login_link_has_an_independent_security_rate_limit(): void
+    {
+        $admin = User::factory()->create();
+        $admin->assignRole(RoleService::ROLE_SUPER_ADMIN);
+        $target = User::factory()->create(['is_official_user' => true]);
+
+        for ($attempt = 0; $attempt < 6; $attempt++) {
+            $this->actingAs($admin)->get(route('user.passkeys.index'))->assertOk();
+        }
+
+        $this->actingAs($admin)
+            ->post('/admin/benutzer/'.$target->getKey().'/login-link')
+            ->assertOk();
     }
 
     /**
