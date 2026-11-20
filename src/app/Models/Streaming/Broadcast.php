@@ -40,6 +40,7 @@ use Google_Exception;
 use Google_Service_YouTube;
 use Google_Service_YouTube_LiveBroadcast;
 use Google_Service_YouTube_LiveBroadcastStatus;
+use Google_Service_YouTube_Video;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -178,6 +179,30 @@ class Broadcast
     }
 
     /**
+     * Update video metadata and remove a partially created broadcast if that update fails.
+     *
+     * @param  Google_Service_YouTube_Video  $video  Video metadata to apply.
+     * @param  string  $broadcastId  ID of the broadcast created before this update.
+     */
+    protected function updateBroadcastVideo(Google_Service_YouTube_Video $video, string $broadcastId): void
+    {
+        try {
+            $this->youtube->videos->update('snippet,status', $video);
+        } catch (\Throwable $exception) {
+            try {
+                $this->youtube->liveBroadcasts->delete($broadcastId);
+            } catch (\Throwable $cleanupException) {
+                Log::warning(
+                    'YouTube broadcast cleanup failed after video metadata update error ('
+                    .$cleanupException::class.').'
+                );
+            }
+
+            throw $exception;
+        }
+    }
+
+    /**
      * @param  string  $statusString
      * @return Broadcast
      */
@@ -221,14 +246,14 @@ class Broadcast
         );
         $instance->setLiveBroadcast($broadcastsResponse);
 
-        $video = new \Google_Service_YouTube_Video;
+        $video = new Google_Service_YouTube_Video;
         $video->setId($broadcastsResponse->id);
         $video->setSnippet($service->getVideoSnippet());
         $videoStatus = new \Google_Service_YouTube_VideoStatus;
         $videoStatus->setSelfDeclaredMadeForKids($service->city->youtube_self_declared_for_children == 1);
         $video->setStatus($videoStatus);
 
-        $videoResponse = $instance->getYoutube()->videos->update('snippet,status', $video);
+        $instance->updateBroadcastVideo($video, (string) $broadcastsResponse->id);
 
         return $instance;
     }
