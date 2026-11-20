@@ -139,13 +139,16 @@ class UpdateYoutubeStream extends Command
     }
 
     /**
-     * Check if video has stopped streaming already
+     * Check whether YouTube reports an end time for a video's live stream.
      *
-     * @return bool
+     * Videos without live-streaming details have not reported that they ended.
+     *
+     * @param  \Google_Service_YouTube_Video  $video  Video returned by YouTube.
+     * @return bool Whether the video has an actual live-stream end time.
      */
-    private function videoHasEnded(\Google_Service_YouTube_Video $video)
+    private function videoHasEnded(\Google_Service_YouTube_Video $video): bool
     {
-        return $video->getLiveStreamingDetails()->actualEndTime !== null;
+        return $video->getLiveStreamingDetails()?->actualEndTime !== null;
     }
 
     /**
