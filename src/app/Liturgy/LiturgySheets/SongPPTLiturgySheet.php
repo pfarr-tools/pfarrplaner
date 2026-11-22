@@ -828,6 +828,9 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
                         if (mb_substr($line, 0, 1) === "\t") {
                             $paragraph->getAlignment()->setMarginLeft(35);
                             $line = mb_substr($line, 1);
+                            if ($isOdp) {
+                                $line = "\u{00A0}\u{00A0}".$line;
+                            }
                         }
 
                         $paragraph->getAlignment()->setVertical($this->config['verticalAlignment']);

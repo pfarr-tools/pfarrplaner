@@ -21,11 +21,44 @@ use App\Models\Sermon;
 use App\Models\Service;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
+use PhpOffice\PhpPresentation\PhpPresentation;
 use Tests\TestCase;
+use ZipArchive;
 
 /** Regression tests for configurable PowerPoint/ODP separator slides. */
 class SongPPTLiturgySheetFeatureTest extends TestCase
 {
+    /** ODP content keeps indentation from Psalm verse tabs. */
+    public function test_odp_file_preserves_indented_verse_lines(): void
+    {
+        $sheet = new class extends SongPPTLiturgySheet
+        {
+            /**
+             * @param  array<int, string>  $lines
+             */
+            public function exportOdpSlideForTest(array $lines, string $outputPath): void
+            {
+                $this->ppt = new PhpPresentation;
+                $this->ppt->removeSlideByIndex(0);
+                $this->setConfiguration(['outputFormat' => 'odp']);
+                $this->slide($lines, 40);
+                $this->createODPFile($outputPath);
+            }
+        };
+        $tempFile = tempnam(sys_get_temp_dir(), 'psalm-odp-test-');
+
+        $sheet->exportOdpSlideForTest(['First line', "\tIndented line"], $tempFile);
+
+        $zip = new ZipArchive;
+        $this->assertTrue($zip->open($tempFile));
+        $contentXml = $zip->getFromName('content.xml');
+        $zip->close();
+        unlink($tempFile);
+
+        $this->assertIsString($contentXml);
+        $this->assertStringContainsString("\u{00A0}\u{00A0}Indented line", $contentXml);
+    }
+
     /** PPT and ODP event lists omit the automatic possible-baptism description. */
     public function test_ad_list_description_excludes_possible_baptism_label(): void
     {
