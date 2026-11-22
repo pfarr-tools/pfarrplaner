@@ -99,7 +99,7 @@ class UserController extends Controller
     public function index()
     {
         Gate::authorize('index', User::class);
-        $userQuery = User::select(['id', 'first_name', 'last_name', 'title', 'email', 'is_official_user'])
+        $userQuery = User::select(['id', 'first_name', 'last_name', 'title', 'email', 'is_official_user', 'is_locked'])
             ->with([
                 'homeCities:id,name',
                 'cities:id,name',
@@ -365,6 +365,7 @@ class UserController extends Controller
             'last_name' => $user->last_name,
             'email' => $user->email,
             'isOfficialUser' => $user->isOfficialUser,
+            'isLocked' => $user->isLocked,
             'isAdmin' => $user->isAdmin,
             'home_cities' => $this->compactOptions($user->getRelation('homeCities')),
             'cities' => $this->compactOptions($user->getRelation('cities')),
@@ -900,6 +901,12 @@ class UserController extends Controller
     {
         abort_if(Session::has('adminUserSwitchBack'), 403);
         Gate::authorize('impersonate', $user);
+        if (! $user->isOfficialUser || $user->isLocked) {
+            return redirect()->back()->withErrors([
+                'user' => 'Dieses Konto ist nicht aktiv und kann nicht übernommen werden.',
+            ]);
+        }
+
         $adminId = Auth::user()->id;
         Auth::logout();
         $request->session()->invalidate();

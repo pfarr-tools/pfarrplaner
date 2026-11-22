@@ -56,6 +56,58 @@ class UserWebFeatureTest extends TestCase
             );
     }
 
+    /** A locked target cannot discard the administrator's authenticated session. */
+    public function test_switching_to_a_locked_user_keeps_the_administrator_session(): void
+    {
+        $this->withoutMiddleware(VerifyCsrfToken::class);
+        $this->user->assignRole(RoleService::ROLE_ADMIN);
+        $target = User::factory()->create(['is_locked' => true]);
+
+        $this->from(route('users.index'))
+            ->actingAs($this->user)
+            ->post(route('user.switch', $target))
+            ->assertRedirect(route('users.index'))
+            ->assertSessionHasErrors('user');
+
+        $this->assertAuthenticatedAs($this->user);
+    }
+
+    /** User list data exposes lock state so the UI can hide unusable switch actions. */
+    public function test_index_includes_lock_state_for_each_user(): void
+    {
+        $this->user->assignRole(RoleService::ROLE_ADMIN);
+        $target = User::factory()->create(['is_locked' => true]);
+
+        $this->actingAs($this->user)
+            ->get(route('users.index'))
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->where('users', fn ($users) => collect($users)
+                    ->firstWhere('id', $target->id)['isLocked'] === true)
+            );
+    }
+
+    /** A successful account switch persists across navigation and can be reversed. */
+    public function test_switching_to_an_active_user_and_back_preserves_both_sessions(): void
+    {
+        $this->withoutMiddleware(VerifyCsrfToken::class);
+        $this->user->assignRole(RoleService::ROLE_ADMIN);
+        $target = User::factory()->create(['is_official_user' => true, 'is_locked' => false]);
+
+        $this->actingAs($this->user)
+            ->post(route('user.switch', $target))
+            ->assertRedirect(route('home'));
+
+        $this->assertAuthenticatedAs($target);
+        $this->get(route('home'))->assertOk();
+        $this->assertAuthenticatedAs($target);
+
+        $this->post(route('user.switchback'))
+            ->assertRedirect(route('home'));
+
+        $this->assertAuthenticatedAs($this->user);
+    }
+
     /** The profile exposes only non-sensitive factor state to the UI. */
     public function test_profile_exposes_two_factor_state_without_secrets(): void
     {
