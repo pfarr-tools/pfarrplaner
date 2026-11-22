@@ -562,7 +562,7 @@ class DemoBuilder extends Command
             'own_podcast_url' => '',
             'own_podcast_spotify' => false,
             'own_podcast_itunes' => false,
-            'api_token' => Str::random(60),
+            'api_token' => hash('sha256', Str::random(60)),
             'remember_token' => Str::random(60),
             'email' => 'demo-user-'.$user->id.'@demo.pfarrplaner.de',
             'image' => '',

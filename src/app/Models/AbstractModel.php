@@ -292,7 +292,7 @@ class AbstractModel extends Model
     public static function registerApiRoutes(): void
     {
         Route::middleware([
-            'auth:api',
+            'auth:sanctum,api',
         ])->group(function () {
             static::registerDefaultRoutes('api', static::apiControllerClass());
         });

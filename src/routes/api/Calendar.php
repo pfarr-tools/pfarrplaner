@@ -33,5 +33,5 @@ use App\Http\Controllers\Api\CalendarController;
 Route::get('/cal/city/{city}/{date}', [CalendarController::class, 'city'])->name('calendar.byCityAndMonth');
 Route::get('/quick-pick/{date}', [CalendarController::class, 'quickPick'])->name('calendar.quick-pick');
 
-Route::get('/kalender/monat/{date}', [CalendarController::class, 'month'])->name('calendar.month')->middleware('auth:api');
-Route::get('/kalender/gottesdienst/{service}', [CalendarController::class, 'service'])->name('calendar.service')->middleware('auth:api');
+Route::get('/kalender/monat/{date}', [CalendarController::class, 'month'])->name('calendar.month')->middleware('auth:sanctum,api');
+Route::get('/kalender/gottesdienst/{service}', [CalendarController::class, 'service'])->name('calendar.service')->middleware('auth:sanctum,api');

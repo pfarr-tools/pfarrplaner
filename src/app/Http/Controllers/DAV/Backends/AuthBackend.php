@@ -31,6 +31,7 @@
 namespace App\Http\Controllers\DAV\Backends;
 
 use App\Models\People\User;
+use App\Services\ApiTokenAuthenticator;
 use Illuminate\Support\Facades\Auth;
 use Sabre\DAV\Auth\Backend\AbstractBasic;
 
@@ -54,9 +55,10 @@ class AuthBackend extends AbstractBasic
             return false;
         }
 
-        $storedToken = (string) $user->api_token;
-        if ($storedToken === ''
-            || (! hash_equals($storedToken, hash('sha256', $token)) && ! hash_equals($storedToken, $token))) {
+        $tokenUser = ApiTokenAuthenticator::findUser($token);
+        if (! $tokenUser
+            || $tokenUser->getKey() !== $user->getKey()
+            || $user->two_factor_recovery_required_at) {
             return false;
         }
         Auth::login($user);

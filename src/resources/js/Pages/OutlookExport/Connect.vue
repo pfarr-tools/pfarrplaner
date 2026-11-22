@@ -28,7 +28,7 @@
 
 <template>
     <admin-layout title="Mit Outlook verbinden">
-        <form-selectize
+        <FormSelectize
             label="Welche Art von Kalender möchtest du mit Outlook verbinden?"
             :options="calendarLinks"
             v-model="myType"
@@ -37,7 +37,7 @@
             v-if="link.needs.includes('cities')"
             :key="link.id"
         >
-            <form-selectize
+            <FormSelectize
                 label="Daten für folgende Kirchengemeinden mit einschließen"
                 :options="cities"
                 v-model="myForm.cities"
@@ -48,7 +48,7 @@
             v-if="link.needs.includes('includeHidden')"
             :key="link.id"
         >
-            <form-check
+            <FormCheck
                 label="Versteckte Gottesdienste mit einbeziehen"
                 v-model="myForm.includeHidden"
             />
@@ -73,6 +73,7 @@
                         <button
                             class="btn btn-outline-secondary"
                             type="button"
+                            :disabled="!url"
                             @click="copyToClipboard"
                             title="In die Zwischenablage kopieren"
                         >
@@ -80,6 +81,22 @@
                         </button>
                     </div>
                 </div>
+                <button
+                    v-if="!feedToken"
+                    class="btn btn-primary"
+                    type="button"
+                    :disabled="creatingToken"
+                    @click="generateCalendarLink"
+                >
+                    Kalenderlink erzeugen
+                </button>
+                <p
+                    v-if="feedToken"
+                    class="small text-muted"
+                >
+                    Der Zugangsschlüssel wird nur hier angezeigt. Du kannst ihn unter
+                    <a :href="route('tokens.index')">Tokens verwalten</a> widerrufen.
+                </p>
             </li>
             <li>Klicke auf "Ok".</li>
         </ol>
@@ -88,6 +105,8 @@
 </template>
 
 <script>
+/* global route */
+
 import FormSelectize from '../../components/Ui/forms/FormSelectize'
 import FormCheck from '../../components/Ui/forms/FormCheck'
 
@@ -102,9 +121,10 @@ export default {
             })[0]
         },
         url() {
-            let data = {
+            if (!this.feedToken) return ''
+            const data = {
                 user: this.$page.props.currentUser.data.id,
-                token: this.$page.props.currentUser.data.api_token,
+                token: this.feedToken,
                 key: this.link.id,
             }
             if (this.link.needs.includes('cities')) {
@@ -119,6 +139,8 @@ export default {
     data() {
         return {
             myType: this.calendarLinks.length ? this.calendarLinks[0].id : null,
+            feedToken: null,
+            creatingToken: false,
             myForm: {
                 cities: this.cities.length ? [this.cities[0].id] : null,
                 includeHidden: false,
@@ -126,8 +148,25 @@ export default {
         }
     },
     methods: {
+        /** Generate a one-time Sanctum token for the selected calendar URL. */
+        generateCalendarLink() {
+            if (this.creatingToken) return
+            this.creatingToken = true
+            window.api
+                .post(route('ical.token'))
+                .then((response) => {
+                    this.feedToken = response.data.token
+                })
+                .catch(() => {
+                    window.alert('Der Kalenderlink konnte nicht erzeugt werden.')
+                })
+                .finally(() => {
+                    this.creatingToken = false
+                })
+        },
+        /** Copy the generated subscription URL to the system clipboard. */
         copyToClipboard() {
-            navigator.clipboard?.writeText(this.url).then(() => {})
+            window.navigator.clipboard?.writeText(this.url).then(() => {})
         },
     },
 }

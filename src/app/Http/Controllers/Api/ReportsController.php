@@ -38,7 +38,7 @@ class ReportsController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth:api');
+        $this->middleware('auth:sanctum,api');
     }
 
     public function step(Request $request, $report, $step)

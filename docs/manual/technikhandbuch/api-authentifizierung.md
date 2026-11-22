@@ -2,7 +2,7 @@
 
 # API-Authentifizierung
 
-Die API ist standardmäßig vollständig mit `auth:api` abgesichert. Öffentliche API-Routen sind nur noch dort zulässig, wo die Öffentlichkeit fachlich eindeutig beabsichtigt ist.
+Die API ist standardmäßig mit `auth:sanctum,api` abgesichert. Öffentliche API-Routen sind nur dort zulässig, wo die Öffentlichkeit fachlich eindeutig beabsichtigt ist.
 
 ## Was das praktisch bedeutet
 
@@ -11,14 +11,31 @@ Die API ist standardmäßig vollständig mit `auth:api` abgesichert. Öffentlich
 - Auch lesende Endpunkte gelten standardmäßig als intern oder benutzerbezogen und sind deshalb ebenfalls geschützt.
 - Aktuell ist nur der Health-Check unter `/api/health` öffentlich erreichbar.
 
+Browseraufrufe der Anwendung verwenden die Sanctum-Sitzung mit CSRF-Schutz.
+Externe Clients authentifizieren sich mit einem persönlichen Sanctum-Token im
+`Authorization: Bearer …`-Header. Bestehende Integrationen mit dem bisherigen
+Benutzerfeld `api_token` bleiben während der Umstellung gültig; sie können den
+Wert weiterhin als Bearer-Token oder über den bisherigen Query-Parameter
+`api_token` senden. Query-Parameter sind wegen möglicher Speicherung in
+Serverlogs, Browserhistorie und Proxylogs nur ein Übergangsweg. Neue Tokens
+werden ausschließlich im Tokenbereich einmalig im Klartext ausgegeben und
+danach gehasht gespeichert. Eine vorwärtsgerichtete Datenbankmigration hasht
+auch bisherige Klartextwerte, ohne den von Integrationen gesendeten Token zu
+ändern; bereits gehashte Werte bleiben unverändert. Persönliche Tokens lassen
+sich im Tokenbereich widerrufen. Der Kalenderfeed-Token ist auf den Feed
+beschränkt und wird von der allgemeinen JSON-API abgewiesen.
+
 ## Projektbezug
 
 Im Projekt sind unter anderem diese Bausteine sichtbar:
 
-- Guard `api` aus `config/auth.php` mit Token-Authentifizierung
-- Middleware `auth:api` als Standard für die komplette API
+- Sanctum für Sitzungen und persönliche API-Tokens
+- Kompatibilitäts-Guard `api` für bisherige `api_token`-Zugangsdaten
+- Middleware `auth:sanctum,api` als Standard für die komplette API
 - Web-Authentifizierung für normale Oberflächenrouten
-- interne Vue-Komponenten verwenden für API-Aufrufe bevorzugt `this.$api()`, damit das Benutzer-Token konsistent als Bearer-Token gesendet wird
+- interne Vue-Komponenten verwenden `this.$api()` mit der angemeldeten
+  Sanctum-Sitzung; ein dauerhaftes API-Token wird nicht mehr in die Seite
+  eingebettet
 
 ## Zwei-Faktor-Authentifizierung im Web-Login
 
@@ -81,7 +98,12 @@ und TOTP-Ablauf wie ein per E-Mail versendeter Link.
 ## Empfehlung für Integrationen
 
 - Neue produktive Integrationen dürfen nicht von implizit öffentlichen Endpunkten ausgehen.
-- Integrationen sollten immer ein Benutzer-API-Token mitsenden und nicht auf Cookie-Sitzungen vertrauen.
+- Neue externe Integrationen sollten ein persönliches Sanctum-Token im
+  Bearer-Header verwenden und nicht auf Cookie-Sitzungen vertrauen.
+- Bestehende Clients mit `api_token` müssen nicht gleichzeitig umgestellt
+  werden. Die Migration erhält den ursprünglichen Zugangswert; bei einer
+  bewussten Tokenrotation wird die alte Zugangsdaten-Spalte geleert und ein
+  persönliches Sanctum-Token ausgegeben.
 - Vor dem Einsatz sind Route, Controller, erwartete Rechte und Datenumfang zu prüfen.
 - Für dokumentierte Schnittstellen sollte zusätzlich die generierte OpenAPI-Spezifikation bereitgestellt werden.
 

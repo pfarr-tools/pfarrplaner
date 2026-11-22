@@ -63,7 +63,6 @@ class UserResource extends JsonResource
             'isAdmin' => $this->isAdmin,
             'isSuperAdmin' => $this->isSuperAdmin,
             'isPastor' => $this->isPastor,
-            'api_token' => $this->api_token,
         ];
     }
 }

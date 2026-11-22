@@ -39,10 +39,15 @@
 |
 */
 
+use App\Http\Middleware\RejectCalendarFeedToken;
+
 Route::name('api.')->group(function () {
     Route::group([], base_path('routes/api/Health.php'));
 
-    Route::middleware('auth:api')->group(function () {
+    Route::middleware([
+        'auth:sanctum,api',
+        RejectCalendarFeedToken::class,
+    ])->group(function () {
         foreach (glob(base_path('routes/api/*.php')) as $file) {
             if (basename($file) === 'Health.php') {
                 continue;

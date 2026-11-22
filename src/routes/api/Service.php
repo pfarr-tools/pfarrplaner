@@ -34,7 +34,7 @@ Route::get('servicesByDayAndCity/{day}/{city}', [ServiceController::class, 'byDa
 Route::get('user/{user}/services', [ServiceController::class, 'byUser'])->name('user.services');
 
 // authenticated:
-Route::group(['middleware' => 'auth:api'], function () {
+Route::group(['middleware' => 'auth:sanctum,api'], function () {
     Route::get('service/{service}', [ServiceController::class, 'show'])->name('service.show');
     Route::patch('service/{service}', [ServiceController::class, 'update'])->name('service.update');
     Route::delete('service/{service:slug}', [ServiceController::class, 'destroy'])->name('service.destroy');

@@ -30,6 +30,6 @@
 
 use App\Http\Controllers\Api\OccurenceController;
 
-Route::group(['middleware' => 'auth:api'], function () {
+Route::group(['middleware' => 'auth:sanctum,api'], function () {
     Route::delete('occurence/{occurence}', [OccurenceController::class, 'destroy'])->name('occurence.destroy');
 });

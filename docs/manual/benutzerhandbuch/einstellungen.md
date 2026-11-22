@@ -117,6 +117,12 @@ Wählen Sie vor allem die Informationen, die Sie nach dem Anmelden sofort brauch
 
 Sie können externe Kalender mit Pfarrplaner verbinden. Für Outlook weist Pfarrplaner auf das Add-in **Outlook CalDav Synchronizer** hin.
 
+Für einen Kalenderlink klicken Sie auf der Outlook-Verbindungsseite auf
+**Kalenderlink erzeugen**. Der Link enthält einen persönlichen Zugangsschlüssel
+und wird nur einmal vollständig angezeigt. Behandeln Sie ihn wie ein Passwort;
+bei Bedarf können Sie ihn in der Tokenverwaltung widerrufen und einen neuen
+Kalenderlink erzeugen.
+
 1. Öffnen Sie den Reiter **Verbundene Kalender**.
 2. Klicken Sie auf **Neue Verbindung anlegen**, falls diese Funktion in Ihrer Installation freigeschaltet ist.
 3. Folgen Sie den Angaben auf der Einrichtungsseite.

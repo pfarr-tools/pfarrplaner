@@ -480,6 +480,21 @@ entfernen. Nicht kompatible Änderungen erhalten eine geplante kurze
 Wartungszeit. Das vorherige Release bleibt in der Registry als Rollback-
 Grundlage verfügbar und wird bei Bedarf erneut lokal gezogen.
 
+### API-Token sicher migrieren
+
+Die Migration `2026_11_22_000001_hash_legacy_user_api_tokens` ersetzt bisherige
+Klartextwerte in `users.api_token` durch SHA-256-Werte. Bereits gehashte Werte
+bleiben unverändert. Der Authentifizierungsweg akzeptiert weiterhin den
+ursprünglichen Tokenwert, sodass bestehende Integrationen und Kalenderlinks
+beim Update keinen Tokenwechsel benötigen. Die Migration ist absichtlich
+vorwärtsgerichtet: Ein Rollback der Anwendung allein stellt Klartextwerte nicht
+wieder her. Für einen vollständigen Rollback sind das verifizierte Backup und
+das vorherige Image gemeinsam wiederherzustellen.
+
+`./planer update` führt die Datenmigration im normalen Ablauf aus. Vor einem
+Produktionsupdate sind Datenbank und MinIO zu sichern und die Sicherung zu
+verifizieren.
+
 ### Migration der Kontoklassifikation und des Sicherheits-Onboardings
 
 Die Migration `2026_11_18_090000_persist_official_user_and_security_onboarding_state` ergänzt `users.is_official_user`, `users.security_onboarding_email_logins` und `users.security_onboarding_last_shown_at`. Bei Bestandskonten wird `is_official_user` auf `true` gesetzt, wenn zuvor ein nichtleerer Legacy-Passwort-Hash vorhanden war. Für alle Konten setzt die Migration `must_change_password` auf `false`. Die bisherigen Hashwerte bleiben in der Datenbank erhalten, werden nach dem Update aber von keinem Anmelde- oder Verwaltungsweg verwendet.

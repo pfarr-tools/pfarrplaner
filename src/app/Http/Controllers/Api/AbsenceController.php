@@ -44,7 +44,7 @@ class AbsenceController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth:api');
+        $this->middleware('auth:sanctum,api');
     }
 
     /**
@@ -58,7 +58,7 @@ class AbsenceController extends Controller
         operationId: 'setAbsenceChecked',
         summary: 'Mark an absence as checked',
         tags: ['Absence'],
-        security: [['apiToken' => []]],
+        security: [['sanctumBearer' => []], ['legacyApiToken' => []]],
         parameters: [new OA\Parameter(name: 'absence', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))],
         responses: [
             new OA\Response(response: 200, description: 'Updated absence'),

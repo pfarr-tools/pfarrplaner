@@ -49,7 +49,7 @@ class CalendarController extends Controller
     /** Configure API authentication middleware. */
     public function __construct()
     {
-        $this->middleware('auth:api')->except('navigate');
+        $this->middleware('auth:sanctum,api')->except('navigate');
     }
 
     /**

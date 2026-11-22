@@ -35,10 +35,13 @@ use App\CalendarLinks\CalendarLinks;
 use App\Models\Leave\Absence;
 use App\Models\People\User;
 use App\Models\Service;
+use App\Services\ApiTokenAuthenticator;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Routing\ResponseFactory;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\View;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -94,10 +97,8 @@ class ICalController extends Controller
      */
     protected function checkToken($token)
     {
-        $tokenUser = User::where('api_token', $token)
-            ->whereNull('two_factor_recovery_required_at')
-            ->first();
-        if (! $tokenUser) {
+        $tokenUser = ApiTokenAuthenticator::findUser((string) $token);
+        if (! $tokenUser || $tokenUser->two_factor_recovery_required_at) {
             abort(401);
         }
         $this->user = $tokenUser;
@@ -185,6 +186,22 @@ class ICalController extends Controller
     }
 
     /**
+     * Create a one-time Sanctum token for a user-requested calendar subscription.
+     *
+     * @param  Request  $request  Authenticated session request from the calendar page.
+     * @return JsonResponse The one-time plaintext credential for the generated URL.
+     */
+    public function createCalendarToken(Request $request): JsonResponse
+    {
+        $user = $request->user();
+        abort_unless($user instanceof User, 401);
+        Gate::authorize('update', $user);
+        $token = $user->createToken('Kalender-Feed', ['calendar:feed'])->plainTextToken;
+
+        return response()->json(['token' => $token]);
+    }
+
+    /**
      * @return mixed
      */
     public function setup($key)
@@ -199,7 +216,10 @@ class ICalController extends Controller
      */
     public function export(Request $request, User $user, $token, $key)
     {
-        if ($token != $user->getToken()) {
+        $tokenUser = ApiTokenAuthenticator::findUser((string) $token);
+        if (! $tokenUser
+            || $tokenUser->getKey() !== $user->getKey()
+            || $tokenUser->two_factor_recovery_required_at) {
             return abort(403);
         }
 
