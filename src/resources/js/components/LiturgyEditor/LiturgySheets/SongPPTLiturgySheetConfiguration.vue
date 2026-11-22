@@ -228,14 +228,14 @@
                 />
             </tab>
             <tab id="format">
-                <form-selectize
-                    label="Dateiformat"
+                <FormRadioGroup
                     v-model="myConfig.outputFormat"
+                    label="Dateiformat"
                     name="config[outputFormat]"
-                    :options="[
-                        { id: 'ppt', name: 'Microsoft PowerPoint (.pptx, .pptm)' },
-                        { id: 'odp', name: 'OpenDocument Presentation (.odp)' },
-                    ]"
+                    :items="{
+                        ppt: 'Microsoft PowerPoint (.pptx, .pptm)',
+                        odp: 'OpenDocument Presentation (.odp)',
+                    }"
                 />
             </tab>
         </tabs>
@@ -245,6 +245,7 @@
 <script>
 import LiturgySheetConfigurationForm from './LiturgySheetConfigurationForm'
 import FormCheck from '../../Ui/forms/FormCheck'
+import FormRadioGroup from '../../Ui/forms/FormRadioGroup.vue'
 import FormSelectize from '../../Ui/forms/FormSelectize'
 import FormInput from '../../Ui/forms/FormInput'
 import FormFileUploader from '../../Ui/forms/FormFileUploader.vue'
@@ -263,6 +264,7 @@ export default {
         FormInput,
         FormFileUploader,
         AttachmentList,
+        FormRadioGroup,
         FormSelectize,
         FormCheck,
         LiturgySheetConfigurationForm,
@@ -326,6 +328,7 @@ export default {
     methods: {
         /** Store the uploaded title-slide attachment in the export configuration. */
         setTitleSlideAttachment(attachments) {
+            /** The selected title-slide attachment, when one is present. */
             const attachment = (attachments || []).find((item) => item.cut === 'ppt-title-slide')
             if (!attachment) {
                 this.myConfig.titleSlideAttachmentId = null
