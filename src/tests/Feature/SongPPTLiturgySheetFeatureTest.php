@@ -26,6 +26,70 @@ use Tests\TestCase;
 /** Regression tests for configurable PowerPoint/ODP separator slides. */
 class SongPPTLiturgySheetFeatureTest extends TestCase
 {
+    /** PPT and ODP event lists omit the automatic possible-baptism description. */
+    public function test_ad_list_description_excludes_possible_baptism_label(): void
+    {
+        $sheet = new class extends SongPPTLiturgySheet
+        {
+            /**
+             * @param  array<string, int|string>  $layout
+             * @return array<string, mixed>
+             */
+            public function eventListEntryLayoutForTest(object $event, array $layout): array
+            {
+                return $this->getEventListEntryLayout($event, $layout);
+            }
+        };
+        $service = new class
+        {
+            public string $locationTextWithCity = 'Musterkirche, Musterstadt';
+
+            public function titleText(bool $short = true): string
+            {
+                return 'Gottesdienst';
+            }
+        };
+        $eventDetails = new class
+        {
+            /**
+             * @param  array<int, string>  $exclude
+             */
+            public function descriptionText(array $exclude = []): string
+            {
+                return in_array('baptism', $exclude, true)
+                    ? 'mit Abendmahl'
+                    : 'möglicher Taufgottesdienst; mit Abendmahl';
+            }
+        };
+        $event = new class($service, $eventDetails)
+        {
+            public object $service;
+
+            public object $event;
+
+            public function __construct(object $service, object $event)
+            {
+                $this->service = $service;
+                $this->event = $event;
+            }
+
+            public function getAdText(string $channel, string $default = ''): string
+            {
+                return $default;
+            }
+        };
+
+        $entry = $sheet->eventListEntryLayoutForTest($event, [
+            'titleFontTtfPath' => resource_path('fonts/Sarabun-SemiBold.ttf'),
+            'listFontSize' => 20,
+            'maxTitleWidthPx' => 1000,
+            'descriptionFontTtfPath' => resource_path('fonts/Sarabun-Regular.ttf'),
+            'descriptionFontSize' => 18,
+        ]);
+
+        $this->assertSame('mit Abendmahl', implode(' ', $entry['descriptionLines']));
+    }
+
     public function test_long_event_lists_are_split_across_multiple_slides(): void
     {
         $sheet = new class extends SongPPTLiturgySheet

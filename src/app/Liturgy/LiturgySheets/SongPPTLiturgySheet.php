@@ -1384,7 +1384,7 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
     protected function getEventListEntryLayout($event, array $layout): array
     {
         $titleText = $event->getAdText('ppt', $event->service->titleText(false));
-        $descriptionText = trim($event->event->descriptionText());
+        $descriptionText = trim($event->event->descriptionText(['baptism']));
         $titleLines = PPTUnitsHelper::wrapTextByPixelWidth(
             $titleText,
             $layout['titleFontTtfPath'],
