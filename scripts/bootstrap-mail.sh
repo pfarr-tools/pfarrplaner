@@ -47,7 +47,6 @@ generate_dkim_key() {
   generated_public="$ROOT/secrets/dkim/${selector}.txt"
   mv "$generated_private" "$ROOT/secrets/dkim/${domain}.private"
   mv "$generated_public" "$ROOT/secrets/dkim/${domain}.txt"
-  chmod 600 "$ROOT/secrets/dkim/${domain}.private"
   chmod 644 "$ROOT/secrets/dkim/${domain}.txt"
   printf '%s' "$ROOT/secrets/dkim/${domain}.txt"
 }
@@ -144,3 +143,7 @@ case "$mode" in
   postfix) configure_postfix ;;
   *) echo 'Ungültiger Mailmodus.' >&2; exit 2 ;;
 esac
+
+if [[ "$mode" == postfix && "${PLANER_BOOTSTRAP_MAIL_MODE:-}" != fixture ]]; then
+  PLANER_ROOT="$ROOT" "$SOURCE_ROOT/scripts/ensure-dkim-permissions.sh"
+fi

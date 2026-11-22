@@ -20,11 +20,11 @@ docker compose -f compose.production.yaml --profile mail up -d postfix
 Postfix veröffentlicht keinen Host-Port. App und Horizon erreichen ihn nur als
 `postfix:587` im privaten Mail-Netzwerk. Der Host-Postfix bleibt unabhängig.
 
-Bei jedem Produktionsupdate werden die Rechte des DKIM-Verzeichnisses vor dem
-Start der Maildienste normalisiert: `secrets/dkim` erhält `755`, private
-Schlüssel `600` und öffentliche TXT-Dateien `644`. So können bestehende
-Installationen den OpenDKIM-Prozess zuverlässig starten, ohne private Schlüssel
-freizugeben.
+Der Bootstrap und jedes Produktionsupdate normalisieren die DKIM-Rechte mit
+dem Postfix-Image: `secrets/dkim` erhält `755`, private Schlüssel gehören dem
+Konto `opendkim` im Container und erhalten Modus `600`; öffentliche TXT-Dateien
+erhalten `644`. So bleiben private Schlüssel für den Milter lesbar, ohne sie
+für andere Benutzer freizugeben.
 
 ## Erforderliche Konfiguration
 

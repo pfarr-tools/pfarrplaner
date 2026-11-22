@@ -10,11 +10,7 @@ die() { echo "Fehler: $*" >&2; exit 2; }
 grep -Eq '^APP_ENV=production([[:space:]]|$)' "$ROOT/.env" || die 'APP_ENV muss production sein.'
 
 ensure_dkim_permissions() {
-  local dkim_dir="$ROOT/secrets/dkim"
-  [[ -d "$dkim_dir" ]] || return 0
-  chmod 755 "$dkim_dir"
-  find "$dkim_dir" -type f -name '*.private' -exec chmod 600 {} +
-  find "$dkim_dir" -type f -name '*.txt' -exec chmod 644 {} +
+  "$ROOT/scripts/ensure-dkim-permissions.sh"
 }
 
 postfix_services=()

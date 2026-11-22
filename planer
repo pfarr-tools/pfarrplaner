@@ -120,6 +120,11 @@ EOF
         -e DB_CONNECTION=sqlite \
         -e DB_DATABASE=:memory: \
         -e APP_KEY='base64:MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTI=' \
+        -e DATABASE_KEY='base64:MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTI=' \
+        -e APP_NAME='Pfarrplaner' \
+        -e PUSHER_APP_ID=1 \
+        -e PUSHER_APP_KEY=testing-key \
+        -e PUSHER_APP_SECRET=testing-secret \
         app php artisan test "$@" || test_status=$?
       repair_dev_query_log_permissions
       return "$test_status"
@@ -158,9 +163,9 @@ EOF
       QUALITY_FILES="$js_quality_files" run_dev docs:check
       QUALITY_FILES="$js_quality_files" run_dev lint
       run_dev complexity:check
+      compose run --rm vite npm run build
       run_dev test --no-browser --no-js
       compose run --rm vite npm run test:js:run
-      compose run --rm vite npm run build
       ;;
     complexity:check) compose exec --user www-data app composer complexity:check ;;
     manual) PLANER_MANUAL_DEV=1 exec "$ROOT/scripts/manual.sh" "${1:-help}" "${@:2}" ;;
