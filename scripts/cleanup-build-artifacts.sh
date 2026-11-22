@@ -34,8 +34,12 @@ cleanup_repository() {
       sort -V
   )
 
-  if [[ -z "$selected_keep" || ! " ${release_images[*]} " == *" $selected_keep "* ]]; then
-    selected_keep="${release_images[-1]-}"
+  if [[ -n "$selected_keep" ]] && [[ " ${release_images[*]} " == *" $selected_keep "* ]]; then
+    :
+  elif ((${#release_images[@]} > 0)); then
+    selected_keep="${release_images[${#release_images[@]}-1]}"
+  else
+    selected_keep=''
   fi
 
   for image in "${release_images[@]}"; do
