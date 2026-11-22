@@ -223,12 +223,13 @@ export default {
             availableVersions.push('Eigener Text')
         }
 
+        /** The current Bible reference including its selected translation version. */
         let myValue = (this.modelValue !== undefined ? this.modelValue : this.value) || ''
         if (!myValue.includes('['))
             myValue += ' [' + (this.version || this.$page.props.bible.versions[0] || '') + ']'
         let parts = myValue.split('[')
         let myVersion = parts[1].replace(']', '').trim()
-        let myReference = parts[0]
+        let myReference = parts[0].replace(/ $/, '')
 
         return {
             myId: this.id || uid(),
@@ -258,7 +259,7 @@ export default {
             }
             let parts = newVal.split('[')
             this.myVersion = parts[1].replace(']', '').trim()
-            this.myReference = parts[0]
+            this.myReference = parts[0].replace(/ $/, '')
         },
     },
     methods: {
