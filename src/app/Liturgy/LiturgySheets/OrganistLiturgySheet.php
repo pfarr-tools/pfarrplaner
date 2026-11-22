@@ -34,15 +34,9 @@ use App\Models\Service;
 
 class OrganistLiturgySheet extends AbstractLiturgySheet
 {
-    protected $title = 'Ablaufplan für Organist:innen (DIN A4)';
+    protected $title = 'Ablaufplan für Musiker:innen (DIN A4)';
 
     protected $icon = 'fa fa-file-pdf';
-
-    public function __construct()
-    {
-        parent::__construct();
-        $this->title = 'Ablaufplan für '.config('labels.organist').'nen (DIN A4)';
-    }
 
     protected function getData(Service $service)
     {
