@@ -30,7 +30,7 @@ cleanup_repository() {
 
   mapfile -t release_images < <(
     docker image ls --format '{{.Repository}}:{{.Tag}}' "$image_repository" |
-      sed -nE "s#^${image_repository//\//\\/}:((v|)[0-9]{4}\.[0-9]+\.[0-9]+)$#\1#p" |
+      sed -nE "s#^${image_repository//\//\\/}:((v|)[0-9]{4}\.[0-9]+\.[0-9]+)\$#\1#p" |
       sort -V
   )
 
