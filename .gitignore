@@ -3,6 +3,7 @@
 !.env.example
 /backup.yaml
 /secrets/
+/docs/cve/
 
 backups/
 
