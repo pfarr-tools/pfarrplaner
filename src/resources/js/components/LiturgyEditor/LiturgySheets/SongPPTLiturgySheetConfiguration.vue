@@ -27,35 +27,35 @@
   -->
 
 <template>
-    <liturgy-sheet-configuration-form
+    <LiturgySheetConfigurationForm
         :service="service"
         :sheet="sheet"
     >
-        <tab-headers>
-            <tab-header
+        <TabHeaders>
+            <TabHeader
                 id="colorscheme"
                 active="1"
                 title="Farbschema"
             />
-            <tab-header
+            <TabHeader
                 id="layout"
                 title="Layout"
             />
-            <tab-header
+            <TabHeader
                 id="content"
                 title="Inhalte"
             />
-            <tab-header
+            <TabHeader
                 id="ads"
                 title="Werbung"
             />
-            <tab-header
+            <TabHeader
                 id="format"
                 title="Ausgabeformat"
             />
-        </tab-headers>
-        <tabs>
-            <tab
+        </TabHeaders>
+        <Tabs>
+            <Tab
                 id="colorscheme"
                 active="1"
             >
@@ -64,7 +64,7 @@
                     name="config[backgroundColor]"
                     v-model="myConfig.backgroundColor"
                 />
-                <form-selectize
+                <FormSelectize
                     label="Hintergrundfarbe für Folien mit Text"
                     v-model="myConfig.backgroundColor"
                     :options="myColorOptions"
@@ -74,7 +74,7 @@
                     name="config[backgroundColorEmpty]"
                     v-model="myConfig.backgroundColorEmpty"
                 />
-                <form-selectize
+                <FormSelectize
                     label="Hintergrundfarbe für Folien ohne Text"
                     v-model="myConfig.backgroundColorEmpty"
                     :options="myColorOptions"
@@ -84,7 +84,7 @@
                     name="config[textColor]"
                     v-model="myConfig.textColor"
                 />
-                <form-selectize
+                <FormSelectize
                     label="Textfarbe"
                     v-model="myConfig.textColor"
                     :options="myColorOptions"
@@ -94,21 +94,21 @@
                     name="config[verticalAlignment]"
                     v-model="myConfig.verticalAlignment"
                 />
-            </tab>
-            <tab id="layout">
-                <form-selectize
+            </Tab>
+            <Tab id="layout">
+                <FormSelectize
                     label="Vertikale Ausrichtung der Texte"
                     v-model="myConfig.verticalAlignment"
                     :options="myAlignmentOptions"
                 />
-                <form-input
+                <FormInput
                     label="Schrifgröße"
                     type="number"
                     v-model="myConfig.fontSize"
                 />
-            </tab>
-            <tab id="content">
-                <form-selectize
+            </Tab>
+            <Tab id="content">
+                <FormSelectize
                     label="Folie zwischen den Elementen einfügen"
                     v-model="myConfig.slideBetweenElements"
                     name="config[slideBetweenElements]"
@@ -119,12 +119,12 @@
                     ]"
                 />
                 <template v-if="myConfig.slideBetweenElements === 'title'">
-                    <form-input
+                    <FormInput
                         label="Titel der Titelfolie"
                         v-model="myConfig.titleSlideTitle"
                         name="config[titleSlideTitle]"
                     />
-                    <form-input
+                    <FormInput
                         label="Untertitel der Titelfolie"
                         v-model="myConfig.titleSlideSubtitle"
                         name="config[titleSlideSubtitle]"
@@ -134,7 +134,7 @@
                         name="config[titleSlideAttachmentId]"
                         v-model="myConfig.titleSlideAttachmentId"
                     />
-                    <form-file-uploader
+                    <FormFileUploader
                         v-if="!titleSlideAttachments.length"
                         title="Titelfolie"
                         :single="true"
@@ -148,7 +148,7 @@
                         cut="ppt-title-slide"
                         @update:model-value="setTitleSlideAttachment"
                     />
-                    <attachment-list
+                    <AttachmentList
                         :model-value="titleSlideAttachments"
                         :prevent-empty-list-message="true"
                         delete-route-name="service.detach"
@@ -158,50 +158,50 @@
                         @update:model-value="setTitleSlideAttachment"
                     />
                 </template>
-                <form-check
+                <FormCheck
                     label="Platzhalter für Jingle, Intro, ..."
                     v-model="myConfig.includeJingleAndIntro"
                     name="config[includeJingleAndIntro]"
                 />
-                <form-check
+                <FormCheck
                     label="Mitwirkende anzeigen"
                     v-model="myConfig.includeCredits"
                     name="config[includeCredits]"
                 />
                 <hr />
-                <form-check
+                <FormCheck
                     label="Liederliste am Anfang"
                     v-model="myConfig.includeSongList"
                     name="config[includeSongList]"
                 />
-                <form-check
+                <FormCheck
                     label="Hinweis auf Liederbuch vor jedem Lied"
                     v-model="myConfig.includeSongbookReference"
                     name="config[includeSongbookReference]"
                 />
-                <form-check
+                <FormCheck
                     label="Wo möglich, Noten statt Text verwenden"
                     v-model="myConfig.renderMusic"
                     name="config[renderMusic]"
                 />
-                <form-check
+                <FormCheck
                     label="QR-Code für digitales Liedblatt anzeigen"
                     v-model="myConfig.includeVirtualSongsheetQR"
                     name="config[includeVirtualSongsheetQR]"
                 />
-            </tab>
-            <tab id="ads">
-                <form-check
+            </Tab>
+            <Tab id="ads">
+                <FormCheck
                     label="Veranstaltungswerbung am Anfang einfügen"
                     v-model="myConfig.includeAdLoopStart"
                     name="config[includeAdLoopStart]"
                 />
-                <form-check
+                <FormCheck
                     label="Veranstaltungswerbung am Ende einfügen"
                     v-model="myConfig.includeAdLoopEnd"
                     name="config[includeAdLoopEnd]"
                 />
-                <form-selectize
+                <FormSelectize
                     label="Veranstaltungswerbung bei folgenden Elementen einfügen"
                     multiple
                     :options="myItems"
@@ -209,7 +209,7 @@
                     name="config[includeAdLoopElements][]"
                 />
                 <hr />
-                <form-selectize
+                <FormSelectize
                     label="Veranstaltungen aus folgenden Kirchengemeinden einschließen"
                     :key="this.myCities.length"
                     multiple
@@ -218,7 +218,7 @@
                     :options="myCities"
                 />
                 <hr />
-                <form-input
+                <FormInput
                     label="Werbefolien nach ___ Sekunden weiterschalten"
                     v-model="myConfig.adLoopDelay"
                     name="config[adLoopDelay]"
@@ -226,8 +226,8 @@
                     min="0"
                     help="Bei 0 erfolgt keine automatische Weiterschaltung"
                 />
-            </tab>
-            <tab id="format">
+            </Tab>
+            <Tab id="format">
                 <FormRadioGroup
                     v-model="myConfig.outputFormat"
                     label="Dateiformat"
@@ -237,9 +237,9 @@
                         odp: 'OpenDocument Presentation (.odp)',
                     }"
                 />
-            </tab>
-        </tabs>
-    </liturgy-sheet-configuration-form>
+            </Tab>
+        </Tabs>
+    </LiturgySheetConfigurationForm>
 </template>
 
 <script>
@@ -254,6 +254,7 @@ import Tabs from '../../Ui/tabs/tabs'
 import Tab from '../../Ui/tabs/tab'
 import TabHeaders from '../../Ui/tabs/tabHeaders'
 import TabHeader from '../../Ui/tabs/tabHeader'
+/* global route */
 export default {
     name: 'SongPPTLiturgySheetConfiguration',
     components: {
@@ -278,14 +279,16 @@ export default {
             })
     },
     data() {
-        let myConfig = this.sheet.config
+        /** Keep attachment selection reactive without mutating the service prop. */
+        const myAttachments = [...(this.service.attachments || [])]
+        const myConfig = this.sheet.config
         if (!(myConfig.showAdsFromCities || []).length)
             myConfig.showAdsFromCities = [this.service.city_id]
         myConfig.adLoopDelay = parseInt(myConfig.adLoopDelay || '7')
         if (!myConfig.outputFormat) myConfig.outputFormat = 'ppt'
         if (!myConfig.slideBetweenElements) myConfig.slideBetweenElements = 'empty'
 
-        let myItems = []
+        const myItems = []
         if (!(myConfig.includeAdsLoopElements || []).length) myConfig.includeAdLoopElements = []
         this.service.liturgy_blocks.forEach((block) => {
             block.items.forEach((item) => {
@@ -295,6 +298,7 @@ export default {
 
         return {
             myCities: [],
+            myAttachments,
             myConfig,
             myItems,
             myColorOptions: [
@@ -312,9 +316,7 @@ export default {
     },
     computed: {
         titleSlideAttachments() {
-            return (this.service.attachments || []).filter(
-                (attachment) => attachment.cut === 'ppt-title-slide',
-            )
+            return this.myAttachments.filter((attachment) => attachment.cut === 'ppt-title-slide')
         },
         titleSlidePreset() {
             return {
@@ -332,18 +334,14 @@ export default {
             const attachment = (attachments || []).find((item) => item.cut === 'ppt-title-slide')
             if (!attachment) {
                 this.myConfig.titleSlideAttachmentId = null
-                this.service.attachments = attachments?.length
+                this.myAttachments = attachments?.length
                     ? attachments
-                    : (this.service.attachments || []).filter(
-                          (item) => item.cut !== 'ppt-title-slide',
-                      )
+                    : this.myAttachments.filter((item) => item.cut !== 'ppt-title-slide')
                 return
             }
             this.myConfig.titleSlideAttachmentId = attachment.id
-            this.service.attachments = [
-                ...(this.service.attachments || []).filter(
-                    (item) => item.cut !== 'ppt-title-slide',
-                ),
+            this.myAttachments = [
+                ...this.myAttachments.filter((item) => item.cut !== 'ppt-title-slide'),
                 attachment,
             ]
         },

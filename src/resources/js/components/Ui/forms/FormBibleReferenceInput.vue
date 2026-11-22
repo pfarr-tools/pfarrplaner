@@ -28,7 +28,7 @@
 
 <template>
     <div class="form-bible-reference-input">
-        <form-group
+        <FormGroup
             :name="name"
             :id="myId"
             :input-id="`${myId}Input`"
@@ -113,7 +113,7 @@
                     </div>
                 </div>
             </div>
-        </form-group>
+        </FormGroup>
         <div :key="myVersion">
             <small
                 class="form-text text-muted mt-0 p-0"
@@ -145,9 +145,11 @@
 </template>
 
 <script>
+import axios from 'axios'
 import FormGroup from './FormGroup'
 import __ from 'lodash'
 import { uid } from '../../../libraries/uid'
+/* global navigator, route */
 
 export default {
     name: 'FormBibleReferenceInput',
@@ -213,12 +215,12 @@ export default {
     data() {
         const sources = this.sources || {}
 
-        let myOptions = []
+        const myOptions = []
         for (const sourceKey in sources) {
             myOptions.push({ id: sources[sourceKey], name: sourceKey + ': ' + sources[sourceKey] })
         }
 
-        let availableVersions = [...this.$page.props.bible.versions]
+        const availableVersions = [...this.$page.props.bible.versions]
         if (this.allowOwnVersion) {
             availableVersions.push('Eigener Text')
         }
@@ -227,9 +229,9 @@ export default {
         let myValue = (this.modelValue !== undefined ? this.modelValue : this.value) || ''
         if (!myValue.includes('['))
             myValue += ' [' + (this.version || this.$page.props.bible.versions[0] || '') + ']'
-        let parts = myValue.split('[')
-        let myVersion = parts[1].replace(']', '').trim()
-        let myReference = parts[0].replace(/ $/, '')
+        const parts = myValue.split('[')
+        const myVersion = parts[1].replace(']', '').trim()
+        const myReference = parts[0].replace(/ $/, '')
 
         return {
             myId: this.id || uid(),
@@ -257,7 +259,7 @@ export default {
                 this.myReference = newVal.trim()
                 return
             }
-            let parts = newVal.split('[')
+            const parts = newVal.split('[')
             this.myVersion = parts[1].replace(']', '').trim()
             this.myReference = parts[0].replace(/ $/, '')
         },
@@ -266,7 +268,7 @@ export default {
         bibleText: __.debounce((component) => {
             if (!component.myValue.includes(' ')) return
             if (!component.myValue.includes(',')) return
-            if (component.myVersion == 'Eigener Text') {
+            if (component.myVersion === 'Eigener Text') {
                 return
             }
             component.myBibleText = ''
@@ -282,7 +284,7 @@ export default {
                     component.myBibleText = result.data.text
                     component.myReference = result.data.reference
                     component.myBibleTextLoading = false
-                    if (component.myReference != result.data.reference.correctedReference) {
+                    if (component.myReference !== result.data.reference.correctedReference) {
                         component.myReference = result.data.reference.correctedReference
                         component.setNewValue(false)
                     }
