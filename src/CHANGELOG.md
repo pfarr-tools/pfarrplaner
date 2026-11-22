@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2026.22.4](https://github.com/pfarr-tools/pfarrplaner/compare/v2026.22.3...v2026.22.4) (2026-11-22)
+
+
+### Bug Fixes
+
+* **auth:** API-Tokens automatisch auf Sanctum migrieren ([#146](https://github.com/pfarr-tools/pfarrplaner/issues/146)) ([1d195c4](https://github.com/pfarr-tools/pfarrplaner/commit/1d195c48c2f1a3e3f4a6814067d40de2b4f16537)), closes [#144](https://github.com/pfarr-tools/pfarrplaner/issues/144)
+* **auth:** Benutzerwechsel vor dem Logout absichern. ([7e7c2e0](https://github.com/pfarr-tools/pfarrplaner/commit/7e7c2e08cbcfdf7e841328008a13b2203880a2ec)), closes [#147](https://github.com/pfarr-tools/pfarrplaner/issues/147)
+* **auth:** Gesperrte Konten beim Benutzerwechsel ablehnen. ([37ccdd0](https://github.com/pfarr-tools/pfarrplaner/commit/37ccdd069426e6dacbd9a3239155e6d132ae600c)), closes [#147](https://github.com/pfarr-tools/pfarrplaner/issues/147)
+* **ci:** Docker-Bake-Ziele der Qualitätsprüfung korrigieren. ([408e620](https://github.com/pfarr-tools/pfarrplaner/commit/408e620d73612af3f3898257ff74191cca05fa98)), closes [#142](https://github.com/pfarr-tools/pfarrplaner/issues/142)
+* **ci:** Vite-Manifest vor PHP-Tests bauen. ([ace06b3](https://github.com/pfarr-tools/pfarrplaner/commit/ace06b35812741f6fd87c3eb6390b0f5784b5648)), closes [#142](https://github.com/pfarr-tools/pfarrplaner/issues/142)
+* **component:** Bibelreferenz beim Tippen unverändert halten. ([235877e](https://github.com/pfarr-tools/pfarrplaner/commit/235877ee14919905092ddfbc202cea1462f3cc3f)), closes [#137](https://github.com/pfarr-tools/pfarrplaner/issues/137)
+* **export:** ODP-Einrückung für Psalmzeilen erhalten. ([b26689d](https://github.com/pfarr-tools/pfarrplaner/commit/b26689d0cbb2152dbd87fe862603263ad558ecc5)), closes [#140](https://github.com/pfarr-tools/pfarrplaner/issues/140)
+* **export:** Taufhinweis aus PPT-Werbung entfernen. ([1bae6a9](https://github.com/pfarr-tools/pfarrplaner/commit/1bae6a9365105a24ab1b9394377b92ad6ac7bd40)), closes [#139](https://github.com/pfarr-tools/pfarrplaner/issues/139)
+* **liturgy:** Ablaufplan als Musiker:innen bezeichnen. ([52377e0](https://github.com/pfarr-tools/pfarrplaner/commit/52377e08f009917859149a4f302c6b4ba7ee8cc2)), closes [#138](https://github.com/pfarr-tools/pfarrplaner/issues/138)
+* **mail:** DKIM-Schlüssel nach Updates lesbar halten. ([a6b0fb1](https://github.com/pfarr-tools/pfarrplaner/commit/a6b0fb1b1a5d5220f85d27929c9bec8b6ef9cfed)), closes [#142](https://github.com/pfarr-tools/pfarrplaner/issues/142)
+* **mail:** DKIM-Verzeichnis nach Normalisierung sperren. ([1986002](https://github.com/pfarr-tools/pfarrplaner/commit/19860026c1c990d7f83f758cd5b0b77021445e41)), closes [#142](https://github.com/pfarr-tools/pfarrplaner/issues/142)
+* **test:** Testläufe mit gültigem Datenbankschlüssel starten. ([3a30aa6](https://github.com/pfarr-tools/pfarrplaner/commit/3a30aa6bbb64bb1803cc4f9a359fab3c4a87552e)), closes [#142](https://github.com/pfarr-tools/pfarrplaner/issues/142)
+* **test:** Testumgebung mit Anwendungs- und Pusherwerten starten. ([31226e2](https://github.com/pfarr-tools/pfarrplaner/commit/31226e21f149b765b343ad4005bb2c8a7cb0b5e7)), closes [#142](https://github.com/pfarr-tools/pfarrplaner/issues/142)
+* **ui:** Ausgabeformat als Radio-Auswahl anzeigen. ([0a1d5c5](https://github.com/pfarr-tools/pfarrplaner/commit/0a1d5c5282cd7ecbeaffae0dbe4fc30df7bc0332)), closes [#136](https://github.com/pfarr-tools/pfarrplaner/issues/136)
+
 ### [2026.22.3](https://github.com/pfarr-tools/pfarrplaner/compare/v2026.22.2...v2026.22.3) (2026-11-20)
 
 
