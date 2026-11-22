@@ -167,8 +167,7 @@
                                                 v-if="
                                                     isAdmin &&
                                                     currentUser.id != row.id &&
-                                                    row.isOfficialUser &&
-                                                    !row.isLocked
+                                                    row.isOfficialUser
                                                 "
                                                 class="btn-sm"
                                                 force-icon

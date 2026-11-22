@@ -72,21 +72,6 @@ class UserWebFeatureTest extends TestCase
         $this->assertAuthenticatedAs($this->user);
     }
 
-    /** User list data exposes lock state so the UI can hide unusable switch actions. */
-    public function test_index_includes_lock_state_for_each_user(): void
-    {
-        $this->user->assignRole(RoleService::ROLE_ADMIN);
-        $target = User::factory()->create(['is_locked' => true]);
-
-        $this->actingAs($this->user)
-            ->get(route('users.index'))
-            ->assertOk()
-            ->assertInertia(fn (Assert $page) => $page
-                ->where('users', fn ($users) => collect($users)
-                    ->firstWhere('id', $target->id)['isLocked'] === true)
-            );
-    }
-
     /** A successful account switch persists across navigation and can be reversed. */
     public function test_switching_to_an_active_user_and_back_preserves_both_sessions(): void
     {

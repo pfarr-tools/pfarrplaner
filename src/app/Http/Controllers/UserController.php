@@ -99,7 +99,7 @@ class UserController extends Controller
     public function index()
     {
         Gate::authorize('index', User::class);
-        $userQuery = User::select(['id', 'first_name', 'last_name', 'title', 'email', 'is_official_user', 'is_locked'])
+        $userQuery = User::select(['id', 'first_name', 'last_name', 'title', 'email', 'is_official_user'])
             ->with([
                 'homeCities:id,name',
                 'cities:id,name',
@@ -365,7 +365,6 @@ class UserController extends Controller
             'last_name' => $user->last_name,
             'email' => $user->email,
             'isOfficialUser' => $user->isOfficialUser,
-            'isLocked' => $user->isLocked,
             'isAdmin' => $user->isAdmin,
             'home_cities' => $this->compactOptions($user->getRelation('homeCities')),
             'cities' => $this->compactOptions($user->getRelation('cities')),
