@@ -2419,12 +2419,6 @@ parameters:
 			path: app/Http/Resources/ServiceResource.php
 
 		-
-			message: '#^Access to an undefined property App\\Http\\Resources\\UserResource\:\:\$api_token\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Resources/UserResource.php
-
-		-
 			message: '#^Access to an undefined property App\\Http\\Resources\\UserResource\:\:\$cities\.$#'
 			identifier: property.notFound
 			count: 2

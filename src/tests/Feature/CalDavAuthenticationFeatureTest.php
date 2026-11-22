@@ -65,6 +65,27 @@ final class CalDavAuthenticationFeatureTest extends TestCase
         self::assertGuest();
     }
 
+    /** A Sanctum personal access token can authenticate CalDAV for its owner. */
+    public function test_caldav_accepts_sanctum_personal_access_tokens(): void
+    {
+        $user = User::factory()->create([
+            'email' => 'calendar@example.test',
+            'is_official_user' => true,
+        ]);
+        DB::table('calendar_connections')->insert([
+            'user_id' => $user->getKey(),
+            'title' => 'Kalender',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $token = $user->createToken('CalDAV')->plainTextToken;
+        $method = new ReflectionMethod(AuthBackend::class, 'validateUserPass');
+        $backend = new AuthBackend;
+
+        self::assertTrue($method->invoke($backend, $user->email, $token));
+        self::assertAuthenticatedAs($user);
+    }
+
     /** A web account lock does not change the dedicated DAV credential. */
     public function test_caldav_login_remains_available_when_web_account_is_locked(): void
     {

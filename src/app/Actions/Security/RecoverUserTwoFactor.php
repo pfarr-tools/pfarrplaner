@@ -108,7 +108,7 @@ class RecoverUserTwoFactor
             $lockedTarget->disableTwoFactor();
             $lockedTarget->forceFill([
                 'two_factor_recovery_required_at' => now(),
-                'api_token' => Str::random(60),
+                'api_token' => hash('sha256', Str::random(60)),
                 'remember_token' => Str::random(60),
             ])->save();
 

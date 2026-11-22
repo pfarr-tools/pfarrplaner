@@ -26,6 +26,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/* global route */
+
 export default {
     data() {
         return {
@@ -33,10 +35,9 @@ export default {
         }
     },
     methods: {
+        /** Return the cookie-authenticated Axios client for first-party API calls. */
         $api() {
-            let myApiAxios = window.api
-            myApiAxios.defaults.headers.common['Authorization'] =
-                'Bearer ' + this.$page.props.currentUser.data.api_token
+            const myApiAxios = window.api
             myApiAxios.defaults.headers.common['Accept'] = 'application/json'
             return myApiAxios
         },

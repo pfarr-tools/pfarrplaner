@@ -67,7 +67,7 @@ return [
 
     'guards' => [
         'api' => [
-            'driver' => 'token',
+            'driver' => 'legacy-api-token',
             'provider' => 'users',
         ],
         'web' => [

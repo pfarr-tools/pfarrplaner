@@ -42,7 +42,7 @@ class PsalmController extends AbstractApiCRUDController
      */
     public function __construct()
     {
-        $this->middleware('auth:api');
+        $this->middleware('auth:sanctum,api');
     }
 
     public function index(Request $request)

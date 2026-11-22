@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Models\People\User;
+use App\Services\ApiTokenAuthenticator;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -23,7 +24,11 @@ class AuthenticateDavApiToken
                 ->first()
             : null;
 
-        if (! $user || ! $this->matchesApiToken((string) $user->api_token, $token)) {
+        $tokenUser = ApiTokenAuthenticator::findUser($token);
+        if (! $user
+            || ! $tokenUser
+            || $tokenUser->getKey() !== $user->getKey()
+            || $user->two_factor_recovery_required_at) {
             return response('Unauthorized', Response::HTTP_UNAUTHORIZED)
                 ->header('WWW-Authenticate', 'Basic realm="'.config('app.name').' DAV"');
         }
@@ -31,16 +36,5 @@ class AuthenticateDavApiToken
         Auth::login($user);
 
         return $next($request);
-    }
-
-    /** Compare a supplied token against hashed or legacy raw API-token storage. */
-    private function matchesApiToken(string $storedToken, string $providedToken): bool
-    {
-        if ($storedToken === '') {
-            return false;
-        }
-
-        return hash_equals($storedToken, hash('sha256', $providedToken))
-            || hash_equals($storedToken, $providedToken);
     }
 }

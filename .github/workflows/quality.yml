@@ -22,6 +22,11 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Laravel-Cache-Verzeichnis vorbereiten
+        run: |
+          mkdir -p src/bootstrap/cache
+          chmod -R a+rwX src/bootstrap/cache
+
       - name: Docker-Builder-Cache einrichten
         uses: docker/setup-buildx-action@v4
 

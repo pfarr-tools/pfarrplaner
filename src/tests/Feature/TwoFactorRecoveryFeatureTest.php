@@ -365,6 +365,7 @@ final class TwoFactorRecoveryFeatureTest extends TestCase
         self::assertNotSame($rememberToken, $target->fresh()->remember_token);
         self::assertNotSame($legacyApiToken, $target->fresh()->api_token);
         self::assertNull(Auth::guard('web')->getProvider()->retrieveByToken($target->getKey(), $rememberToken));
+        Auth::guard('web')->logout();
         $this->withToken($legacyApiToken)->getJson(route('api.events.range', [
             'calendar' => 'unknown',
             'start' => '2026-01-01',

@@ -42,13 +42,20 @@ use OpenApi\Attributes as OA;
     description: 'REST API for collaborative church service planning.',
 )]
 #[OA\SecurityScheme(
-    securityScheme: 'apiToken',
+    securityScheme: 'legacyApiToken',
     type: 'apiKey',
     in: 'query',
     name: 'api_token',
 )]
+#[OA\SecurityScheme(
+    securityScheme: 'sanctumBearer',
+    type: 'http',
+    scheme: 'bearer',
+)]
+/** Base controller for authenticated API CRUD endpoints and OpenAPI security schemes. */
 class AbstractApiCRUDController extends AbstractCRUDController
 {
+    /** Return a JSON representation of the controller action result. */
     protected function returnResult($action, $result = null)
     {
         return response()->json($result);

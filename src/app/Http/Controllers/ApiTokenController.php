@@ -30,9 +30,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\People\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -41,26 +42,29 @@ use Inertia\Response;
  */
 class ApiTokenController extends Controller
 {
+    /** Require an authenticated session for API token management. */
     public function __construct()
     {
         $this->middleware('auth');
     }
 
     /**
-     * Update the authenticated user's API token.
+     * Rotate the legacy API credential and issue a hashed Sanctum personal token.
      *
-     * @return Response
+     * @param  Request  $request  Authenticated request initiating token rotation.
+     * @return Response One-time response containing the new plain-text token.
      */
-    public function update(Request $request)
+    public function update(Request $request): Response
     {
-        Gate::authorize('update', $request->user());
-        $token = Str::random(60);
+        $user = $request->user();
+        abort_unless($user instanceof User, 401);
+        Gate::authorize('update', $user);
+        $token = DB::transaction(function () use ($user) {
+            $user->tokens()->where('name', 'API-Token')->delete();
+            $user->forceFill(['api_token' => null])->save();
 
-        $request->user()->forceFill(
-            [
-                'api_token' => hash('sha256', $token),
-            ]
-        )->save();
+            return $user->createToken('API-Token')->plainTextToken;
+        });
 
         return Inertia::render('ApiToken', compact('token'));
     }

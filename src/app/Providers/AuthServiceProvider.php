@@ -74,7 +74,10 @@ use App\Policies\TagPolicy;
 use App\Policies\TeamPolicy;
 use App\Policies\UserPolicy;
 use App\Policies\WeddingPolicy;
+use App\Services\ApiTokenAuthenticator;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 
 /**
@@ -127,6 +130,12 @@ class AuthServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->registerPolicies();
+
+        Auth::viaRequest('legacy-api-token', function (Request $request) {
+            $token = $request->bearerToken() ?? $request->query('api_token');
+
+            return ApiTokenAuthenticator::findUser(is_string($token) ? $token : null);
+        });
 
         // Super-Administrator:in can do everything except subject-specific account management.
         Gate::before(
