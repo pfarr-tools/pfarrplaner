@@ -21,10 +21,11 @@ Postfix veröffentlicht keinen Host-Port. App und Horizon erreichen ihn nur als
 `postfix:587` im privaten Mail-Netzwerk. Der Host-Postfix bleibt unabhängig.
 
 Der Bootstrap und jedes Produktionsupdate normalisieren die DKIM-Rechte mit
-dem Postfix-Image: `secrets/dkim` erhält `755`, private Schlüssel gehören dem
-Konto `opendkim` im Container und erhalten Modus `600`; öffentliche TXT-Dateien
-erhalten `644`. So bleiben private Schlüssel für den Milter lesbar, ohne sie
-für andere Benutzer freizugeben.
+dem Postfix-Image. `secrets/dkim` wird dafür kurz mit `755` geöffnet und danach
+auf `555` gesetzt. Private Schlüssel gehören dem Konto `opendkim` im Container
+und erhalten Modus `600`; öffentliche TXT-Dateien erhalten `644`. So bleiben
+private Schlüssel für den Milter lesbar, ohne sie für andere Benutzer
+freizugeben.
 
 ## Erforderliche Konfiguration
 

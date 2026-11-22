@@ -13,6 +13,7 @@ public_key="$dkim_dir/domain.txt"
 docker_capture="$test_root/docker-args"
 
 cleanup() {
+  [[ -d "$dkim_dir" ]] && chmod 755 "$dkim_dir"
   [[ -f "$docker_capture" ]] && unlink "$docker_capture"
   [[ -f "$test_root/.env" ]] && unlink "$test_root/.env"
   [[ -f "$private_key" ]] && unlink "$private_key"
@@ -40,7 +41,7 @@ DOCKER
 chmod +x "$fake_bin/docker"
 
 PATH="$fake_bin:$PATH" PLANER_ROOT="$test_root" DKIM_DOCKER_CAPTURE="$docker_capture" "$HELPER"
-[[ "$(stat -c '%a' "$dkim_dir")" == 755 ]]
+[[ "$(stat -c '%a' "$dkim_dir")" == 555 ]]
 [[ "$(stat -c '%a' "$public_key")" == 644 ]]
 grep -Fq -- '--profile mail run' "$docker_capture"
 grep -Fq -- '--user 0 --entrypoint /bin/sh postfix' "$docker_capture"
