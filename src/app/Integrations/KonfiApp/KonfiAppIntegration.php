@@ -106,7 +106,7 @@ class KonfiAppIntegration extends AbstractIntegration
     /**
      * Get a collection with all defined event types from KonfiApp
      *
-     * @return Collection Event types
+     * @return Collection<array-key, mixed> Event types
      *
      * @throws Exception when request status is not 200
      */
@@ -121,14 +121,19 @@ class KonfiAppIntegration extends AbstractIntegration
 
         $response = $this->requestData('verwaltung/veranstaltungen/');
         if ($response && isset($response->data->veranstaltungen)) {
-            $eventTypes = collect($response->data->veranstaltungen)->values()->all();
+            /** @var array<int, mixed> $rawEventTypes */
+            $rawEventTypes = $response->data->veranstaltungen;
+            $eventTypes = collect($rawEventTypes)->values()->all();
             Cache::put($cacheKey, $eventTypes, self::EVENT_TYPES_CACHE_TTL);
             Cache::put($staleCacheKey, $eventTypes, self::EVENT_TYPES_STALE_TTL);
 
             return collect($eventTypes);
         }
 
-        return collect(Cache::get($staleCacheKey, []));
+        /** @var array<int, mixed> $cachedEventTypes */
+        $cachedEventTypes = Cache::get($staleCacheKey, []);
+
+        return collect($cachedEventTypes);
     }
 
     /**
@@ -384,7 +389,7 @@ class KonfiAppIntegration extends AbstractIntegration
     /**
      * List QR codes for a KonfiApp event type.
      *
-     * @return Collection QR codes returned by KonfiApp
+     * @return Collection<array-key, mixed> QR codes returned by KonfiApp
      */
     public function listQRCodes(int $eventType): Collection
     {
@@ -399,7 +404,10 @@ class KonfiAppIntegration extends AbstractIntegration
 
         $data = json_decode((string) $response->getBody());
 
-        return collect($data->detail ?? []);
+        /** @var array<int, mixed> $details */
+        $details = $data->detail ?? [];
+
+        return collect($details);
     }
 
     /**

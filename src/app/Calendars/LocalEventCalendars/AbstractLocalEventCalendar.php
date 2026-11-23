@@ -30,6 +30,7 @@
 
 namespace App\Calendars\LocalEventCalendars;
 
+use App\Models\Service;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
 
@@ -46,6 +47,10 @@ abstract class AbstractLocalEventCalendar
 
     abstract public static function list(): array;
 
+    /**
+     * @param  Builder<Service>  $query  Query to restrict to the calendar.
+     * @return Builder<Service>
+     */
     abstract public function adjustQuery(Builder $query): Builder;
 
     public static function getKey()

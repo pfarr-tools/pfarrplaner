@@ -40,7 +40,6 @@ namespace App\CalendarLinks;
 use App\Models\People\User;
 use App\Models\Service;
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -78,7 +77,7 @@ class AllServicesCalendarLink extends AbstractCalendarLink
     }
 
     /**
-     * @return array|Builder[]|Collection
+     * @return Collection<int, Service>
      */
     public function getRenderData(Request $request, User $user)
     {

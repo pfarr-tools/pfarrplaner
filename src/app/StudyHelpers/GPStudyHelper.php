@@ -43,7 +43,7 @@ class GPStudyHelper extends AbstractStudyHelper
         if ('' == ($content = $this->getContent('https://www.theologie.uzh.ch/predigten/category/aktuelle/'))) {
             return [];
         }
-        $content = Str::replace("\n", '', $content);
+        $content = Str::replace("\n", '', (string) $content);
         preg_match_all('/<h3 class="entry-title no-date"><a href="(.*?)">(.*?)<\/a>(?:.*?)<p>(?:.*?)(\d\d.\d\d.\d\d)/', $content, $matches);
 
         foreach ($matches[0] as $index => $match) {

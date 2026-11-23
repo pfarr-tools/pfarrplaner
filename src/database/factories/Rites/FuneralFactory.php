@@ -34,6 +34,7 @@ use App\Models\Rites\Funeral;
 use App\Models\Service;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+/** @extends Factory<Funeral> */
 class FuneralFactory extends Factory
 {
     protected $model = Funeral::class;

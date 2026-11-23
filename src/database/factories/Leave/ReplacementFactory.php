@@ -35,6 +35,7 @@ use App\Models\Leave\Replacement;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+/** @extends Factory<Replacement> */
 class ReplacementFactory extends Factory
 {
     protected $model = Replacement::class;

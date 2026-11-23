@@ -16,6 +16,7 @@ namespace Database\Factories\Liturgy;
 use App\Models\Liturgy\Text;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+/** @extends Factory<Text> */
 class TextFactory extends Factory
 {
     protected $model = Text::class;

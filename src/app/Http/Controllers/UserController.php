@@ -346,6 +346,7 @@ class UserController extends Controller
     /**
      * Build the small representation needed by the user overview.
      *
+     * @param  Collection<int, City>  $allCities  Cities available for administration.
      * @return array<string, mixed>
      */
     protected function compactIndexUser(User $user, Collection $allCities): array
@@ -494,6 +495,8 @@ class UserController extends Controller
 
     /**
      * Load only the location fields needed for home-screen configuration.
+     *
+     * @return Collection<int, Location>
      */
     protected function locationsForUser(): Collection
     {

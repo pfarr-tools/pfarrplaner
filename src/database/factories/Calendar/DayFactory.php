@@ -34,6 +34,7 @@ use App\Models\Calendar\Day;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+/** @extends Factory<Day> */
 class DayFactory extends Factory
 {
     protected $model = Day::class;

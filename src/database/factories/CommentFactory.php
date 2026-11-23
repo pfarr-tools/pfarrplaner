@@ -35,6 +35,7 @@ use App\Models\People\User;
 use App\Models\Service;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+/** @extends Factory<Comment> */
 class CommentFactory extends Factory
 {
     protected $model = Comment::class;

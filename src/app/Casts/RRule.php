@@ -6,6 +6,9 @@ use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Database\Eloquent\Model;
 use Recurr\Rule;
 
+/**
+ * @implements CastsAttributes<mixed, string>
+ */
 class RRule implements CastsAttributes
 {
     /**
@@ -32,7 +35,7 @@ class RRule implements CastsAttributes
         if (! $value) {
             return '';
         }
-        if (! is_a($value, Rule::class)) {
+        if (! is_object($value) || ! is_a($value, Rule::class)) {
             return '';
         }
 

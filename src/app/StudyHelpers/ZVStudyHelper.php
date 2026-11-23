@@ -43,7 +43,7 @@ class ZVStudyHelper extends AbstractStudyHelper
         if ('' == ($content = $this->getContent('https://www.zentrum-verkuendigung.de/service/predigten/aktuell/'))) {
             return [];
         }
-        $content = Str::replace("\n", '', $content);
+        $content = Str::replace("\n", '', (string) $content);
         preg_match_all('/<li>(.*?)<\/li>/', $content, $matches);
 
         $lastMatch = null;

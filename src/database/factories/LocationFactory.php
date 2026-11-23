@@ -34,6 +34,7 @@ use App\Models\Location;
 use App\Models\Places\City;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+/** @extends Factory<Location> */
 class LocationFactory extends Factory
 {
     protected $model = Location::class;

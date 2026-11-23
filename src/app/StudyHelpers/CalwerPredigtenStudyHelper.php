@@ -61,7 +61,7 @@ class CalwerPredigtenStudyHelper extends AbstractStudyHelper
         foreach ($doc->getElementsByTagName('li') as $li) {
             foreach ($li->getElementsByTagName('div') as $div) {
                 if ($div->getAttribute('class') == 'list-headline') {
-                    $recordTitle = Str::replace("\n", '', $div->nodeValue);
+                    $recordTitle = Str::replace("\n", '', (string) $div->nodeValue);
                     $recordTitle = Str::replace('(', ', ', $recordTitle);
                     $recordTitle = Str::replace(')', '', $recordTitle);
                     while (Str::contains($recordTitle, '  ')) {

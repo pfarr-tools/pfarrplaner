@@ -104,7 +104,7 @@ class DAVCalendarItem
      */
     public static function fromUri($uri): ?DAVCalendarItem
     {
-        $uri = Str::replace('.ics', '', $uri);
+        $uri = Str::replace('.ics', '', (string) $uri);
         $tmp = explode('--', $uri);
         $class = Str::replace('-', '\\', $tmp[0]);
         if (! is_subclass_of($class, Model::class)) {

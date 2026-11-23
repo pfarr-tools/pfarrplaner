@@ -35,6 +35,7 @@ use App\Models\Rites\Baptism;
 use App\Models\Service;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+/** @extends Factory<Baptism> */
 class BaptismFactory extends Factory
 {
     protected $model = Baptism::class;

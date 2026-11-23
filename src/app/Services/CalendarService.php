@@ -45,7 +45,7 @@ use Illuminate\Support\Facades\Gate;
 class CalendarService
 {
     /**
-     * @return Collection
+     * @return Collection<int, string>
      */
     public static function initializeMonth($year, $month)
     {
@@ -151,8 +151,8 @@ class CalendarService
      * Add liturgically relevant dates missing from the current month payload.
      *
      * @param  Carbon  $date  Date within the target month.
-     * @param  Collection  $days  Existing date values.
-     * @return Collection Updated unique, sorted dates.
+     * @param  Collection<int, string>  $days  Existing date values.
+     * @return Collection<int, string> Updated unique, sorted dates.
      */
     public static function addMissingDefaultDays($date, $days)
     {
@@ -205,6 +205,7 @@ class CalendarService
     /**
      * Initialize the day map for a calendar month.
      *
+     * @param  Collection<int, string>  $dates  Dates in the current month.
      * @return array<string, array<string, mixed>>
      */
     protected static function initializeMonthDayMap(Collection $dates, Carbon $date): array

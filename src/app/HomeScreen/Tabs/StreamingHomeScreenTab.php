@@ -88,7 +88,7 @@ class StreamingHomeScreenTab extends AbstractHomeScreenTab
     /**
      * Build the query
      *
-     * @return Builder
+     * @return Builder<Service>
      */
     public function buildQuery($includeNew = true)
     {

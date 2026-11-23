@@ -647,7 +647,7 @@ class Service extends Model implements HasDAVCalendarItems
     public function getImageCutUrl(string $cut): string
     {
         if ($attachment = $this->attachments()->firstWhere('cut', Str::slug($cut))) {
-            return route('image', Str::replace('attachments/', '', $attachment->file));
+            return route('image', Str::replace('attachments/', '', (string) $attachment->file));
         }
 
         return '';
@@ -1093,7 +1093,9 @@ class Service extends Model implements HasDAVCalendarItems
             $cities = [$cities];
         }
         $cityIds = collect();
-        foreach (collect($cities) as $item) {
+        /** @var iterable<int, mixed> $cities */
+        $cityItems = collect($cities);
+        foreach ($cityItems as $item) {
             if (is_array($item)) {
                 $item = array_first($item);
             }
@@ -1125,6 +1127,7 @@ class Service extends Model implements HasDAVCalendarItems
     {
         $query = $this->scopeInCities($query, $cities);
 
+        /** @var iterable<int, mixed> $locations */
         if ($locations === null || collect($locations)->filter()->isEmpty()) {
             return $query;
         }
@@ -1132,6 +1135,7 @@ class Service extends Model implements HasDAVCalendarItems
         if (is_string($locations)) {
             $locations = [$locations];
         }
+        /** @var iterable<int, mixed> $locations */
         $locationIds = collect($locations)->map(function ($item) {
             if (is_array($item)) {
                 $item = array_first($item);

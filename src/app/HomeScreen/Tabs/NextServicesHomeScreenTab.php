@@ -84,7 +84,7 @@ class NextServicesHomeScreenTab extends AbstractHomeScreenTab
     /**
      * Build the query
      *
-     * @return Builder
+     * @return Builder<Service>
      */
     public function buildQuery()
     {

@@ -47,7 +47,7 @@ class LiturgischerWegweiserStudyHelper extends AbstractStudyHelper
         ))) {
             return [];
         }
-        $content = Str::replace("\n", '', $content);
+        $content = Str::replace("\n", '', (string) $content);
         preg_match_all('/<li><a href="([^"<]+?)" class="c-mega-menu__sub-link">(.*?)<\/a><\/li>/', $content, $matches);
 
         foreach ($matches[0] as $index => $match) {

@@ -157,7 +157,7 @@ class EKDStatsReport extends AbstractExcelDocumentReport
             ->whereHas('pastors')
             ->get()
             ->groupBy(function ($item) {
-                return $item->locationTextWithCity;
+                return (string) $item->locationTextWithCity;
             });
 
         $ctChristmasEve = Service::with([])->between(

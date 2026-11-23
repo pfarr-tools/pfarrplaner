@@ -34,6 +34,7 @@ use App\Models\Parish;
 use App\Models\Places\City;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+/** @extends Factory<Parish> */
 class ParishFactory extends Factory
 {
     protected $model = Parish::class;

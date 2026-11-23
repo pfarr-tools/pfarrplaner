@@ -82,7 +82,7 @@ class WeddingsHomeScreenTab extends AbstractHomeScreenTab
     /**
      * Build the query
      *
-     * @return Builder
+     * @return Builder<Wedding>
      */
     public function buildQuery()
     {

@@ -32,7 +32,6 @@ namespace App\HomeScreen\Tabs;
 
 use App\Models\Rites\Baptism;
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 
 class BaptismsHomeScreenTab extends AbstractHomeScreenTab
@@ -93,7 +92,7 @@ class BaptismsHomeScreenTab extends AbstractHomeScreenTab
     /**
      * Build the query
      *
-     * @return Builder
+     * @return void
      */
     public function buildQueries()
     {

@@ -34,6 +34,7 @@ use App\Models\Leave\Absence;
 use App\Models\People\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+/** @extends Factory<Absence> */
 class AbsenceFactory extends Factory
 {
     protected $model = Absence::class;

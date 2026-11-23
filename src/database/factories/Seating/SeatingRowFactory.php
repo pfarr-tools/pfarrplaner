@@ -34,6 +34,7 @@ use App\Models\Seating\SeatingRow;
 use App\Models\Seating\SeatingSection;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+/** @extends Factory<SeatingRow> */
 class SeatingRowFactory extends Factory
 {
     protected $model = SeatingRow::class;

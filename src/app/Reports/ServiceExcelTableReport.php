@@ -391,6 +391,9 @@ class ServiceExcelTableReport extends AbstractExcelDocumentReport
         };
     }
 
+    /**
+     * @param  Collection<int, User>  $people  People to format.
+     */
     protected function peopleListFormatted(Collection $people): string
     {
         $recs = [];

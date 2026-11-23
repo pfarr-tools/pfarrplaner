@@ -34,6 +34,7 @@ use App\Models\Seating\Booking;
 use App\Models\Service;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+/** @extends Factory<Booking> */
 class BookingFactory extends Factory
 {
     protected $model = Booking::class;

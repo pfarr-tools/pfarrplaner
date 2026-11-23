@@ -38,6 +38,9 @@ use App\Models\Tag;
  *
  * @extends AbstractCRUDController<Tag>
  */
+/**
+ * @extends AbstractCRUDController<Tag>
+ */
 class TagController extends AbstractCRUDController
 {
     protected string $modelClass = Tag::class;

@@ -197,7 +197,7 @@ class AbstractCalendarLink
     }
 
     /**
-     * @return array
+     * @return mixed Render data consumed by the calendar link view.
      */
     public function getRenderData(Request $request, User $user)
     {

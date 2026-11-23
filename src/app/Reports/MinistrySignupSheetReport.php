@@ -88,7 +88,9 @@ class MinistrySignupSheetReport extends AbstractPDFDocumentReport
         foreach ($data['cities'] as $key => $id) {
             $data['cities'][$key] = City::find($id);
         }
-        $data['cities'] = collect($data['cities']);
+        /** @var array<int, mixed> $cityIds */
+        $cityIds = $data['cities'];
+        $data['cities'] = collect($cityIds);
         $data['start'] = Carbon::createFromFormat('d.m.Y H:i:s', $data['start'].' 0:00:00');
         $data['end'] = Carbon::createFromFormat('d.m.Y H:i:s', $data['end'].' 23:59:00');
         $data['services'] = Service::between($data['start'], $data['end'])

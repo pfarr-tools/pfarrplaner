@@ -214,7 +214,47 @@ Rückgabetyp; die Ankündigungsverwaltung setzt die verknüpfte Veranstaltung ü
 | `argument.templateType` | 43 |
 
 Level 6 ist erreicht, sobald diese 2.189 Befunde fachlich aufgelöst sind. Die
-arbeit liegt überwiegend in einzelnen Deklarationen und ist daher deutlich
+Arbeit liegt überwiegend in einzelnen Deklarationen und ist daher deutlich
 aufwändiger als die beiden gemeinsamen Typpakete. Die Schätzung von 40–80
 weiteren aktiven Agentenstunden bleibt bestehen; sie schließt den Abbau der
 alten Level-5-Baseline nicht ein.
+
+## Drittes Folgepaket: Collection- und Template-Typen
+
+Alle verbleibenden `missingType.generics`- und `argument.templateType`-Befunde
+sind abgearbeitet. Factory-Klassen nennen ihr Modell, `HasCityScopes`,
+`TracksDeletedByTrait` und die HomeScreen-Abfragen tragen konkrete Typen,
+Collection-Parameter und -Rückgaben sind in Diensten, Berichten und
+Liturgieblättern präzisiert. Bei dynamischen Werten aus Requests, Cache und DOM
+wurden örtliche Typangaben beziehungsweise explizite
+String-Konvertierungen ergänzt; das Laufzeitverhalten bleibt unverändert.
+
+| Level | Nach dem zweiten Folgepaket | Nach dem dritten Folgepaket |
+|---|---:|---:|
+| 5 | 0 | 0 |
+| 6 | 2.189 | **2.051** |
+
+`missingType.generics` und `argument.templateType` stehen jetzt beide auf 0.
+Zwölf obsolete PHPStan-Muster und 43 veraltete PHPDoc-Baseline-Einträge wurden
+entfernt, 92 Einträge an verschobene Zeilen angepasst; keine neuen Ausnahmen.
+
+### Verifikation
+
+- PHPStan Level 5: 0 Fehler; Level 6: 2.051 erwartete Befunde.
+- `./planer dev quality`: vollständig grün (1.201 PHP-Tests, 528 JavaScript-Tests,
+  PHPStan, Format-, PHPDoc- und JSDoc-Prüfung).
+- `git diff --check`: bestanden.
+
+### Verbleibender Weg bis Level 6
+
+| Kategorie | Befunde |
+|---|---:|
+| `missingType.parameter` | 631 |
+| `missingType.iterableValue` | 563 |
+| `missingType.return` | 531 |
+| `missingType.property` | 326 |
+
+Damit sind nur noch die vier einfachen Fehlertypen übrig. Sie verteilen sich auf
+viele einzelne Deklarationen und lassen sich nicht weiter durch gemeinsame
+Verträge abkürzen. Für jedes Paket gilt weiterhin: zuerst fokussierter Test,
+dann Typangabe, danach Level 5 und 6 frisch prüfen.

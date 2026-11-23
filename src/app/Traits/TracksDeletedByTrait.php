@@ -45,6 +45,9 @@ trait TracksDeletedByTrait
         });
     }
 
+    /**
+     * @return BelongsTo<User, $this>
+     */
     public function deletedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'deleted_by');

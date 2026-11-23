@@ -119,7 +119,7 @@ class RowBasedSeatFinder extends AbstractSeatFinder
      * @param  string  $fixedSeat  Desired fixed seating position
      * @param  string  $overrideSeats  Override the default maximum number of seats for a fixed position
      * @param  string  $overrideSplit  Override the default splitting configuration for a fixed position
-     * @param  Collection  $bookings  Existing bookings used for the check
+     * @param  Collection<int, Booking>  $bookings  Existing bookings used for the check
      * @return bool True if this booking can be added
      */
     public function find($number, $fixedSeat = '', $overrideSeats = '', $overrideSplit = '', $bookings = null)
@@ -187,6 +187,7 @@ class RowBasedSeatFinder extends AbstractSeatFinder
      * Find a place for all existing bookings
      *
      * @param  Collection|array  $bookings  Optional: array or collection of bookings
+     * @param  Collection<int, Booking>  $bookings  Existing bookings.
      * @return bool Success
      */
     protected function loadExistingBookings($bookings = null)

@@ -33,6 +33,7 @@ namespace Database\Factories\Calendar\External;
 use App\Models\Calendar\External\CalendarConnection;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+/** @extends Factory<CalendarConnection> */
 class CalendarConnectionFactory extends Factory
 {
     protected $model = CalendarConnection::class;

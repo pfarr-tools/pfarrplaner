@@ -33,7 +33,7 @@ namespace App\HomeScreen\Tabs;
 use App\Models\Location;
 use App\Models\Service;
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
 
 class MissingEntriesHomeScreenTab extends AbstractHomeScreenTab
@@ -86,7 +86,7 @@ class MissingEntriesHomeScreenTab extends AbstractHomeScreenTab
     /**
      * Build the query
      *
-     * @return Builder
+     * @return Collection<int, Service>
      */
     public function getMissing()
     {

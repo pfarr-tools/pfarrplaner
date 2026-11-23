@@ -189,6 +189,9 @@ class PapierkorbController extends Controller
         ];
     }
 
+    /**
+     * @return Builder<Service>|Builder<Absence>|Builder<Baptism>|Builder<Funeral>|Builder<Wedding>
+     */
     protected static function baseQueryForType(string $type): Builder
     {
         abort_unless(isset(self::SUPPORTED_TYPES[$type]), 404);

@@ -209,6 +209,9 @@ class RitesReport extends AbstractWordDocumentReport
         $run->addText("\t");
     }
 
+    /**
+     * @param  Collection<int, Service>  $baptisms  Services with baptisms to render.
+     */
     public function renderBaptisms(Section $section, Collection $baptisms): void
     {
         if (! count($baptisms)) {
@@ -227,6 +230,9 @@ class RitesReport extends AbstractWordDocumentReport
         }
     }
 
+    /**
+     * @param  Collection<int, Service>  $weddings  Services with weddings to render.
+     */
     public function renderWeddings(Section $section, Collection $weddings): void
     {
         if (! count($weddings)) {
@@ -255,6 +261,9 @@ class RitesReport extends AbstractWordDocumentReport
         }
     }
 
+    /**
+     * @param  Collection<int, Service>  $baptismalServices  Services with baptisms.
+     */
     public function renderBaptismDates(Section $section, Collection $baptismalServices): void
     {
         if (! count($baptismalServices)) {
@@ -278,6 +287,9 @@ class RitesReport extends AbstractWordDocumentReport
         }
     }
 
+    /**
+     * @param  Collection<int, Service>  $funerals  Services with funerals to render.
+     */
     public function renderFunerals(Section $section, Collection $funerals): void
     {
         if (! count($funerals)) {

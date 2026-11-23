@@ -31,9 +31,11 @@
 namespace App\Events;
 
 use App\Integrations\Youtube\YoutubeIntegration;
+use App\Models\People\User;
 use App\Models\Service;
 use App\Models\Streaming\Broadcast;
 use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Collection;
@@ -49,11 +51,13 @@ class ServiceUpdated
     /** @var Service */
     public $service;
 
-    /** @var Collection */
+    /** @var \Illuminate\Database\Eloquent\Collection<int, User&object{pivot: Pivot&object{category: string}}> */
     public $originalParticipants;
 
     /**
      * Create a new event instance.
+     *
+     * @param  \Illuminate\Database\Eloquent\Collection<int, User&object{pivot: Pivot&object{category: string}}>  $originalParticipants  Participants before the change.
      */
     public function __construct(Service $service, Collection $originalParticipants)
     {

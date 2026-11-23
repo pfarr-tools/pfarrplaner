@@ -91,6 +91,9 @@ abstract class AbstractSyncEngine
 
     /**
      * Sync a collection of services
+     *
+     * @param  Collection<int, Service>  $services  Services to synchronize.
+     * @return void
      */
     public function syncServices(Collection $services)
     {

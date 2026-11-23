@@ -43,7 +43,7 @@ class NachhaltigPredigenStudyHelper extends AbstractStudyHelper
         if ('' == ($content = $this->getContent('http://www.nachhaltig-predigen.de/index.php/predigtanregungen/2023-24'))) {
             return [];
         }
-        $content = Str::replace("\n", '', $content);
+        $content = Str::replace("\n", '', (string) $content);
         $content = Str::replace("\r", '', $content);
         preg_match_all('/<li><h4>(?:.*?)href="(.*?)">(?:<span class="mod-articles-category-title "(?: style="font-size: medium;")?>)?(.*?)(?:<\/span>)?<\/a>(?:.*?)<\/h4>/', $content, $matches);
 

@@ -34,6 +34,7 @@ use App\Models\Parish;
 use App\Models\Places\StreetRange;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+/** @extends Factory<StreetRange> */
 class StreetRangeFactory extends Factory
 {
     protected $model = StreetRange::class;

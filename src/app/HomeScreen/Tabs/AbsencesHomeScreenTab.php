@@ -34,7 +34,6 @@ use App\Models\Leave\Absence;
 use App\Models\Leave\Poolmaster;
 use App\Models\Leave\Replacement;
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 
 class AbsencesHomeScreenTab extends AbstractHomeScreenTab
@@ -82,7 +81,7 @@ class AbsencesHomeScreenTab extends AbstractHomeScreenTab
     /**
      * Build the queries
      *
-     * @return Builder
+     * @return void
      */
     public function buildQueries()
     {

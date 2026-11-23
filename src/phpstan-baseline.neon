@@ -43,12 +43,6 @@ parameters:
 			path: app/Calendars/AbstractCalendarItem.php
 
 		-
-			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Builder\:\:inCity\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: app/Calendars/LocalEventCalendars/CityLocalEventCalendar.php
-
-		-
 			message: '#^Left side of && is always true\.$#'
 			identifier: booleanAnd.leftAlwaysTrue
 			count: 1
@@ -307,12 +301,6 @@ parameters:
 			path: app/Helpers/ImageHelper.php
 
 		-
-			message: '#^Method App\\HomeScreen\\Tabs\\AbsenceRequestsHomeScreenTab\:\:buildQueries\(\) should return Illuminate\\Database\\Eloquent\\Builder but return statement is missing\.$#'
-			identifier: return.missing
-			count: 1
-			path: app/HomeScreen/Tabs/AbsenceRequestsHomeScreenTab.php
-
-		-
 			message: '#^Method App\\HomeScreen\\Tabs\\AbsenceRequestsHomeScreenTab\:\:getContent\(\) has invalid return type App\\HomeScreen\\Tabs\\Illuminate\\Contracts\\View\\View\.$#'
 			identifier: class.notFound
 			count: 1
@@ -329,12 +317,6 @@ parameters:
 			identifier: larastan.relationExistence
 			count: 1
 			path: app/HomeScreen/Tabs/AbsenceRequestsHomeScreenTab.php
-
-		-
-			message: '#^Method App\\HomeScreen\\Tabs\\AbsencesHomeScreenTab\:\:buildQueries\(\) should return Illuminate\\Database\\Eloquent\\Builder but return statement is missing\.$#'
-			identifier: return.missing
-			count: 1
-			path: app/HomeScreen/Tabs/AbsencesHomeScreenTab.php
 
 		-
 			message: '#^Method App\\HomeScreen\\Tabs\\AbsencesHomeScreenTab\:\:getContent\(\) has invalid return type App\\HomeScreen\\Tabs\\Illuminate\\Contracts\\View\\View\.$#'
@@ -371,12 +353,6 @@ parameters:
 			identifier: return.type
 			count: 1
 			path: app/HomeScreen/Tabs/AbstractHomeScreenTab.php
-
-		-
-			message: '#^Method App\\HomeScreen\\Tabs\\BaptismsHomeScreenTab\:\:buildQueries\(\) should return Illuminate\\Database\\Eloquent\\Builder but return statement is missing\.$#'
-			identifier: return.missing
-			count: 1
-			path: app/HomeScreen/Tabs/BaptismsHomeScreenTab.php
 
 		-
 			message: '#^Method App\\HomeScreen\\Tabs\\BaptismsHomeScreenTab\:\:getContent\(\) has invalid return type App\\HomeScreen\\Tabs\\Illuminate\\Contracts\\View\\View\.$#'
@@ -453,12 +429,6 @@ parameters:
 		-
 			message: '#^Method App\\HomeScreen\\Tabs\\MissingEntriesHomeScreenTab\:\:getContent\(\) has invalid return type App\\HomeScreen\\Tabs\\Illuminate\\Contracts\\View\\View\.$#'
 			identifier: class.notFound
-			count: 1
-			path: app/HomeScreen/Tabs/MissingEntriesHomeScreenTab.php
-
-		-
-			message: '#^Method App\\HomeScreen\\Tabs\\MissingEntriesHomeScreenTab\:\:getMissing\(\) should return Illuminate\\Database\\Eloquent\\Builder but returns Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\Service\>\.$#'
-			identifier: return.type
 			count: 1
 			path: app/HomeScreen/Tabs/MissingEntriesHomeScreenTab.php
 
@@ -3541,24 +3511,6 @@ parameters:
 			path: app/Reports/RegulatoryReport.php
 
 		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$baptisms\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Reports/RitesReport.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$funerals\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Reports/RitesReport.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$weddings\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Reports/RitesReport.php
-
-		-
 			message: '#^Parameter \#1 \$centimeter of static method PhpOffice\\PhpWord\\Shared\\Converter\:\:cmToTwip\(\) expects float, string given\.$#'
 			identifier: argument.type
 			count: 4
@@ -3913,28 +3865,10 @@ parameters:
 			path: app/UI/MenuBuilder.php
 
 		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
-			identifier: property.notFound
-			count: 2
-			path: database/factories/AttachmentFactory.php
-
-		-
 			message: '#^Access to property \$id on an unknown class App\\Models\\Model\.$#'
 			identifier: class.notFound
 			count: 2
 			path: database/factories/AttachmentFactory.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
-			identifier: property.notFound
-			count: 1
-			path: database/factories/CommentFactory.php
-
-		-
-			message: '#^PHPDoc type string of property Database\\Factories\\People\\TeamFactory\:\:\$model is not covariant with PHPDoc type class\-string\<Illuminate\\Database\\Eloquent\\Model\> of overridden property Illuminate\\Database\\Eloquent\\Factories\\Factory\<Illuminate\\Database\\Eloquent\\Model\>\:\:\$model\.$#'
-			identifier: property.phpDocType
-			count: 1
-			path: database/factories/People/TeamFactory.php
 
 		-
 			message: '#^PHPDoc tag @extends has invalid type App\\Models\\Model\.$#'
@@ -3959,12 +3893,6 @@ parameters:
 			identifier: generics.notSubtype
 			count: 1
 			path: database/factories/Places/CityFactory.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
-			identifier: property.notFound
-			count: 1
-			path: database/factories/Rites/BaptismFactory.php
 
 		-
 			message: '#^Call to method dropColumn\(\) on an unknown class Doctrine\\DBAL\\Schema\\Table\.$#'

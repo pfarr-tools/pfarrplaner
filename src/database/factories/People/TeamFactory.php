@@ -34,12 +34,13 @@ use App\Models\People\Team;
 use App\Models\Places\City;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+/** @extends Factory<Team> */
 class TeamFactory extends Factory
 {
     /**
      * The name of the factory's corresponding model.
      *
-     * @var string
+     * @var class-string<Team>
      */
     protected $model = Team::class;
 

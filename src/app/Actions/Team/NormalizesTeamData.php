@@ -34,6 +34,7 @@ trait NormalizesTeamData
 {
     protected function normalizeInput(array $input): array
     {
+        /** @var array{users?: array<int, mixed>} $input */
         $input['users'] = collect($input['users'] ?? [])
             ->map(function ($user) {
                 if (is_array($user)) {

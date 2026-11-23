@@ -34,6 +34,7 @@ use App\Models\Rites\Wedding;
 use App\Models\Service;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+/** @extends Factory<Wedding> */
 class WeddingFactory extends Factory
 {
     protected $model = Wedding::class;

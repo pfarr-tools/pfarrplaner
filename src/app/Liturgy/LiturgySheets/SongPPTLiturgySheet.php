@@ -119,7 +119,7 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
     /**
      * Cache ad events to be listed to prevent multiple queries
      *
-     * @var array|Collection
+     * @var array|Collection<int|string, Occurence>
      */
     protected $adEventsToBeListed = [];
 
@@ -1140,6 +1140,7 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
 
         $renderableHighlightedEvents = collect($this->adEventsToBeHighlighted)
             ->map(function ($events) {
+                /** @var array<int, mixed> $events */
                 return collect($events)
                     ->filter(function (Occurence $event) {
                         return ! empty($event->service->getImageCutPath('bildschirm-16x9'));
@@ -1219,13 +1220,14 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
     /**
      * Split event lists into slide-sized chunks per day.
      *
-     * @return array<string, array<int, Collection>>
+     * @return array<string, array<int, Collection<int, mixed>>>
      */
     protected function paginateEventListSlidesByDate(iterable $eventsByDate): array
     {
         $pagesByDate = [];
 
         foreach ($eventsByDate as $date => $events) {
+            /** @var array<int, mixed> $events */
             $pagesByDate[$date] = $this->paginateEventListSlides(collect($events));
         }
 
@@ -1235,14 +1237,15 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
     /**
      * Remove event list slides whose entries are all rendered as dedicated highlight slides.
      *
-     * @param  array<string, array<int, Collection>>  $pagesByDate
-     * @return array<string, array<int, Collection>>
+     * @param  array<string, array<int, Collection<int, mixed>>>  $pagesByDate
+     * @return array<string, array<int, Collection<int, mixed>>>
      */
     protected function suppressHighlightedOnlyEventListSlides(array $pagesByDate, iterable $highlightedEventsByDate): array
     {
         $highlightKeysByDate = [];
 
         foreach ($highlightedEventsByDate as $date => $events) {
+            /** @var array<int, mixed> $events */
             $highlightKeysByDate[$date] = collect($events)
                 ->map(function ($event) {
                     return $this->getEventListComparisonKey($event);
@@ -1274,7 +1277,8 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
     /**
      * Split a single day's event list into multiple slide-sized chunks.
      *
-     * @return array<int, Collection>
+     * @param  Collection<int, mixed>  $events  Events of the day.
+     * @return array<int, Collection<int, mixed>>
      */
     protected function paginateEventListSlides(Collection $events): array
     {
@@ -1575,6 +1579,7 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
      * @param  int  $firstAdSlideNumber  Number of the first slide in the loop
      * @param  int  $finalAdSlideNumber  Number of the last slide in the loop
      * @param  bool  $isFinalLoop  True, if this loop is at the very end of the presentation
+     * @param  Collection<int, mixed>  $events  Events rendered on this slide.
      * @return void
      *
      * @throws OutOfBoundsException

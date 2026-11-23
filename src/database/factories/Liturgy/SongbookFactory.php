@@ -16,6 +16,7 @@ namespace Database\Factories\Liturgy;
 use App\Models\Liturgy\Songbook;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+/** @extends Factory<Songbook> */
 class SongbookFactory extends Factory
 {
     protected $model = Songbook::class;

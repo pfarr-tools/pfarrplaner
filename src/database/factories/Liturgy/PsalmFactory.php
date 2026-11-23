@@ -16,6 +16,7 @@ namespace Database\Factories\Liturgy;
 use App\Models\Liturgy\Psalm;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+/** @extends Factory<Psalm> */
 class PsalmFactory extends Factory
 {
     protected $model = Psalm::class;

@@ -86,6 +86,9 @@ class NameService
         return new self($user->first_name ?? '', $user->last_name ?? '', $user->title ?? '');
     }
 
+    /**
+     * @param  Collection<int, User>  $users  Candidate users.
+     */
     public static function identifyPeople(array $names, ?Collection $users = null): array
     {
         $users = $users ?: self::loadUsersForIdentification();
@@ -118,6 +121,9 @@ class NameService
         return self::groupIdentificationResults($results);
     }
 
+    /**
+     * @param  Collection<int, User>  $users  Candidate users.
+     */
     public static function identifyPerson(string $name, ?Collection $users = null): array
     {
         $users = $users ?: self::loadUsersForIdentification();
@@ -221,6 +227,10 @@ class NameService
         ];
     }
 
+    /**
+     * @param  Collection<int, User>  $users  Candidate users.
+     * @return Collection<int, User>
+     */
     protected static function findUsersByExactVariant(Collection $users, string $normalizedInput): Collection
     {
         return $users->filter(function (User $user) use ($normalizedInput) {
@@ -228,6 +238,10 @@ class NameService
         })->values();
     }
 
+    /**
+     * @param  Collection<int, User>  $users  Candidate users.
+     * @return Collection<int, User>
+     */
     protected static function findUsersByNameParts(Collection $users, array $parsed): Collection
     {
         return $users->filter(function (User $user) use ($parsed) {
@@ -236,6 +250,9 @@ class NameService
         })->values();
     }
 
+    /**
+     * @return Collection<int, User>
+     */
     protected static function loadUsersForIdentification(): Collection
     {
         return User::query()->get(['id', 'first_name', 'last_name', 'title']);
@@ -354,6 +371,9 @@ class NameService
         ];
     }
 
+    /**
+     * @param  Collection<int, User>  $users  Candidate users.
+     */
     protected static function buildContextCandidates(array $results, Collection $users): array
     {
         $candidates = [];

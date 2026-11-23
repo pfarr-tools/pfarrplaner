@@ -43,7 +43,7 @@ class VELKDStudyHelper extends AbstractStudyHelper
         if ('' == ($content = $this->getContent('https://www.velkd.de/schwerpunkte/liturgie/lesepredigt'))) {
             return [];
         }
-        $content = Str::replace("\n", '', $content);
+        $content = Str::replace("\n", '', (string) $content);
 
         // https://www.velkd.de/fileadmin/user_upload/VELKD/PDF/Lesepredigt/Lesepredigt-01-02-2026.pdf
         preg_match('/Lesepredigt-(\d\d\-\d\d\-\d\d\d\d)/', $content, $matches);

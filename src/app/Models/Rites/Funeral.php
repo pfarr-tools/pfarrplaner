@@ -49,6 +49,9 @@ use Illuminate\Support\Facades\URL;
 
 /**
  * Class Funeral
+ *
+ * @property-read string|null $birthName Birth name recorded for the deceased.
+ * @property-read int|null $age Age at death.
  */
 class Funeral extends AbstractModel implements HasDAVCalendarItems
 {

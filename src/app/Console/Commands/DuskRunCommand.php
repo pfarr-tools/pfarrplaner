@@ -100,7 +100,9 @@ class DuskRunCommand extends Command
 
         $this->purgeSourceLogs();
 
-        $options = collect($_SERVER['argv'])
+        /** @var array<int, string> $argv */
+        $argv = $_SERVER['argv'];
+        $options = collect($argv)
             ->slice(2)
             ->diff([
                 '--browse', '--compact', '--debug-tests', '--profile', '--stop-on-failure', '--testdox', '--without-build', '--without-server', '--without-tty',
@@ -480,7 +482,10 @@ class DuskRunCommand extends Command
      */
     protected function forwardedPhpUnitOptions(): array
     {
-        return collect($_SERVER['argv'])
+        /** @var array<int, string> $argv */
+        $argv = $_SERVER['argv'];
+
+        return collect($argv)
             ->slice(2)
             ->diff([
                 '--browse', '--compact', '--debug-tests', '--profile', '--stop-on-failure', '--testdox', '--without-build', '--without-server', '--without-tty',

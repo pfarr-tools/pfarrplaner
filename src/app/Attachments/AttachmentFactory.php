@@ -40,13 +40,16 @@ class AttachmentFactory
             return [];
         }
 
+        /** @var \Closure(mixed): array<string, mixed> $infoMapper */
+        $infoMapper = function ($file) {
+            return (static::getClassFromFile($file))::getInfo();
+        };
+
         return collect(glob(app_path('Attachments/'.ucfirst($type).'/*.php')))
             ->reject(function ($file) {
                 return Str::startsWith(basename($file), 'Abstract');
             })
-            ->map(function ($file) {
-                return (static::getClassFromFile($file))::getInfo();
-            });
+            ->map($infoMapper);
 
     }
 

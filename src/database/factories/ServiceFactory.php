@@ -35,6 +35,7 @@ use App\Models\Places\City;
 use App\Models\Service;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+/** @extends Factory<Service> */
 class ServiceFactory extends Factory
 {
     protected $model = Service::class;

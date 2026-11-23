@@ -65,7 +65,7 @@ class DasKirchenjahrStudyHelper extends AbstractStudyHelper
         if ('' == ($content = $this->getContent($url))) {
             return [];
         }
-        $content = Str::replace("\n", '', $content);
+        $content = Str::replace("\n", '', (string) $content);
         preg_match_all('/<A href="(tag.php\?name=(?:.*?)&zeit=(?:.*?))"(?:.*?)>(.*?)<\/A>/', $content, $matches);
         foreach ($matches[0] as $index => $match) {
             if (! Str::contains($matches[1][$index], '&typ=')) {

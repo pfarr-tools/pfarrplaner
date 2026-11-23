@@ -61,8 +61,8 @@ class FileNameService
             $name = '';
         }
 
-        $title = Str::replace(' /', ',', $title);
-        $title = Str::replace('/', ',', $title);
+        $title = Str::replace(' /', ',', (string) $title);
+        $title = Str::replace('/', ',', (string) $title);
 
         return ($callSign ? $callSign.($date ? '_' : '') : '')
             .($date ?? ' ').$name.$title.($extension ?: '');

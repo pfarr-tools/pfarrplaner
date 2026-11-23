@@ -80,7 +80,7 @@ class FuneralsHomeScreenTab extends AbstractHomeScreenTab
     /**
      * Build the query
      *
-     * @return Builder
+     * @return Builder<Funeral>
      */
     public function buildQuery()
     {

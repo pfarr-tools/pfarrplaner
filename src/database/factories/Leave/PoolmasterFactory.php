@@ -18,6 +18,7 @@ use App\Models\Leave\Poolmaster;
 use App\Models\People\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+/** @extends Factory<Poolmaster> */
 class PoolmasterFactory extends Factory
 {
     protected $model = Poolmaster::class;

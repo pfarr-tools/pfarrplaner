@@ -34,8 +34,10 @@ use App\Models\UserSetting;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
+/** @extends Factory<UserSetting> */
 class UserSettingFactory extends Factory
 {
+    /** @use HasFactory<Factory<UserSetting>> */
     use HasFactory;
 
     protected $model = UserSetting::class;

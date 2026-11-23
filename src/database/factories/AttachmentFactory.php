@@ -38,6 +38,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
+/** @extends Factory<Attachment> */
 class AttachmentFactory extends Factory
 {
     protected $model = Attachment::class;

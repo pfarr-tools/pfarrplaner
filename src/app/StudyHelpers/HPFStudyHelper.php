@@ -43,7 +43,7 @@ class HPFStudyHelper extends AbstractStudyHelper
         if ('' == ($content = $this->getContent('https://predigtforum.de/'))) {
             return [];
         }
-        $content = Str::replace("\n", '', $content);
+        $content = Str::replace("\n", '', (string) $content);
         preg_match_all('/<h3>(.*?)<\/h3>(?:.*?)<td>(.*?)<\/td>(?:.*?)<td>(.*?)<\/td>(?:.*?)<td>(.*?)<\/td>(?:.*?)<td>(.*?)<\/td>(?:.*?)<td>(.*?)<\/td>(?:.*?)<a(?:.*?)href="(.*?)"/', $content, $matches);
 
         foreach ($matches[0] as $index => $match) {

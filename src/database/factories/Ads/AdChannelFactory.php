@@ -18,6 +18,7 @@ use App\Models\Places\City;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
+/** @extends Factory<AdChannel> */
 class AdChannelFactory extends Factory
 {
     protected $model = AdChannel::class;

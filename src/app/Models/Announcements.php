@@ -411,7 +411,7 @@ class Announcements
             $paragraphs[] = $day;
             foreach ($events as $event) {
                 $paragraphs[] = ($event->event->is_allday ? '' : $event->event->timeText().$this->tab())
-                    .Str::replace('&', '&amp;', $event->event->titleText(false, false))
+                    .Str::replace('&', '&amp;', (string) $event->event->titleText(false, false))
                     .(count($event->event->pastors ?? []) ?
                         ' mit '.$event->event->pastors->map(function ($pastor) {
                             return NameService::fromUser($pastor)->format(NameService::TITLE_FIRST_LAST);

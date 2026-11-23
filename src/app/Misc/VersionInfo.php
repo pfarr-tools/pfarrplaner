@@ -59,7 +59,7 @@ class VersionInfo
     /**
      * Get version "what's new" messages
      *
-     * @return Collection
+     * @return Collection<int, array{date: Carbon|null, text: string}>
      */
     public static function getMessages()
     {
