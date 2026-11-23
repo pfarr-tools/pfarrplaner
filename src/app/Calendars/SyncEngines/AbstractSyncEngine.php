@@ -101,13 +101,16 @@ abstract class AbstractSyncEngine
     }
 
     /**
-     * Sync a single service
+     * Synchronize a service and its configured additional events to the remote calendar.
+     *
+     * @param  Service  $service  Service providing the event dates and participants.
+     * @return void
      */
     public function syncSingleService(Service $service)
     {
         $record = [
             'startDate' => $service->dateTime->copy()->format('Y-m-d H:i:s'),
-            'endDate' => $service->dateTime->copy()->addHour(1)->format('Y-m-d H:i:s'),
+            'endDate' => $service->dateTime->copy()->addHour()->format('Y-m-d H:i:s'),
             'title' => $service->titleTextWithParticipants(),
             'location' => $service->locationText(),
             'description' => '<p><a href="'
@@ -251,7 +254,10 @@ abstract class AbstractSyncEngine
     }
 
     /**
-     * Remove a single service from the external calendar
+     * Remove a service and its configured preparation/anniversary events from the external calendar.
+     *
+     * @param  Service  $service  Service whose synchronized entries are removed.
+     * @return void
      */
     public function deleteSingleService(Service $service)
     {
@@ -286,7 +292,9 @@ abstract class AbstractSyncEngine
             foreach ([$service->weddings, $service->funerals, $service->baptisms] as $collection) {
                 if (count($collection)) {
                     foreach ($collection as $collectionItem) {
-                        $result = $collectionItem->getPreparationEvent();
+                        $result = $collectionItem->getAdditionalEvents([
+                            'include_rite_anniversaries' => $this->calendarConnection->include_rite_anniversaries,
+                        ]);
                         if ($result) {
                             foreach ($result as $prepKey => $prepEvent) {
                                 $this->deleteSingleAlternateEvent($prepKey);

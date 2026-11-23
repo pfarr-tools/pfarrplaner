@@ -36,6 +36,8 @@ use Illuminate\Http\Request;
 
 /**
  * Class LocationController
+ *
+ * @extends AbstractCRUDController<Location>
  */
 class LocationController extends AbstractCRUDController
 {

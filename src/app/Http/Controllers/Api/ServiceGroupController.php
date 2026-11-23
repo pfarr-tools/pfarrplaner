@@ -32,6 +32,11 @@ namespace App\Http\Controllers\Api;
 
 use App\Models\ServiceGroup;
 
+/**
+ * Handles CRUD requests for ServiceGroup records.
+ *
+ * @extends AbstractApiCRUDController<ServiceGroup>
+ */
 class ServiceGroupController extends AbstractApiCRUDController
 {
     protected string $modelClass = ServiceGroup::class;

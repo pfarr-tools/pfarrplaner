@@ -32,6 +32,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Liturgy\Psalm;
 
+/**
+ * Handles CRUD requests for Psalm records.
+ *
+ * @extends AbstractCRUDController<Psalm>
+ */
 class PsalmController extends AbstractCRUDController
 {
     protected string $modelClass = Psalm::class;

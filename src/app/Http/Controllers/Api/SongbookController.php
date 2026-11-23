@@ -34,6 +34,11 @@ use App\Models\Liturgy\Songbook;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+/**
+ * Handles CRUD requests for Songbook records.
+ *
+ * @extends AbstractApiCRUDController<Songbook>
+ */
 class SongbookController extends AbstractApiCRUDController
 {
     protected string $modelClass = Songbook::class;

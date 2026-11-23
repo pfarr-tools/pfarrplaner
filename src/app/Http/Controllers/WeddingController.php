@@ -50,6 +50,8 @@ use Inertia\Response;
 
 /**
  * Class WeddingController
+ *
+ * @extends AbstractCRUDController<Wedding>
  */
 class WeddingController extends AbstractCRUDController
 {

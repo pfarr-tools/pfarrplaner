@@ -5,6 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\Ads\AdChannel;
 use Illuminate\Http\Request;
 
+/**
+ * Handles CRUD requests for AdChannel records.
+ *
+ * @extends AbstractCRUDController<AdChannel>
+ */
 class AdChannelController extends AbstractCRUDController
 {
     protected string $modelClass = AdChannel::class;

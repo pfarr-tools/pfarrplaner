@@ -32,6 +32,11 @@ namespace App\Http\Controllers\Api;
 
 use App\Models\Ads\AdConfig;
 
+/**
+ * Handles CRUD requests for AdConfig records.
+ *
+ * @extends AbstractApiCRUDController<AdConfig>
+ */
 class AdConfigController extends AbstractApiCRUDController
 {
     protected string $modelClass = AdConfig::class;

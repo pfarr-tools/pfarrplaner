@@ -37,6 +37,11 @@ use App\Models\Liturgy\SongReference;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+/**
+ * Handles CRUD requests for Song records.
+ *
+ * @extends AbstractApiCRUDController<Song>
+ */
 class SongController extends AbstractApiCRUDController
 {
     protected string $modelClass = Song::class;

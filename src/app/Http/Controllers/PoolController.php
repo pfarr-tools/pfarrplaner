@@ -8,6 +8,11 @@ use App\Models\People\ListedPerson;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
+/**
+ * Handles CRUD requests for Pool records.
+ *
+ * @extends AbstractCRUDController<Pool>
+ */
 class PoolController extends AbstractCRUDController
 {
     protected string $modelClass = Pool::class;

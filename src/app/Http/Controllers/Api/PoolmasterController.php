@@ -15,6 +15,11 @@ namespace App\Http\Controllers\Api;
 
 use App\Models\Leave\Poolmaster;
 
+/**
+ * Handles CRUD requests for Poolmaster records.
+ *
+ * @extends AbstractApiCRUDController<Poolmaster>
+ */
 class PoolmasterController extends AbstractApiCRUDController
 {
     protected string $modelClass = Poolmaster::class;

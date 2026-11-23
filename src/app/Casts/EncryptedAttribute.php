@@ -37,6 +37,11 @@ use Illuminate\Encryption\Encrypter;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Str;
 
+/**
+ * Encrypt stored values while accepting plaintext and legacy serialized data on reads.
+ *
+ * @implements CastsAttributes<mixed, mixed>
+ */
 class EncryptedAttribute implements CastsAttributes
 {
     public static $encrypter = null;
@@ -90,13 +95,13 @@ class EncryptedAttribute implements CastsAttributes
     }
 
     /**
-     * Cast the given value.
+     * Read plaintext, decrypt a string, or restore a legacy serialized value.
      *
      * @param  Model  $model
      * @param  string  $key
      * @param  mixed  $value
-     * @param  array  $attributes
-     * @return array
+     * @param  array<string, mixed>  $attributes
+     * @return mixed Plaintext/database value or a value restored from legacy serialization.
      */
     public function get($model, $key, $value, $attributes)
     {
@@ -115,8 +120,8 @@ class EncryptedAttribute implements CastsAttributes
      *
      * @param  Model  $model
      * @param  string  $key
-     * @param  array  $value
-     * @param  array  $attributes
+     * @param  mixed  $value
+     * @param  array<string, mixed>  $attributes
      * @return string
      */
     public function set($model, $key, $value, $attributes)

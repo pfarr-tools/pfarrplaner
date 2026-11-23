@@ -38,6 +38,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 
+/**
+ * Handles CRUD requests for Team records.
+ *
+ * @extends AbstractCRUDController<Team>
+ */
 class TeamController extends AbstractCRUDController
 {
     protected string $modelClass = Team::class;

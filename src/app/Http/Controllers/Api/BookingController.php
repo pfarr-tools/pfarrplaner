@@ -33,6 +33,11 @@ namespace App\Http\Controllers\Api;
 use App\Models\Seating\Booking;
 use Illuminate\Http\Request;
 
+/**
+ * Handles CRUD requests for Booking records.
+ *
+ * @extends AbstractApiCRUDController<Booking>
+ */
 class BookingController extends AbstractApiCRUDController
 {
     protected string $modelClass = Booking::class;

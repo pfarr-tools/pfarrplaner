@@ -194,12 +194,12 @@ class AbstractModel extends Model
     public static function getRoutes()
     {
         $routeClassPrefixes = ['web' => static::$path];
-        $defaultRoutes = static::$defaultRoutes ?? [];
-        $customRoutes = static::$routes ?? [];
+        $defaultRoutes = static::$defaultRoutes;
+        $customRoutes = static::$routes;
 
         $routeClasses = array_merge(array_keys($customRoutes), array_keys($defaultRoutes));
         foreach (array_keys($defaultRoutes) as $routeClass) {
-            foreach ((static::$exceptRoutes ?? [])[$routeClass] ?? [] as $exception) {
+            foreach (static::$exceptRoutes[$routeClass] ?? [] as $exception) {
                 if (isset(($defaultRoutes[$routeClass] ?? [])[$exception])) {
                     unset($defaultRoutes[$routeClass][$exception]);
                 }

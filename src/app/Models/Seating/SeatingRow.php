@@ -117,7 +117,9 @@ class SeatingRow extends AbstractModel
     }
 
     /**
-     * @return BelongsTo
+     * Return the seatingSection associated with this model.
+     *
+     * @return BelongsTo<SeatingSection, $this>
      */
     public function seatingSection()
     {

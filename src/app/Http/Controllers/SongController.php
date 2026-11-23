@@ -39,6 +39,11 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 
+/**
+ * Handles CRUD requests for Song records.
+ *
+ * @extends AbstractCRUDController<Song>
+ */
 class SongController extends AbstractCRUDController
 {
     protected string $modelClass = Song::class;
@@ -51,6 +56,11 @@ class SongController extends AbstractCRUDController
         $this->middleware('auth');
     }
 
+    /**
+     * Load song summaries without eager loading their verses.
+     *
+     * @return Collection<int, Song> Songs available to the index.
+     */
     protected function getModelsForIndex(): Collection
     {
         return Song::without(['verses'])->select(['id', 'title', 'alt_eg'])->get();

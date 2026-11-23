@@ -34,6 +34,11 @@ use App\Models\Location;
 use App\Models\Seating\SeatingRow;
 use Illuminate\Http\Request;
 
+/**
+ * Handles CRUD requests for SeatingRow records.
+ *
+ * @extends AbstractCRUDController<SeatingRow>
+ */
 class SeatingRowController extends AbstractCRUDController
 {
     protected string $modelClass = SeatingRow::class;

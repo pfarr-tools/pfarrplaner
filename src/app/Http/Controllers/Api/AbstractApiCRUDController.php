@@ -31,11 +31,20 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\AbstractCRUDController;
+use App\Models\AbstractModel;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
-use Inertia\Response;
 use OpenApi\Attributes as OA;
 
+/**
+ * Provides authenticated API CRUD endpoints for one concrete model type.
+ *
+ * @template TModel of AbstractModel
+ *
+ * @extends AbstractCRUDController<TModel>
+ */
 #[OA\Info(
     version: '1.0.0',
     title: 'Pfarrplaner API',
@@ -52,7 +61,6 @@ use OpenApi\Attributes as OA;
     type: 'http',
     scheme: 'bearer',
 )]
-/** Base controller for authenticated API CRUD endpoints and OpenAPI security schemes. */
 class AbstractApiCRUDController extends AbstractCRUDController
 {
     /** Return a JSON representation of the controller action result. */
@@ -64,7 +72,7 @@ class AbstractApiCRUDController extends AbstractCRUDController
     /**
      * Display a listing of the resource.
      *
-     * @return Response
+     * @return Collection<int, TModel>|JsonResponse Authorized models, optionally serialized by API subclasses.
      */
     public function index(Request $request)
     {

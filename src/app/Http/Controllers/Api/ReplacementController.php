@@ -32,6 +32,11 @@ namespace App\Http\Controllers\Api;
 
 use App\Models\Leave\Replacement;
 
+/**
+ * Handles CRUD requests for Replacement records.
+ *
+ * @extends AbstractApiCRUDController<Replacement>
+ */
 class ReplacementController extends AbstractApiCRUDController
 {
     protected string $modelClass = Replacement::class;

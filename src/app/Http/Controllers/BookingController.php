@@ -41,6 +41,11 @@ use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
 
+/**
+ * Handles CRUD requests for Booking records.
+ *
+ * @extends AbstractCRUDController<Booking>
+ */
 class BookingController extends AbstractCRUDController
 {
     protected string $modelClass = Booking::class;

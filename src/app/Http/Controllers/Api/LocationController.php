@@ -32,6 +32,11 @@ namespace App\Http\Controllers\Api;
 
 use App\Models\Location;
 
+/**
+ * Handles CRUD requests for Location records.
+ *
+ * @extends AbstractApiCRUDController<Location>
+ */
 class LocationController extends AbstractApiCRUDController
 {
     protected string $modelClass = Location::class;

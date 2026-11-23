@@ -35,6 +35,8 @@ use App\Models\Tag;
 /**f
  * Class TagController
  * @package App\Http\Controllers
+ *
+ * @extends AbstractCRUDController<Tag>
  */
 class TagController extends AbstractCRUDController
 {

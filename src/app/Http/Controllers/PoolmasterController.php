@@ -35,6 +35,11 @@ use App\Models\People\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
+/**
+ * Handles CRUD requests for Poolmaster records.
+ *
+ * @extends AbstractCRUDController<Poolmaster>
+ */
 class PoolmasterController extends AbstractCRUDController
 {
     protected string $modelClass = Poolmaster::class;

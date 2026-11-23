@@ -1,6 +1,6 @@
 # PHPStan-Level-10-Pilot zu Issue #149
 
-Stand: 23. November 2026. **Pilot beendet, weitere Umsetzung pausiert. Experimentell, nicht mergefähig.**
+Historischer Pilotstand vom 23. November 2026. **Der Pilot wurde als `0fa26155` committed; die anschließende Fortsetzung ist unten dokumentiert.**
 
 - Issue: https://github.com/pfarr-tools/pfarrplaner/issues/149
 - Branch: `experiment/149-phpstan-pilot`
@@ -86,3 +86,82 @@ Die Arbeit wurde unterbrochen; die verstrichene Kalenderzeit ist kein Aufwandma�
 ```
 
 Die Analyseausgaben enthalten vollständige Dateipfade, Zeilen, Meldungen und Identifikatoren. Sie liegen in der lokalen Sicherung; die Datei `metrics.json` enthält die zusammengefassten Zahlen für die Wiederaufnahme.
+
+
+## Fortsetzung nach Freigabe
+
+Der Benutzer hat das Committen und die weitere Umsetzung freigegeben. Der
+Pilotcommit ist `0fa26155`; es erfolgt kein Push oder Merge.
+
+Das erste Folgepaket stellt das Level-5-Gate wieder her. Gemeinsame CRUD- und
+API-Controller geben ihren Model-Typ an konkrete Unterklassen weiter; Beziehungen,
+Rückgaben und Pivot-Daten sind genauer beschrieben. Der verschlüsselte Cast
+verspricht kein Array mehr, wenn tatsächlich Klartext oder ein Legacy-Wert
+zurückgegeben wird. Sein `mixed` ist eine reale Grenze, die auf höheren Levels
+weiterhin fachlich eingegrenzt werden muss.
+
+Zwei Verhaltensfehler wurden durch zuerst fehlschlagende Regressionstests
+abgesichert: Kalenderlöschungen verwenden nun dieselbe Zusatzereignis-Schnittstelle
+und Jahrestagsoption wie die Synchronisierung; die Kontaktspalte des
+Predigtbegleitblatts gibt den Gemeindenamen einmal statt zusammen mit einer
+zusätzlichen Leerzeile aus. Die Änderungen stellen erwartetes Verhalten wieder
+her, ohne neue Benutzerabläufe oder Betreiber-Schnittstellen einzuführen.
+DemoBuilder benötigt keine Anpassung, da Datenmodell und Anonymisierung unverändert
+bleiben.
+
+Die PHPDoc-Prüfung verlor Dokumentationsblöcke vor PHP-Attributen. Vier isolierte
+Regressionstests prüfen verschachtelte Attributargumente, Klassen, Methoden und
+die weiterhin erforderliche Dokumentation. Der Scanner überspringt jetzt komplette
+Attributgruppen, ohne Dokumentation auf nachfolgende Deklarationen zu übertragen.
+
+Baseline-Pflege: 227 obsolete PHPStan-Muster entfernt, bei sechs verbleibenden
+Mustern die erwartete Anzahl um insgesamt 11 reduziert. Keine Muster hinzugefügt.
+Die PHPDoc-Baseline wurde anhand identischer Deklarationszeilen verschoben;
+68 Einträge erhielten neue Zeilennummern, 89 bereits dokumentierte oder entfernte
+Deklarationen entfielen. Keine neue PHPDoc-Ausnahme wurde aufgenommen.
+
+Ruling: Die bestehenden veröffentlichten Benutzer- und Administratorenhandbücher
+bleiben unverändert, weil nur erwartetes Verhalten wiederhergestellt wird. Das
+Technikhandbuch erklärt die generischen Controller, Beziehungstypen und die
+Grenzen des verschlüsselten Casts. Diese Entscheidung würde eine zusätzliche
+Handbuchänderung erfordern, falls später tatsächlich ein Benutzerablauf geändert
+wird.
+
+## Messung nach dem ersten Folgepaket
+
+Alle Werte wurden nach demselben Verfahren wie im Pilot gemessen. Die
+bestehende Baseline blieb aktiv; ihre verbliebenen 846 Muster unterdrücken
+weiterhin Altlasten.
+
+| Level | Vor dem Pilot | Nach dem Pilot | Nach dem Folgepaket |
+|---|---:|---:|---:|
+| 5 | 0 | 189 | 0 |
+| 6 | 2.564 | 2.614 | 2.406 |
+| 10 | 10.800 | 10.370 | 10.138 |
+
+Auf Level 10 entfallen 84 der 10.138 Meldungen auf die Baseline-Pflege
+(74 `ignore.unmatched`, 10 `ignore.count`). Die eigentlichen Code-Diagnosen
+sinken damit von 10.679 vor dem Pilot auf 10.054 nach dem Folgepaket, also um
+625 (rund 5,9 %). Gegenüber dem Pilotstand sind es 66 weniger. Die 2.406
+Meldungen auf Level 6 verteilen sich auf 514 Dateien, die 10.054
+Code-Diagnosen auf Level 10 auf 672 Dateien.
+
+Das Level-5-Gate ist wieder grün. Die Prüfung umfasst 1.114 Dateien; die
+verbleibenden Meldungen auf Level 6 und 10 sind erwartungsgemäß und noch nicht
+abgearbeitet. Häufigste Identifikatoren auf Level 6 bleiben fehlende
+Parameter-, Iterable-, Rückgabe-, Property- und Generics-Typen. Auf Level 10
+dominieren `argument.type`, `offsetAccess.nonOffsetAccessible` und
+`method.nonObject`; sie zeigen, wo präzisere gemeinsame Verträge noch fehlen.
+
+## Nächste Pakete
+
+1. Die 2.406 Level-6-Meldungen fachlich gruppieren und mit gemeinsam genutzten
+   Typen beginnen; nach jedem Paket Level 5 und 6 frisch prüfen.
+2. Level 10 erst danach erneut messen und in Pakete nach Domänen schneiden.
+3. Weitere Verhaltenskorrekturen nur mit zuerst fehlschlagendem Regressionstest
+   und anschließender Prüfung der Handbuchauswirkungen.
+4. Standardlevel erst nach vollständiger Verifikation und grünem Level-5-Gate
+   erhöhen.
+
+Der Stand bleibt lokal auf `experiment/149-phpstan-pilot`. Es erfolgt kein Push
+und kein Merge; Issue #149 bleibt offen.

@@ -32,6 +32,11 @@ namespace App\Http\Controllers\Api;
 
 use App\Models\Ads\AdChannel;
 
+/**
+ * Handles CRUD requests for AdChannel records.
+ *
+ * @extends AbstractApiCRUDController<AdChannel>
+ */
 class AdChannelController extends AbstractApiCRUDController
 {
     protected string $modelClass = AdChannel::class;

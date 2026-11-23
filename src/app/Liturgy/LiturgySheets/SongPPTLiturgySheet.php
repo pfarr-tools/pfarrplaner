@@ -200,7 +200,7 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
                     $this->renderSongItem($item);
                 } elseif ($item->data_type == 'freetext') {
                     if ($lastItem && ($lastItem->data_type == 'psalm')) {
-                        if (($item->data_type == 'freetext') && ($item->title == 'Ehr sei dem Vater') && (isset($item->data['description']))) {
+                        if (($item->title == 'Ehr sei dem Vater') && (isset($item->data['description']))) {
                             /** @var Liturgy\ItemHelpers\FreetextItemHelper $ftHelper */
                             $ftHelper = $item->getHelper();
                             $this->renderGloriaPatriSlide($ftHelper->getText());

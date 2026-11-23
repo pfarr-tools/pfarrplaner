@@ -55,6 +55,8 @@ use Inertia\Response;
  * Handles CRUD operations and additional functionality such as
  * retrieving models, managing attachments, and generating QR codes
  * for city-related events or services.
+ *
+ * @extends AbstractCRUDController<City>
  */
 class CityController extends AbstractCRUDController
 {

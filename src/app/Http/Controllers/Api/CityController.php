@@ -38,6 +38,8 @@ use Illuminate\Support\Facades\Gate;
 
 /**
  * Class CityController
+ *
+ * @extends AbstractApiCRUDController<City>
  */
 class CityController extends AbstractApiCRUDController
 {

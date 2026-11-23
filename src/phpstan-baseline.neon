@@ -91,18 +91,6 @@ parameters:
 			path: app/Actions/Funeral/UpdateFuneral.php
 
 		-
-			message: '#^Property App\\Actions\\Location\\DeleteLocation\:\:\$city \(App\\Models\\Places\\City\) does not accept Illuminate\\Database\\Eloquent\\Model\|null\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: app/Actions/Location/DeleteLocation.php
-
-		-
-			message: '#^Property App\\Actions\\Location\\UpdateLocation\:\:\$city \(App\\Models\\Places\\City\) does not accept Illuminate\\Database\\Eloquent\\Model\|null\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: app/Actions/Location/UpdateLocation.php
-
-		-
 			message: '#^Property App\\Actions\\Parish\\DeleteParish\:\:\$city \(App\\Models\\Places\\City\) does not accept Illuminate\\Database\\Eloquent\\Model\|null\.$#'
 			identifier: assign.propertyType
 			count: 1
@@ -113,30 +101,6 @@ parameters:
 			identifier: assign.propertyType
 			count: 1
 			path: app/Actions/Parish/UpdateParish.php
-
-		-
-			message: '#^Property App\\Actions\\SeatingRow\\CreateSeatingRow\:\:\$location \(App\\Models\\Location\) does not accept Illuminate\\Database\\Eloquent\\Model\|null\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: app/Actions/SeatingRow/CreateSeatingRow.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$location\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Actions/SeatingRow/DeleteSeatingRow.php
-
-		-
-			message: '#^Property App\\Actions\\SeatingRow\\UpdateSeatingRow\:\:\$location \(App\\Models\\Location\) does not accept Illuminate\\Database\\Eloquent\\Model\|null\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: app/Actions/SeatingRow/UpdateSeatingRow.php
-
-		-
-			message: '#^Property App\\Actions\\SeatingSection\\DeleteSeatingSection\:\:\$location \(App\\Models\\Location\) does not accept Illuminate\\Database\\Eloquent\\Model\|null\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: app/Actions/SeatingSection/DeleteSeatingSection.php
 
 		-
 			message: '#^Parameter \#1 \$service of method App\\Actions\\Wedding\\DeleteWedding\:\:getServiceSlug\(\) expects App\\Models\\Service, Illuminate\\Database\\Eloquent\\Model given\.$#'
@@ -181,12 +145,6 @@ parameters:
 			path: app/Attachments/Baptism/BaptismLettersAddressLabelsAttachment.php
 
 		-
-			message: '#^Parameter \#1 \$name of static method App\\Services\\NameService\:\:fromName\(\) expects string, array given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/Attachments/Baptism/BaptismLettersAddressLabelsAttachment.php
-
-		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$city\.$#'
 			identifier: property.notFound
 			count: 1
@@ -196,12 +154,6 @@ parameters:
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$date\.$#'
 			identifier: property.notFound
 			count: 1
-			path: app/Attachments/Baptism/PfefferBibleInlayAttachment.php
-
-		-
-			message: '#^Parameter \#1 \$name of static method App\\Services\\NameService\:\:fromName\(\) expects string, array given\.$#'
-			identifier: argument.type
-			count: 2
 			path: app/Attachments/Baptism/PfefferBibleInlayAttachment.php
 
 		-
@@ -255,12 +207,6 @@ parameters:
 		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
 			identifier: property.notFound
-			count: 2
-			path: app/Calendars/LocalEventCalendars/CityLocalEventCalendar.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name\.$#'
-			identifier: property.notFound
 			count: 1
 			path: app/Calendars/LocalEventCalendars/CityLocalEventCalendar.php
 
@@ -280,12 +226,6 @@ parameters:
 			message: '#^Access to an undefined property App\\Models\\Calendar\\External\\CalendarConnectionEntry\:\:\$service\.$#'
 			identifier: property.notFound
 			count: 1
-			path: app/Calendars/SyncEngines/AbstractSyncEngine.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\Service\:\:\$dateTime\.$#'
-			identifier: property.notFound
-			count: 2
 			path: app/Calendars/SyncEngines/AbstractSyncEngine.php
 
 		-
@@ -314,18 +254,6 @@ parameters:
 
 		-
 			message: '#^Call to an undefined method App\\Calendars\\AbstractCalendarItem\:\:update\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: app/Calendars/SyncEngines/AbstractSyncEngine.php
-
-		-
-			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:getAdditionalEvents\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: app/Calendars/SyncEngines/AbstractSyncEngine.php
-
-		-
-			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:getPreparationEvent\(\)\.$#'
 			identifier: method.notFound
 			count: 1
 			path: app/Calendars/SyncEngines/AbstractSyncEngine.php
@@ -479,12 +407,6 @@ parameters:
 			identifier: phpDoc.parseError
 			count: 1
 			path: app/Events/ServiceBeforeUpdate.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$google_access_token\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Events/ServiceUpdated.php
 
 		-
 			message: '#^PHPDoc type array of property App\\Exceptions\\Handler\:\:\$dontFlash is not covariant with PHPDoc type array\<int, string\> of overridden property Illuminate\\Foundation\\Exceptions\\Handler\:\:\$dontFlash\.$#'
@@ -793,24 +715,6 @@ parameters:
 			path: app/HomeScreen/Tabs/RegistrationsHomeScreenTab.php
 
 		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$locations\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/HomeScreen/Tabs/StreamingHomeScreenTab.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name\.$#'
-			identifier: property.notFound
-			count: 2
-			path: app/HomeScreen/Tabs/StreamingHomeScreenTab.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$youtube_active_stream_id\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/HomeScreen/Tabs/StreamingHomeScreenTab.php
-
-		-
 			message: '#^Method App\\HomeScreen\\Tabs\\StreamingHomeScreenTab\:\:getContent\(\) has invalid return type App\\HomeScreen\\Tabs\\Illuminate\\Contracts\\View\\View\.$#'
 			identifier: class.notFound
 			count: 1
@@ -825,12 +729,6 @@ parameters:
 		-
 			message: '#^Method Carbon\\Carbon\:\:addMonth\(\) invoked with 1 parameter, 0 required\.$#'
 			identifier: arguments.count
-			count: 1
-			path: app/HomeScreen/Tabs/StreamingHomeScreenTab.php
-
-		-
-			message: '#^Parameter \#1 \$city of static method App\\Models\\Streaming\\Broadcast\:\:getActive\(\) expects App\\Models\\Places\\City, Illuminate\\Database\\Eloquent\\Model given\.$#'
-			identifier: argument.type
 			count: 1
 			path: app/HomeScreen/Tabs/StreamingHomeScreenTab.php
 
@@ -1033,18 +931,6 @@ parameters:
 			path: app/Http/Controllers/AbsenceController.php
 
 		-
-			message: '#^Method App\\Http\\Controllers\\AbstractCRUDController\:\:destroy\(\) should return Illuminate\\Http\\Response but returns Illuminate\\Http\\RedirectResponse\.$#'
-			identifier: return.type
-			count: 1
-			path: app/Http/Controllers/AbstractCRUDController.php
-
-		-
-			message: '#^Method App\\Http\\Controllers\\AbstractCRUDController\:\:store\(\) should return Illuminate\\Http\\Response but returns Illuminate\\Http\\RedirectResponse\.$#'
-			identifier: return.type
-			count: 1
-			path: app/Http/Controllers/AbstractCRUDController.php
-
-		-
 			message: '#^Access to an undefined property App\\Models\\Calendar\\Occurence\:\:\$adStart\.$#'
 			identifier: property.notFound
 			count: 1
@@ -1073,24 +959,6 @@ parameters:
 			identifier: property.notFound
 			count: 2
 			path: app/Http/Controllers/Api/AbsenceController.php
-
-		-
-			message: '#^Method App\\Http\\Controllers\\Api\\AbstractApiCRUDController\:\:index\(\) should return Inertia\\Response but returns Illuminate\\Support\\Collection\.$#'
-			identifier: return.type
-			count: 1
-			path: app/Http/Controllers/Api/AbstractApiCRUDController.php
-
-		-
-			message: '#^Method App\\Http\\Controllers\\Api\\AbstractApiCRUDController\:\:returnResult\(\) should return Illuminate\\Http\\RedirectResponse but returns Illuminate\\Http\\JsonResponse\.$#'
-			identifier: return.type
-			count: 1
-			path: app/Http/Controllers/Api/AbstractApiCRUDController.php
-
-		-
-			message: '#^Method App\\Http\\Controllers\\Api\\CityController\:\:index\(\) should return Inertia\\Response but returns Illuminate\\Http\\JsonResponse\.$#'
-			identifier: return.type
-			count: 2
-			path: app/Http/Controllers/Api/CityController.php
 
 		-
 			message: '#^Call to an undefined method PhpOffice\\PhpWord\\Element\\AbstractElement\:\:getText\(\)\.$#'
@@ -1123,12 +991,6 @@ parameters:
 			path: app/Http/Controllers/Api/LiturgicalTextsController.php
 
 		-
-			message: '#^Access to an undefined property App\\Models\\Liturgy\\Block\:\:\$items\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Controllers/Api/LiturgyController.php
-
-		-
 			message: '#^Access to an undefined property App\\Models\\Liturgy\\Block\:\:\$service\.$#'
 			identifier: property.notFound
 			count: 3
@@ -1141,21 +1003,9 @@ parameters:
 			path: app/Http/Controllers/Api/LiturgyController.php
 
 		-
-			message: '#^Access to an undefined property App\\Models\\Service\:\:\$liturgyBlocks\.$#'
-			identifier: property.notFound
-			count: 5
-			path: app/Http/Controllers/Api/LiturgyController.php
-
-		-
 			message: '#^PHPDoc tag @param references unknown parameter\: \$service$#'
 			identifier: parameter.notFound
 			count: 1
-			path: app/Http/Controllers/Api/LiturgyController.php
-
-		-
-			message: '#^Relation ''liturgyBlocks'' is not found in App\\Models\\Service model\.$#'
-			identifier: larastan.relationExistence
-			count: 2
 			path: app/Http/Controllers/Api/LiturgyController.php
 
 		-
@@ -1169,18 +1019,6 @@ parameters:
 			identifier: larastan.relationExistence
 			count: 1
 			path: app/Http/Controllers/Api/PoolController.php
-
-		-
-			message: '#^Method App\\Http\\Controllers\\Api\\PsalmController\:\:index\(\) should return Inertia\\Response but returns Illuminate\\Http\\JsonResponse\.$#'
-			identifier: return.type
-			count: 1
-			path: app/Http/Controllers/Api/PsalmController.php
-
-		-
-			message: '#^Method App\\Http\\Controllers\\Api\\PsalmController\:\:store\(\) should return Illuminate\\Http\\Response but returns Illuminate\\Http\\JsonResponse\.$#'
-			identifier: return.type
-			count: 1
-			path: app/Http/Controllers/Api/PsalmController.php
 
 		-
 			message: '#^Access to an undefined property App\\Models\\Rites\\Baptism\:\:\$buried_name\.$#'
@@ -1217,12 +1055,6 @@ parameters:
 			identifier: return.type
 			count: 1
 			path: app/Http/Controllers/Api/RitesController.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Controllers/Api/ServiceController.php
 
 		-
 			message: '#^Called ''pluck'' on Laravel collection, but could have been retrieved as a query\.$#'
@@ -1273,24 +1105,6 @@ parameters:
 			path: app/Http/Controllers/Api/SongController.php
 
 		-
-			message: '#^Return type \(Illuminate\\Http\\JsonResponse\) of method App\\Http\\Controllers\\Api\\SongController\:\:index\(\) should be compatible with return type \(Inertia\\Response\) of method App\\Http\\Controllers\\Api\\AbstractApiCRUDController\:\:index\(\)$#'
-			identifier: method.childReturnType
-			count: 1
-			path: app/Http/Controllers/Api/SongController.php
-
-		-
-			message: '#^Return type \(Illuminate\\Http\\JsonResponse\) of method App\\Http\\Controllers\\Api\\SongController\:\:store\(\) should be compatible with return type \(Illuminate\\Http\\Response\) of method App\\Http\\Controllers\\AbstractCRUDController\:\:store\(\)$#'
-			identifier: method.childReturnType
-			count: 1
-			path: app/Http/Controllers/Api/SongController.php
-
-		-
-			message: '#^Return type \(Illuminate\\Http\\JsonResponse\) of method App\\Http\\Controllers\\Api\\SongbookController\:\:index\(\) should be compatible with return type \(Inertia\\Response\) of method App\\Http\\Controllers\\Api\\AbstractApiCRUDController\:\:index\(\)$#'
-			identifier: method.childReturnType
-			count: 1
-			path: app/Http/Controllers/Api/SongbookController.php
-
-		-
 			message: '#^Method App\\Http\\Controllers\\Api\\UserController\:\:activate\(\) with return type void returns Illuminate\\Http\\JsonResponse but should not return anything\.$#'
 			identifier: return.void
 			count: 1
@@ -1309,18 +1123,6 @@ parameters:
 			path: app/Http/Controllers/BaptismController.php
 
 		-
-			message: '#^Method App\\Http\\Controllers\\BaptismController\:\:create\(\) should return Illuminate\\Http\\Response but returns Illuminate\\Http\\RedirectResponse\.$#'
-			identifier: return.type
-			count: 1
-			path: app/Http/Controllers/BaptismController.php
-
-		-
-			message: '#^PHPDoc tag @param references unknown parameter\: \$serviceId$#'
-			identifier: parameter.notFound
-			count: 1
-			path: app/Http/Controllers/BaptismController.php
-
-		-
 			message: '#^PHPDoc tag @return with type Illuminate\\Http\\Response is incompatible with native type array\.$#'
 			identifier: return.phpDocType
 			count: 1
@@ -1333,50 +1135,8 @@ parameters:
 			path: app/Http/Controllers/BaptismController.php
 
 		-
-			message: '#^Return type \(Illuminate\\Http\\Response\) of method App\\Http\\Controllers\\BaptismController\:\:create\(\) should be compatible with return type \(Inertia\\Response\) of method App\\Http\\Controllers\\AbstractCRUDController\:\:create\(\)$#'
-			identifier: method.childReturnType
-			count: 1
-			path: app/Http/Controllers/BaptismController.php
-
-		-
 			message: '#^Access to an undefined property App\\Models\\AbstractModel\:\:\$service_id\.$#'
 			identifier: property.notFound
-			count: 1
-			path: app/Http/Controllers/BookingController.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$first_name\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Controllers/BookingController.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$last_name\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Controllers/BookingController.php
-
-		-
-			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:fullName\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: app/Http/Controllers/BookingController.php
-
-		-
-			message: '#^Method App\\Http\\Controllers\\BookingController\:\:destroy\(\) should return Illuminate\\Http\\Response but returns Illuminate\\Http\\JsonResponse\.$#'
-			identifier: return.type
-			count: 1
-			path: app/Http/Controllers/BookingController.php
-
-		-
-			message: '#^Method App\\Http\\Controllers\\BookingController\:\:index\(\) should return Inertia\\Response but returns Illuminate\\Http\\JsonResponse\.$#'
-			identifier: return.type
-			count: 1
-			path: app/Http/Controllers/BookingController.php
-
-		-
-			message: '#^Parameter \#1 \$array of function sort contains unresolvable type\.$#'
-			identifier: argument.unresolvableType
 			count: 1
 			path: app/Http/Controllers/BookingController.php
 
@@ -1447,24 +1207,6 @@ parameters:
 			path: app/Http/Controllers/CityController.php
 
 		-
-			message: '#^Relation ''adChannels'' is not found in App\\Models\\AbstractModel model\.$#'
-			identifier: larastan.relationExistence
-			count: 1
-			path: app/Http/Controllers/CityController.php
-
-		-
-			message: '#^Relation ''locations'' is not found in App\\Models\\AbstractModel model\.$#'
-			identifier: larastan.relationExistence
-			count: 1
-			path: app/Http/Controllers/CityController.php
-
-		-
-			message: '#^Relation ''parishes'' is not found in App\\Models\\AbstractModel model\.$#'
-			identifier: larastan.relationExistence
-			count: 1
-			path: app/Http/Controllers/CityController.php
-
-		-
 			message: '#^Method App\\Http\\Controllers\\CommentController\:\:destroy\(\) should return Illuminate\\Http\\Response but returns string\.$#'
 			identifier: return.type
 			count: 1
@@ -1513,48 +1255,6 @@ parameters:
 			path: app/Http/Controllers/Extranet/SermonController.php
 
 		-
-			message: '#^Access to an undefined property App\\Models\\Sermon\:\:\$services\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Controllers/Extranet/SermonController.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\Service\:\:\$sermon\.$#'
-			identifier: property.notFound
-			count: 3
-			path: app/Http/Controllers/Extranet/SermonController.php
-
-		-
-			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Builder\<App\\Models\\Sermon\>\:\:endingAt\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: app/Http/Controllers/Extranet/SermonController.php
-
-		-
-			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Builder\<App\\Models\\Sermon\>\:\:userParticipates\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: app/Http/Controllers/Extranet/SermonController.php
-
-		-
-			message: '#^Relation ''sermon'' is not found in App\\Models\\Service model\.$#'
-			identifier: larastan.relationExistence
-			count: 2
-			path: app/Http/Controllers/Extranet/SermonController.php
-
-		-
-			message: '#^Relation ''services'' is not found in App\\Models\\Sermon model\.$#'
-			identifier: larastan.relationExistence
-			count: 2
-			path: app/Http/Controllers/Extranet/SermonController.php
-
-		-
-			message: '#^Relation ''sermon'' is not found in App\\Models\\Service model\.$#'
-			identifier: larastan.relationExistence
-			count: 1
-			path: app/Http/Controllers/Extranet/ServiceController.php
-
-		-
 			message: '#^Access to an undefined property App\\Models\\Leave\\Poolmaster\:\:\$pool\.$#'
 			identifier: property.notFound
 			count: 1
@@ -1569,12 +1269,6 @@ parameters:
 		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$date\.$#'
 			identifier: property.notFound
-			count: 1
-			path: app/Http/Controllers/FuneralController.php
-
-		-
-			message: '#^Binary operation "\." between non\-falsy\-string and array results in an error\.$#'
-			identifier: binaryOp.invalid
 			count: 1
 			path: app/Http/Controllers/FuneralController.php
 
@@ -1612,12 +1306,6 @@ parameters:
 			message: '#^Relation ''pool'' is not found in App\\Models\\Leave\\Poolmaster model\.$#'
 			identifier: larastan.relationExistence
 			count: 2
-			path: app/Http/Controllers/FuneralController.php
-
-		-
-			message: '#^Return type \(Illuminate\\Http\\RedirectResponse\) of method App\\Http\\Controllers\\FuneralController\:\:create\(\) should be compatible with return type \(Inertia\\Response\) of method App\\Http\\Controllers\\AbstractCRUDController\:\:create\(\)$#'
-			identifier: method.childReturnType
-			count: 1
 			path: app/Http/Controllers/FuneralController.php
 
 		-
@@ -1663,24 +1351,6 @@ parameters:
 			path: app/Http/Controllers/LiturgicalTextsController.php
 
 		-
-			message: '#^Access to an undefined property App\\Models\\Service\:\:\$liturgyBlocks\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Controllers/LiturgyBlockController.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\Service\:\:\$dateTime\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Controllers/LiturgyEditorController.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\Service\:\:\$liturgyBlocks\.$#'
-			identifier: property.notFound
-			count: 3
-			path: app/Http/Controllers/LiturgyEditorController.php
-
-		-
 			message: '#^Access to an undefined property App\\Models\\Service\:\:\$locationText\.$#'
 			identifier: property.notFound
 			count: 1
@@ -1703,24 +1373,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: app/Http/Controllers/LiturgyEditorController.php
-
-		-
-			message: '#^Relation ''liturgyBlocks'' is not found in App\\Models\\Service model\.$#'
-			identifier: larastan.relationExistence
-			count: 3
-			path: app/Http/Controllers/LiturgyEditorController.php
-
-		-
-			message: '#^Relation ''sermon'' is not found in App\\Models\\Service model\.$#'
-			identifier: larastan.relationExistence
-			count: 1
-			path: app/Http/Controllers/LiturgyEditorController.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\Liturgy\\Block\:\:\$items\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Controllers/LiturgyItemController.php
 
 		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$date\.$#'
@@ -1885,24 +1537,6 @@ parameters:
 			path: app/Http/Controllers/SeatingRowController.php
 
 		-
-			message: '#^Access to an undefined property App\\Models\\Sermon\:\:\$services\.$#'
-			identifier: property.notFound
-			count: 4
-			path: app/Http/Controllers/SermonController.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\Service\:\:\$sermon\.$#'
-			identifier: property.notFound
-			count: 3
-			path: app/Http/Controllers/SermonController.php
-
-		-
-			message: '#^Relation ''services'' is not found in App\\Models\\Sermon model\.$#'
-			identifier: larastan.relationExistence
-			count: 1
-			path: app/Http/Controllers/SermonController.php
-
-		-
 			message: '#^Access to an undefined property App\\Models\\Service\:\:\$attachments\.$#'
 			identifier: property.notFound
 			count: 2
@@ -1915,39 +1549,9 @@ parameters:
 			path: app/Http/Controllers/ServiceController.php
 
 		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$iban\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Controllers/ServiceController.php
-
-		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
 			identifier: property.notFound
 			count: 2
-			path: app/Http/Controllers/ServiceController.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$konfiapp_apikey\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Controllers/ServiceController.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name\.$#'
-			identifier: property.notFound
-			count: 2
-			path: app/Http/Controllers/ServiceController.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$official_name\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Controllers/ServiceController.php
-
-		-
-			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:getActiveAdChannels\(\)\.$#'
-			identifier: method.notFound
-			count: 1
 			path: app/Http/Controllers/ServiceController.php
 
 		-
@@ -2023,12 +1627,6 @@ parameters:
 			path: app/Http/Controllers/ServiceController.php
 
 		-
-			message: '#^Relation ''liturgyBlocks'' is not found in App\\Models\\Service model\.$#'
-			identifier: larastan.relationExistence
-			count: 1
-			path: app/Http/Controllers/ServiceController.php
-
-		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$pivot\.$#'
 			identifier: property.notFound
 			count: 7
@@ -2077,34 +1675,10 @@ parameters:
 			path: app/Http/Controllers/SongController.php
 
 		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name\.$#'
-			identifier: property.notFound
-			count: 2
-			path: app/Http/Controllers/StreamingTroubleshooterController.php
-
-		-
-			message: '#^Parameter \#1 \$city of static method App\\Integrations\\Youtube\\YoutubeIntegration\:\:get\(\) expects App\\Models\\Places\\City, Illuminate\\Database\\Eloquent\\Model\|null given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/Http/Controllers/StreamingTroubleshooterController.php
-
-		-
 			message: '#^Access to an undefined property App\\Models\\People\\Team\:\:\$writable\.$#'
 			identifier: property.notFound
 			count: 1
 			path: app/Http/Controllers/TeamController.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\Service\:\:\$liturgyBlocks\.$#'
-			identifier: property.notFound
-			count: 2
-			path: app/Http/Controllers/TemplateController.php
-
-		-
-			message: '#^Relation ''liturgyBlocks'' is not found in App\\Models\\Service model\.$#'
-			identifier: larastan.relationExistence
-			count: 2
-			path: app/Http/Controllers/TemplateController.php
 
 		-
 			message: '#^Access to an undefined property App\\Models\\People\\User\:\:\$duplicates\.$#'
@@ -2116,12 +1690,6 @@ parameters:
 			message: '#^Access to an undefined property App\\Models\\People\\User\:\:\$fullNameText\.$#'
 			identifier: property.notFound
 			count: 3
-			path: app/Http/Controllers/UserController.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
-			identifier: property.notFound
-			count: 1
 			path: app/Http/Controllers/UserController.php
 
 		-
@@ -2182,12 +1750,6 @@ parameters:
 			message: '#^Access to an undefined property App\\Models\\Rites\\Wedding\:\:\$attachments\.$#'
 			identifier: property.notFound
 			count: 2
-			path: app/Http/Controllers/WeddingController.php
-
-		-
-			message: '#^Return type \(Illuminate\\Http\\RedirectResponse\) of method App\\Http\\Controllers\\WeddingController\:\:create\(\) should be compatible with return type \(Inertia\\Response\) of method App\\Http\\Controllers\\AbstractCRUDController\:\:create\(\)$#'
-			identifier: method.childReturnType
-			count: 1
 			path: app/Http/Controllers/WeddingController.php
 
 		-
@@ -2293,12 +1855,6 @@ parameters:
 			path: app/Http/Resources/Calendar/CalendarMinistriesResource.php
 
 		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$default_time\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Resources/Calendar/CalendarMonthServiceResource.php
-
-		-
 			message: '#^PHPDoc tag @var with type App\\Models\\Service is not subtype of native type \$this\(App\\Http\\Resources\\Calendar\\CalendarMonthServiceResource\)\.$#'
 			identifier: varTag.nativeType
 			count: 1
@@ -2315,12 +1871,6 @@ parameters:
 			identifier: varTag.nativeType
 			count: 1
 			path: app/Http/Resources/Calendar/CalendarServiceIdResource.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\Service\:\:\$liturgyBlocks\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Resources/Calendar/CalendarServiceResource.php
 
 		-
 			message: '#^PHPDoc tag @var with type App\\Models\\Service is not subtype of native type \$this\(App\\Http\\Resources\\Calendar\\CalendarServiceResource\)\.$#'
@@ -2547,7 +2097,7 @@ parameters:
 		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$konfiapp_apikey\.$#'
 			identifier: property.notFound
-			count: 3
+			count: 1
 			path: app/Inputs/MultipleServicesInput.php
 
 		-
@@ -2555,18 +2105,6 @@ parameters:
 			identifier: property.notFound
 			count: 1
 			path: app/Inputs/MultipleServicesInput.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Inputs/PlanningInput.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$pivot\.$#'
-			identifier: property.notFound
-			count: 2
-			path: app/Inputs/PlanningInput.php
 
 		-
 			message: '#^Called ''pluck'' on Laravel collection, but could have been retrieved as a query\.$#'
@@ -2614,12 +2152,6 @@ parameters:
 			message: '#^Access to an undefined property App\\Models\\Service\:\:\$communiapp_id\.$#'
 			identifier: property.notFound
 			count: 2
-			path: app/Integrations/CommuniApp/CommuniAppIntegration.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\Service\:\:\$dateTime\.$#'
-			identifier: property.notFound
-			count: 1
 			path: app/Integrations/CommuniApp/CommuniAppIntegration.php
 
 		-
@@ -2671,54 +2203,6 @@ parameters:
 			path: app/Integrations/KonfiApp/KonfiAppIntegration.php
 
 		-
-			message: '#^Parameter \#1 \$city of static method App\\Integrations\\KonfiApp\\KonfiAppIntegration\:\:get\(\) expects App\\Models\\Places\\City, Illuminate\\Database\\Eloquent\\Model\|null given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/Integrations/KonfiApp/ServiceBeforeDeleteListener.php
-
-		-
-			message: '#^Parameter \#1 \$city of static method App\\Integrations\\KonfiApp\\KonfiAppIntegration\:\:isActive\(\) expects App\\Models\\Places\\City, Illuminate\\Database\\Eloquent\\Model\|null given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/Integrations/KonfiApp/ServiceBeforeDeleteListener.php
-
-		-
-			message: '#^Parameter \#1 \$city of method App\\Integrations\\KonfiApp\\ServiceBeforeUpdateListener\:\:isIntegrationActive\(\) expects App\\Models\\Places\\City, Illuminate\\Database\\Eloquent\\Model\|null given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/Integrations/KonfiApp/ServiceBeforeUpdateListener.php
-
-		-
-			message: '#^Parameter \#1 \$city of method App\\Integrations\\KonfiApp\\ServiceBeforeUpdateListener\:\:resolveIntegration\(\) expects App\\Models\\Places\\City, Illuminate\\Database\\Eloquent\\Model\|null given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/Integrations/KonfiApp/ServiceBeforeUpdateListener.php
-
-		-
-			message: '#^Parameter \#1 \$city of static method App\\Integrations\\KonfiApp\\KonfiAppIntegration\:\:get\(\) expects App\\Models\\Places\\City, Illuminate\\Database\\Eloquent\\Model\|null given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/Integrations/KonfiApp/ServiceCreatedListener.php
-
-		-
-			message: '#^Parameter \#1 \$city of static method App\\Integrations\\KonfiApp\\KonfiAppIntegration\:\:isActive\(\) expects App\\Models\\Places\\City, Illuminate\\Database\\Eloquent\\Model\|null given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/Integrations/KonfiApp/ServiceCreatedListener.php
-
-		-
-			message: '#^Parameter \#1 \$city of static method App\\Integrations\\KonfiApp\\KonfiAppIntegration\:\:get\(\) expects App\\Models\\Places\\City, Illuminate\\Database\\Eloquent\\Model\|null given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/Integrations/KonfiApp/ServiceUpdatedListener.php
-
-		-
-			message: '#^Parameter \#1 \$city of static method App\\Integrations\\KonfiApp\\KonfiAppIntegration\:\:isActive\(\) expects App\\Models\\Places\\City, Illuminate\\Database\\Eloquent\\Model\|null given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/Integrations/KonfiApp/ServiceUpdatedListener.php
-
-		-
 			message: '#^Parameter \#4 \$additionalSubscribers of static method App\\Models\\Subscription\:\:send\(\) expects null, Illuminate\\Support\\Collection\<int, \*NEVER\*\> given\.$#'
 			identifier: argument.type
 			count: 1
@@ -2732,24 +2216,6 @@ parameters:
 
 		-
 			message: '#^Access to an undefined property App\\Models\\Service\:\:\$city_youtube_passive_stream_id\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Integrations/Youtube/Commands/UpdateYoutubeStream.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$youtube_active_stream_id\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Integrations/Youtube/Commands/UpdateYoutubeStream.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$youtube_auto_startstop\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Integrations/Youtube/Commands/UpdateYoutubeStream.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$youtube_passive_stream_id\.$#'
 			identifier: property.notFound
 			count: 1
 			path: app/Integrations/Youtube/Commands/UpdateYoutubeStream.php
@@ -2905,18 +2371,6 @@ parameters:
 			path: app/Liturgy/LiturgySheets/A4LiturgySheet.php
 
 		-
-			message: '#^Access to an undefined property App\\Models\\Service\:\:\$liturgyBlocks\.$#'
-			identifier: property.notFound
-			count: 2
-			path: app/Liturgy/LiturgySheets/A4WordSpecificLiturgySheet.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\Service\:\:\$sermon\.$#'
-			identifier: property.notFound
-			count: 3
-			path: app/Liturgy/LiturgySheets/A4WordSpecificLiturgySheet.php
-
-		-
 			message: '#^Call to an undefined method App\\Liturgy\\ItemHelpers\\AbstractItemHelper\:\:getText\(\)\.$#'
 			identifier: method.notFound
 			count: 2
@@ -2935,44 +2389,8 @@ parameters:
 			path: app/Liturgy/LiturgySheets/A4WordSpecificLiturgySheet.php
 
 		-
-			message: '#^Access to an undefined property App\\Models\\Service\:\:\$liturgyBlocks\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Liturgy/LiturgySheets/AIPromptLiturgySheet.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$at_text\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Liturgy/LiturgySheets/AIPromptLiturgySheet.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\Service\:\:\$dateTime\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Liturgy/LiturgySheets/FullTextLiturgySheet.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\Service\:\:\$liturgyBlocks\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Liturgy/LiturgySheets/FullTextLiturgySheet.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\Service\:\:\$sermon\.$#'
-			identifier: property.notFound
-			count: 2
-			path: app/Liturgy/LiturgySheets/FullTextLiturgySheet.php
-
-		-
 			message: '#^Call to an undefined method App\\Liturgy\\ItemHelpers\\AbstractItemHelper\:\:getText\(\)\.$#'
 			identifier: method.notFound
-			count: 1
-			path: app/Liturgy/LiturgySheets/FullTextLiturgySheet.php
-
-		-
-			message: '#^Parameter \#1 \$city of static method App\\Integrations\\KonfiApp\\KonfiAppIntegration\:\:get\(\) expects App\\Models\\Places\\City, Illuminate\\Database\\Eloquent\\Model\|null given\.$#'
-			identifier: argument.type
 			count: 1
 			path: app/Liturgy/LiturgySheets/FullTextLiturgySheet.php
 
@@ -2983,69 +2401,9 @@ parameters:
 			path: app/Liturgy/LiturgySheets/FullTextLiturgySheet.php
 
 		-
-			message: '#^Access to an undefined property App\\Models\\Service\:\:\$liturgyBlocks\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Liturgy/LiturgySheets/FuneralSermonTextLiturgySheet.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\Service\:\:\$sermon\.$#'
-			identifier: property.notFound
-			count: 3
-			path: app/Liturgy/LiturgySheets/FuneralSermonTextLiturgySheet.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$address\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Liturgy/LiturgySheets/FuneralSermonTextLiturgySheet.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$buried_name\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Liturgy/LiturgySheets/FuneralSermonTextLiturgySheet.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$dob\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Liturgy/LiturgySheets/FuneralSermonTextLiturgySheet.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$dod\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Liturgy/LiturgySheets/FuneralSermonTextLiturgySheet.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$email\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Liturgy/LiturgySheets/FuneralSermonTextLiturgySheet.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$office\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Liturgy/LiturgySheets/FuneralSermonTextLiturgySheet.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$phone\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Liturgy/LiturgySheets/FuneralSermonTextLiturgySheet.php
-
-		-
 			message: '#^Left side of && is always true\.$#'
 			identifier: booleanAnd.leftAlwaysTrue
 			count: 2
-			path: app/Liturgy/LiturgySheets/FuneralSermonTextLiturgySheet.php
-
-		-
-			message: '#^Parameter \#1 \$user of static method App\\Services\\NameService\:\:fromUser\(\) expects App\\Models\\People\\User, Illuminate\\Database\\Eloquent\\Model given\.$#'
-			identifier: argument.type
-			count: 1
 			path: app/Liturgy/LiturgySheets/FuneralSermonTextLiturgySheet.php
 
 		-
@@ -3053,24 +2411,6 @@ parameters:
 			identifier: deadCode.unreachable
 			count: 1
 			path: app/Liturgy/LiturgySheets/OrganistLiturgySheet.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\Service\:\:\$liturgyBlocks\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Liturgy/LiturgySheets/PsalmLiturgySheet.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\Service\:\:\$liturgyBlocks\.$#'
-			identifier: property.notFound
-			count: 2
-			path: app/Liturgy/LiturgySheets/ReadingAndAnnouncementsLiturgySheet.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\Service\:\:\$sermon\.$#'
-			identifier: property.notFound
-			count: 2
-			path: app/Liturgy/LiturgySheets/ReadingAndAnnouncementsLiturgySheet.php
 
 		-
 			message: '#^Call to an undefined method App\\Liturgy\\ItemHelpers\\AbstractItemHelper\:\:getText\(\)\.$#'
@@ -3085,92 +2425,8 @@ parameters:
 			path: app/Liturgy/LiturgySheets/ReadingAndAnnouncementsLiturgySheet.php
 
 		-
-			message: '#^Access to an undefined property App\\Models\\Service\:\:\$liturgyBlocks\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Liturgy/LiturgySheets/SermonHandoutLiturgySheet.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\Service\:\:\$sermon\.$#'
-			identifier: property.notFound
-			count: 6
-			path: app/Liturgy/LiturgySheets/SermonHandoutLiturgySheet.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$address\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Liturgy/LiturgySheets/SermonHandoutLiturgySheet.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$email\.$#'
-			identifier: property.notFound
-			count: 2
-			path: app/Liturgy/LiturgySheets/SermonHandoutLiturgySheet.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$homepage\.$#'
-			identifier: property.notFound
-			count: 2
-			path: app/Liturgy/LiturgySheets/SermonHandoutLiturgySheet.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$logo\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Liturgy/LiturgySheets/SermonHandoutLiturgySheet.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name\.$#'
-			identifier: property.notFound
-			count: 2
-			path: app/Liturgy/LiturgySheets/SermonHandoutLiturgySheet.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$office\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Liturgy/LiturgySheets/SermonHandoutLiturgySheet.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$official_title\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Liturgy/LiturgySheets/SermonHandoutLiturgySheet.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$own_podcast_title\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Liturgy/LiturgySheets/SermonHandoutLiturgySheet.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$own_website\.$#'
-			identifier: property.notFound
-			count: 3
-			path: app/Liturgy/LiturgySheets/SermonHandoutLiturgySheet.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$phone\.$#'
-			identifier: property.notFound
-			count: 2
-			path: app/Liturgy/LiturgySheets/SermonHandoutLiturgySheet.php
-
-		-
-			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:fullName\(\)\.$#'
-			identifier: method.notFound
-			count: 2
-			path: app/Liturgy/LiturgySheets/SermonHandoutLiturgySheet.php
-
-		-
 			message: '#^Call to an undefined method PhpOffice\\PhpWord\\Element\\Section\:\:addColumnBreak\(\)\.$#'
 			identifier: method.notFound
-			count: 1
-			path: app/Liturgy/LiturgySheets/SermonHandoutLiturgySheet.php
-
-		-
-			message: '#^Expression on left side of \?\? is not nullable\.$#'
-			identifier: nullCoalesce.expr
 			count: 1
 			path: app/Liturgy/LiturgySheets/SermonHandoutLiturgySheet.php
 
@@ -3199,28 +2455,10 @@ parameters:
 			path: app/Liturgy/LiturgySheets/SermonHandoutLiturgySheet.php
 
 		-
-			message: '#^Access to an undefined property App\\Models\\Service\:\:\$liturgyBlocks\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Liturgy/LiturgySheets/SermonTextLiturgySheet.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\Service\:\:\$sermon\.$#'
-			identifier: property.notFound
-			count: 3
-			path: app/Liturgy/LiturgySheets/SermonTextLiturgySheet.php
-
-		-
 			message: '#^Left side of && is always true\.$#'
 			identifier: booleanAnd.leftAlwaysTrue
 			count: 2
 			path: app/Liturgy/LiturgySheets/SermonTextLiturgySheet.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\Service\:\:\$liturgyBlocks\.$#'
-			identifier: property.notFound
-			count: 2
-			path: app/Liturgy/LiturgySheets/SongBeamerLiturgySheet.php
 
 		-
 			message: '#^Call to method getText\(\) on an unknown class App\\Liturgy\\LiturgySheets\\Liturgy\\ItemHelpers\\FreetextItemHelper\.$#'
@@ -3247,36 +2485,6 @@ parameters:
 			path: app/Liturgy/LiturgySheets/SongBeamerLiturgySheet.php
 
 		-
-			message: '#^Access to an undefined property App\\Models\\Service\:\:\$liturgyBlocks\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Liturgy/LiturgySheets/SongMailLiturgySheet.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$at_text\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Liturgy/LiturgySheets/SongMailLiturgySheet.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$email\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Liturgy/LiturgySheets/SongMailLiturgySheet.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Liturgy/LiturgySheets/SongMailLiturgySheet.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\Service\:\:\$liturgyBlocks\.$#'
-			identifier: property.notFound
-			count: 2
-			path: app/Liturgy/LiturgySheets/SongPPTLiturgySheet.php
-
-		-
 			message: '#^Access to an undefined property App\\Models\\Service\:\:\$start\.$#'
 			identifier: property.notFound
 			count: 1
@@ -3290,12 +2498,6 @@ parameters:
 
 		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$locationTextWithCity\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Liturgy/LiturgySheets/SongPPTLiturgySheet.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name\.$#'
 			identifier: property.notFound
 			count: 1
 			path: app/Liturgy/LiturgySheets/SongPPTLiturgySheet.php
@@ -3409,12 +2611,6 @@ parameters:
 			path: app/Liturgy/LiturgySheets/SongPPTLiturgySheet.php
 
 		-
-			message: '#^Access to an undefined property App\\Models\\Service\:\:\$liturgyBlocks\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Liturgy/LiturgySheets/SongSheetLiturgySheet.php
-
-		-
 			message: '#^Call to an undefined method App\\Liturgy\\ItemHelpers\\AbstractItemHelper\:\:getText\(\)\.$#'
 			identifier: method.notFound
 			count: 1
@@ -3469,26 +2665,8 @@ parameters:
 			path: app/Liturgy/Music/ABCMusic.php
 
 		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Liturgy/Replacement/BekanntgabenReplacer.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$public_events_calendar_url\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Liturgy/Replacement/BekanntgabenReplacer.php
-
-		-
 			message: '#^Method Carbon\\Carbon\:\:subSecond\(\) invoked with 1 parameter, 0 required\.$#'
 			identifier: arguments.count
-			count: 1
-			path: app/Liturgy/Replacement/BekanntgabenReplacer.php
-
-		-
-			message: '#^Parameter \#1 \$city of class App\\Imports\\OPEventsImport constructor expects App\\Models\\Places\\City, Illuminate\\Database\\Eloquent\\Model\|null given\.$#'
-			identifier: argument.type
 			count: 1
 			path: app/Liturgy/Replacement/BekanntgabenReplacer.php
 
@@ -3501,13 +2679,7 @@ parameters:
 		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
 			identifier: property.notFound
-			count: 5
-			path: app/Liturgy/Replacement/KasualienReplacer.php
-
-		-
-			message: '#^Binary operation "\." between non\-falsy\-string and array results in an error\.$#'
-			identifier: binaryOp.invalid
-			count: 1
+			count: 2
 			path: app/Liturgy/Replacement/KasualienReplacer.php
 
 		-
@@ -3533,24 +2705,6 @@ parameters:
 			identifier: method.notFound
 			count: 5
 			path: app/Liturgy/Replacement/KasualienReplacer.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Liturgy/Replacement/TermineReplacer.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$public_events_calendar_url\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Liturgy/Replacement/TermineReplacer.php
-
-		-
-			message: '#^Parameter \#1 \$city of class App\\Imports\\OPEventsImport constructor expects App\\Models\\Places\\City, Illuminate\\Database\\Eloquent\\Model\|null given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/Liturgy/Replacement/TermineReplacer.php
 
 		-
 			message: '#^Parameter \#2 \$value of method App\\Liturgy\\SongBeamer\\AbstractSngFile\:\:addHeader\(\) expects string, int given\.$#'
@@ -3607,12 +2761,6 @@ parameters:
 			path: app/Mail/AbstractServiceMailable.php
 
 		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name\.$#'
-			identifier: property.notFound
-			count: 2
-			path: app/Mail/RegulatoryReportMail.php
-
-		-
 			message: '#^Parameter \#2 \$return of function print_r expects bool, int given\.$#'
 			identifier: argument.type
 			count: 2
@@ -3629,12 +2777,6 @@ parameters:
 			identifier: class.notFound
 			count: 1
 			path: app/Mail/User/AccountData.php
-
-		-
-			message: '#^Static property App\\Models\\AbstractModel\:\:\$exceptRoutes \(array\) on left side of \?\? is not nullable\.$#'
-			identifier: nullCoalesce.property
-			count: 1
-			path: app/Models/AbstractModel.php
 
 		-
 			message: '#^Unsafe usage of new static\(\)\.$#'
@@ -3667,12 +2809,6 @@ parameters:
 			path: app/Models/Ads/AdConfig.php
 
 		-
-			message: '#^Access to an undefined property App\\Models\\Service\:\:\$liturgyBlocks\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Models/Announcements.php
-
-		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$age\.$#'
 			identifier: property.notFound
 			count: 1
@@ -3697,12 +2833,6 @@ parameters:
 			path: app/Models/Announcements.php
 
 		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$communiapp_token\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Models/Announcements.php
-
-		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$date\.$#'
 			identifier: property.notFound
 			count: 4
@@ -3724,12 +2854,6 @@ parameters:
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$event\.$#'
 			identifier: property.notFound
 			count: 4
-			path: app/Models/Announcements.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$homepage\.$#'
-			identifier: property.notFound
-			count: 1
 			path: app/Models/Announcements.php
 
 		-
@@ -3811,12 +2935,6 @@ parameters:
 			path: app/Models/Announcements.php
 
 		-
-			message: '#^Parameter \#1 \$user of static method App\\Services\\NameService\:\:fromUser\(\) expects App\\Models\\People\\User, Illuminate\\Database\\Eloquent\\Model given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/Models/Announcements.php
-
-		-
 			message: '#^Parameter \#2 \$preserveKeys of method Illuminate\\Support\\Collection\<\(int\|string\),Illuminate\\Database\\Eloquent\\Model\>\:\:groupBy\(\) expects bool, Closure given\.$#'
 			identifier: argument.type
 			count: 1
@@ -3892,12 +3010,6 @@ parameters:
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$email\.$#'
 			identifier: property.notFound
 			count: 1
-			path: app/Models/Calendar/External/CalendarConnection.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
-			identifier: property.notFound
-			count: 3
 			path: app/Models/Calendar/External/CalendarConnection.php
 
 		-
@@ -4189,12 +3301,6 @@ parameters:
 			path: app/Models/Liturgy/Block.php
 
 		-
-			message: '#^Relation ''items'' is not found in App\\Models\\Liturgy\\Block model\.$#'
-			identifier: larastan.relationExistence
-			count: 1
-			path: app/Models/Liturgy/Block.php
-
-		-
 			message: '#^Access to an undefined property App\\Models\\Liturgy\\Item\:\:\$block\.$#'
 			identifier: property.notFound
 			count: 1
@@ -4255,12 +3361,6 @@ parameters:
 			path: app/Models/Liturgy/Songbook.php
 
 		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name\.$#'
-			identifier: property.notFound
-			count: 2
-			path: app/Models/Location.php
-
-		-
 			message: '#^PHPDoc type array\<string\> of property App\\Models\\Location\:\:\$fillable is not covariant with PHPDoc type list\<string\> of overridden property Illuminate\\Database\\Eloquent\\Model\:\:\$fillable\.$#'
 			identifier: property.phpDocType
 			count: 1
@@ -4317,13 +3417,13 @@ parameters:
 		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
 			identifier: property.notFound
-			count: 5
+			count: 2
 			path: app/Models/People/User.php
 
 		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$pivot\.$#'
 			identifier: property.notFound
-			count: 2
+			count: 1
 			path: app/Models/People/User.php
 
 		-
@@ -4417,12 +3517,6 @@ parameters:
 			path: app/Models/People/User.php
 
 		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$pivot\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Models/Places/City.php
-
-		-
 			message: '#^PHPDoc type array\<string\> of property App\\Models\\Places\\City\:\:\$fillable is not covariant with PHPDoc type list\<string\> of overridden property Illuminate\\Database\\Eloquent\\Model\:\:\$fillable\.$#'
 			identifier: property.phpDocType
 			count: 1
@@ -4465,36 +3559,6 @@ parameters:
 			path: app/Models/Rites/Baptism.php
 
 		-
-			message: '#^Binary operation "\." between '' \- '' and array results in an error\.$#'
-			identifier: binaryOp.invalid
-			count: 1
-			path: app/Models/Rites/Baptism.php
-
-		-
-			message: '#^Binary operation "\." between ''1\. Jahrestag der…'' and array results in an error\.$#'
-			identifier: binaryOp.invalid
-			count: 1
-			path: app/Models/Rites/Baptism.php
-
-		-
-			message: '#^Binary operation "\." between ''Taufgespräch '' and array results in an error\.$#'
-			identifier: binaryOp.invalid
-			count: 2
-			path: app/Models/Rites/Baptism.php
-
-		-
-			message: '#^Binary operation "\." between array and '', '' results in an error\.$#'
-			identifier: binaryOp.invalid
-			count: 1
-			path: app/Models/Rites/Baptism.php
-
-		-
-			message: '#^Binary operation "\." between non\-falsy\-string and array results in an error\.$#'
-			identifier: binaryOp.invalid
-			count: 3
-			path: app/Models/Rites/Baptism.php
-
-		-
 			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:locationText\(\)\.$#'
 			identifier: method.notFound
 			count: 2
@@ -4525,18 +3589,6 @@ parameters:
 			path: app/Models/Rites/Baptism.php
 
 		-
-			message: '#^Parameter \#2 \$array of function implode expects array\<string\>, array\<int, array\> given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/Models/Rites/Baptism.php
-
-		-
-			message: '#^Parameter \#5 \$location of class App\\DAV\\DAVCalendarItem constructor expects string, array given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/Models/Rites/Baptism.php
-
-		-
 			message: '#^Relation ''attachments'' is not found in App\\Models\\Rites\\Baptism model\.$#'
 			identifier: larastan.relationExistence
 			count: 1
@@ -4558,18 +3610,6 @@ parameters:
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$date\.$#'
 			identifier: property.notFound
 			count: 8
-			path: app/Models/Rites/Funeral.php
-
-		-
-			message: '#^Binary operation "\." between ''1\. Jahrestag der…'' and array results in an error\.$#'
-			identifier: binaryOp.invalid
-			count: 2
-			path: app/Models/Rites/Funeral.php
-
-		-
-			message: '#^Binary operation "\." between ''Trauergespräch '' and array results in an error\.$#'
-			identifier: binaryOp.invalid
-			count: 2
 			path: app/Models/Rites/Funeral.php
 
 		-
@@ -4609,12 +3649,6 @@ parameters:
 			path: app/Models/Rites/Funeral.php
 
 		-
-			message: '#^Parameter \#1 \$string of function nl2br expects string, array\|null given\.$#'
-			identifier: argument.type
-			count: 2
-			path: app/Models/Rites/Funeral.php
-
-		-
 			message: '#^Property ''age'' does not exist in model\.$#'
 			identifier: rules.modelAppends
 			count: 1
@@ -4642,36 +3676,6 @@ parameters:
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$date\.$#'
 			identifier: property.notFound
 			count: 6
-			path: app/Models/Rites/Wedding.php
-
-		-
-			message: '#^Binary operation "\." between '' \- '' and array results in an error\.$#'
-			identifier: binaryOp.invalid
-			count: 4
-			path: app/Models/Rites/Wedding.php
-
-		-
-			message: '#^Binary operation "\." between ''1\. Jahrestag der…'' and array results in an error\.$#'
-			identifier: binaryOp.invalid
-			count: 2
-			path: app/Models/Rites/Wedding.php
-
-		-
-			message: '#^Binary operation "\." between ''Traugespräch '' and array results in an error\.$#'
-			identifier: binaryOp.invalid
-			count: 2
-			path: app/Models/Rites/Wedding.php
-
-		-
-			message: '#^Binary operation "\." between array and '' / '' results in an error\.$#'
-			identifier: binaryOp.invalid
-			count: 1
-			path: app/Models/Rites/Wedding.php
-
-		-
-			message: '#^Binary operation "\." between non\-falsy\-string and array results in an error\.$#'
-			identifier: binaryOp.invalid
-			count: 12
 			path: app/Models/Rites/Wedding.php
 
 		-
@@ -4729,12 +3733,6 @@ parameters:
 			path: app/Models/Rites/Wedding.php
 
 		-
-			message: '#^Binary operation "\." between '', '' and array results in an error\.$#'
-			identifier: binaryOp.invalid
-			count: 1
-			path: app/Models/Seating/Booking.php
-
-		-
 			message: '#^PHPDoc tag @return with type Illuminate\\Database\\Eloquent\\Relations\\BelongsTo is incompatible with native type string\.$#'
 			identifier: return.phpDocType
 			count: 1
@@ -4751,12 +3749,6 @@ parameters:
 			identifier: property.defaultValue
 			count: 1
 			path: app/Models/Seating/Booking.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$color\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Models/Seating/SeatingRow.php
 
 		-
 			message: '#^Static property App\\Models\\Seating\\SeatingRow\:\:\$validationRules \(array\<array\>\) does not accept default value of type array\<string, string\>\.$#'
@@ -4777,138 +3769,6 @@ parameters:
 			path: app/Models/Sermon.php
 
 		-
-			message: '#^Access to an undefined property App\\Models\\Sermon\:\:\$services\.$#'
-			identifier: property.notFound
-			count: 5
-			path: app/Models/Sermon.php
-
-		-
-			message: '#^Method App\\Models\\Sermon\:\:getList\(\) should return Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\Sermon\> but returns array\<App\\Models\\Sermon\>\.$#'
-			identifier: return.type
-			count: 1
-			path: app/Models/Sermon.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\Service\:\:\$liturgyBlocks\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Models/Service.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$buried_name\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Models/Service.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$candidate_name\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Models/Service.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$cc_default_location\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Models/Service.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$default_funeral_offering_description\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Models/Service.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$default_funeral_offering_goal\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Models/Service.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$default_offering_description\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Models/Service.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$default_offering_goal\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Models/Service.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$default_offering_url\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Models/Service.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$default_wedding_offering_description\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Models/Service.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$default_wedding_offering_goal\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Models/Service.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$fullName\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Models/Service.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Models/Service.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name\.$#'
-			identifier: property.notFound
-			count: 2
-			path: app/Models/Service.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$number\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Models/Service.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$pivot\.$#'
-			identifier: property.notFound
-			count: 2
-			path: app/Models/Service.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$seatingSections\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Models/Service.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$type\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Models/Service.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$youtube_channel_url\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Models/Service.php
-
-		-
-			message: '#^Binary operation "\." between '' \('' and non\-empty\-array results in an error\.$#'
-			identifier: binaryOp.invalid
-			count: 2
-			path: app/Models/Service.php
-
-		-
 			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Builder\:\:inCity\(\)\.$#'
 			identifier: method.notFound
 			count: 1
@@ -4927,30 +3787,6 @@ parameters:
 			path: app/Models/Service.php
 
 		-
-			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:atText\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: app/Models/Service.php
-
-		-
-			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:getActiveAdChannels\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: app/Models/Service.php
-
-		-
-			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:getCalendarItems\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: app/Models/Service.php
-
-		-
-			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Relations\\HasMany\:\:withTrashed\(\)\.$#'
-			identifier: method.notFound
-			count: 8
-			path: app/Models/Service.php
-
-		-
 			message: '#^Call to static method title\(\) on an unknown class App\\Models\\MinistryService\.$#'
 			identifier: class.notFound
 			count: 1
@@ -4959,12 +3795,6 @@ parameters:
 		-
 			message: '#^Method App\\Models\\Service\:\:associateParticipants\(\) should return array but empty return statement found\.$#'
 			identifier: return.empty
-			count: 1
-			path: app/Models/Service.php
-
-		-
-			message: '#^Method App\\Models\\Service\:\:ministries\(\) should return array but returns Illuminate\\Database\\Eloquent\\Collection\<\(int\|string\), Illuminate\\Database\\Eloquent\\Collection\<int, Illuminate\\Database\\Eloquent\\Model\>\>\.$#'
-			identifier: return.type
 			count: 1
 			path: app/Models/Service.php
 
@@ -5020,30 +3850,6 @@ parameters:
 			message: '#^Parameter \#1 \$categoryId of method Google\\Service\\YouTube\\VideoSnippet\:\:setCategoryId\(\) expects string, int given\.$#'
 			identifier: argument.type
 			count: 1
-			path: app/Models/Service.php
-
-		-
-			message: '#^Parameter \#1 \$city of static method App\\Helpers\\YoutubeHelper\:\:getLiveDashboardUrl\(\) expects App\\Models\\Places\\City, Illuminate\\Database\\Eloquent\\Model given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/Models/Service.php
-
-		-
-			message: '#^Parameter \#1 \$city of static method App\\Integrations\\KonfiApp\\KonfiAppIntegration\:\:get\(\) expects App\\Models\\Places\\City, Illuminate\\Database\\Eloquent\\Model given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/Models/Service.php
-
-		-
-			message: '#^Parameter \#1 \$city of static method App\\Integrations\\KonfiApp\\KonfiAppIntegration\:\:isActive\(\) expects App\\Models\\Places\\City, Illuminate\\Database\\Eloquent\\Model given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/Models/Service.php
-
-		-
-			message: '#^Parameter \#1 \$name of static method App\\Services\\NameService\:\:fromName\(\) expects string, array given\.$#'
-			identifier: argument.type
-			count: 2
 			path: app/Models/Service.php
 
 		-
@@ -5141,30 +3947,6 @@ parameters:
 			identifier: property.defaultValue
 			count: 1
 			path: app/Models/ServiceGroup.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$youtube_passive_stream_id\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Models/Streaming/Broadcast.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$youtube_self_declared_for_children\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Models/Streaming/Broadcast.php
-
-		-
-			message: '#^Parameter \#1 \$city of method App\\Models\\Streaming\\Broadcast\:\:authenticate\(\) expects App\\Models\\Places\\City, Illuminate\\Database\\Eloquent\\Model\|null given\.$#'
-			identifier: argument.type
-			count: 2
-			path: app/Models/Streaming/Broadcast.php
-
-		-
-			message: '#^Parameter \#1 \$city of static method App\\Integrations\\Youtube\\YoutubeIntegration\:\:get\(\) expects App\\Models\\Places\\City, Illuminate\\Database\\Eloquent\\Model\|null given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/Models/Streaming/Broadcast.php
 
 		-
 			message: '#^Parameter \#1 \$selfDeclaredMadeForKids of method Google\\Service\\YouTube\\LiveBroadcastStatus\:\:setSelfDeclaredMadeForKids\(\) expects bool, string given\.$#'
@@ -5311,12 +4093,6 @@ parameters:
 			path: app/Policies/FuneralPolicy.php
 
 		-
-			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:administeredBy\(\)\.$#'
-			identifier: method.notFound
-			count: 4
-			path: app/Policies/LocationPolicy.php
-
-		-
 			message: '#^Access to an undefined property App\\Models\\Leave\\Poolmaster\:\:\$user\.$#'
 			identifier: property.notFound
 			count: 3
@@ -5327,30 +4103,6 @@ parameters:
 			identifier: property.notFound
 			count: 1
 			path: app/Policies/PoolmasterPolicy.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$location\.$#'
-			identifier: property.notFound
-			count: 2
-			path: app/Policies/SeatingRowPolicy.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\Sermon\:\:\$services\.$#'
-			identifier: property.notFound
-			count: 2
-			path: app/Policies/SermonPolicy.php
-
-		-
-			message: '#^Relation ''services'' is not found in App\\Models\\Sermon model\.$#'
-			identifier: larastan.relationExistence
-			count: 1
-			path: app/Policies/SermonPolicy.php
-
-		-
-			message: '#^Parameter \#1 \$city of method App\\Models\\People\\User\:\:isCurrentlyPoolmasterForCity\(\) expects App\\Models\\Places\\City, Illuminate\\Database\\Eloquent\\Model\|null given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/Policies/ServicePolicy.php
 
 		-
 			message: '#^PHPDoc tag @return with type mixed is not subtype of native type bool\.$#'
@@ -5395,19 +4147,7 @@ parameters:
 			path: app/Providers/EventServiceProvider.php
 
 		-
-			message: '#^Access to an undefined property App\\Models\\Service\:\:\$liturgyBlocks\.$#'
-			identifier: property.notFound
-			count: 3
-			path: app/Reports/AnnouncementsReport.php
-
-		-
 			message: '#^Access to an undefined property App\\Models\\Service\:\:\$locationText\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Reports/AnnouncementsReport.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\Service\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\Service\>\:\:\$dateTime\.$#'
 			identifier: property.notFound
 			count: 1
 			path: app/Reports/AnnouncementsReport.php
@@ -5415,12 +4155,6 @@ parameters:
 		-
 			message: '#^Expression on left side of \?\? is not nullable\.$#'
 			identifier: nullCoalesce.expr
-			count: 1
-			path: app/Reports/AnnouncementsReport.php
-
-		-
-			message: '#^Parameter \#1 \$city of static method App\\Integrations\\KonfiApp\\KonfiAppIntegration\:\:get\(\) expects App\\Models\\Places\\City, Illuminate\\Database\\Eloquent\\Model\|null given\.$#'
-			identifier: argument.type
 			count: 1
 			path: app/Reports/AnnouncementsReport.php
 
@@ -5435,12 +4169,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: app/Reports/AnnouncementsReport.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
-			identifier: property.notFound
-			count: 2
-			path: app/Reports/BillBoardReport.php
 
 		-
 			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\:\:inCities\(\)\.$#'
@@ -5707,12 +4435,6 @@ parameters:
 			path: app/Reports/GiroCodeQRReport.php
 
 		-
-			message: '#^Parameter \#1 \$city of static method App\\Integrations\\KonfiApp\\KonfiAppIntegration\:\:get\(\) expects App\\Models\\Places\\City, Illuminate\\Database\\Eloquent\\Model\|null given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/Reports/GiroCodeQRReport.php
-
-		-
 			message: '#^Variable \$service might not be defined\.$#'
 			identifier: variable.undefined
 			count: 1
@@ -5721,18 +4443,12 @@ parameters:
 		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$konfiapp_apikey\.$#'
 			identifier: property.notFound
-			count: 2
+			count: 1
 			path: app/Reports/KonfiAppQRReport.php
 
 		-
 			message: '#^Method App\\Reports\\KonfiAppQRReport\:\:setup\(\) should return Illuminate\\Contracts\\Foundation\\Application\|Illuminate\\Contracts\\View\\Factory\|Illuminate\\View\\View but returns Inertia\\Response\.$#'
 			identifier: return.type
-			count: 1
-			path: app/Reports/KonfiAppQRReport.php
-
-		-
-			message: '#^Parameter \#1 \$city of static method App\\Integrations\\KonfiApp\\KonfiAppIntegration\:\:get\(\) expects App\\Models\\Places\\City, Illuminate\\Database\\Eloquent\\Model\|null given\.$#'
-			identifier: argument.type
 			count: 1
 			path: app/Reports/KonfiAppQRReport.php
 
@@ -5899,22 +4615,10 @@ parameters:
 			path: app/Reports/ServiceExcelTableReport.php
 
 		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Reports/ServiceTableReport.php
-
-		-
 			message: '#^Parameter \#1 \$row of method PhpOffice\\PhpSpreadsheet\\Worksheet\\Worksheet\:\:getRowDimension\(\) expects int, string given\.$#'
 			identifier: argument.type
 			count: 1
 			path: app/Reports/ServiceTableReport.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Reports/ServiceThemesReport.php
 
 		-
 			message: '#^Method App\\Reports\\ServiceThemesReport\:\:cellAddress\(\) invoked with 3 parameters, 2 required\.$#'
@@ -6013,25 +4717,7 @@ parameters:
 			path: app/Seating/AbstractSeatingModel.php
 
 		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$code\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Seating/MaximumBasedSeatFinder.php
-
-		-
-			message: '#^Binary operation "\." between '', '' and non\-empty\-array results in an error\.$#'
-			identifier: binaryOp.invalid
-			count: 1
-			path: app/Seating/MaximumBasedSeatFinder.php
-
-		-
 			message: '#^Access to an undefined property App\\Seating\\RowBasedSeatFinder\:\:\$bookings\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Seating/RowBasedSeatFinder.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
 			identifier: property.notFound
 			count: 1
 			path: app/Seating/RowBasedSeatFinder.php
@@ -6055,12 +4741,6 @@ parameters:
 			path: app/Seating/RowBasedSeatFinder.php
 
 		-
-			message: '#^Property App\\Seating\\RowBasedSeatFinder\:\:\$location \(App\\Models\\Location\) does not accept Illuminate\\Database\\Eloquent\\Model\|null\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: app/Seating/RowBasedSeatFinder.php
-
-		-
 			message: '#^Parameter \#2 \$data of method App\\Seating\\AbstractSeatFinder\:\:checkIfBookingCanBeChanged\(\) expects array, ArrayAccess&Illuminate\\Validation\\Validator given\.$#'
 			identifier: argument.type
 			count: 1
@@ -6068,30 +4748,6 @@ parameters:
 
 		-
 			message: '#^Access to an undefined property App\\Models\\Service\:\:\$participantText\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Services/CalendarService.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$first_name\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Services/CalendarService.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$last_name\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Services/CalendarService.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Services/CalendarService.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$title\.$#'
 			identifier: property.notFound
 			count: 1
 			path: app/Services/CalendarService.php
@@ -6373,12 +5029,6 @@ parameters:
 			path: database/migrations/2021_06_03_090726_migrate_baptism_registration_forms.php
 
 		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$date\.$#'
-			identifier: property.notFound
-			count: 1
-			path: database/migrations/2022_03_10_144500_add_service_date_field.php
-
-		-
 			message: '#^Parameter \#2 \$default of method App\\Models\\People\\User\:\:getSetting\(\) expects null, array given\.$#'
 			identifier: argument.type
 			count: 2
@@ -6391,21 +5041,9 @@ parameters:
 			path: database/migrations/2022_12_19_191400_convert_liturgic_to_freetext.php
 
 		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
-			identifier: property.notFound
-			count: 3
-			path: database/migrations/2022_12_19_191400_convert_liturgic_to_freetext.php
-
-		-
 			message: '#^Method Illuminate\\Database\\Migrations\\Migration@anonymous/database/migrations/2022_12_19_191400_convert_liturgic_to_freetext\.php\:42\:\:relativeDateString\(\) is unused\.$#'
 			identifier: method.unused
 			count: 1
-			path: database/migrations/2022_12_19_191400_convert_liturgic_to_freetext.php
-
-		-
-			message: '#^Parameter \#1 \$name of static method App\\Services\\NameService\:\:fromName\(\) expects string, array given\.$#'
-			identifier: argument.type
-			count: 4
 			path: database/migrations/2022_12_19_191400_convert_liturgic_to_freetext.php
 
 		-

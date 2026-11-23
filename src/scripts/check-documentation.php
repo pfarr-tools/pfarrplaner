@@ -44,8 +44,24 @@ foreach ($paths as $path) {
 
     $tokens = token_get_all($contents);
     $lastDocblock = null;
+    $attributeDepth = 0;
     $line = 1;
     foreach ($tokens as $index => $token) {
+        // Attributes belong to the following declaration; their arguments are not declarations.
+        if (is_array($token) && $token[0] === T_ATTRIBUTE) {
+            $attributeDepth++;
+
+            continue;
+        }
+        if ($attributeDepth > 0) {
+            if ($token === '[') {
+                $attributeDepth++;
+            } elseif ($token === ']') {
+                $attributeDepth--;
+            }
+
+            continue;
+        }
         if (is_array($token)) {
             [$id, $text, $tokenLine] = $token;
             $line = $tokenLine;

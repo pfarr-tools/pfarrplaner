@@ -15,6 +15,11 @@ namespace App\Http\Controllers\Api;
 
 use App\Models\Parish;
 
+/**
+ * Handles CRUD requests for Parish records.
+ *
+ * @extends AbstractApiCRUDController<Parish>
+ */
 class ParishController extends AbstractApiCRUDController
 {
     protected string $modelClass = Parish::class;

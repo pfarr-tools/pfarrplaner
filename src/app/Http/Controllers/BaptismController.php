@@ -50,6 +50,8 @@ use Illuminate\Support\Facades\View;
 
 /**
  * Class BaptismController
+ *
+ * @extends AbstractCRUDController<Baptism>
  */
 class BaptismController extends AbstractCRUDController
 {
@@ -65,8 +67,7 @@ class BaptismController extends AbstractCRUDController
     /**
      * Show the form for creating a new resource.
      *
-     * @param  int  $serviceId  Service Id
-     * @return Response
+     * @return RedirectResponse Redirect to the new baptism editor.
      */
     public function create(Request $request)
     {

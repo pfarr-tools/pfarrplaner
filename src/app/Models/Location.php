@@ -82,7 +82,9 @@ class Location extends AbstractModel
     protected $appends = ['fullName'];
 
     /**
-     * @return BelongsTo
+     * Return the city associated with this model.
+     *
+     * @return BelongsTo<City, $this>
      */
     public function city()
     {

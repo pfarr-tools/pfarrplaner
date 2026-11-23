@@ -36,6 +36,8 @@ use Illuminate\Http\Request;
 
 /**
  * Class ParishController
+ *
+ * @extends AbstractCRUDController<Parish>
  */
 class ParishController extends AbstractCRUDController
 {

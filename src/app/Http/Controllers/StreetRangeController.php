@@ -32,6 +32,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Places\StreetRange;
 
+/**
+ * Handles CRUD requests for StreetRange records.
+ *
+ * @extends AbstractCRUDController<StreetRange>
+ */
 class StreetRangeController extends AbstractCRUDController
 {
     protected string $modelClass = StreetRange::class;

@@ -32,6 +32,31 @@ Deklarationen. Der Block beschreibt den Zweck und bei Bedarf Parameter,
 Rückgabe, Nebenwirkungen und Ausnahmen; native Typen allein ersetzen keine
 Beschreibung.
 
+## Statische Typen und Laravel-Verträge
+
+Gemeinsame CRUD-Controller tragen den konkreten Model-Typ als PHPDoc-Template
+weiter. Fachliche Controller geben ihn mit `@extends` an. Eloquent-Beziehungen
+benennen sowohl das Zielmodell als auch `$this` als Herkunftsmodell. Collections
+benötigen Schlüssel- und Elementtypen; ein allgemeiner Model-Typ ersetzt keinen
+konkreten Typ in veränderbaren Collections.
+
+Zusatzdaten einer Zwischentabelle gehören zum Ergebnis der jeweiligen Beziehung.
+Ein `pivot`-Attribut wird deshalb nicht pauschal für alle Instanzen des Zielmodells
+versprochen. Legacy-Accessors, deren Namen mit öffentlichen Methoden kollidieren,
+können eine ausdrückliche `@property-read`-Dokumentation benötigen.
+
+Bei verschlüsselten Feldern ist die tatsächliche Datenform maßgeblich:
+`EncryptedAttribute` kann neben Klartext auch wiederhergestellte Legacy-Werte
+liefern. Sein Rückgabetyp ist deshalb `mixed`, nicht pauschal `array`. Fachliche
+Aufrufer müssen die benötigte Datenform gesondert absichern; der allgemeinere
+Cast-Typ ersetzt diese Prüfung nicht.
+
+Nach Änderungen an Cast-Typen oder anderen indirekt ausgewerteten Verträgen kann
+ein frischer Analyselauf ohne alten Ergebniscache erforderlich sein. Obsolete
+Baseline-Einträge werden erst nach der Prüfung entfernt; neue Befunde dürfen
+nicht durch eine vergrößerte Baseline verschwinden. Der PHPDoc-Checker erkennt
+Dokumentationsblöcke auch vor PHP-Attributen an Klassen und Methoden.
+
 ## Formatierungsstandard
 
 Prettier ist verbindlich für JavaScript-, Vue-, Skript-, CSS-, SCSS-, Sass-,

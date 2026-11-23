@@ -15,6 +15,11 @@ namespace App\Http\Controllers\Api;
 
 use App\Models\Seating\SeatingSection;
 
+/**
+ * Handles CRUD requests for SeatingSection records.
+ *
+ * @extends AbstractApiCRUDController<SeatingSection>
+ */
 class SeatingSectionController extends AbstractApiCRUDController
 {
     protected string $modelClass = SeatingSection::class;

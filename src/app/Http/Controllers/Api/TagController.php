@@ -32,6 +32,11 @@ namespace App\Http\Controllers\Api;
 
 use App\Models\Tag;
 
+/**
+ * Handles CRUD requests for Tag records.
+ *
+ * @extends AbstractApiCRUDController<Tag>
+ */
 class TagController extends AbstractApiCRUDController
 {
     protected string $modelClass = Tag::class;

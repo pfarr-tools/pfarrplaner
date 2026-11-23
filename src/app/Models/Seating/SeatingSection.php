@@ -123,7 +123,9 @@ class SeatingSection extends AbstractModel
     }
 
     /**
-     * @return BelongsTo
+     * Return the location containing this seating section.
+     *
+     * @return BelongsTo<Location, $this>
      */
     public function location()
     {

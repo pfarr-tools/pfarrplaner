@@ -42,10 +42,14 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 
-/** Provides shared CRUD actions and response handling for application models. */
+/**
+ * Provides shared CRUD actions and response handling for one model type.
+ *
+ * @template TModel of AbstractModel
+ */
 class AbstractCRUDController extends Controller
 {
-    /** @var class-string<AbstractModel> Concrete model handled by this controller. */
+    /** @var class-string<TModel> Concrete model handled by this controller. */
     protected string $modelClass;
 
     /**
@@ -59,7 +63,7 @@ class AbstractCRUDController extends Controller
     /**
      * Prepare the collection of models for the index view.
      *
-     * @return Collection<int, AbstractModel> Models with the configured relationships.
+     * @return Collection<int, TModel> Models with the configured relationships.
      */
     protected function getModelsForIndex(): Collection
     {
@@ -68,8 +72,6 @@ class AbstractCRUDController extends Controller
 
     /**
      * Add authorization flags and editor routes to each model in place.
-     *
-     * @template TModel of AbstractModel
      *
      * @param  Collection<int, TModel>  $collection  Models to decorate for the index.
      * @return Collection<int, TModel> The decorated models with their existing keys.
@@ -97,6 +99,7 @@ class AbstractCRUDController extends Controller
      *
      * @param  mixed  $modelId
      * @param  list<string>  $relations  Relationships to eager load.
+     * @return TModel The requested model.
      */
     protected function getSingleModel(Request $request, $modelId = null, $relations = []): AbstractModel
     {
@@ -115,7 +118,7 @@ class AbstractCRUDController extends Controller
      *
      * @param  AbstractAction  $action  Completed action providing a redirect and flash messages.
      * @param  mixed  $result
-     * @return RedirectResponse
+     * @return RedirectResponse|JsonResponse
      */
     protected function returnResult($action, $result = null)
     {
@@ -125,7 +128,7 @@ class AbstractCRUDController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Inertia\Response
+     * @return \Inertia\Response|JsonResponse|Collection<int, TModel> Web page or API representation.
      */
     public function index(Request $request)
     {
@@ -141,7 +144,7 @@ class AbstractCRUDController extends Controller
     /**
      * Get additional resources needed to display the editor component.
      *
-     * @param  AbstractModel|null  $model  Existing model, or null when creating one.
+     * @param  TModel|null  $model  Existing model, or null when creating one.
      * @return array<string, mixed> Named Inertia props for the editor.
      */
     protected function getResourcesForEditor(Request $request, $model = null): array
@@ -152,7 +155,7 @@ class AbstractCRUDController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Inertia\Response
+     * @return \Inertia\Response|RedirectResponse Editor page or redirect to a newly created record.
      */
     public function create(Request $request)
     {
@@ -171,7 +174,7 @@ class AbstractCRUDController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @return Response
+     * @return RedirectResponse|JsonResponse
      */
     public function store(Request $request)
     {
@@ -221,7 +224,7 @@ class AbstractCRUDController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @return Response
+     * @return \Symfony\Component\HttpFoundation\Response Redirect or API deletion response.
      */
     public function destroy(Request $request, $modelId)
     {

@@ -33,7 +33,6 @@ namespace App\Models;
 use App\Models\Places\City;
 use App\Traits\HasAttachedImage;
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Auth;
@@ -111,7 +110,7 @@ class Sermon extends Model
     /**
      * Get accessible sermons, i.e. those preached in the same city, or by the currently logged-in user
      *
-     * @return Sermon[]|Collection
+     * @return array<int|string, Sermon> Sermons keyed by sortable service date.
      */
     public static function getList(City $city)
     {

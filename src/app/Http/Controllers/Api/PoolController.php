@@ -37,6 +37,11 @@ use App\Models\People\User;
 use App\Models\Service;
 use Carbon\Carbon;
 
+/**
+ * Handles CRUD requests for Pool records.
+ *
+ * @extends AbstractApiCRUDController<Pool>
+ */
 class PoolController extends AbstractApiCRUDController
 {
     protected string $modelClass = Pool::class;

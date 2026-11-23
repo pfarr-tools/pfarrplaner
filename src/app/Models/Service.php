@@ -70,6 +70,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -80,6 +81,10 @@ use Throwable;
 
 /**
  * Class Service
+ *
+ * @property-read Carbon $datetime Copy of the service date exposed by the legacy accessor.
+ * @property-read Carbon $dateTime Legacy camel-case alias, distinct from the dateTime() formatting method.
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, User&object{pivot: Pivot&object{category: string}}> $participants Participants with their service-specific category.
  */
 class Service extends Model implements HasDAVCalendarItems
 {
@@ -410,7 +415,9 @@ class Service extends Model implements HasDAVCalendarItems
     }
 
     /**
-     * @return array
+     * Group custom-ministry participants by their pivot category.
+     *
+     * @return Collection<int|string, \Illuminate\Database\Eloquent\Collection<int, User>>
      */
     public function ministries()
     {
@@ -742,7 +749,9 @@ class Service extends Model implements HasDAVCalendarItems
     }
 
     /**
-     * @return array
+     * Expose the participant groups used by the ministry planner.
+     *
+     * @return Collection<int|string, \Illuminate\Database\Eloquent\Collection<int, User>>
      */
     public function getMinistriesByCategoryAttribute()
     {
@@ -818,9 +827,9 @@ class Service extends Model implements HasDAVCalendarItems
     }
 
     /**
-     * Get all preachers for this service
+     * Return sermon recipients, or an empty collection when no sermon item exists.
      *
-     * @return Collection
+     * @return array<array-key, mixed>|Collection<array-key, mixed>
      */
     public function getPreachersAttribute()
     {

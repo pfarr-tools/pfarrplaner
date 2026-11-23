@@ -39,6 +39,13 @@ use Illuminate\Support\Facades\Auth;
 
 class SermonController extends Controller
 {
+    /**
+     * Attach public service metadata and the rite privacy flag to a sermon.
+     *
+     * @param  Sermon  $sermon  Sermon whose services are summarized.
+     * @param  bool  $includePreview  Whether future services are included.
+     * @return Sermon The enriched sermon instance.
+     */
     protected function transformSermon(Sermon $sermon, $includePreview = false)
     {
         $services = [];
@@ -48,7 +55,7 @@ class SermonController extends Controller
             if (($service->date <= Carbon::now()) || ($includePreview)) {
                 $services[] = [
                     /** @var Service $service */
-                    'date' => $service->dateTime,
+                    'date' => $service->datetime,
                     'time' => $service->timeText(),
                     'title' => $service->titleText(false),
                     'location' => $service->locationText(),

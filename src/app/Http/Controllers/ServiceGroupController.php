@@ -34,6 +34,8 @@ use App\Models\ServiceGroup;
 
 /**
  * Class ServiceGroupController
+ *
+ * @extends AbstractCRUDController<ServiceGroup>
  */
 class ServiceGroupController extends AbstractCRUDController
 {

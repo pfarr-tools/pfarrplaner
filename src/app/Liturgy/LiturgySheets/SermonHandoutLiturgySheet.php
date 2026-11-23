@@ -107,6 +107,12 @@ class SermonHandoutLiturgySheet extends AbstractLiturgySheet
             ['size' => 9]);
     }
 
+    /**
+     * Render website, podcast and parish contact information once in the second column.
+     *
+     * @param  FoldedFlyerWordDocument  $doc  Document receiving the contact column.
+     * @return void
+     */
     protected function renderColumn2(FoldedFlyerWordDocument $doc)
     {
 
@@ -129,7 +135,7 @@ class SermonHandoutLiturgySheet extends AbstractLiturgySheet
                 $run->addText('Weiteres Material zu dieser Predigt findest du online unter:');
                 foreach ($urls as $url) {
                     $run->addTextBreak();
-                    $run->addText(' - '.$url->own_website.' ('.$url->fullName(true, true).')');
+                    $run->addText(' - '.$url->own_website.' ('.$url->fullName(true).')');
                 }
             }
             $run->addTextBreak(2);
@@ -158,18 +164,11 @@ class SermonHandoutLiturgySheet extends AbstractLiturgySheet
         $run = $cell->addTextRun(['align' => 'center']);
         $run->addImage(resource_path('img/logo/ELKW.png'), ['width' => Converter::cmToPoint(5)]);
         $run->addTextBreak(2);
-        if ($this->service->city->official_title) {
-            $run->addText(trim(str_replace('Evangelische', '', $this->service->city->official_title)),
-                ['bold' => true, 'size' => 9]);
-        } else {
-            $run->addText('Kirchengemeinde '.$this->service->city->name, ['bold' => true, 'size' => 9]);
-        }
-        $run->addText(trim(str_replace('Evangelische', '', $this->service->city->official_title)) ?? 'Kirchengemeinde '.$this->service->city->name,
-            ['bold' => true, 'size' => 9]);
+        $run->addText('Kirchengemeinde '.$this->service->city->name, ['bold' => true, 'size' => 9]);
 
         foreach ($this->service->pastors as $pastor) {
             $run->addTextBreak(2);
-            $run->addText($pastor->fullName(true, true), ['bold' => true, 'size' => 9]);
+            $run->addText($pastor->fullName(true), ['bold' => true, 'size' => 9]);
             if ($pastor->office) {
                 $run->addTextBreak();
                 $run->addText($pastor->office, ['size' => 9]);

@@ -54,6 +54,8 @@ use Inertia\Inertia;
 
 /**
  * Class FuneralController
+ *
+ * @extends AbstractCRUDController<Funeral>
  */
 class FuneralController extends AbstractCRUDController
 {

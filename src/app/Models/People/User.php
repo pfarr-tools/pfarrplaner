@@ -53,6 +53,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Collection;
@@ -68,6 +69,8 @@ use Spatie\Permission\Traits\HasRoles;
 
 /**
  * Class User
+ *
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, City&object{pivot: Pivot&object{permission: string}}> $cities Cities with this user's access level.
  */
 class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticatable
 {
@@ -965,9 +968,9 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
     }
 
     /**
-     * Cities to which the user has at least read access
+     * Cities to which the user has at least read access.
      *
-     * @return BelongsToMany
+     * @return BelongsToMany<City, $this>
      */
     public function cities()
     {

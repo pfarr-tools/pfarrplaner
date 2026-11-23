@@ -33,6 +33,11 @@ namespace App\Http\Controllers;
 use App\Models\Liturgy\Songbook;
 use App\Traits\HandlesAttachedImageTrait;
 
+/**
+ * Handles CRUD requests for Songbook records.
+ *
+ * @extends AbstractCRUDController<Songbook>
+ */
 class SongbookController extends AbstractCRUDController
 {
     use HandlesAttachedImageTrait;

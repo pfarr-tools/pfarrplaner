@@ -34,6 +34,11 @@ use App\Models\People\Team;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 
+/**
+ * Handles CRUD requests for Team records.
+ *
+ * @extends AbstractApiCRUDController<Team>
+ */
 class TeamController extends AbstractApiCRUDController
 {
     protected string $modelClass = Team::class;
