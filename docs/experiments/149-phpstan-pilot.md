@@ -258,3 +258,20 @@ Damit sind nur noch die vier einfachen Fehlertypen übrig. Sie verteilen sich au
 viele einzelne Deklarationen und lassen sich nicht weiter durch gemeinsame
 Verträge abkürzen. Für jedes Paket gilt weiterhin: zuerst fokussierter Test,
 dann Typangabe, danach Level 5 und 6 frisch prüfen.
+
+## Level-6-Gate und Baseline-Ratchet
+
+Der Prüfmaßstab wird auf Level 6 angehoben. Die beim Umstieg verbleibenden 2.051
+Befunde wurden in einer vollständig neu erzeugten Baseline erfasst: 2.934
+Meldungen in 2.710 Mustern. Die vorherige Baseline ging dabei nicht verloren,
+sondern wurde mit den neuen Mustern zusammengeführt.
+
+Der Stand wird in `main` übernommen; der Experimentbranch bleibt erhalten und
+dient als Arbeitsbranch für die weitere Reduktion. Bei Bedarf wird `main` in
+diesen Branch gemergt, ein fachliches Paket bearbeitet und anschließend wieder
+nach `main` zurückgeführt. Die Baseline schützt dabei vor Rückschritten, weil
+sowohl neue als auch weggefallene Vorkommen eines Musters als Fehler gemeldet
+werden. Neue Unterdrückungen sind unzulässig.
+
+Issue #149 bleibt offen, bis das ursprüngliche Ziel Level 10 erreicht ist. Das
+Technikhandbuch beschreibt den Ratchet-Modus und die Messung ohne Baseline.
