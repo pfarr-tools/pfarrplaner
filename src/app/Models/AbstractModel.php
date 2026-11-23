@@ -47,8 +47,10 @@ class AbstractModel extends Model
     use HasAttributeLabels;
     use HasFactory;
 
+    /** @var array<string, list<string>> Resource actions omitted from each route group. */
     public static array $exceptRoutes = [];
 
+    /** @var array<string, array<string, array{list<string>, string}>> Default HTTP methods and URL patterns by route group and action. */
     protected static $defaultRoutes = [
         'web' => [
             'index' => [['GET', 'HEAD'], '#p#'],
@@ -68,11 +70,13 @@ class AbstractModel extends Model
         ],
     ];
 
+    /** @var array<string, array<string, array{list<string>, string}>> Additional route definitions supplied by concrete models. */
     protected static $routes = [
         'web' => [],
         'api' => [],
     ];
 
+    /** @var string Path segment used for the editor. */
     protected static $editVerb = 'bearbeiten';
 
     /** @var array[] Default validation rules */
@@ -86,22 +90,30 @@ class AbstractModel extends Model
 
     protected $guarded = [];
 
+    /** @var string Display title of the administrative module. */
     public static $adminTitle = '';
 
+    /** @var string Icon identifying the administrative module. */
     public static $adminIcon = '';
 
+    /** @var string Navigation group containing the module. */
     public static $adminGroup = '';
 
     protected $appends = ['label'];
 
+    /** @var string Attribute used to resolve route model bindings. */
     protected static $modelKeyInRoute = 'id';
 
+    /** @var list<string> Relationships eager loaded for the index. */
     public static $relationsForIndex = [];
 
+    /** @var list<string> Relationships eager loaded for the editor. */
     public static $relationsForEditor = [];
 
     /**
-     * @return array|bool
+     * Describe the authorized administrative navigation entry, or disable it.
+     *
+     * @return array{text: string, group: string, icon: string, url: string, active: bool, inertia: true}|false
      */
     public static function getAdminModuleConfig()
     {
@@ -177,7 +189,7 @@ class AbstractModel extends Model
     /**
      * Resolve route definitions for this model, including configured overrides.
      *
-     * @return array<string, array<string, array<string, mixed>>> Routes grouped by route class and name.
+     * @return array<string, array<string, array{verb: string, httpVerbs: list<string>, urlPattern: string}>> Routes grouped by route class and name.
      */
     public static function getRoutes()
     {
@@ -366,7 +378,9 @@ class AbstractModel extends Model
     }
 
     /**
-     * fill defaults array
+     * Return attribute defaults used when preparing an unsaved editor model.
+     *
+     * @return array<string, mixed> Default attribute values.
      */
     public function fillDefaults(): array
     {

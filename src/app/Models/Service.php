@@ -339,7 +339,9 @@ class Service extends Model implements HasDAVCalendarItems
     }
 
     /**
-     * @return HasMany
+     * Return the baptisms associated with this service.
+     *
+     * @return HasMany<Baptism, $this>
      */
     public function baptisms()
     {
@@ -756,7 +758,9 @@ class Service extends Model implements HasDAVCalendarItems
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Collection
+     * Return the loaded organist participant collection.
+     *
+     * @return \Illuminate\Database\Eloquent\Collection<int, User>
      */
     public function getOrganistsAttribute()
     {
@@ -764,7 +768,9 @@ class Service extends Model implements HasDAVCalendarItems
     }
 
     /**
-     * @return BelongsToMany
+     * Return participants assigned to the organist category.
+     *
+     * @return BelongsToMany<User, $this>
      */
     public function organists()
     {
@@ -772,7 +778,9 @@ class Service extends Model implements HasDAVCalendarItems
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Collection
+     * Return the loaded additional-participant collection.
+     *
+     * @return \Illuminate\Database\Eloquent\Collection<int, User>
      */
     public function getOtherParticipantsAttribute()
     {
@@ -780,7 +788,9 @@ class Service extends Model implements HasDAVCalendarItems
     }
 
     /**
-     * @return BelongsToMany
+     * Return participants assigned to the additional-participant category.
+     *
+     * @return BelongsToMany<User, $this>
      */
     public function otherParticipants()
     {
@@ -788,7 +798,9 @@ class Service extends Model implements HasDAVCalendarItems
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Collection
+     * Return the loaded pastor participant collection.
+     *
+     * @return \Illuminate\Database\Eloquent\Collection<int, User>
      */
     public function getPastorsAttribute()
     {
@@ -796,7 +808,9 @@ class Service extends Model implements HasDAVCalendarItems
     }
 
     /**
-     * @return BelongsToMany
+     * Return participants assigned to the pastor category.
+     *
+     * @return BelongsToMany<User, $this>
      */
     public function pastors()
     {
@@ -839,7 +853,9 @@ class Service extends Model implements HasDAVCalendarItems
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Collection
+     * Return the loaded sacristan participant collection.
+     *
+     * @return \Illuminate\Database\Eloquent\Collection<int, User>
      */
     public function getSacristansAttribute()
     {
@@ -847,7 +863,9 @@ class Service extends Model implements HasDAVCalendarItems
     }
 
     /**
-     * @return BelongsToMany
+     * Return participants assigned to the sacristan category.
+     *
+     * @return BelongsToMany<User, $this>
      */
     public function sacristans()
     {
@@ -1483,7 +1501,9 @@ class Service extends Model implements HasDAVCalendarItems
     }
 
     /**
-     * @return BelongsToMany
+     * Return all participants with their category on the pivot record.
+     *
+     * @return BelongsToMany<User, $this>
      */
     public function participants()
     {
@@ -1517,7 +1537,9 @@ class Service extends Model implements HasDAVCalendarItems
     }
 
     /**
-     * @return HasMany
+     * Return seating bookings associated with this service.
+     *
+     * @return HasMany<Booking, $this>
      */
     public function bookings()
     {
@@ -1593,7 +1615,9 @@ class Service extends Model implements HasDAVCalendarItems
     }
 
     /**
-     * @return BelongsTo
+     * Return the city responsible for this service.
+     *
+     * @return BelongsTo<City, $this>
      */
     public function city()
     {
@@ -1601,7 +1625,9 @@ class Service extends Model implements HasDAVCalendarItems
     }
 
     /**
-     * @return BelongsTo
+     * Return the liturgical calendar day for this service.
+     *
+     * @return BelongsTo<Day, $this>
      */
     public function day()
     {
@@ -1609,7 +1635,9 @@ class Service extends Model implements HasDAVCalendarItems
     }
 
     /**
-     * @return HasMany
+     * Return advertising configurations for this service.
+     *
+     * @return HasMany<AdConfig, $this>
      */
     public function AdConfigs()
     {
@@ -1648,7 +1676,9 @@ class Service extends Model implements HasDAVCalendarItems
     }
 
     /**
-     * @return HasMany
+     * Return funerals associated with this service.
+     *
+     * @return HasMany<Funeral, $this>
      */
     public function funerals()
     {
@@ -1788,6 +1818,8 @@ class Service extends Model implements HasDAVCalendarItems
 
     /**
      * Return the liturgy blocks belonging to this service.
+     *
+     * @return HasMany<Block, $this>
      */
     public function liturgyBlocks()
     {
@@ -1795,7 +1827,9 @@ class Service extends Model implements HasDAVCalendarItems
     }
 
     /**
-     * @return BelongsTo
+     * Return the location assigned to this service.
+     *
+     * @return BelongsTo<Location, $this>
      */
     public function location()
     {
@@ -1811,7 +1845,9 @@ class Service extends Model implements HasDAVCalendarItems
     }
 
     /**
-     * @return HasMany
+     * Return recurrence occurrences associated with this service.
+     *
+     * @return HasMany<Occurence, $this>
      */
     public function occurences()
     {
@@ -1902,9 +1938,9 @@ class Service extends Model implements HasDAVCalendarItems
      * @return BelongsToMany
      */
     /**
-     * Return participants that belong to ministry categories.
+     * Return participants whose category names a custom ministry.
      *
-     * @return BelongsToMany Ministry participant relationship.
+     * @return BelongsToMany<User, $this>
      */
     public function participantsWithMinistry()
     {
@@ -1916,6 +1952,8 @@ class Service extends Model implements HasDAVCalendarItems
 
     /**
      * Return the sermon associated with this service.
+     *
+     * @return BelongsTo<Sermon, $this>
      */
     public function sermon()
     {
@@ -1923,7 +1961,9 @@ class Service extends Model implements HasDAVCalendarItems
     }
 
     /**
-     * @return BelongsToMany
+     * Return the service groups containing this service.
+     *
+     * @return BelongsToMany<ServiceGroup, $this>
      */
     public function serviceGroups()
     {
@@ -1969,7 +2009,9 @@ class Service extends Model implements HasDAVCalendarItems
     }
 
     /**
-     * @return BelongsToMany
+     * Return the tags assigned to this service.
+     *
+     * @return BelongsToMany<Tag, $this>
      */
     public function tags()
     {
@@ -2047,7 +2089,9 @@ class Service extends Model implements HasDAVCalendarItems
     }
 
     /**
-     * @return BelongsToMany
+     * Return additional cities associated with this service.
+     *
+     * @return BelongsToMany<City, $this>
      */
     public function relatedCities()
     {
@@ -2055,7 +2099,9 @@ class Service extends Model implements HasDAVCalendarItems
     }
 
     /**
-     * @return BelongsToMany
+     * Return users linked to this service through the user pivot.
+     *
+     * @return BelongsToMany<User, $this>
      */
     public function users()
     {
@@ -2063,7 +2109,9 @@ class Service extends Model implements HasDAVCalendarItems
     }
 
     /**
-     * @return HasMany
+     * Return weddings associated with this service.
+     *
+     * @return HasMany<Wedding, $this>
      */
     public function weddings()
     {

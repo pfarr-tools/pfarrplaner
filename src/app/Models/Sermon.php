@@ -35,6 +35,7 @@ use App\Traits\HasAttachedImage;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
@@ -48,6 +49,11 @@ class Sermon extends Model
 
     protected $appends = ['fullTitle'];
 
+    /**
+     * Return the services associated with this sermon.
+     *
+     * @return HasMany<Service, $this>
+     */
     public function services()
     {
         return $this->hasMany(Service::class);

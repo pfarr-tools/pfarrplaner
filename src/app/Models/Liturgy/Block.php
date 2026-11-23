@@ -33,6 +33,7 @@ namespace App\Models\Liturgy;
 use App\Models\Service;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Block extends Model
 {
@@ -57,6 +58,11 @@ class Block extends Model
         return $this->belongsTo(Service::class);
     }
 
+    /**
+     * Return the ordered-content records assigned to this liturgy block.
+     *
+     * @return HasMany<Item, $this>
+     */
     public function items()
     {
         return $this->hasMany(Item::class, 'liturgy_block_id');

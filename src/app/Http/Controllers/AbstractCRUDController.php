@@ -30,6 +30,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\AbstractAction;
 use App\Models\AbstractModel;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -44,6 +45,7 @@ use Inertia\Inertia;
 /** Provides shared CRUD actions and response handling for application models. */
 class AbstractCRUDController extends Controller
 {
+    /** @var class-string<AbstractModel> Concrete model handled by this controller. */
     protected string $modelClass;
 
     /**
@@ -55,7 +57,9 @@ class AbstractCRUDController extends Controller
     }
 
     /**
-     * Prepare the collection of models for the index view
+     * Prepare the collection of models for the index view.
+     *
+     * @return Collection<int, AbstractModel> Models with the configured relationships.
      */
     protected function getModelsForIndex(): Collection
     {
@@ -63,7 +67,12 @@ class AbstractCRUDController extends Controller
     }
 
     /**
-     * Add rights and routes to a collection of models
+     * Add authorization flags and editor routes to each model in place.
+     *
+     * @template TModel of AbstractModel
+     *
+     * @param  Collection<int, TModel>  $collection  Models to decorate for the index.
+     * @return Collection<int, TModel> The decorated models with their existing keys.
      */
     protected function addRightsToModelCollection(Collection $collection): Collection
     {
@@ -87,7 +96,7 @@ class AbstractCRUDController extends Controller
      * Get a single model instance, optionally with relations
      *
      * @param  mixed  $modelId
-     * @param  array  $relations
+     * @param  list<string>  $relations  Relationships to eager load.
      */
     protected function getSingleModel(Request $request, $modelId = null, $relations = []): AbstractModel
     {
@@ -104,7 +113,7 @@ class AbstractCRUDController extends Controller
     /**
      * Redirect after an action and include status messages
      *
-     * @param  mixed  $action
+     * @param  AbstractAction  $action  Completed action providing a redirect and flash messages.
      * @param  mixed  $result
      * @return RedirectResponse
      */
@@ -130,7 +139,10 @@ class AbstractCRUDController extends Controller
     }
 
     /**
-     * Get additional resources needed to display the editor component
+     * Get additional resources needed to display the editor component.
+     *
+     * @param  AbstractModel|null  $model  Existing model, or null when creating one.
+     * @return array<string, mixed> Named Inertia props for the editor.
      */
     protected function getResourcesForEditor(Request $request, $model = null): array
     {
@@ -221,7 +233,9 @@ class AbstractCRUDController extends Controller
     }
 
     /**
-     * Get data to pre-fill a new model with
+     * Get request-derived defaults for a new model.
+     *
+     * @return array<string, mixed> Attribute values supplied to Model::fill().
      */
     protected function preFillNewModel(Request $request): array
     {
