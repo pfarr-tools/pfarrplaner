@@ -119,7 +119,7 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
     /**
      * Cache ad events to be listed to prevent multiple queries
      *
-     * @var array
+     * @var array|Collection
      */
     protected $adEventsToBeListed = [];
 

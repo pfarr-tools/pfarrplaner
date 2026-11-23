@@ -50,7 +50,7 @@ class Participant extends Pivot
     protected $table = 'service_user';
 
     /**
-     * @return BelongsTo
+     * @return BelongsTo<Service, $this>
      */
     public function service()
     {
@@ -58,7 +58,7 @@ class Participant extends Pivot
     }
 
     /**
-     * @return BelongsTo
+     * @return BelongsTo<User, $this>
      */
     public function user()
     {

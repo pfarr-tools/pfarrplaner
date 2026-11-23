@@ -41,6 +41,7 @@ use App\Tools\StringTool;
 use App\Traits\HasAttachmentsTrait;
 use App\Traits\TracksDeletedByTrait;
 use Carbon\Carbon;
+use Database\Factories\Leave\AbsenceFactory;
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -56,7 +57,9 @@ use Illuminate\Support\Facades\Auth;
  */
 class Absence extends Model implements HasDAVCalendarItems
 {
+    /** @use HasFactory<AbsenceFactory> */
     use HasFactory;
+
     use SoftDeletes;
     use TracksDeletedByTrait;
 
@@ -182,7 +185,8 @@ class Absence extends Model implements HasDAVCalendarItems
 
     // SCOPES
     /**
-     * @return Builder
+     * @param  Builder<static>  $query  Query being filtered.
+     * @return Builder<static>
      */
     public function scopeByPeriod(Builder $query, Carbon $start, Carbon $end)
     {
@@ -191,6 +195,7 @@ class Absence extends Model implements HasDAVCalendarItems
     }
 
     /**
+     * @param  Builder<static>  $query  Query being filtered.
      * @return mixed
      */
     public function scopeByUserAndPeriod(Builder $query, User $user, Carbon $start, Carbon $end)
@@ -201,7 +206,8 @@ class Absence extends Model implements HasDAVCalendarItems
     }
 
     /**
-     * @return Builder
+     * @param  Builder<static>  $query  Query being filtered.
+     * @return Builder<static>
      */
     public function scopeShowInCalendar(Builder $query)
     {
@@ -210,6 +216,10 @@ class Absence extends Model implements HasDAVCalendarItems
         });
     }
 
+    /**
+     * @param  Builder<static>  $query  Query being filtered.
+     * @return Builder<static>
+     */
     public function scopeUserIsReplacement(Builder $query, User $user)
     {
         return $query->whereHas('replacements', function ($q) use ($user) {
@@ -247,8 +257,8 @@ class Absence extends Model implements HasDAVCalendarItems
     /**
      * Get all absences keyed by days
      *
-     * @param  Collection|\Illuminate\Database\Eloquent\Collection  $absences
-     * @param  Collection|\Illuminate\Database\Eloquent\Collection  $days
+     * @param  Collection<int, Absence>|\Illuminate\Database\Eloquent\Collection<int, Absence>  $absences
+     * @param  Collection<array-key, int|string>|\Illuminate\Database\Eloquent\Collection<array-key, int|string>  $days
      */
     public static function getByDays($absences, $days)
     {
@@ -330,6 +340,7 @@ class Absence extends Model implements HasDAVCalendarItems
         return $this->user->fullName().' ('.$this->reason.')'.$t;
     }
 
+    /** @return Collection<int, int<0, max>> */
     public function getReplacingUserIds(): Collection
     {
         $ids = [];
@@ -345,7 +356,7 @@ class Absence extends Model implements HasDAVCalendarItems
     }
 
     /**
-     * @return HasMany
+     * @return HasMany<Replacement, $this>
      */
     public function replacements()
     {
@@ -422,7 +433,7 @@ class Absence extends Model implements HasDAVCalendarItems
     }
 
     /**
-     * @return BelongsTo
+     * @return BelongsTo<User, $this>
      */
     public function user()
     {

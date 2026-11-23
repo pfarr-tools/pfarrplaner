@@ -42,10 +42,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Support\Collection;
 
 /**
  * Class City
+ *
+ * @property-read Pivot&object{permission: string, connection_type: int|null} $pivot Pivot data when loaded through a many-to-many relation.
  */
 class City extends AbstractModel
 {
@@ -164,7 +167,7 @@ class City extends AbstractModel
     protected $orderDirection = 'ASC';
 
     /**
-     * @return HasMany
+     * @return HasMany<Location, $this>
      */
     public function locations()
     {
@@ -172,7 +175,7 @@ class City extends AbstractModel
     }
 
     /**
-     * @return BelongsToMany
+     * @return BelongsToMany<Pool, $this>
      */
     public function pools()
     {
@@ -180,7 +183,7 @@ class City extends AbstractModel
     }
 
     /**
-     * @return HasManyThrough
+     * @return HasManyThrough<Service, Location, $this>
      */
     public function services()
     {
@@ -188,7 +191,7 @@ class City extends AbstractModel
     }
 
     /**
-     * @return HasMany
+     * @return HasMany<Parish, $this>
      */
     public function parishes()
     {
@@ -204,7 +207,7 @@ class City extends AbstractModel
     }
 
     /**
-     * @return HasMany
+     * @return HasMany<AdChannel, $this>
      */
     public function adChannels()
     {
@@ -212,7 +215,7 @@ class City extends AbstractModel
     }
 
     /**
-     * @return BelongsTo
+     * @return BelongsTo<self, $this>
      */
     public function parent()
     {
@@ -220,7 +223,7 @@ class City extends AbstractModel
     }
 
     /**
-     * @return HasMany
+     * @return HasMany<self, $this>
      */
     public function children()
     {
@@ -249,7 +252,7 @@ class City extends AbstractModel
     /**
      * Get the default ad channels for this city
      *
-     * @return Collection
+     * @return Collection<array-key, mixed>
      */
     public function getDefaultAdChannels()
     {
@@ -274,7 +277,7 @@ class City extends AbstractModel
     /**
      * Return configured and stored advertising channels for this city.
      *
-     * @return Collection Active advertising channels sorted by name.
+     * @return Collection<array-key, mixed> Active advertising channels sorted by name.
      */
     public function getActiveAdChannels()
     {
@@ -285,7 +288,7 @@ class City extends AbstractModel
     }
 
     /**
-     * @return BelongsToMany
+     * @return BelongsToMany<User, $this, Pivot>
      */
     public function scopedUsers()
     {

@@ -70,6 +70,9 @@ class AdConfig extends AbstractModel
         return AdConfigFactory::new();
     }
 
+    /**
+     * @return BelongsTo<Service, $this>
+     */
     public function service(): BelongsTo
     {
         return $this->belongsTo(Service::class);

@@ -35,6 +35,7 @@ use App\Models\People\User;
 use App\Models\Places\City;
 use App\Models\Service;
 use Carbon\Carbon;
+use Database\Factories\Calendar\External\CalendarConnectionFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -44,6 +45,7 @@ use Illuminate\Support\Str;
 
 class CalendarConnection extends Model
 {
+    /** @use HasFactory<CalendarConnectionFactory> */
     use HasFactory;
 
     public const CONNECTION_TYPE_OWN = 1;
@@ -64,7 +66,7 @@ class CalendarConnection extends Model
     protected $appends = ['uri'];
 
     /**
-     * @return BelongsTo
+     * @return BelongsTo<User, $this>
      */
     public function user()
     {
@@ -72,7 +74,7 @@ class CalendarConnection extends Model
     }
 
     /**
-     * @return BelongsToMany
+     * @return BelongsToMany<City, $this>
      */
     public function cities()
     {
@@ -88,7 +90,7 @@ class CalendarConnection extends Model
      * Get all services for a city that should be synced in a full sync
      *
      * @param  false  $countOnly
-     * @return Collection|int
+     * @return Collection<int, Service>|int
      */
     public function getSyncableServicesForCity(City $city, $countOnly = false)
     {
@@ -116,6 +118,8 @@ class CalendarConnection extends Model
 
     /**
      * Get all services to be synced
+     *
+     * @return Collection<int, Service>
      */
     public function getSyncableServices(): Collection
     {
@@ -153,7 +157,7 @@ class CalendarConnection extends Model
                 foreach (
                     $service->getCalendarItems(
                         $this->include_alternate,
-                        $this->include_rite_anniversaries
+                        (bool) $this->include_rite_anniversaries
                     ) as $item
                 ) {
                     $items[] = $item;

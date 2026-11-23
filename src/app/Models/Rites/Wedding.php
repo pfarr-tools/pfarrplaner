@@ -40,6 +40,7 @@ use App\Models\Service;
 use App\Traits\HasAttachmentsTrait;
 use App\Traits\HasCommentsTrait;
 use App\Traits\TracksDeletedByTrait;
+use Database\Factories\Rites\WeddingFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -50,6 +51,7 @@ use Illuminate\Support\Facades\URL;
  */
 class Wedding extends AbstractModel implements HasDAVCalendarItems
 {
+    /** @use HasFactory<WeddingFactory> */
     use HasAttachmentsTrait, HasCommentsTrait, HasFactory, SoftDeletes, TracksDeletedByTrait;
 
     protected static string $prefix = 'wedding';
@@ -246,6 +248,9 @@ class Wedding extends AbstractModel implements HasDAVCalendarItems
         return trim($this->spouse1_name.' / '.$this->spouse2_name, ' /');
     }
 
+    /**
+     * @return BelongsTo<Service, $this>
+     */
     public function service(): BelongsTo
     {
         return $this->belongsTo(Service::class);
@@ -284,8 +289,8 @@ class Wedding extends AbstractModel implements HasDAVCalendarItems
         }
         if ($config['include_rite_anniversaries'] ?? false) {
             $records['wedding_anniversary_'.$this->id] = [
-                'startDate' => $this->service->date->copy()->addYear(1),
-                'endDate' => $this->service->date->copy()->addYear(1),
+                'startDate' => $this->service->date->copy()->addYears(1),
+                'endDate' => $this->service->date->copy()->addYears(1),
                 'title' => '1. Jahrestag der Trauung von '.$this->spouse1_name.' / '.$this->spouse2_name,
                 'description' => $description,
                 'location' => '',
@@ -360,8 +365,8 @@ class Wedding extends AbstractModel implements HasDAVCalendarItems
                 return new DAVCalendarItem(
                     $this,
                     '1. Jahrestag der Trauung von '.$this->spouse1_name.' / '.$this->spouse2_name,
-                    $this->service->date->copy()->addYear(1),
-                    $this->service->date->copy()->addYear(1)->addDay(1)->startOfDay(),
+                    $this->service->date->copy()->addYears(1),
+                    $this->service->date->copy()->addYears(1)->addDays(1)->startOfDay(),
                     '',
                     $description,
                     'anniv',

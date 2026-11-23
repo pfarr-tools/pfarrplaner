@@ -38,7 +38,7 @@ use App\Models\Rites\Wedding;
 use App\Models\Scopes\ServicesOnlyScope;
 use App\Services\NameService;
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
 class Announcements
@@ -53,22 +53,22 @@ class Announcements
 
     protected City $city;
 
-    /** @var Collection */
+    /** @var Collection<array-key, mixed> */
     protected $events;
 
-    /** @var Collection */
+    /** @var Collection<array-key, mixed> */
     protected $featuredEvents;
 
-    /** @var Collection */
+    /** @var Collection<array-key, mixed> */
     protected $texts;
 
-    /** @var Collection */
+    /** @var Collection<array-key, mixed> */
     protected $baptisms;
 
-    /** @var Collection */
+    /** @var Collection<array-key, mixed> */
     protected $funerals;
 
-    /** @var Collection */
+    /** @var Collection<array-key, mixed> */
     protected $weddings;
 
     /** @var bool Use tabs \t in output? */
@@ -114,8 +114,6 @@ class Announcements
         // expand multi-full-day events to each of the days
         $this->events = static::expandMultiDayEvents($this->events)->groupBy(function ($event) {
             return $event->start->setTimezone('Europe/Berlin')->isoFormat($this->eventListKeyFormat);
-        }, function ($event) {
-            return $event->start->format('Hi');
         });
 
         $this->featuredEvents = Occurence::with('event')
@@ -529,31 +527,37 @@ class Announcements
         return $this->service;
     }
 
+    /** @return Collection<array-key, mixed> */
     public function getEvents(): Collection
     {
         return $this->events;
     }
 
+    /** @return Collection<array-key, mixed> */
     public function getFeaturedEvents(): Collection
     {
         return $this->featuredEvents;
     }
 
+    /** @return Collection<array-key, mixed> */
     public function getTexts(): Collection
     {
         return $this->texts;
     }
 
+    /** @return Collection<array-key, mixed> */
     public function getBaptisms(): Collection
     {
         return $this->baptisms;
     }
 
+    /** @return Collection<array-key, mixed> */
     public function getFunerals(): Collection
     {
         return $this->funerals;
     }
 
+    /** @return Collection<array-key, mixed> */
     public function getWeddings(): Collection
     {
         return $this->weddings;
@@ -584,6 +588,10 @@ class Announcements
         $this->eventListKeyFormat = $eventListKeyFormat;
     }
 
+    /**
+     * @param  Collection<int, Occurence>  $events
+     * @return Collection<int, Occurence>
+     */
     public static function expandMultiDayEvents(Collection $events): Collection
     {
         $extra = collect();
@@ -597,7 +605,7 @@ class Announcements
             $cursor = $event->start->copy()->addDay();
             while ($cursor < $event->end) {
                 $newEvent = clone $event;
-                $newEvent->event = clone $event->event;
+                $newEvent->setRelation('event', clone $event->event);
                 $newEvent->start = $cursor;
                 $newEvent->event->date = $cursor;
                 $extra->push($newEvent);

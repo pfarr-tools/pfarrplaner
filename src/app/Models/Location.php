@@ -33,6 +33,7 @@ namespace App\Models;
 use App\Models\Places\City;
 use App\Models\Seating\SeatingSection;
 use App\Traits\HasCityScopes;
+use Database\Factories\LocationFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -44,6 +45,8 @@ use Illuminate\Support\Str;
 class Location extends AbstractModel
 {
     use HasCityScopes;
+
+    /** @use HasFactory<LocationFactory> */
     use HasFactory;
 
     protected static string $prefix = 'ort';
@@ -92,7 +95,7 @@ class Location extends AbstractModel
     }
 
     /**
-     * @return HasMany
+     * @return HasMany<Service, $this>
      */
     public function services()
     {
@@ -100,7 +103,7 @@ class Location extends AbstractModel
     }
 
     /**
-     * @return BelongsTo
+     * @return BelongsTo<Location, $this>
      */
     public function alternateLocation()
     {
@@ -108,7 +111,7 @@ class Location extends AbstractModel
     }
 
     /**
-     * @return HasMany
+     * @return HasMany<SeatingSection, $this>
      */
     public function seatingSections()
     {

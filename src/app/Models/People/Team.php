@@ -33,12 +33,14 @@ namespace App\Models\People;
 use App\Models\AbstractModel;
 use App\Models\Places\City;
 use App\Traits\HasCityScopes;
+use Database\Factories\People\TeamFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Team extends AbstractModel
 {
+    /** @use HasFactory<TeamFactory> */
     use HasCityScopes, HasFactory;
 
     protected static string $prefix = 'team';
@@ -72,11 +74,17 @@ class Team extends AbstractModel
         };
     }
 
+    /**
+     * @return BelongsTo<City, $this>
+     */
     public function city(): BelongsTo
     {
         return $this->belongsTo(City::class);
     }
 
+    /**
+     * @return BelongsToMany<User, $this>
+     */
     public function users(): BelongsToMany
     {
         return $this->belongsToMany(User::class);

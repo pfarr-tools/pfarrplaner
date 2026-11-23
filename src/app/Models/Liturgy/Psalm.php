@@ -31,11 +31,13 @@
 namespace App\Models\Liturgy;
 
 use App\Models\AbstractModel;
+use Database\Factories\Liturgy\PsalmFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Psalm extends AbstractModel
 {
+    /** @use HasFactory<PsalmFactory> */
     use HasFactory;
 
     protected static string $prefix = 'psalm';

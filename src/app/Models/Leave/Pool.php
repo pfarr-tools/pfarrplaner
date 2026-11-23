@@ -33,11 +33,13 @@ namespace App\Models\Leave;
 use App\Models\AbstractModel;
 use App\Models\People\User;
 use App\Models\Places\City;
+use Database\Factories\Leave\PoolFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Str;
 
 class Pool extends AbstractModel
 {
+    /** @use HasFactory<PoolFactory> */
     use HasFactory;
 
     protected $fillable = ['id', 'name', 'slug', 'contact', 'office', 'phone', 'email'];

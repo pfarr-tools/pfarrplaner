@@ -46,7 +46,7 @@ class Occurence extends Model
     protected $casts = ['start' => 'datetime', 'end' => 'datetime'];
 
     /**
-     * @return BelongsTo
+     * @return BelongsTo<Service, $this>
      */
     public function service()
     {
@@ -54,7 +54,7 @@ class Occurence extends Model
     }
 
     /**
-     * @return BelongsTo
+     * @return BelongsTo<Service, $this>
      */
     public function event()
     {
@@ -62,7 +62,8 @@ class Occurence extends Model
     }
 
     /**
-     * @return Builder
+     * @param  Builder<static>  $query  Query being filtered.
+     * @return Builder<static>
      */
     public function scopeBetween(Builder $query, Carbon $start, Carbon $end)
     {
@@ -77,7 +78,8 @@ class Occurence extends Model
      * @param  Carbon  $adDate  Date of the ad
      * @param  bool  $exactDate  If true, the ad date must match exactly, otherwise the ad date is used as lower bound
      * @param  bool  $includeEnded  If true, ended occurences are included
-     * @return Builder
+     * @param  Builder<static>  $query  Query being filtered.
+     * @return Builder<static>
      */
     public function scopeAdRunningAt(Builder $query, string $adChannelSlug, Carbon $adDate, bool $exactDate = false, bool $includeEnded = false)
     {
@@ -106,7 +108,8 @@ class Occurence extends Model
     }
 
     /**
-     * @return Builder
+     * @param  Builder<static>  $query  Query being filtered.
+     * @return Builder<static>
      */
     public function scopeStartingFrom(Builder $query, Carbon $start)
     {

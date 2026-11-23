@@ -30,6 +30,7 @@
 
 namespace App\Models;
 
+use Database\Factories\AttachmentFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
@@ -41,6 +42,7 @@ use Illuminate\Support\Facades\Storage;
  */
 class Attachment extends AbstractModel
 {
+    /** @use HasFactory<AttachmentFactory> */
     use HasFactory;
 
     protected static string $prefix = 'attachment';
@@ -67,6 +69,9 @@ class Attachment extends AbstractModel
 
     protected $appends = ['size', 'mimeType', 'icon', 'extension', 'hasFile', 'errorMessage'];
 
+    /**
+     * @return MorphTo<Model, $this>
+     */
     public function attachable(): MorphTo
     {
         return $this->morphTo();

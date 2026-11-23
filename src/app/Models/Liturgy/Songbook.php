@@ -31,11 +31,19 @@
 namespace App\Models\Liturgy;
 
 use App\Models\AbstractModel;
+use Database\Factories\Liturgy\SongbookFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 
+/**
+ * A songbook that groups songs for liturgical use.
+ *
+ * @property-read Pivot&object{songbook_id: int, reference: string, code: string, color: string} $pivot Pivot data of a song-songbook relation.
+ */
 class Songbook extends AbstractModel
 {
+    /** @use HasFactory<SongbookFactory> */
     use HasFactory;
 
     protected static string $prefix = 'liederbuch';
@@ -74,6 +82,9 @@ class Songbook extends AbstractModel
         };
     }
 
+    /**
+     * @return BelongsToMany<Song, $this, Pivot>
+     */
     public function songs(): BelongsToMany
     {
         return $this->belongsToMany(Song::class)->withPivot(['id', 'reference']);

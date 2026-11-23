@@ -33,12 +33,14 @@ namespace App\Models\Seating;
 use App\Casts\EncryptedAttribute;
 use App\Models\AbstractModel;
 use App\Models\Service;
+use Database\Factories\Seating\BookingFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Booking extends AbstractModel
 {
+    /** @use HasFactory<BookingFactory> */
     use HasFactory;
 
     protected static string $path = '';
@@ -142,6 +144,9 @@ class Booking extends AbstractModel
         };
     }
 
+    /**
+     * @return BelongsTo<Service, $this>
+     */
     public function service(): BelongsTo
     {
         return $this->belongsTo(Service::class);

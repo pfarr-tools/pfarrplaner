@@ -32,6 +32,7 @@ namespace App\Models\Places;
 
 use App\Models\AbstractModel;
 use App\Models\Parish;
+use Database\Factories\Places\StreetRangeFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -40,6 +41,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class StreetRange extends AbstractModel
 {
+    /** @use HasFactory<StreetRangeFactory> */
     use HasFactory;
 
     protected static string $prefix = 'streetrange';
@@ -74,6 +76,9 @@ class StreetRange extends AbstractModel
         'even_end',
     ];
 
+    /**
+     * @return BelongsTo<Parish, $this>
+     */
     public function parish(): BelongsTo
     {
         return $this->belongsTo(Parish::class);

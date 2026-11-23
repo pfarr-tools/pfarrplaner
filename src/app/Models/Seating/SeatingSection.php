@@ -33,6 +33,7 @@ namespace App\Models\Seating;
 use App\Models\AbstractModel;
 use App\Models\Location;
 use App\Seating\RowBasedSeatingModel;
+use Database\Factories\Seating\SeatingSectionFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -40,6 +41,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class SeatingSection extends AbstractModel
 {
+    /** @use HasFactory<SeatingSectionFactory> */
     use HasFactory;
 
     protected static string $path = '';
@@ -133,7 +135,7 @@ class SeatingSection extends AbstractModel
     }
 
     /**
-     * @return HasMany
+     * @return HasMany<SeatingRow, $this>
      */
     public function seatingRows()
     {

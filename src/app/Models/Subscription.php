@@ -104,7 +104,7 @@ class Subscription extends Model
     }
 
     /**
-     * @return BelongsTo
+     * @return BelongsTo<User, $this>
      */
     public function user()
     {
@@ -112,7 +112,7 @@ class Subscription extends Model
     }
 
     /**
-     * @return BelongsTo
+     * @return BelongsTo<City, $this>
      */
     public function city()
     {

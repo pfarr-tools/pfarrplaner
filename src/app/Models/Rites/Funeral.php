@@ -41,6 +41,7 @@ use App\Traits\HasAttachmentsTrait;
 use App\Traits\HasCommentsTrait;
 use App\Traits\TracksDeletedByTrait;
 use Carbon\Carbon;
+use Database\Factories\Rites\FuneralFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -51,6 +52,7 @@ use Illuminate\Support\Facades\URL;
  */
 class Funeral extends AbstractModel implements HasDAVCalendarItems
 {
+    /** @use HasFactory<FuneralFactory> */
     use HasAttachmentsTrait, HasCommentsTrait, HasFactory, SoftDeletes, TracksDeletedByTrait;
 
     protected static string $prefix = 'funeral';
@@ -320,6 +322,9 @@ class Funeral extends AbstractModel implements HasDAVCalendarItems
         return $this->buried_name ?: '';
     }
 
+    /**
+     * @return BelongsTo<Service, $this>
+     */
     public function service(): BelongsTo
     {
         return $this->belongsTo(Service::class);
@@ -430,8 +435,8 @@ class Funeral extends AbstractModel implements HasDAVCalendarItems
 
         if ($config['include_rite_anniversaries']) {
             $records['funeral_anniversary_'.$this->id] = [
-                'startDate' => $this->service->date->copy()->addYear(1),
-                'endDate' => $this->service->date->copy()->addYear(1),
+                'startDate' => $this->service->date->copy()->addYears(1),
+                'endDate' => $this->service->date->copy()->addYears(1),
                 'title' => '1. Jahrestag der Beerdigung von '.$this->buried_name,
                 'description' => '<p>'.$this->type.' am '.$this->service->date->format(
                     'd.m.Y'
@@ -507,8 +512,8 @@ class Funeral extends AbstractModel implements HasDAVCalendarItems
                 return new DAVCalendarItem(
                     $this,
                     '1. Jahrestag der Beerdigung von '.$this->buried_name,
-                    $this->service->date->copy()->addYear(1),
-                    $this->service->date->copy()->addYear(1)->addDay(1)->startOfDay(),
+                    $this->service->date->copy()->addYears(1),
+                    $this->service->date->copy()->addYears(1)->addDays(1)->startOfDay(),
                     $this->relative_address ?? '',
                     $this->type.' am '.$this->service->date->format(
                         'd.m.Y'

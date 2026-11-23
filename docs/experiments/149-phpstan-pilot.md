@@ -165,3 +165,56 @@ dominieren `argument.type`, `offsetAccess.nonOffsetAccessible` und
 
 Der Stand bleibt lokal auf `experiment/149-phpstan-pilot`. Es erfolgt kein Push
 und kein Merge; Issue #149 bleibt offen.
+
+## Zweites Folgepaket: Eloquent-Typverträge
+
+Die gemeinsamen Modellverträge sind jetzt vollständig generisch: Beziehungen
+nennen Zielmodell und Herkunftsmodell, Scopes tragen `Builder<static>`,
+`HasFactory` nennt die konkrete Factory. Das `HasCityScopes`-Trait ist ebenfalls
+typisiert und wirkt damit auf alle fünf verwendenden Modelle. Pivot-Daten sind
+an den betroffenen Modellen als `@property-read` dokumentiert.
+
+| Level | Nach dem ersten Folgepaket | Nach dem zweiten Folgepaket |
+|---|---:|---:|
+| 5 | 0 | 0 |
+| 6 | 2.406 | **2.189** |
+
+Die Level-6-Befunde sinken um 217 (rund 9 %). Davon entfallen 181 auf
+`missingType.generics`, die jetzt vollständig aus `app/Models` verschwunden sind;
+der Rest auf Ergebnis- und Parametertypen des gemeinsamen Traits. Weitere 174
+veraltete Baseline-Muster sind durch PHPStan selbst entfernt worden, nachdem die
+präziseren Verträge die alten Muster unbrauchbar gemacht haben. Die PHPDoc-Baseline
+wurde an 141 verschobene Deklarationszeilen angepasst; 36 veraltete Einträge
+entfielen, keine neuen Ausnahmen kamen hinzu.
+
+Durch die präziseren Verträge wurden echte Fehler sichtbar und behoben:
+`Carbon::addYear(1)` beziehungsweise `addDay(1)` sind jetzt `addYears(1)` und
+`addDays(1)`; `getSubscriptionType()` dokumentiert den tatsächlichen
+Rückgabetyp; die Ankündigungsverwaltung setzt die verknüpfte Veranstaltung über
+`setRelation()` statt über eine schreibende Eigenschaft und übergibt an
+`groupBy()` keinen wirkungslosen zweiten Closure mehr.
+
+### Verifikation
+
+- PHPStan Level 5: 0 Fehler; Level 6: 2.189 erwartete Befunde, keine
+  Baseline- oder sonstige technische Fehler.
+- `./planer dev quality`: bestanden, einschließlich vollständiger PHP- und
+  JavaScript-Testsuite sowie Format-, PHPDoc- und JSDoc-Prüfung.
+- `git diff --check`: bestanden.
+
+### Verbleibender Weg bis Level 6
+
+| Kategorie | Befunde |
+|---|---:|
+| `missingType.parameter` | 631 |
+| `missingType.iterableValue` | 565 |
+| `missingType.return` | 532 |
+| `missingType.property` | 326 |
+| `missingType.generics` | 92 |
+| `argument.templateType` | 43 |
+
+Level 6 ist erreicht, sobald diese 2.189 Befunde fachlich aufgelöst sind. Die
+arbeit liegt überwiegend in einzelnen Deklarationen und ist daher deutlich
+aufwändiger als die beiden gemeinsamen Typpakete. Die Schätzung von 40–80
+weiteren aktiven Agentenstunden bleibt bestehen; sie schließt den Abbau der
+alten Level-5-Baseline nicht ein.

@@ -30,11 +30,13 @@
 
 namespace App\Models\Liturgy;
 
+use Database\Factories\Liturgy\TextFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Text extends Model
 {
+    /** @use HasFactory<TextFactory> */
     use HasFactory;
 
     protected $table = 'liturgical_texts';

@@ -40,8 +40,9 @@ trait HasCityScopes
      *
      * If a city has is_org=true, child cities will be included
      *
+     * @param  Builder<static>  $query  Query being filtered.
      * @param  mixed  $cities  An array or collection of cities, each having an id property.
-     * @return Builder
+     * @return Builder<static>
      */
     public function scopeInCities(Builder $query, $cities)
     {
@@ -65,8 +66,9 @@ trait HasCityScopes
      *
      * If the city has is_org=true, child cities will be included
      *
-     * @param  $city  A city object or id
-     * @return Builder
+     * @param  Builder<static>  $query  Query being filtered.
+     * @param  City|int|string  $city  A city object or id.
+     * @return Builder<static>
      */
     public function scopeInCity(Builder $query, $city)
     {

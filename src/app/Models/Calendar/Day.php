@@ -35,6 +35,7 @@ use App\Models\Places\City;
 use App\Models\Service;
 use App\Services\LiturgyService;
 use Carbon\Carbon;
+use Database\Factories\Calendar\DayFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -46,6 +47,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class Day extends Model
 {
+    /** @use HasFactory<DayFactory> */
     use HasFactory;
 
     public const DAY_TYPE_DEFAULT = 0;
@@ -95,6 +97,10 @@ class Day extends Model
     // END MUTATORS
 
     // SCOPES
+    /**
+     * @param  Builder<static>  $query  Query being filtered.
+     * @return Builder<static>
+     */
     public function scopeInMonth(Builder $query, Carbon $date)
     {
         $date->setTime(0, 0, 0)->setDay(1);
@@ -103,6 +109,10 @@ class Day extends Model
             ->where('date', '<=', $date->copy()->addMonth(1)->subSecond(1));
     }
 
+    /**
+     * @param  Builder<static>  $query  Query being filtered.
+     * @return Builder<static>
+     */
     public function scopeVisibleForCities(Builder $query, $cities)
     {
         if (count($cities) && isset($cities->first()->id)) {
@@ -122,11 +132,19 @@ class Day extends Model
         );
     }
 
+    /**
+     * @param  Builder<static>  $query  Query being filtered.
+     * @return Builder<static>
+     */
     public function scopeStartingFrom(Builder $query, $date)
     {
         return $query->where('date', '>=', $date);
     }
 
+    /**
+     * @param  Builder<static>  $query  Query being filtered.
+     * @return Builder<static>
+     */
     public function scopeEndingAt(Builder $query, $date)
     {
         return $query->where('date', '<=', $date);
@@ -180,7 +198,7 @@ class Day extends Model
     }
 
     /**
-     * @return HasMany
+     * @return HasMany<Service, $this>
      */
     public function services()
     {
@@ -188,7 +206,7 @@ class Day extends Model
     }
 
     /**
-     * @return BelongsToMany
+     * @return BelongsToMany<City, $this>
      */
     public function cities()
     {

@@ -57,7 +57,7 @@ class UserSetting extends Model
     ];
 
     /**
-     * @return BelongsTo
+     * @return BelongsTo<User, $this>
      */
     public function user()
     {

@@ -64,6 +64,9 @@ class Poolmaster extends AbstractModel
         return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
+    /**
+     * @return HasMany<Replacement, $this>
+     */
     public function currentReplacements(): HasMany
     {
         return $this->hasMany(Replacement::class, 'pool_id', 'pool_id')

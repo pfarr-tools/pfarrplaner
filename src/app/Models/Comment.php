@@ -32,6 +32,7 @@ namespace App\Models;
 
 use App\Casts\EncryptedAttribute;
 use App\Models\People\User;
+use Database\Factories\CommentFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -40,6 +41,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class Comment extends AbstractModel
 {
+    /** @use HasFactory<CommentFactory> */
     use HasFactory;
 
     protected static string $prefix = 'kommentar';
@@ -88,6 +90,9 @@ class Comment extends AbstractModel
         return $this->morphTo();
     }
 
+    /**
+     * @return BelongsTo<User, $this>
+     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

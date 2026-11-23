@@ -30,6 +30,7 @@
 
 namespace App\Models;
 
+use Database\Factories\TagFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
@@ -38,6 +39,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  */
 class Tag extends AbstractModel
 {
+    /** @use HasFactory<TagFactory> */
     use HasFactory;
 
     /**
@@ -63,7 +65,7 @@ class Tag extends AbstractModel
     public static $adminTitle = 'Tags';
 
     /**
-     * @return BelongsToMany
+     * @return BelongsToMany<Service, $this>
      */
     public function services()
     {

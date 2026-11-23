@@ -47,6 +47,7 @@ use App\Providers\AuthServiceProvider;
 use App\Services\NameService;
 use App\Services\RoleService;
 use Carbon\Carbon;
+use Database\Factories\People\UserFactory;
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -74,6 +75,7 @@ use Spatie\Permission\Traits\HasRoles;
  */
 class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticatable
 {
+    /** @use HasFactory<UserFactory> */
     use HasApiTokens, HasFactory, HasRoles, HasTwoFactorAuthentication, Notifiable, PasskeyAuthenticatable;
 
     public const NAME_FORMAT_DEFAULT = 1;
@@ -190,7 +192,7 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
     }
 
     /**
-     * @return BelongsToMany
+     * @return BelongsToMany<City, $this>
      */
     public function adminCities()
     {
@@ -299,7 +301,7 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
     }
 
     /**
-     * @return BelongsToMany
+     * @return BelongsToMany<City, $this>
      */
     public function writableCities()
     {
@@ -359,6 +361,7 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
      * 2) User is subscribed to own services for this city AND is a participant in this service
      *
      * @param  bool  $isNew  True, if this is a newly created service
+     * @param  Builder<static>  $query  Query being filtered.
      * @return mixed
      */
     public function scopeSubscribedTo(Builder $query, Service $service, $isNew = false)
@@ -398,7 +401,8 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
     }
 
     /**
-     * @return Builder
+     * @param  Builder<static>  $query  Query being filtered.
+     * @return Builder<static>
      */
     public function scopeVisibleFor(Builder $query, User $user)
     {
@@ -490,7 +494,7 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
     }
 
     /**
-     * @return BelongsToMany
+     * @return BelongsToMany<User, $this>
      */
     public function approvers()
     {
@@ -498,7 +502,7 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
     }
 
     /**
-     * @return HasMany
+     * @return HasMany<CalendarConnection, $this>
      */
     public function calendarConnections()
     {
@@ -553,7 +557,7 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
     }
 
     /**
-     * @return BelongsToMany
+     * @return BelongsToMany<City, $this>
      */
     public function cityScopes()
     {
@@ -561,7 +565,7 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
     }
 
     /**
-     * @return HasMany
+     * @return HasMany<Comment, $this>
      */
     public function comments()
     {
@@ -719,9 +723,9 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
     }
 
     /**
-     * Get the users subscription for a city
+     * Get the users subscription type for a city
      *
-     * @return Subscription
+     * @return int
      */
     public function getSubscriptionType($city)
     {
@@ -736,7 +740,7 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
      * If no subscription is present yet, it will be created with type SUBSCRIBE_NONE
      *
      * @param  int|City  $city
-     * @return bool
+     * @return Subscription
      */
     public function getSubscription($city)
     {
@@ -757,7 +761,7 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
     }
 
     /**
-     * @return HasMany
+     * @return HasMany<Subscription, $this>
      */
     public function subscriptions()
     {
@@ -833,7 +837,7 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
     }
 
     /**
-     * @return BelongsToMany
+     * @return BelongsToMany<City, $this>
      */
     public function homeCities()
     {
@@ -979,7 +983,7 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
     }
 
     /**
-     * @return BelongsToMany
+     * @return BelongsToMany<Parish, $this>
      */
     public function parishes()
     {
@@ -1000,7 +1004,7 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
     }
 
     /**
-     * @return BelongsToMany
+     * @return BelongsToMany<Pool, $this>
      */
     public function pools()
     {
@@ -1008,7 +1012,7 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
     }
 
     /**
-     * @return BelongsToMany
+     * @return BelongsToMany<User, $this>
      */
     public function relatedUsers()
     {
@@ -1016,7 +1020,7 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
     }
 
     /**
-     * @return BelongsToMany
+     * @return BelongsToMany<Service, $this>
      */
     public function services()
     {
@@ -1159,7 +1163,7 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
     }
 
     /**
-     * @return HasMany
+     * @return HasMany<UserSetting, $this>
      */
     public function userSettings()
     {
@@ -1167,7 +1171,7 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
     }
 
     /**
-     * @return BelongsToMany
+     * @return BelongsToMany<User, $this>
      */
     public function vacationAdmins()
     {
@@ -1179,7 +1183,7 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
     }
 
     /**
-     * @return BelongsToMany
+     * @return BelongsToMany<User, $this>
      */
     public function vacationApprovers()
     {
@@ -1190,7 +1194,7 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
     }
 
     /**
-     * @return BelongsToMany
+     * @return BelongsToMany<City, $this>
      */
     public function visibleCities()
     {
@@ -1198,7 +1202,7 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
     }
 
     /**
-     * @return BelongsToMany
+     * @return BelongsToMany<City, $this>
      */
     public function writableCitiesWithoutAdmin()
     {

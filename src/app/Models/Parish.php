@@ -34,6 +34,7 @@ use App\Models\People\User;
 use App\Models\Places\City;
 use App\Models\Places\StreetRange;
 use App\Traits\HasCityScopes;
+use Database\Factories\ParishFactory;
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -46,6 +47,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class Parish extends AbstractModel
 {
+    /** @use HasFactory<ParishFactory> */
     use HasCityScopes, HasFactory;
 
     protected static string $prefix = 'pfarramt';
@@ -88,7 +90,7 @@ class Parish extends AbstractModel
     ];
 
     /**
-     * @return BelongsTo
+     * @return BelongsTo<City, $this>
      */
     public function owningCity()
     {
@@ -96,7 +98,7 @@ class Parish extends AbstractModel
     }
 
     /**
-     * @return HasMany
+     * @return HasMany<StreetRange, $this>
      */
     public function streetRanges()
     {
@@ -104,7 +106,7 @@ class Parish extends AbstractModel
     }
 
     /**
-     * @return BelongsToMany
+     * @return BelongsToMany<User, $this>
      */
     public function users()
     {
@@ -155,6 +157,7 @@ class Parish extends AbstractModel
     /**
      * @param  string  $street
      * @param  int  $number
+     * @param  Builder<static>  $query  Query being filtered.
      * @return mixed
      */
     public function scopeByAddress(Builder $query, $street, $number)

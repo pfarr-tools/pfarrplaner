@@ -61,6 +61,7 @@ use App\Traits\IncludesPermissionAttributes;
 use App\Traits\TracksChangesTrait;
 use App\Traits\TracksDeletedByTrait;
 use Carbon\Carbon;
+use Database\Factories\ServiceFactory;
 use Exception;
 use Google_Service_YouTube_LiveBroadcastSnippet;
 use Google_Service_YouTube_VideoSnippet;
@@ -91,7 +92,10 @@ class Service extends Model implements HasDAVCalendarItems
     use HasAttachmentsTrait;
     use HasAttributeLabels;
     use HasCommentsTrait;
+
+    /** @use HasFactory<ServiceFactory> */
     use HasFactory;
+
     use HasLiturgicalInfo;
     use IncludesPermissionAttributes;
     use SoftDeletes;
@@ -978,7 +982,8 @@ class Service extends Model implements HasDAVCalendarItems
     // SCOPES
 
     /**
-     * @return Builder
+     * @param  Builder<static>  $query  Query being filtered.
+     * @return Builder<static>
      */
     public function scopeAtDate(Builder $query, $date)
     {
@@ -987,7 +992,8 @@ class Service extends Model implements HasDAVCalendarItems
 
     /**
      * @param  Carbon  $date
-     * @return Builder
+     * @param  Builder<static>  $query  Query being filtered.
+     * @return Builder<static>
      */
     public function scopeBetween(Builder $query, Carbon $start, Carbon $end)
     {
@@ -998,7 +1004,8 @@ class Service extends Model implements HasDAVCalendarItems
     }
 
     /**
-     * @return Builder
+     * @param  Builder<static>  $query  Query being filtered.
+     * @return Builder<static>
      */
     public function scopeDateRange(Builder $query, Carbon $start, Carbon $end)
     {
@@ -1012,6 +1019,7 @@ class Service extends Model implements HasDAVCalendarItems
      * Filter services which should not be publically displayed before a specific date
      * This includes notHidden() and checks for funerals which have not been announced yet
      *
+     * @param  Builder<static>  $query  Query being filtered.
      * @return void
      */
     public function scopeDisplayable(Builder $query, $date = null)
@@ -1027,7 +1035,8 @@ class Service extends Model implements HasDAVCalendarItems
     }
 
     /**
-     * @return Builder
+     * @param  Builder<static>  $query  Query being filtered.
+     * @return Builder<static>
      */
     public function scopeEndingAt(Builder $query, Carbon $date)
     {
@@ -1035,7 +1044,8 @@ class Service extends Model implements HasDAVCalendarItems
     }
 
     /**
-     * @return Builder
+     * @param  Builder<static>  $query  Query being filtered.
+     * @return Builder<static>
      */
     public function scopeHavingOpenMinistries(Builder $query, $ministries)
     {
@@ -1045,13 +1055,14 @@ class Service extends Model implements HasDAVCalendarItems
                 $query->whereIn('service_user.category', $ministries);
             }
         )
-            ->orderBy('date', 'ASC');
+            ->orderBy('date', 'asc');
     }
 
     /**
      * Scope a query to include all event types by removing the ServicesOnlyScope.
      *
-     * @return Builder
+     * @param  Builder<static>  $query  Query being filtered.
+     * @return Builder<static>
      */
     public function scopeIncludeAllEventTypes(Builder $query)
     {
@@ -1059,7 +1070,8 @@ class Service extends Model implements HasDAVCalendarItems
     }
 
     /**
-     * @return Builder
+     * @param  Builder<static>  $query  Query being filtered.
+     * @return Builder<static>
      */
     public function scopeHidden(Builder $query)
     {
@@ -1072,7 +1084,8 @@ class Service extends Model implements HasDAVCalendarItems
      * If a city has is_org=true, child cities will be included
      *
      * @param  mixed  $cities  An array or collection of cities, each having an id property.
-     * @return Builder
+     * @param  Builder<static>  $query  Query being filtered.
+     * @return Builder<static>
      */
     public function scopeInCities(Builder $query, $cities)
     {
@@ -1105,7 +1118,8 @@ class Service extends Model implements HasDAVCalendarItems
      *
      * @param  mixed  $cities  An array or collection of cities, each having an id property.
      * @param  mixed|null  $locations  An optional array or collection of locations, each having an id property.
-     * @return Builder
+     * @param  Builder<static>  $query  Query being filtered.
+     * @return Builder<static>
      */
     public function scopeInCitiesAndLocations(Builder $query, $cities, $locations = null)
     {
@@ -1139,7 +1153,8 @@ class Service extends Model implements HasDAVCalendarItems
      * If the city has is_org=true, child cities will be included
      *
      * @param  $city  A city object or id
-     * @return Builder
+     * @param  Builder<static>  $query  Query being filtered.
+     * @return Builder<static>
      */
     public function scopeInCity(Builder $query, $city)
     {
@@ -1149,7 +1164,8 @@ class Service extends Model implements HasDAVCalendarItems
     /**
      * @param  int  $year  Year
      * @param  int  $month  Month
-     * @return Builder
+     * @param  Builder<static>  $query  Query being filtered.
+     * @return Builder<static>
      */
     public function scopeInMonth(Builder $query, $year, $month)
     {
@@ -1159,9 +1175,9 @@ class Service extends Model implements HasDAVCalendarItems
     /**
      * Limit services to the month containing a date.
      *
-     * @param  Builder  $query  Service query.
+     * @param  Builder<static>  $query  Service query.
      * @param  Carbon  $date  Reference date.
-     * @return Builder Filtered query.
+     * @return Builder<static> Filtered query.
      */
     public function scopeInMonthByDate(Builder $query, Carbon $date)
     {
@@ -1171,7 +1187,8 @@ class Service extends Model implements HasDAVCalendarItems
     /**
      * Get services not used as agenda
      *
-     * @return Builder
+     * @param  Builder<static>  $query  Query being filtered.
+     * @return Builder<static>
      */
     public function scopeIsNotAgenda(Builder $query)
     {
@@ -1181,7 +1198,8 @@ class Service extends Model implements HasDAVCalendarItems
     /**
      * Get services used as template
      *
-     * @return Builder
+     * @param  Builder<static>  $query  Query being filtered.
+     * @return Builder<static>
      */
     public function scopeIsTemplate(Builder $query)
     {
@@ -1189,7 +1207,8 @@ class Service extends Model implements HasDAVCalendarItems
     }
 
     /**
-     * @return Builder
+     * @param  Builder<static>  $query  Query being filtered.
+     * @return Builder<static>
      */
     public function scopeNotHidden(Builder $query)
     {
@@ -1197,7 +1216,8 @@ class Service extends Model implements HasDAVCalendarItems
     }
 
     /**
-     * @return Builder
+     * @param  Builder<static>  $query  Query being filtered.
+     * @return Builder<static>
      */
     public function scopeOrdered(Builder $query, $direction = 'ASC')
     {
@@ -1205,7 +1225,8 @@ class Service extends Model implements HasDAVCalendarItems
     }
 
     /**
-     * @return Builder
+     * @param  Builder<static>  $query  Query being filtered.
+     * @return Builder<static>
      */
     public function scopeOrderedDesc(Builder $query)
     {
@@ -1213,7 +1234,8 @@ class Service extends Model implements HasDAVCalendarItems
     }
 
     /**
-     * @return Builder
+     * @param  Builder<static>  $query  Query being filtered.
+     * @return Builder<static>
      */
     public function scopeRegularForCity(Builder $query, City $city)
     {
@@ -1223,7 +1245,8 @@ class Service extends Model implements HasDAVCalendarItems
     }
 
     /**
-     * @return Builder
+     * @param  Builder<static>  $query  Query being filtered.
+     * @return Builder<static>
      */
     public function scopeStartingFrom(Builder $query, Carbon $date)
     {
@@ -1234,7 +1257,8 @@ class Service extends Model implements HasDAVCalendarItems
      * Get services where a specific user is a participant
      *
      * @param  string  $category
-     * @return Builder
+     * @param  Builder<static>  $query  Query being filtered.
+     * @return Builder<static>
      */
     public function scopeUserParticipates(Builder $query, User $user, $category = null)
     {
@@ -1247,7 +1271,8 @@ class Service extends Model implements HasDAVCalendarItems
     }
 
     /**
-     * @return Builder
+     * @param  Builder<static>  $query  Query being filtered.
+     * @return Builder<static>
      */
     public function scopeWritable(Builder $query)
     {
@@ -1255,7 +1280,8 @@ class Service extends Model implements HasDAVCalendarItems
     }
 
     /**
-     * @return Builder
+     * @param  Builder<static>  $query  Query being filtered.
+     * @return Builder<static>
      */
     public function scopeServicesOnly(Builder $query)
     {
@@ -1536,7 +1562,7 @@ class Service extends Model implements HasDAVCalendarItems
      * Record participant changes for the given field.
      *
      * @param  string  $field  Audited field.
-     * @param  Collection  $originalRecords  Original related records.
+     * @param  Collection<int|string, Model>  $originalRecords  Original related records.
      * @param  array<int, int>  $newIds  New related record IDs.
      * @return void
      */
@@ -1846,7 +1872,7 @@ class Service extends Model implements HasDAVCalendarItems
     }
 
     /**
-     * @return BelongsToMany
+     * @return BelongsToMany<User, $this>
      */
     public function ministryParticipants($ministry)
     {

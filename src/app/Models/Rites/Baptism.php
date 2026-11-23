@@ -40,6 +40,7 @@ use App\Traits\HasAttachmentsTrait;
 use App\Traits\HasCityScopes;
 use App\Traits\HasCommentsTrait;
 use App\Traits\TracksDeletedByTrait;
+use Database\Factories\Rites\BaptismFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -50,6 +51,7 @@ use Illuminate\Support\Facades\URL;
  */
 class Baptism extends AbstractModel implements HasDAVCalendarItems
 {
+    /** @use HasFactory<BaptismFactory> */
     use HasAttachmentsTrait, HasCityScopes, HasCommentsTrait, HasFactory, SoftDeletes, TracksDeletedByTrait;
 
     protected static string $prefix = 'baptism';
@@ -189,6 +191,9 @@ class Baptism extends AbstractModel implements HasDAVCalendarItems
         return $this->candidate_name ?: '';
     }
 
+    /**
+     * @return BelongsTo<Service, $this>
+     */
     public function service(): BelongsTo
     {
         return $this->belongsTo(Service::class);
@@ -306,8 +311,8 @@ class Baptism extends AbstractModel implements HasDAVCalendarItems
                 return new DAVCalendarItem(
                     $this,
                     '1. Jahrestag der Taufe von '.$this->candidate_name,
-                    $this->service->date->copy()->addYear(1),
-                    $this->service->date->copy()->addYear(1)->addDay(1)->startOfDay(),
+                    $this->service->date->copy()->addYears(1),
+                    $this->service->date->copy()->addYears(1)->addDays(1)->startOfDay(),
                     $this->candidate_address,
                     $description,
                     'anniv',

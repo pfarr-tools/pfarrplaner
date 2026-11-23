@@ -34,6 +34,8 @@ use App\Models\Places\City;
 use App\Services\NameService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 
 /**
  * Class ListedUser
@@ -51,11 +53,18 @@ class ListedPerson extends Model
             ->format(NameService::FIRST_LAST);
     }
 
+    /**
+     * @return BelongsToMany<City, $this, Pivot>
+     */
     public function cityScopes()
     {
         return $this->belongsToMany(City::class, 'user_scopes', 'user_id');
     }
 
+    /**
+     * @param  Builder<static>  $query  Query being filtered.
+     * @return Builder<static>
+     */
     public function scopeVisibleFor(Builder $query, User $user)
     {
         return $query->whereHas('cityScopes', function ($q) use ($user) {

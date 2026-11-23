@@ -32,6 +32,7 @@ namespace App\Models;
 
 use App\Traits\HasAttributeLabels;
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
@@ -45,6 +46,8 @@ use Illuminate\Support\Str;
 class AbstractModel extends Model
 {
     use HasAttributeLabels;
+
+    /** @use HasFactory<Factory<static>> */
     use HasFactory;
 
     /** @var array<string, list<string>> Resource actions omitted from each route group. */

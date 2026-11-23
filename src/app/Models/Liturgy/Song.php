@@ -31,13 +31,16 @@
 namespace App\Models\Liturgy;
 
 use App\Models\AbstractModel;
+use Database\Factories\Liturgy\SongFactory;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 
 class Song extends AbstractModel
 {
+    /** @use HasFactory<SongFactory> */
     use HasFactory;
 
     protected static string $prefix = 'lied';
@@ -146,11 +149,17 @@ class Song extends AbstractModel
         return $this->title ?: '';
     }
 
+    /**
+     * @return HasMany<SongVerse, $this>
+     */
     public function verses(): HasMany
     {
         return $this->hasMany(SongVerse::class);
     }
 
+    /**
+     * @return BelongsToMany<Songbook, $this, Pivot>
+     */
     public function songbooks(): BelongsToMany
     {
         return $this->belongsToMany(Songbook::class)->withPivot(['id', 'reference', 'code', 'color']);

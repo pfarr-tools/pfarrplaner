@@ -35,6 +35,7 @@ use App\Models\People\User;
 use App\Tools\StringTool;
 use App\Traits\TracksDeletedByTrait;
 use Carbon\Carbon;
+use Database\Factories\Leave\ReplacementFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -46,7 +47,9 @@ use Illuminate\Support\Collection;
  */
 class Replacement extends AbstractModel
 {
+    /** @use HasFactory<ReplacementFactory> */
     use HasFactory;
+
     use SoftDeletes;
     use TracksDeletedByTrait;
 
@@ -91,16 +94,25 @@ class Replacement extends AbstractModel
         });
     }
 
+    /**
+     * @return BelongsTo<Absence, $this>
+     */
     public function absence(): BelongsTo
     {
         return $this->belongsTo(Absence::class);
     }
 
+    /**
+     * @return BelongsToMany<User, $this>
+     */
     public function users(): BelongsToMany
     {
         return $this->belongsToMany(User::class)->withTimestamps();
     }
 
+    /**
+     * @return BelongsTo<Pool, $this>
+     */
     public function pool(): BelongsTo
     {
         return $this->belongsTo(Pool::class);
