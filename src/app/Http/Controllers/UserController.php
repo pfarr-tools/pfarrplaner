@@ -269,7 +269,7 @@ class UserController extends Controller
 
         $homeScreenTabsConfig = $user->getSetting('homeScreenTabsConfig') ?? [];
         $settings = Settings::all($user);
-        $availableTabs = HomeScreenTabFactory::available();
+        $availableTabs = HomeScreenTabFactory::available($user);
         $locations = $this->compactOptions($this->locationsForUser());
         $ministries = MinistryService::all();
         $modules = Modules::tree();

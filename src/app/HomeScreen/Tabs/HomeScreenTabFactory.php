@@ -30,14 +30,22 @@
 
 namespace App\HomeScreen\Tabs;
 
+use App\Models\People\User;
+
+/**
+ * Discovers home screen tabs and builds them for a user's permissions.
+ */
 class HomeScreenTabFactory
 {
     /**
      * Get homescreen tabs
      *
-     * @return array
+     * @param  array  $config  Saved tab configurations keyed by tab type
+     * @param  array  $filter  Optional ordered list of tab types to return
+     * @param  User|null  $user  User whose tab permissions should be checked
+     * @return array<string, AbstractHomeScreenTab> Available tab objects keyed by type
      */
-    public static function get(array $config, array $filter = [])
+    public static function get(array $config, array $filter = [], ?User $user = null)
     {
         $homeScreenTabs = [];
         foreach ((glob(app_path('HomeScreen/Tabs/*HomeScreenTab.php'))) as $file) {
@@ -49,7 +57,7 @@ class HomeScreenTabFactory
                 $class = 'App\\HomeScreen\\Tabs\\'.basename($file, '.php');
                 /** @var AbstractHomeScreenTab $object */
                 $object = new $class($config);
-                if ($object->isAvailable()) {
+                if ($object->isAvailable($user)) {
                     $homeScreenTabs[$object->getTitle()] = $object;
                 }
             }
@@ -128,28 +136,37 @@ class HomeScreenTabFactory
         return self::get($config, []);
     }
 
-    public static function available()
+    /**
+     * Get available home screen tabs for a user.
+     *
+     * @param  User|null  $user  User whose available tabs should be returned
+     * @return array<string, array<string, mixed>> Available tabs keyed by type
+     */
+    public static function available(?User $user = null): array
     {
-        $tabs = self::get([]);
+        $tabs = self::get([], [], $user);
         $available = [];
         /**
          * @var $key
          * @var AbstractHomeScreenTab $tab
          */
         foreach ($tabs as $key => $tab) {
-            if ($tab->isAvailable()) {
-                $available[$key] = [
-                    'type' => $key,
-                    'title' => $tab->getTitle(),
-                    'description' => $tab->getDescription(),
-                    'config' => $tab->getConfig(),
-                ];
-            }
+            $available[$key] = [
+                'type' => $key,
+                'title' => $tab->getTitle(),
+                'description' => $tab->getDescription(),
+                'config' => $tab->getConfig(),
+            ];
         }
 
         return $available;
     }
 
+    /**
+     * Get display titles for a saved home screen configuration.
+     *
+     * @throws \Exception If a configured tab class does not exist
+     */
     public static function getTitles($tabsConfig)
     {
         $titles = [];

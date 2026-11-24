@@ -30,8 +30,12 @@
 
 namespace App\HomeScreen\Tabs;
 
+use App\Models\People\User;
 use View;
 
+/**
+ * Base implementation shared by configurable home screen tabs.
+ */
 class AbstractHomeScreenTab
 {
     protected $title = '';
@@ -40,6 +44,9 @@ class AbstractHomeScreenTab
 
     protected $config = [];
 
+    /**
+     * Initialize the tab with its saved configuration.
+     */
     public function __construct($config = [])
     {
         if (! count($config)) {
@@ -48,28 +55,43 @@ class AbstractHomeScreenTab
     }
 
     /**
-     * Check if this tab is available to the current user
+     * Check whether this tab is available to the given user or current user.
+     *
+     * @param  User|null  $user  User whose access should be checked
+     * @return bool Whether the tab is available
      */
-    public function isAvailable(): bool
+    public function isAvailable(?User $user = null): bool
     {
         return true;
     }
 
+    /**
+     * Get the tab's display title.
+     */
     public function getTitle(): string
     {
         return $this->title;
     }
 
+    /**
+     * Set the tab's display title.
+     */
     public function setTitle(string $title): void
     {
         $this->title = $title;
     }
 
+    /**
+     * Get the tab's explanatory text.
+     */
     public function getDescription(): string
     {
         return $this->description;
     }
 
+    /**
+     * Set the tab's explanatory text.
+     */
     public function setDescription(string $description): void
     {
         $this->description = $description;
@@ -103,6 +125,9 @@ class AbstractHomeScreenTab
         }
     }
 
+    /**
+     * Apply default values to missing tab configuration entries.
+     */
     protected function setDefaultConfig(array $config, array $defaults)
     {
         if (isset($config[$this->getKey()])) {
@@ -124,6 +149,9 @@ class AbstractHomeScreenTab
         return lcfirst(basename(str_replace('\\', '/', get_called_class()), 'HomeScreenTab'));
     }
 
+    /**
+     * Build the namespaced view name for this tab.
+     */
     public function viewName($viewName)
     {
         return 'homescreen.tabs.'.$this->getKey().'.'.$viewName;
@@ -181,6 +209,9 @@ class AbstractHomeScreenTab
         return 'settings[homeScreenTabsConfig]['.$this->getKey().']'.($name ? '['.$name.']' : '').($isArray ? '[]' : '');
     }
 
+    /**
+     * Add common tab metadata to its serialized data.
+     */
     public function toArray($data = [])
     {
         $data['title'] = $this->getTitle();

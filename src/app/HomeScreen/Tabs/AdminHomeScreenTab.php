@@ -42,11 +42,20 @@ class AdminHomeScreenTab extends AbstractHomeScreenTab
 
     protected $config = [];
 
-    public function isAvailable(): bool
+    /**
+     * Check whether the administration tab is available to the user.
+     *
+     * @param  User|null  $user  User whose administrator access should be checked
+     * @return bool Whether the user is an administrator
+     */
+    public function isAvailable(?User $user = null): bool
     {
-        return Auth::user()->isAdmin;
+        return ($user ?? Auth::user())->isAdmin;
     }
 
+    /**
+     * Add people and administration modules to the serialized tab.
+     */
     public function toArray($data = [])
     {
         $data['people'] = User::select('id', 'first_name', 'last_name', 'title', 'email', 'is_official_user')
