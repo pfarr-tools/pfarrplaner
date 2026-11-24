@@ -153,3 +153,11 @@ Vor Updates, Serverumzügen oder Integrationsarbeiten:
 2. Wartungsfenster festlegen.
 3. Rückfallplan festhalten.
 4. Verantwortliche informieren.
+
+### Fehler bei der Passkey-Einrichtung zuordnen
+
+Die Fehlermeldung enthält eine Diagnose-ID und die betroffene Phase: Vorbereitung, Gerät/Browser oder Serverprüfung. Suchen Sie die ID im Anwendungsprotokoll (`./planer logs app`). `Passkey registration client failure` enthält ausschließlich feste Fehlerkategorien, Browser- und Plattformfamilie, HTTP-Status und Phase; `Passkey registration server failure` ordnet serverseitige Fehler derselben ID zu. Eine fehlgeschlagene Diagnoseübertragung, etwa bei einer abgelaufenen Sitzung oder ohne Netzwerk, kann keinen Protokolleintrag erzeugen.
+
+Bei Domainfehlern prüfen Sie `APP_URL`, `PASSKEYS_RELYING_PARTY_ID` und `PASSKEYS_ALLOWED_ORIGINS` gegen die tatsächlich verwendete Browseradresse, auch hinter einem Reverse Proxy. Bei Gerätefehlern prüfen Sie gemeinsam mit der betroffenen Person Bildschirmsperre, Browser und Passkey-Anbieter. Eine funktionierende Geräteentsperrung allein bestätigt noch nicht die Passkey-Unterstützung im Browser. Eine Meldung des Microsoft-Konto-Managers lässt sich nicht automatisch einer Serverfehlkonfiguration zuordnen.
+
+Geräteinterne, synchronisierte und externe Passkeys sind zugelassen. Sie müssen auffindbare Credentials und Benutzerverifikation (z. B. PIN oder Biometrie) unterstützen. Diese Anforderungen werden bei Fehlern nicht gelockert. Ein Vergleichstest auf `https://webauthn.io/` mit diesen Anforderungen kann Geräteprobleme eingrenzen; verwenden Sie dort ausschließlich Testangaben. Prüfen Sie anschließend erneut auf der echten Pfarrplaner-Domain. Die tatsächliche Kompatibilität mit Windows Hello, Microsoft-Passkey-Provider, Android Credential Manager, Chrome, Edge, Firefox und externen FIDO2-Schlüsseln muss auf den jeweiligen Geräten bestätigt werden.

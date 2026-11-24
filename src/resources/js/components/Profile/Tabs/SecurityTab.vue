@@ -84,7 +84,7 @@
                 data-testid="existing-passkeys"
             >
                 <h4 class="h5">Eingerichtete Passkeys</h4>
-                <dataset
+                <Dataset
                     :ds-data="managedPasskeys"
                     ds-sort-by="name"
                 >
@@ -96,7 +96,7 @@
                                     <th></th>
                                 </tr>
                             </thead>
-                            <dataset-item tag="tbody">
+                            <DatasetItem tag="tbody">
                                 <template #default="{ row }">
                                     <tr>
                                         <td>
@@ -130,10 +130,10 @@
                                         </td>
                                     </tr>
                                 </template>
-                            </dataset-item>
+                            </DatasetItem>
                         </table>
                     </div>
-                </dataset>
+                </Dataset>
             </section>
             <p
                 v-else
@@ -497,7 +497,7 @@ import axios from 'axios'
 import QRCode from 'qrcode'
 import { Dataset, DatasetItem } from 'vue-dataset'
 import OneTimeCodeInput from '../../Ui/forms/OneTimeCodeInput.vue'
-import { Passkeys } from '@laravel/passkeys'
+import { PasskeyRegistration } from '@/lib/passkeyRegistration'
 export default {
     name: 'SecurityTab',
     components: { Dataset, DatasetItem, OneTimeCodeInput },
@@ -548,7 +548,7 @@ export default {
             this.copiedField = ''
 
             try {
-                await navigator.clipboard.writeText(value)
+                await window.navigator.clipboard.writeText(value)
                 this.copiedField = field
             } catch {
                 this.clipboardError =
@@ -562,11 +562,12 @@ export default {
             this.passkeyBusy = true
             this.passkeyError = ''
             try {
-                const result = await Passkeys.register({
+                const result = await PasskeyRegistration.register({
                     name: this.newPasskeyName.trim(),
                     routes: {
                         options: window.route('user.passkeys.options'),
                         submit: window.route('user.passkeys.store'),
+                        diagnostics: window.route('user.passkeys.diagnostics'),
                     },
                 })
                 this.managedPasskeys.unshift({ ...result, authenticator: 'Passkey' })
@@ -575,8 +576,7 @@ export default {
                 this.passkeyNameModalOpen = false
                 this.$nextTick(() => this.$refs.registerPasskeyTrigger?.focus())
             } catch (error) {
-                this.passkeyError =
-                    'Passkey konnte nicht eingerichtet werden. Bitte erneut versuchen.'
+                this.passkeyError = error.message
             } finally {
                 this.passkeyBusy = false
             }
@@ -624,7 +624,7 @@ export default {
             this.passkeyError = ''
             try {
                 await action()
-            } catch (error) {
+            } catch {
                 this.passkeyError = 'Passkey-Verwaltung nicht möglich. Bitte erneut versuchen.'
             } finally {
                 this.passkeyBusy = false

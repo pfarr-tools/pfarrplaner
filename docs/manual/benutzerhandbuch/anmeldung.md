@@ -69,3 +69,11 @@ Wenn Sie keinen Zugriff mehr auf Ihr E-Mail-Postfach, Ihre Passkeys und Ihre Rec
 - [Startseite](startseite.md): Persönliche Übersicht nach der Anmeldung
 - [Kalender](kalender.md): Gottesdienste und Veranstaltungen im Monatsüberblick
 - [Administration](administration.md): Benutzerkonten verwalten, falls Sie Administratorrechte haben
+
+## Wenn die Passkey-Einrichtung scheitert
+
+Die Fehlermeldung zeigt, ob die Vorbereitung, die Abfrage auf dem Gerät oder die anschließende Serverprüfung gescheitert ist. Bei Abbruch oder Zeitüberschreitung können Sie im geöffneten Dialog erneut **Einrichten** wählen. Bestätigen Sie die Geräteabfrage möglichst innerhalb einer Minute.
+
+Prüfen Sie bei Geräteproblemen die Bildschirmsperre und den eingerichteten Passkey-Anbieter. Unter Windows können Sie im Systemdialog gegebenenfalls **Auf andere Weise speichern** wählen. Bietet Android nur USB oder NFC an, prüfen Sie den Passkey-Anbieter in den Geräteeinstellungen und versuchen Sie einen anderen aktuellen Browser. Die verfügbaren Möglichkeiten bestimmt Ihr Browser zusammen mit dem Gerät.
+
+Wenn das Problem bleibt, geben Sie Ihrer Administration die angezeigte **Diagnose-ID** und den ungefähren Zeitpunkt weiter. Teilen Sie keine PIN, Anmeldelinks oder Recovery-Codes. Die Anmeldung per E-Mail bleibt verfügbar. Auf der Einrichtungsseite können Sie **Später erinnern** wählen und die Einrichtung später im Profil erneut starten.

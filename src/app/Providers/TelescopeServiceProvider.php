@@ -28,6 +28,7 @@ class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
                 : null;
             if (is_string($requestPath) && (
                 preg_match('#^/login/link(?:/|$)#', $requestPath)
+                || preg_match('#^/(?:user/passkeys|passkeys)(?:/|$)#', $requestPath)
                 || preg_match('#^/admin/benutzer/\d+/login-link$#', $requestPath)
             )) {
                 return false;

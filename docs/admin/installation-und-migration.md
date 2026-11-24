@@ -821,3 +821,11 @@ unhealthy `app`-Container verhindert die Port-Veröffentlichung.
 Bei Fehlern nicht blind `migrate:fresh` ausführen. Gesundheitsstatus und
 Migration prüfen, gegebenenfalls das vorige Image starten und anschließend
 das getestete Datenbank-/Objektbackup wiederherstellen.
+
+### Passkey-Registrierungsfehler diagnostizieren
+
+Die Einrichtung meldet getrennt Fehler bei Vorbereitung, Gerät/Browser und Serverprüfung. Mit der angezeigten Diagnose-ID lassen sich die Meldungen `Passkey registration client failure` und `Passkey registration server failure` im Anwendungsprotokoll (`./planer logs app`) zuordnen. Protokolliert werden ausschließlich feste Fehlerkategorien und Browser-/Plattformfamilien, Phase, HTTP-Status und Korrelations-ID. Passkey-Requests werden von der Telescope-Aufzeichnung ausgeschlossen. Ohne gültige Sitzung oder Netzwerk kann die Browserdiagnose nicht ankommen.
+
+Prüfen Sie bei Domainfehlern `APP_URL`, `PASSKEYS_RELYING_PARTY_ID` und `PASSKEYS_ALLOWED_ORIGINS` gegen die öffentliche HTTPS-Adresse, einschließlich Port und Reverse-Proxy-Konfiguration. Bei Gerätefehlern sind Bildschirmsperre, Browser und Passkey-Anbieter zu prüfen. Es gibt keine Einschränkung auf USB-/NFC-Schlüssel; auffindbare Passkeys mit PIN/Biometrie bleiben erforderlich. Die Anmeldung per E-Mail bleibt unverändert verfügbar. Weitere Schritte stehen im [Sicherheitskapitel](../manual/administratorhandbuch/sicherheit.md#fehler-bei-der-passkey-einrichtung-zuordnen).
+
+Diese Diagnoseänderung benötigt keine Migration und keine neue Umgebungsvariable. Vor dem Produktiv-Update gelten weiterhin die Backup-Prüfungen dieses Handbuchs. Ein Rollback auf das zuvor verwendete Anwendungsimage benötigt keine Datenbankrücksetzung; vorhandene Passkeys bleiben erhalten.

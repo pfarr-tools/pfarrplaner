@@ -2,7 +2,7 @@ import { flushPromises, mount } from '@vue/test-utils'
 import axios from 'axios'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import SecurityTab from '@/components/Profile/Tabs/SecurityTab.vue'
-import { Passkeys } from '@laravel/passkeys'
+import { PasskeyRegistration } from '@/lib/passkeyRegistration'
 
 vi.mock('qrcode', () => ({
     default: { toDataURL: vi.fn(() => 'data:image/png;base64,local-qr-code') },
@@ -262,7 +262,7 @@ describe('SecurityTab', () => {
     })
 
     it('registers a discoverable passkey without an account-password dialog', async () => {
-        const register = vi.spyOn(Passkeys, 'register').mockResolvedValue({
+        const register = vi.spyOn(PasskeyRegistration, 'register').mockResolvedValue({
             id: 7,
             name: 'Arbeitslaptop',
         })
@@ -278,10 +278,31 @@ describe('SecurityTab', () => {
             routes: {
                 options: '/user.passkeys.options',
                 submit: '/user.passkeys.store',
+                diagnostics: '/user.passkeys.diagnostics',
             },
         })
         expect(wrapper.find('[role="dialog"]').exists()).toBe(false)
         expect(wrapper.find('#passkey-label-7').element.value).toBe('Arbeitslaptop')
+    })
+
+    it('shows the phase-specific registration error and keeps the email fallback visible', async () => {
+        vi.spyOn(PasskeyRegistration, 'register').mockRejectedValue(
+            new Error(
+                'Gerät/Browser: Der Browser oder Passkey-Anbieter konnte den Passkey nicht erstellen. Du kannst dich weiterhin per E-Mail-Link anmelden. Diagnose-ID: 1234',
+            ),
+        )
+        const wrapper = mountSecurityTab()
+
+        await wrapper.find('[data-testid="register-passkey"]').trigger('click')
+        await wrapper.find('[data-testid="passkey-name"]').setValue('Arbeitslaptop')
+        await wrapper.find('[data-testid="confirm-passkey-setup"]').trigger('click')
+        await flushPromises()
+
+        const alert = wrapper.find('[role="dialog"] [role="alert"]')
+        expect(alert.text()).toContain('Gerät/Browser')
+        expect(alert.text()).toContain('weiterhin per E-Mail-Link anmelden')
+        expect(alert.text()).toContain('Diagnose-ID: 1234')
+        expect(wrapper.vm.passkeyBusy).toBe(false)
     })
 
     it('manages passkeys through the authenticated account routes without password dialogs', async () => {

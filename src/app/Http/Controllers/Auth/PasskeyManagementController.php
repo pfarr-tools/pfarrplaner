@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\PasskeyDiagnosticRequest;
 use App\Models\People\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 use Laravel\Passkeys\Actions\GenerateRegistrationOptions;
 use Laravel\Passkeys\Actions\StorePasskey;
@@ -73,6 +75,19 @@ class PasskeyManagementController extends Controller
             'id' => $passkey->getKey(),
             'name' => $passkey->name,
         ], Response::HTTP_CREATED);
+    }
+
+    /**
+     * Record allowlisted browser diagnostics without credential data or raw error messages.
+     *
+     * @param  PasskeyDiagnosticRequest  $request  Validated categorical diagnostic fields.
+     * @return Response Empty response acknowledging receipt.
+     */
+    public function diagnostics(PasskeyDiagnosticRequest $request): Response
+    {
+        Log::notice('Passkey registration client failure', $request->validated());
+
+        return response()->noContent();
     }
 
     /** Rename an owned passkey without exposing its credential material. */

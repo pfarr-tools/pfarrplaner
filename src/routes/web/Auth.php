@@ -34,6 +34,7 @@ use App\Http\Controllers\Auth\PasskeyLoginController;
 use App\Http\Controllers\Auth\PasskeyManagementController;
 use App\Http\Controllers\Auth\SecurityOnboardingController;
 use App\Http\Controllers\UserController;
+use App\Http\Middleware\CorrelatePasskeyRegistration;
 use App\Http\Middleware\PreventImpersonatedSecurityChanges;
 use App\Http\Middleware\ProcessPasswordlessLoginLinkAfterResponse;
 use App\Http\Middleware\RequireFreshPasskeyChallenge;
@@ -69,11 +70,14 @@ Route::middleware(['auth', PreventImpersonatedSecurityChanges::class])
             ->middleware('throttle:6,1')
             ->name('index');
         Route::get('/options', [PasskeyManagementController::class, 'options'])
-            ->middleware('throttle:6,1')
+            ->middleware([CorrelatePasskeyRegistration::class.':options', 'throttle:6,1'])
             ->name('options');
         Route::post('/', [PasskeyManagementController::class, 'store'])
-            ->middleware([RequireFreshPasskeyChallenge::class.':registration', 'throttle:6,1'])
+            ->middleware([CorrelatePasskeyRegistration::class.':store', RequireFreshPasskeyChallenge::class.':registration', 'throttle:6,1'])
             ->name('store');
+        Route::post('/diagnostics', [PasskeyManagementController::class, 'diagnostics'])
+            ->middleware('throttle:6,1,passkey-diagnostics')
+            ->name('diagnostics');
         Route::patch('/{passkey}', [PasskeyManagementController::class, 'rename'])
             ->middleware('throttle:6,1')
             ->name('rename');

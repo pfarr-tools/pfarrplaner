@@ -1,6 +1,6 @@
 import { flushPromises, mount } from '@vue/test-utils'
 import axios from 'axios'
-import { Passkeys } from '@laravel/passkeys'
+import { PasskeyRegistration } from '@/lib/passkeyRegistration'
 import { afterEach, vi } from 'vitest'
 import { describe, expect, it } from 'vitest'
 import SecurityOnboarding from '@/Pages/Auth/SecurityOnboarding.vue'
@@ -79,7 +79,7 @@ describe('SecurityOnboarding', () => {
     })
 
     it('starts passkey registration from the onboarding page itself', async () => {
-        const register = vi.spyOn(Passkeys, 'register').mockResolvedValue({
+        const register = vi.spyOn(PasskeyRegistration, 'register').mockResolvedValue({
             id: 7,
             name: 'Arbeitslaptop',
         })
@@ -103,6 +103,7 @@ describe('SecurityOnboarding', () => {
             routes: {
                 options: '/user.passkeys.options',
                 submit: '/user.passkeys.store',
+                diagnostics: '/user.passkeys.diagnostics',
             },
         })
     })

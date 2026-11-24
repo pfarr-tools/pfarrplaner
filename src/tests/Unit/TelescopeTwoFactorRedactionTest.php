@@ -35,6 +35,13 @@ class TelescopeTwoFactorRedactionTest extends TestCase
                 'response_status' => 500,
             ])->type('request');
             self::assertFalse($filter($manualLinkRequest));
+            foreach (['/user/passkeys/options', '/user/passkeys', '/user/passkeys/diagnostics', '/passkeys/login'] as $uri) {
+                self::assertFalse($filter(IncomingEntry::make([
+                    'uri' => $uri,
+                    'response_status' => 422,
+                ])->type('request')));
+            }
+
             self::assertContains('code', Telescope::$hiddenRequestParameters);
             self::assertContains('password', Telescope::$hiddenRequestParameters);
             self::assertContains('_old_input.code', Telescope::$hiddenRequestParameters);

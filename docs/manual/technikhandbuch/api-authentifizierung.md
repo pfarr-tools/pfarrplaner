@@ -119,3 +119,13 @@ und TOTP-Ablauf wie ein per E-Mail versendeter Link.
 - Health-Check unter `/api/health`
 
 Wenn ein neuer API-Endpunkt öffentlich bleiben soll, muss das in Route, Controller und Dokumentation ausdrücklich erkennbar sein. Ein „historisch gewachsener“ öffentlicher GET-Endpunkt ist kein ausreichender Grund.
+
+### Diagnose der Passkey-Registrierung
+
+Profil und Sicherheitseinrichtung verwenden `resources/js/lib/passkeyRegistration.js`. Der Ablauf lädt Optionen, ruft den bereits verwendeten SimpleWebAuthn-Adapter `startRegistration` auf und sendet das Credential zur unveränderten Laravel-Passkeys-Validierung. Die Browseroptionen enthalten keine `authenticatorAttachment`-Beschränkung, `residentKey=required`, `requireResidentKey=true`, `userVerification=required`, `attestation=none` sowie ES256/RS256. Eine Plattform-Verfügbarkeitsabfrage wird nicht als Voraussetzung verwendet: Auch externe oder synchronisierte Passkeys müssen möglich bleiben. Siehe [WebAuthn](https://www.w3.org/TR/webauthn-3/#dictdef-authenticatorselectioncriteria) und [SimpleWebAuthn](https://simplewebauthn.dev/docs/packages/browser/).
+
+Jeder Versuch erhält eine zufällige UUID im Header `X-Passkey-Request-ID`. Options- und Speicherrouten übernehmen ausschließlich gültige UUIDs, sonst erzeugen sie eine neue. Fehlerhafte Serverantworten werden mit ID, Phase und Status protokolliert. Challenge, Origin-Prüfung, Benutzerverifikation und Einmalverwendung bleiben unverändert; nach 60 Sekunden ist ein neuer Versuch erforderlich. `excludeCredentials` wird bei jedem Optionsabruf aus den noch vorhandenen Passkeys geladen.
+
+`POST /user/passkeys/diagnostics` (`user.passkeys.diagnostics`) benötigt eine authentifizierte Sitzung, CSRF-Schutz und keine Stellvertretung; die separate Drosselung erlaubt sechs Meldungen pro Minute. Der JSON-Body enthält `correlation_id` (UUID), `phase` (`options`, `authenticator`, `store`), `error` (zugelassener WebAuthn-Exception-Name oder `Other`), `browser` (`Chrome`, `Edge`, `Firefox`, `Safari`, `Other`), `platform` (`Android`, `iOS`, `Windows`, `macOS`, `Linux`, `Other`) und `status` (HTTP-Fehlerstatus 400–599 oder `null`). Erfolg: HTTP 204; ungültige Daten: 422; fehlende Anmeldung: 401; Stellvertretung: 403; Drosselung: 429.
+
+Die Diagnose ist eine nicht verifizierte Browsermeldung und kein Sicherheitsnachweis. Es werden keine rohen Exception-Texte, User-Agent-Zeichenfolgen, Namen, E-Mail-Adressen, Credential-Daten oder Challenges übernommen. Passkey-Requests werden auch in Telescope nicht aufgezeichnet. Die Diagnoseübertragung ist zeitlich begrenzt und blockiert keinen erneuten Versuch. Es entstehen keine neuen Modelldaten; eine Anpassung des DemoBuilders ist nicht erforderlich.
