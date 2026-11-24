@@ -32,6 +32,9 @@ namespace App\HomeScreen\Tabs;
 
 use App\Models\People\User;
 
+/**
+ * Discovers home screen tabs and builds them for a user's permissions.
+ */
 class HomeScreenTabFactory
 {
     /**
@@ -159,6 +162,11 @@ class HomeScreenTabFactory
         return $available;
     }
 
+    /**
+     * Get display titles for a saved home screen configuration.
+     *
+     * @throws \Exception If a configured tab class does not exist
+     */
     public static function getTitles($tabsConfig)
     {
         $titles = [];

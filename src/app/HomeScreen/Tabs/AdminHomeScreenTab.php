@@ -53,6 +53,9 @@ class AdminHomeScreenTab extends AbstractHomeScreenTab
         return ($user ?? Auth::user())->isAdmin;
     }
 
+    /**
+     * Add people and administration modules to the serialized tab.
+     */
     public function toArray($data = [])
     {
         $data['people'] = User::select('id', 'first_name', 'last_name', 'title', 'email', 'is_official_user')

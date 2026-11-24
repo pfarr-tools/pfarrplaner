@@ -9,6 +9,9 @@ use App\Services\RoleService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 
+/**
+ * Displays future services that still need a predicant.
+ */
 class PredicantServicesHomeScreenTab extends AbstractHomeScreenTab
 {
     protected $title = 'Offene Gottesdienste';
@@ -17,6 +20,9 @@ class PredicantServicesHomeScreenTab extends AbstractHomeScreenTab
 
     protected $query = null;
 
+    /**
+     * Initialize the tab configuration and its service query.
+     */
     public function __construct($config = [])
     {
         $this->setDefaultConfig($config, ['cities' => []]);
@@ -41,11 +47,17 @@ class PredicantServicesHomeScreenTab extends AbstractHomeScreenTab
         ]);
     }
 
+    /**
+     * Count future services that need a predicant.
+     */
     public function getCount(): int
     {
         return $this->query->count();
     }
 
+    /**
+     * Add matching services to the tab view data.
+     */
     public function getContent($data = [])
     {
         $data['services'] = $this->query->get();
@@ -53,6 +65,9 @@ class PredicantServicesHomeScreenTab extends AbstractHomeScreenTab
         return parent::getContent($data);
     }
 
+    /**
+     * Serialize matching services and visible cities for the frontend.
+     */
     public function toArray($data = [])
     {
         $data['services'] = $this->query->get();
@@ -62,6 +77,9 @@ class PredicantServicesHomeScreenTab extends AbstractHomeScreenTab
         return new PredicantServicesTabResource(parent::toArray($data));
     }
 
+    /**
+     * Build the query for future services needing a predicant in visible cities.
+     */
     public function buildQuery()
     {
         $visibleCityIds = Auth::user()->visibleCities()->pluck('cities.id');
