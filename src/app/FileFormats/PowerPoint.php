@@ -8,7 +8,7 @@
  * @copyright (c) Christoph Fischer, https://christoph-fischer.org
  * @license https://www.gnu.org/licenses/gpl-3.0.txt GPL 3.0 or later
  * @link https://github.com/pfarr-tools/pfarrplaner
- * @version git: $Id$
+ * @version git: $Id: c6cb84134ab5945a21a606292f843f6bdfcc105f $
  *
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
@@ -36,6 +36,17 @@ use DOMXPath;
 
 class PowerPoint extends AbstractZIPBasedFileFormat
 {
+    /** @var array<string, array{extension: string, contentType: string}> Image MIME types supported by PowerPoint. */
+    protected const IMAGE_FORMATS = [
+        'image/bmp' => ['extension' => 'bmp', 'contentType' => 'image/bmp'],
+        'image/gif' => ['extension' => 'gif', 'contentType' => 'image/gif'],
+        'image/jpeg' => ['extension' => 'jpg', 'contentType' => 'image/jpeg'],
+        'image/png' => ['extension' => 'png', 'contentType' => 'image/png'],
+        'image/svg+xml' => ['extension' => 'svg', 'contentType' => 'image/svg+xml'],
+        'image/tiff' => ['extension' => 'tif', 'contentType' => 'image/tiff'],
+        'image/x-ms-bmp' => ['extension' => 'bmp', 'contentType' => 'image/bmp'],
+    ];
+
     protected const VBA_REL_TYPE = 'http://schemas.microsoft.com/office/2006/relationships/vbaProject';
 
     protected const CT_VBA_BIN = 'application/vnd.ms-office.vbaProject';
@@ -220,6 +231,204 @@ class PowerPoint extends AbstractZIPBasedFileFormat
             return $doc;
         });
         $this->zip->close();
+    }
+
+    /**
+     * Normalize embedded image names, relationships, and content types from each image's actual bytes.
+     *
+     * @throws \DOMException
+     * @throws \RuntimeException When the presentation archive cannot be opened.
+     */
+    public function applyImageFileTypeFix(): void
+    {
+        if ($this->zip->open($this->documentFilePath) !== true) {
+            throw new \RuntimeException('PowerPoint-Datei konnte nicht geöffnet werden.');
+        }
+
+        try {
+            $imagePaths = [];
+            for ($index = 0; $index < $this->zip->numFiles; $index++) {
+                $path = $this->zip->getNameIndex($index);
+                if (is_string($path) && preg_match('#^ppt/media/[^/]+$#', $path)) {
+                    $imagePaths[] = $path;
+                }
+            }
+
+            $renamedPaths = [];
+            $imageFormats = [];
+            foreach ($imagePaths as $path) {
+                $contents = $this->zip->getFromName($path);
+                if (! is_string($contents)) {
+                    continue;
+                }
+
+                $format = $this->getImageFormat($contents);
+                if ($format === null) {
+                    if (pathinfo($path, PATHINFO_EXTENSION) === '') {
+                        throw new \RuntimeException("Unbekanntes Bildformat in PowerPoint-Datei: $path");
+                    }
+
+                    continue;
+                }
+
+                $imageFormats[$path] = $format;
+                $currentExtension = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+                if ($currentExtension === $format['extension']) {
+                    continue;
+                }
+
+                $basePath = preg_replace('/\.[^.\/]*$/', '', $path) ?: $path;
+                $newPath = $basePath.'.'.$format['extension'];
+                $suffix = 1;
+                while ($this->zip->locateName($newPath) !== false) {
+                    $newPath = $basePath.'-'.$suffix.'.'.$format['extension'];
+                    $suffix++;
+                }
+
+                $this->zip->deleteName($path);
+                $this->zip->addFromString($newPath, $contents);
+                $renamedPaths[$path] = $newPath;
+                unset($imageFormats[$path]);
+                $imageFormats[$newPath] = $format;
+            }
+
+            $this->updateImageRelationships($renamedPaths);
+            $this->updateImageContentTypes($renamedPaths, $imageFormats);
+        } finally {
+            $this->zip->close();
+        }
+    }
+
+    /**
+     * Detect a supported image format from the embedded file contents.
+     *
+     * @param  string  $contents  Raw image bytes.
+     * @return array{extension: string, contentType: string}|null Detected format, or null for unknown data.
+     */
+    protected function getImageFormat(string $contents): ?array
+    {
+        $mimeType = (new \finfo(FILEINFO_MIME_TYPE))->buffer($contents);
+        if (! is_string($mimeType)) {
+            return null;
+        }
+
+        return static::IMAGE_FORMATS[$mimeType] ?? null;
+    }
+
+    /**
+     * Update package relationships that reference renamed embedded images.
+     *
+     * @param  array<string, string>  $renamedPaths  Old and new paths inside the presentation archive.
+     *
+     * @throws \DOMException
+     */
+    protected function updateImageRelationships(array $renamedPaths): void
+    {
+        if ($renamedPaths === []) {
+            return;
+        }
+
+        $relationshipFiles = [];
+        for ($index = 0; $index < $this->zip->numFiles; $index++) {
+            $path = $this->zip->getNameIndex($index);
+            if (is_string($path) && str_ends_with($path, '.rels')) {
+                $relationshipFiles[] = $path;
+            }
+        }
+
+        foreach ($relationshipFiles as $path) {
+            $this->patchXMLFile($path, function (DOMDocument $doc) use ($renamedPaths) {
+                foreach ($doc->getElementsByTagName('Relationship') as $relationship) {
+                    if (! $relationship instanceof DOMElement || $relationship->getAttribute('TargetMode') === 'External') {
+                        continue;
+                    }
+
+                    $target = $relationship->getAttribute('Target');
+                    foreach ($renamedPaths as $oldPath => $newPath) {
+                        if (basename($target) === basename($oldPath)) {
+                            $relationship->setAttribute(
+                                'Target',
+                                substr($target, 0, -strlen(basename($oldPath))).basename($newPath)
+                            );
+                            break;
+                        }
+                    }
+                }
+
+                return $doc;
+            });
+        }
+    }
+
+    /**
+     * Remove invalid empty defaults and register the content types of embedded images.
+     *
+     * @param  array<string, string>  $renamedPaths  Old and new paths inside the presentation archive.
+     * @param  array<string, array{extension: string, contentType: string}>  $imageFormats  Detected formats by path.
+     *
+     * @throws \DOMException
+     */
+    protected function updateImageContentTypes(array $renamedPaths, array $imageFormats): void
+    {
+        $this->patchXMLFile('[Content_Types].xml', function (DOMDocument $doc) use ($renamedPaths, $imageFormats) {
+            $types = $doc->documentElement;
+            $requiredTypes = [];
+            $emptyDefaults = [];
+
+            foreach ($types->getElementsByTagName('Default') as $default) {
+                if (! $default instanceof DOMElement) {
+                    continue;
+                }
+                if ($default->getAttribute('Extension') === '') {
+                    $emptyDefaults[] = $default;
+                }
+            }
+            foreach ($emptyDefaults as $default) {
+                $default->parentNode?->removeChild($default);
+            }
+
+            foreach ($types->getElementsByTagName('Override') as $override) {
+                if (! $override instanceof DOMElement) {
+                    continue;
+                }
+                $oldPath = ltrim($override->getAttribute('PartName'), '/');
+                $newPath = $renamedPaths[$oldPath] ?? $oldPath;
+                if (isset($imageFormats[$newPath])) {
+                    if ($newPath !== $oldPath) {
+                        $override->setAttribute('PartName', '/'.$newPath);
+                    }
+                    $override->setAttribute('ContentType', $imageFormats[$newPath]['contentType']);
+                }
+            }
+
+            foreach ($imageFormats as $format) {
+                $requiredTypes[$format['extension']] = $format['contentType'];
+            }
+
+            foreach ($requiredTypes as $extension => $contentType) {
+                $matchedDefault = null;
+                foreach ($types->getElementsByTagName('Default') as $default) {
+                    if ($default instanceof DOMElement
+                        && strtolower($default->getAttribute('Extension')) === $extension) {
+                        $matchedDefault = $default;
+                        break;
+                    }
+                }
+
+                if ($matchedDefault instanceof DOMElement) {
+                    $matchedDefault->setAttribute('ContentType', $contentType);
+
+                    continue;
+                }
+
+                $default = $doc->createElement('Default');
+                $default->setAttribute('Extension', $extension);
+                $default->setAttribute('ContentType', $contentType);
+                $types->appendChild($default);
+            }
+
+            return $doc;
+        });
     }
 
     /**

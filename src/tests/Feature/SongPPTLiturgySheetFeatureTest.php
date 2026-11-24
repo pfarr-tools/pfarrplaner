@@ -8,7 +8,7 @@
  * @copyright (c) Christoph Fischer, https://christoph-fischer.org
  * @license https://www.gnu.org/licenses/gpl-3.0.txt GPL 3.0 or later
  * @link https://github.com/pfarr-tools/pfarrplaner
- * @version git: $Id$
+ * @version git: $Id: 927153449133482a7f827b7ea09deed1e4b83ffa $
  */
 
 namespace Tests\Feature;
@@ -28,6 +28,62 @@ use ZipArchive;
 /** Regression tests for configurable PowerPoint/ODP separator slides. */
 class SongPPTLiturgySheetFeatureTest extends TestCase
 {
+    /**
+     * Exported PowerPoint packages use the image format detected from a source file without an extension.
+     */
+    public function test_ppt_export_normalizes_image_parts_without_source_extensions(): void
+    {
+        $sourcePath = tempnam(sys_get_temp_dir(), 'ppt-image-source-');
+        $outputPath = tempnam(sys_get_temp_dir(), 'ppt-image-export-');
+        file_put_contents(
+            $sourcePath,
+            base64_decode('/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAP//////////////////////////////////////////////////////////////////////////////////////2wBDAf//////////////////////////////////////////////////////////////////////////////////////wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIQAxAAAAF//8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQABBQJ//8QAFBEBAAAAAAAAAAAAAAAAAAAAAP/aAAgBAwEBPwF//8QAFBEBAAAAAAAAAAAAAAAAAAAAAP/aAAgBAgEBPwF//8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQAGPwJ//8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQABPyF//9oADAMBAAIAAwAAABAf/8QAFBEBAAAAAAAAAAAAAAAAAAAAAP/aAAgBAwEBPxB//8QAFBEBAAAAAAAAAAAAAAAAAAAAAP/aAAgBAgEBPxB//8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQABPxB//9oACAEBAAE/EB//2Q==', true)
+        );
+        $sheet = new class extends SongPPTLiturgySheet
+        {
+            /**
+             * Create a PowerPoint containing one image with the supplied source path.
+             *
+             * @param  string  $sourcePath  Path to the source image.
+             * @param  string  $outputPath  Destination path for the presentation archive.
+             */
+            public function exportImageForTest(string $sourcePath, string $outputPath): void
+            {
+                $this->ppt = new PhpPresentation;
+                $this->ppt->getActiveSlide()->createDrawingShape()
+                    ->setPath($sourcePath)
+                    ->setWidth(1)
+                    ->setHeight(1);
+                $this->createPPTFile($outputPath);
+            }
+        };
+
+        $sheet->exportImageForTest($sourcePath, $outputPath);
+
+        $zip = new ZipArchive;
+        $this->assertTrue($zip->open($outputPath));
+        $mediaFiles = [];
+        $relationshipFiles = [];
+        for ($index = 0; $index < $zip->numFiles; $index++) {
+            $path = $zip->getNameIndex($index);
+            if (is_string($path) && str_starts_with($path, 'ppt/media/')) {
+                $mediaFiles[] = $path;
+            }
+            if (is_string($path) && str_ends_with($path, '.rels')) {
+                $relationshipFiles[] = $zip->getFromName($path);
+            }
+        }
+        $contentTypes = $zip->getFromName('[Content_Types].xml');
+        $zip->close();
+        unlink($sourcePath);
+        unlink($outputPath);
+
+        $this->assertCount(1, $mediaFiles);
+        $this->assertMatchesRegularExpression('#^ppt/media/[^/]+\.jpg$#', $mediaFiles[0]);
+        $this->assertStringNotContainsString('Extension=""', $contentTypes);
+        $this->assertStringContainsString(basename($mediaFiles[0]), implode('', $relationshipFiles));
+    }
+
     /** ODP content keeps indentation from Psalm verse tabs. */
     public function test_odp_file_preserves_indented_verse_lines(): void
     {
