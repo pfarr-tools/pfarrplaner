@@ -30,6 +30,7 @@
 
 namespace App\HomeScreen\Tabs;
 
+use App\Models\People\User;
 use Illuminate\Support\Facades\Auth;
 
 class AdminBackupHomeScreenTab extends AbstractHomeScreenTab
@@ -40,9 +41,15 @@ class AdminBackupHomeScreenTab extends AbstractHomeScreenTab
 
     protected $config = [];
 
-    public function isAvailable(): bool
+    /**
+     * Check whether the backup tab is available to the user.
+     *
+     * @param  User|null  $user  User whose administrator access should be checked
+     * @return bool Whether the user is an administrator
+     */
+    public function isAvailable(?User $user = null): bool
     {
-        return Auth::user()->isAdmin;
+        return ($user ?? Auth::user())->isAdmin;
     }
 
     public function toArray($data = [])

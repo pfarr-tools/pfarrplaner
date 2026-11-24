@@ -30,6 +30,7 @@
 
 namespace App\HomeScreen\Tabs;
 
+use App\Models\People\User;
 use View;
 
 class AbstractHomeScreenTab
@@ -48,9 +49,12 @@ class AbstractHomeScreenTab
     }
 
     /**
-     * Check if this tab is available to the current user
+     * Check whether this tab is available to the given user or current user.
+     *
+     * @param  User|null  $user  User whose access should be checked
+     * @return bool Whether the tab is available
      */
-    public function isAvailable(): bool
+    public function isAvailable(?User $user = null): bool
     {
         return true;
     }

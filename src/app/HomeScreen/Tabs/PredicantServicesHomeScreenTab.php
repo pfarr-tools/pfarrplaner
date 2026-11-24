@@ -3,6 +3,7 @@
 namespace App\HomeScreen\Tabs;
 
 use App\Http\Resources\HomeScreen\PredicantServicesTabResource;
+use App\Models\People\User;
 use App\Models\Service;
 use App\Services\RoleService;
 use Carbon\Carbon;
@@ -23,9 +24,17 @@ class PredicantServicesHomeScreenTab extends AbstractHomeScreenTab
         $this->query = $this->buildQuery();
     }
 
-    public function isAvailable(): bool
+    /**
+     * Check whether the open services tab is available to the user.
+     *
+     * @param  User|null  $user  User whose ministry roles should be checked
+     * @return bool Whether the user can view open services
+     */
+    public function isAvailable(?User $user = null): bool
     {
-        return Auth::check() && Auth::user()->hasAnyRole([
+        $user ??= Auth::user();
+
+        return $user && $user->hasAnyRole([
             RoleService::ROLE_PREDICANT,
             'Gottesdienstbearbeiter:in',
             RoleService::ROLE_PASTOR,
