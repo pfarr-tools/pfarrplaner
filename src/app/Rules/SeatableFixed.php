@@ -52,7 +52,9 @@ class SeatableFixed implements DataAwareRule, ValidationRule
         $seatFinder = $service->getSeatFinder();
 
         if ($this->bookingIdKey && isset($data[$this->bookingIdKey])) {
-            $booking = Booking::find((int) $data[$this->bookingIdKey]);
+            /** @var int|string $bookingId ID der zu ändernden Buchung. */
+            $bookingId = $data[$this->bookingIdKey];
+            $booking = Booking::find((int) $bookingId);
             if ($booking === null) {
                 $fail('validation.seatable')->translate();
 
@@ -60,11 +62,17 @@ class SeatableFixed implements DataAwareRule, ValidationRule
             }
             $success = $seatFinder->checkIfBookingCanBeChanged($booking, $data);
         } else {
+            /** @var string $fixedSeat Gewünschter fester Platz. */
+            $fixedSeat = $data['fixed_seat'] ?? '';
+            /** @var string $overrideSeats Überschreibung der Sitzplatzanzahl. */
+            $overrideSeats = $data['override_seats'];
+            /** @var string $overrideSplit Überschreibung der Aufteilung. */
+            $overrideSplit = $data['override_split'];
             $success = $seatFinder->find(
                 $data['number'],
-                $data['fixed_seat'] ?? '',
-                $data['override_seats'],
-                $data['override_split']
+                $fixedSeat,
+                $overrideSeats,
+                $overrideSplit
             );
         }
 

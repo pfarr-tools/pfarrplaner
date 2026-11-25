@@ -30,6 +30,7 @@
 
 namespace App\Traits;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -49,10 +50,11 @@ trait HandlesAttachedImageTrait
     {
         $modelClass = $this->model ?? $this->modelClass ?? null;
         abort_unless((bool) $modelClass, 500);
+        /** @var class-string<Model> $modelClass */
         $modelObject = $modelClass::findOrFail($model);
         Gate::authorize('update', $modelObject);
         $imageField = $field ?? (is_object($modelObject) && method_exists($modelObject, 'getImageField') ? $modelObject->getImageField() : null);
-        if ($imageField === null) {
+        if (! is_string($imageField)) {
             return null;
         }
 
@@ -67,8 +69,12 @@ trait HandlesAttachedImageTrait
                     'model' => $modelObject, 'id' => $model, 'field' => $imageField]);
             }
         } elseif ($request->has('uploadFromUrl')) {
-            $fullPath = 'attachments/'.Str::random(32).'.'.pathinfo($request->get('uploadFromUrl'), PATHINFO_EXTENSION);
-            Storage::put($fullPath, (string) file_get_contents($request->get('uploadFromUrl')));
+            $uploadFromUrl = $request->get('uploadFromUrl');
+            if (! is_string($uploadFromUrl)) {
+                return null;
+            }
+            $fullPath = 'attachments/'.Str::random(32).'.'.pathinfo($uploadFromUrl, PATHINFO_EXTENSION);
+            Storage::put($fullPath, (string) file_get_contents($uploadFromUrl));
             $modelObject->update([$imageField => $fullPath]);
             $path = basename($fullPath);
 
@@ -90,11 +96,16 @@ trait HandlesAttachedImageTrait
     {
         $modelClass = $this->model ?? $this->modelClass ?? null;
         abort_unless((bool) $modelClass, 500);
+        /** @var class-string<Model> $modelClass */
         $modelObject = $modelClass::findOrFail($model);
         Gate::authorize('update', $modelObject);
         $imageField = $field ?? (is_object($modelObject) && method_exists($modelObject, 'getImageField') ? $modelObject->getImageField() : null);
-        if ($imageField !== null && $modelObject->$imageField) {
-            Storage::delete($modelObject->$imageField);
+        if (! is_string($imageField)) {
+            return response()->json();
+        }
+        $existingPath = $modelObject->$imageField;
+        if ($existingPath && is_string($existingPath)) {
+            Storage::delete($existingPath);
             $modelObject->update([$imageField => '']);
         }
 

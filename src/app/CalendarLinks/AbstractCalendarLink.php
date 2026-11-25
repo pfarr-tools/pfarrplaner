@@ -250,6 +250,6 @@ class AbstractCalendarLink
      */
     public function filename()
     {
-        return implode('-', [$this->data['user']->id, $this->getKey()]).'.ics';
+        return implode('-', [(string) $this->user->id, $this->getKey()]).'.ics';
     }
 }

@@ -70,6 +70,7 @@ class UpdateAdChannel extends AbstractUpdateAction implements UpdatesAdChannels
         abort_unless($city instanceof City, 404);
         $this->city = $city;
         Gate::forUser($user)->authorize('update', $adChannel);
+        /** @var array{name: string, ...} $input */
         $input = Validator::make($input, AdChannel::$validationRules)->validateWithBag('updateAdChannel');
         $input['slug'] = Str::slug($input['name']);
         $adChannel->update($input);

@@ -111,17 +111,19 @@ class FuneralStoreRequest extends FormRequest
                 'dod_spouse',
             ] as $dateField
         ) {
-            if (isset($data[$dateField]) && (! empty($data[$dateField]))) {
+            $dateValue = $data[$dateField] ?? null;
+            if (is_string($dateValue) && ! empty($dateValue)) {
                 $data[$dateField] = Carbon::createFromFormat(
                     'd.m.Y',
-                    $data[$dateField]);
+                    $dateValue);
             } else {
                 $data[$dateField] = null;
             }
         }
 
         if (isset($data['appointment'])) {
-            $data['appointment'] = Carbon::parse($data['appointment'], 'Europe/Berlin')->setTimezone('UTC')->format(
+            $appointment = $data['appointment'];
+            $data['appointment'] = Carbon::parse(is_string($appointment) ? $appointment : '', 'Europe/Berlin')->setTimezone('UTC')->format(
                 'd.m.Y H:i'
             );
         }

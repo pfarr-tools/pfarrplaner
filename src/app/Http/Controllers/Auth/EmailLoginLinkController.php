@@ -27,8 +27,10 @@ class EmailLoginLinkController extends Controller
     public function request(Request $request): RedirectResponse
     {
         $validated = $request->validate(['email' => ['required', 'string', 'email', 'max:254']]);
+        /** @var array{email: string} $validated */
         $email = mb_strtolower(trim($validated['email']));
-        $emailKey = 'login-link-email:'.hash_hmac('sha256', $email, (string) config('app.key'));
+        $appKey = config('app.key');
+        $emailKey = 'login-link-email:'.hash_hmac('sha256', $email, is_string($appKey) ? $appKey : '');
 
         if (! RateLimiter::tooManyAttempts($emailKey, 3)) {
             RateLimiter::hit($emailKey, 300);
@@ -95,7 +97,12 @@ class EmailLoginLinkController extends Controller
         $linkId = $request->session()->get('login.link.confirmation_id');
         $result = DB::transaction(function () use ($linkId): array {
             $link = $linkId ? DB::table('passwordless_login_links')->where('id', $linkId)->lockForUpdate()->first() : null;
-            if (! $link || $link->consumed_at || now()->greaterThanOrEqualTo($link->expires_at)) {
+            if (! $link || $link->consumed_at) {
+                return ['state' => 'invalid'];
+            }
+            /** @var string $expiresAt */
+            $expiresAt = $link->expires_at;
+            if (now()->greaterThanOrEqualTo($expiresAt)) {
                 return ['state' => 'invalid'];
             }
 

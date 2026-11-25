@@ -36,6 +36,7 @@ use App\Models\Places\City;
 use App\Models\Service;
 use App\Models\Streaming\Broadcast;
 use Carbon\Carbon;
+use Google\Service\YouTube\Resource\LiveBroadcasts;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 
@@ -142,7 +143,9 @@ class UnpublishYoutubeBroadcasts extends Command
                         $status->setPrivacyStatus('private');
                         $broadcast->setStatus($status);
 
-                        $youtube->getYoutube()->liveBroadcasts->update('snippet,status,contentDetails', $broadcast);
+                        /** @var LiveBroadcasts $liveBroadcasts */
+                        $liveBroadcasts = $youtube->getYoutube()->liveBroadcasts;
+                        $liveBroadcasts->update('snippet,status,contentDetails', $broadcast);
                     } else {
                         $this->output('Broadcast id '.$broadcast->getId()
                                       .' ('.$pubDate->format('Y-m-d H:i:s').') is already unpublished.'

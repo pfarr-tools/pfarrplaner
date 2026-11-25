@@ -59,9 +59,6 @@ class PlanningInput extends AbstractInput
 
     public $description = 'Beliebige Dienste für einen bestimmten Zeitraum eintragen';
 
-    /**
-     * @return bool
-     */
     public function canEdit(): bool
     {
         return Auth::user()?->can('gd-pfarrer-bearbeiten') ||
@@ -81,11 +78,14 @@ class PlanningInput extends AbstractInput
         $cities = $user->writableCities;
         $locations = Location::inCities($cities->pluck('id'))->get();
 
-        $ministries = $this->getAvailableMinistries(
-            Participant::query()
-                ->pluck('category')
-                ->unique()
-        );
+        /** @var array<int, string> $categories */
+        $categories = Participant::query()
+            ->pluck('category')
+            ->unique()
+            ->values()
+            ->all();
+
+        $ministries = $this->getAvailableMinistries($categories);
 
         return Inertia::render('Inputs/Planning/PlanningInputSetup', compact('cities', 'ministries', 'locations'));
     }
@@ -101,17 +101,23 @@ class PlanningInput extends AbstractInput
             switch ($ministry) {
                 case 'P':
                     if (Auth::user()?->can('gd-pfarrer-bearbeiten')) {
-                        $ministries[$ministry] = config('labels.pastor');
+                        /** @var string $label */
+                        $label = config('labels.pastor');
+                        $ministries[$ministry] = $label;
                     }
                     break;
                 case 'O':
                     if (Auth::user()?->can('gd-organist-bearbeiten')) {
-                        $ministries[$ministry] = config('labels.organist');
+                        /** @var string $label */
+                        $label = config('labels.organist');
+                        $ministries[$ministry] = $label;
                     }
                     break;
                 case 'M':
                     if (Auth::user()?->can('gd-mesner-bearbeiten')) {
-                        $ministries[$ministry] = config('labels.sacristan');
+                        /** @var string $label */
+                        $label = config('labels.sacristan');
+                        $ministries[$ministry] = $label;
                     }
                     break;
                 case 'A':
@@ -145,10 +151,10 @@ class PlanningInput extends AbstractInput
                 'ministries.*' => 'required|string',
             ]
         );
-
         $user = Auth::user();
         abort_unless($user instanceof User, 403);
 
+        /** @var array{from: string, to: string, cities: array<int, int>, locations?: array<int, int>|null, ministries: array<int, string>} $setup */
         $locations = Location::inCities($setup['cities'])->get();
 
         $teams = Team::with('users')->inCities($setup['cities'])->get();
@@ -190,7 +196,7 @@ class PlanningInput extends AbstractInput
             'slug' => 'required|string|exists:services,slug',
             'ministries' => 'required',
         ]);
-
+        /** @var array{slug: string, ministries: array<string, array<int, int|string|array{id: int|string}>>} $data */
         $service = Service::where('slug', $data['slug'])->first();
         abort_unless($service instanceof Service, 404);
 

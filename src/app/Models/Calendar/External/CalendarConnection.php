@@ -135,6 +135,7 @@ class CalendarConnection extends Model
      */
     public function getSyncableServices(): Collection
     {
+        /** @var Collection<int, Service> $services */
         $services = collect();
         foreach ($this->cities as $city) {
             /** @var Collection<int, Service> $cityServices */
@@ -152,10 +153,13 @@ class CalendarConnection extends Model
      */
     public function getCurrentSyncToken(): string
     {
-        return max(
+        /** @var Carbon $latest */
+        $latest = max(
             $this->getSyncableServices()->pluck('updated_at')->max(),
             $this->getSyncableAbsences()->pluck('updated_at')->max(),
-        )->toIsoString();
+        );
+
+        return $latest->toIsoString() ?? '';
     }
 
     /**
@@ -240,6 +244,7 @@ class CalendarConnection extends Model
      */
     public function getSyncableAbsences(): Collection
     {
+        /** @var Collection<int, Absence> $absences */
         $absences = collect([]);
 
         if (! $this->include_vacations) {
@@ -250,6 +255,7 @@ class CalendarConnection extends Model
             case 1:
                 $own = Absence::where('user_id', $this->user_id)->where('to', '>=', Carbon::now()->subYear())->get();
                 $user = $this->user;
+                /** @var Collection<int, Absence> $replacing */
                 $replacing = $user === null ? collect() : Absence::userIsReplacement($user)->get();
 
                 return $own->merge($replacing);

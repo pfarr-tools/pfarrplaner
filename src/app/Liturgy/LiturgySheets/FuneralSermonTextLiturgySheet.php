@@ -35,6 +35,7 @@ use App\Documents\Word\DefaultWordDocument;
 use App\Models\Liturgy\Item;
 use App\Models\Service;
 use App\Services\NameService;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use PhpOffice\PhpWord\Shared\Html;
 
@@ -66,6 +67,7 @@ class FuneralSermonTextLiturgySheet extends AbstractLiturgySheet
         $doc = new DefaultFoldedBooklet;
         $this->setProperties($doc);
 
+        /** @var Collection<int, string> $names */
         $names = collect();
 
         // title page
@@ -73,8 +75,9 @@ class FuneralSermonTextLiturgySheet extends AbstractLiturgySheet
         $doc->getSection()->addText('Zur Erinnerung an', ['size' => 16], ['align' => 'center']);
         $doc->getSection()->addTextBreak(1);
         foreach ($service->funerals as $funeral) {
+            $buriedName = $funeral->buried_name;
             /** @var string $name */
-            $name = NameService::fromName($funeral->buried_name)->format(NameService::FIRST_LAST);
+            $name = NameService::fromName(is_string($buriedName) ? $buriedName : '')->format(NameService::FIRST_LAST);
             $names->push($name);
             $doc->getSection()->addText($name, ['size' => 24], ['align' => 'center']);
             $doc->getSection()->addText(
@@ -129,7 +132,8 @@ class FuneralSermonTextLiturgySheet extends AbstractLiturgySheet
         );
         $doc->getSection()->addText('Bleiben Sie behütet!');
         $doc->getSection()->addTextBreak(2);
-        $doc->getSection()->addText($service->pastors->pluck('name')->join(', ', ' und '));
+        $pastorNames = $service->pastors->pluck('name')->join(', ', ' und ');
+        $doc->getSection()->addText(is_string($pastorNames) ? $pastorNames : '');
         foreach ($service->pastors as $pastor) {
             $doc->getSection()->addTextBreak(1);
             $run = $doc->getSection()->addTextRun();
@@ -211,7 +215,7 @@ class FuneralSermonTextLiturgySheet extends AbstractLiturgySheet
                         if (trim($paragraph) === '') {
                             continue;
                         }
-                        $doc->renderText($paragraph, $doc::BLOCKQUOTE, ['size' => 10]);
+                        $doc->renderText($paragraph, DefaultWordDocument::BLOCKQUOTE, ['size' => 10]);
                     }
                 } else {
                     $section = $doc->getSection();

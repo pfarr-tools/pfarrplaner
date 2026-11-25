@@ -64,12 +64,19 @@ class AIPromptLiturgySheet extends AbstractLiturgySheet
     protected function buildPrompt(Service $service): string
     {
         $liturgy = $service->liturgical_info;
+        $liturgy = is_array($liturgy) ? $liturgy : [];
         $prompt = 'Am '.$service->trueDate()->isoFormat('dddd, DD. MMMM YYYY').', '.$service->timeText().
             (($service->location && $service->location->at_text) ? ' '.$service->location->at_text : ', '.$service->locationText(
             ));
-        if ($liturgy['Bezeichnung'] ?? false) {
-            $prompt .= ' ist '.$liturgy['Bezeichnung'].'.'.PHP_EOL.'Wochenspruch ist: '
-                .$liturgy['Wochenspruch']['Text'].' ('.$liturgy['Wochenspruch']['Bibelstelle'].').';
+        $bezeichnung = $liturgy['Bezeichnung'] ?? null;
+        if (is_scalar($bezeichnung) && $bezeichnung) {
+            $wochenspruch = $liturgy['Wochenspruch'] ?? [];
+            $wochenspruch = is_array($wochenspruch) ? $wochenspruch : [];
+            $spruchText = $wochenspruch['Text'] ?? '';
+            $spruchStelle = $wochenspruch['Bibelstelle'] ?? '';
+            $prompt .= ' ist '.(string) $bezeichnung.'.'.PHP_EOL.'Wochenspruch ist: '
+                .(is_scalar($spruchText) ? (string) $spruchText : '')
+                .' ('.(is_scalar($spruchStelle) ? (string) $spruchStelle : '').').';
         } else {
             $prompt .= ' feiern wir Gottesdienst.';
         }
@@ -80,35 +87,57 @@ class AIPromptLiturgySheet extends AbstractLiturgySheet
                     $helper = new SongItemHelper($item);
                     $verseCount = $helper->getActiveVerseCount(true, true);
 
-                    $prompt .= '  -> '.$item->title.': '
-                        .($item->data[$item->data_type]['code'] ?? $item->data[$item->data_type]['songbook']['name'] ?? '')
-                        .' '
-                        .$item->data[$item->data_type]['reference'].' '
-                        .(isset($item->data[$item->data_type]['altEG']) ? '(EG '.$item->data[$item->data_type]['altEG'].') ' : '')
-                        .($item->data[$item->data_type]['song']['title'] ?? '')
+                    $songData = $item->data['song'] ?? null;
+                    $songData = is_array($songData) ? $songData : [];
+                    $code = $songData['code'] ?? null;
+                    if ($code === null) {
+                        $songbook = $songData['songbook'] ?? null;
+                        $code = is_array($songbook) ? ($songbook['name'] ?? '') : '';
+                    }
+                    $code = is_scalar($code) ? (string) $code : '';
+                    $reference = $songData['reference'] ?? '';
+                    $reference = is_scalar($reference) ? (string) $reference : '';
+                    $altEG = $songData['altEG'] ?? null;
+                    $altEGText = isset($songData['altEG']) && is_scalar($altEG) ? '(EG '.(string) $altEG.') ' : '';
+                    $songDetails = $songData['song'] ?? null;
+                    $songDetails = is_array($songDetails) ? $songDetails : [];
+                    $songTitle = $songDetails['title'] ?? '';
+                    $songTitle = is_scalar($songTitle) ? (string) $songTitle : '';
+
+                    $prompt .= '  -> '.$item->title.': '.$code.' '.$reference.' '.$altEGText.$songTitle
                         .$helper->forceVerseString(', ')
                         .($verseCount ? ' ('.$verseCount.')' : '')
                         .PHP_EOL;
                 } elseif ($item->data_type == 'psalm') {
                     if (isset($item->data['psalm'])) {
-                        $prompt .= '  -> '.$item->title.': '
-                            .($item->data[$item->data_type]['songbook_abbreviation'] ?? $item->data[$item->data_type]['songbook'] ?? '')
-                            .' '
-                            .$item->data[$item->data_type]['reference'].' '
-                            .($item->data[$item->data_type]['title'] ?? '')
-                            .(isset($item->data['verses']) && ($item->data['verses'] != '') ? ', '.$item->data['verses'] : '')
-                            .PHP_EOL;
+                        $psalmData = $item->data['psalm'];
+                        $psalmData = is_array($psalmData) ? $psalmData : [];
+                        $book = $psalmData['songbook_abbreviation'] ?? $psalmData['songbook'] ?? '';
+                        $book = is_scalar($book) ? (string) $book : '';
+                        $reference = $psalmData['reference'] ?? '';
+                        $reference = is_scalar($reference) ? (string) $reference : '';
+                        $title = $psalmData['title'] ?? '';
+                        $title = is_scalar($title) ? (string) $title : '';
+                        $verses = $item->data['verses'] ?? '';
+                        $versesText = isset($item->data['verses']) && $verses != '' && is_scalar($verses)
+                            ? ', '.(string) $verses
+                            : '';
+                        $prompt .= '  -> '.$item->title.': '.$book.' '.$reference.' '.$title.$versesText.PHP_EOL;
                     }
                 } elseif ($item->data_type == 'reading') {
-                    $prompt .= $item->title.': '.($item->data['reference'] ?? '--').PHP_EOL;
+                    $reference = $item->data['reference'] ?? '--';
+                    $prompt .= $item->title.': '.(is_scalar($reference) ? (string) $reference : '--').PHP_EOL;
                 } else {
                     $prompt .= $item->title.PHP_EOL;
                 }
             }
         }
 
-        if ($liturgy['Predigt'] ?? false) {
-            $prompt .= PHP_EOL.PHP_EOL.'Predigttext ist '.$liturgy['Predigt']['Bibelstelle'].'.';
+        $predigt = $liturgy['Predigt'] ?? null;
+        $predigt = is_array($predigt) ? $predigt : [];
+        $bibelstelle = $predigt['Bibelstelle'] ?? null;
+        if (is_scalar($bibelstelle) && $bibelstelle !== '') {
+            $prompt .= PHP_EOL.PHP_EOL.'Predigttext ist '.(string) $bibelstelle.'.';
         }
 
         return $prompt.PHP_EOL.PHP_EOL;

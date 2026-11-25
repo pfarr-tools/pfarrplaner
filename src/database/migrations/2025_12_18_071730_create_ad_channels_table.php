@@ -22,6 +22,7 @@ return new class extends Migration
         });
 
         Schema::table('services', function ($table) {
+            /** @var Blueprint $table */
             $table->text('ad_text')->nullable();
         });
     }
@@ -33,6 +34,7 @@ return new class extends Migration
     {
         Schema::dropIfExists('ad_channels');
         Schema::table('services', function ($table) {
+            /** @var Blueprint $table */
             $table->dropColumn('ad_text');
         });
     }

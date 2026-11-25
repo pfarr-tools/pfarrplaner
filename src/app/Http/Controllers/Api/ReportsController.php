@@ -65,6 +65,9 @@ class ReportsController extends Controller
             abort(404);
         }
 
-        return $report->$step($request);
+        /** @var JsonResponse $response */
+        $response = $report->$step($request);
+
+        return $response;
     }
 }

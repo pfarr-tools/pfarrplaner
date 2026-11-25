@@ -66,7 +66,9 @@ class SongbookController extends AbstractApiCRUDController
     public function colors()
     {
         $data = [['name' => 'Ohne Abschnittsfarbe', 'id' => '']];
-        foreach (config('colors.songbooks', []) as $name => $color) {
+        /** @var array<string, string> $colors */
+        $colors = config('colors.songbooks', []);
+        foreach ($colors as $name => $color) {
             $data[] = ['name' => $name, 'id' => $color];
         }
 

@@ -33,6 +33,7 @@ namespace App\Models\Liturgy;
 use App\Models\Service;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Block extends Model
@@ -58,7 +59,7 @@ class Block extends Model
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\Service, $this>
+     * @return BelongsTo<Service, $this>
      */
     public function service()
     {

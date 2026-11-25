@@ -93,7 +93,7 @@ class FuneralsRelativesReport extends AbstractExcelDocumentReport
                 'start' => 'required|date',
             ]
         );
-
+        /** @var array{city: int|string, start: string} $data */
         $start = Carbon::parse($data['start'], 'Europe/Berlin')->setTime(0, 0, 0);
         $city = City::findOrFail((int) $data['city']);
 
@@ -167,7 +167,7 @@ class FuneralsRelativesReport extends AbstractExcelDocumentReport
         // output
         return $this->sendToBrowser(
             FileNameService::make(
-                static::FILE_TITLE.' '.$city->name.' ab '.$start->format('Y-m-d'),
+                self::FILE_TITLE.' '.(is_string($city->name) ? $city->name : '').' ab '.$start->format('Y-m-d'),
                 'xlsx',
                 static::FILE_SIGNATURE,
                 now())

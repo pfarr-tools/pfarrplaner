@@ -76,6 +76,7 @@ class RegulatoryReport extends AbstractReport
 
     public function render(Request $request)
     {
+        /** @var array{service: int, email: string, template: string, number?: int} $data */
         $data = $request->validate(
             [
                 'service' => 'required|int|exists:services,id',
@@ -96,7 +97,10 @@ class RegulatoryReport extends AbstractReport
             ->bcc($this->authenticatedUser())
             ->queue(new RegulatoryReportMail($data));
 
-        return redirect()->to(Session::pull('back'))->with('success', 'Deine Gottesdienstmeldung wurde an '.$data['email'].' gesendet.');
+        /** @var string $back */
+        $back = Session::pull('back');
+
+        return redirect()->to($back)->with('success', 'Deine Gottesdienstmeldung wurde an '.$data['email'].' gesendet.');
     }
 
     public function isActive(): bool

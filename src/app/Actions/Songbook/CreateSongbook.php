@@ -53,6 +53,7 @@ class CreateSongbook extends AbstractCreateAction implements CreatesSongbooks
     public function create(User $user, array $input): Songbook
     {
         Gate::forUser($user)->authorize('create', Songbook::class);
+        /** @var array<string, mixed> $input */
         $input = Validator::make($input, Songbook::$validationRules)->validateWithBag('createSongbook');
         $songbook = Songbook::create($input);
         CreatedSongbook::dispatch($user, $songbook);

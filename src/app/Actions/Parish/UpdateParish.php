@@ -65,6 +65,7 @@ class UpdateParish extends AbstractUpdateAction implements UpdatesParishes
     public function update(User $user, Parish $parish, array $input)
     {
         Gate::forUser($user)->authorize('update', $parish);
+        /** @var array<string, mixed> $input */
         $input = Validator::make($input, Parish::$validationRules)->validateWithBag('updateParish');
         $city = $parish->owningCity;
         abort_unless($city instanceof City, 404);
@@ -73,6 +74,7 @@ class UpdateParish extends AbstractUpdateAction implements UpdatesParishes
         UpdatedParish::dispatch($user, $parish);
 
         // import street ranges from csv
+        /** @var string $csv */
         $csv = request()->get('csv', '');
         if ($csv) {
             $ctr = $parish->importStreetsFromCSV($user, $csv);

@@ -58,6 +58,7 @@ class UpdatePoolmaster extends AbstractUpdateAction implements UpdatesPoolmaster
     public function update(User $user, Poolmaster $poolmaster, array $input): Poolmaster
     {
         Gate::forUser($user)->authorize('update', $poolmaster);
+        /** @var array<string, mixed> $input Validierte Eingabedaten. */
         $input = Validator::make($input, Poolmaster::$validationRules)->validateWithBag(('updatePool'));
         $poolmaster->update($input);
         $poolmaster->refresh();

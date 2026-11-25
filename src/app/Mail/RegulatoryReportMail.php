@@ -76,8 +76,10 @@ class RegulatoryReportMail extends Mailable implements ShouldQueue
         $city = $service->city;
         $cityName = $city !== null ? $city->name : '';
         $sender = 'Evangelische Kirchengemeinde '.$cityName.'';
+        $template = $this->data['template'] ?? '';
+        $template = is_scalar($template) ? (string) $template : '';
         $text = strtr(
-            $this->data['template'],
+            $template,
             [
                 '###GOTTESDIENST###' => implode(', ',
                     [

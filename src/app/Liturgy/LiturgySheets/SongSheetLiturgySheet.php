@@ -165,16 +165,15 @@ class SongSheetLiturgySheet extends AbstractLiturgySheet
      */
     protected function renderPsalmItem(DefaultWordDocument $doc, Item $item): void
     {
-        if (! isset($item->data['psalm'])) {
-            return;
-        }
-        if (! $item->data['psalm']['text']) {
+        $psalm = $item->data['psalm'] ?? null;
+        $text = is_array($psalm) ? ($psalm['text'] ?? null) : null;
+        if (! is_scalar($text) || ! $text) {
             return;
         }
         /** @var PsalmItemHelper $helper */
         $helper = $item->getHelper();
         $doc->getSection()->addTitle($helper->getTitleText(), 3);
-        $doc->renderNormalText($item->data['psalm']['text']);
+        $doc->renderNormalText((string) $text);
     }
 
     /**
@@ -185,33 +184,53 @@ class SongSheetLiturgySheet extends AbstractLiturgySheet
      */
     protected function renderSongItem(DefaultWordDocument $doc, Item $item): void
     {
-        if (! isset($item->data['song'])) {
+        $songData = $item->data['song'] ?? null;
+        if (! is_array($songData)) {
             return;
         }
-        if ($item->data['song']['id'] == -1) {
+        if (($songData['id'] ?? null) == -1) {
             return;
         }
         /** @var SongItemHelper $helper */
         $helper = $item->getHelper();
         $doc->getSection()->addTitle($helper->getTitleText(), 3);
-        if ($item->data['song']['song']['copyrights'] ?? '') {
-            $doc->renderNormalText($item->data['song']['song']['copyrights'], ['size' => 8]);
+        $songDetails = $songData['song'] ?? null;
+        $songDetails = is_array($songDetails) ? $songDetails : [];
+        $copyrights = $songDetails['copyrights'] ?? null;
+        if (is_scalar($copyrights) && $copyrights) {
+            $doc->renderNormalText((string) $copyrights, ['size' => 8]);
         }
 
-        if ($this->config['renderMusic'] && isset($item->data['song']['song']['notation'])) {
-            $song = Song::findOrFail((int) $item->data['song']['song_id']);
-            $images = ABCMusic::images($song, $item->data['verses'], ABCMusic::COLORS_NORMAL, $this->config['mergeVerses']);
+        if ($this->config['renderMusic'] && isset($songDetails['notation'])) {
+            $songId = $songData['song_id'] ?? null;
+            $song = Song::findOrFail(is_scalar($songId) ? (int) $songId : 0);
+            /** @var array<int, string>|string $verses */
+            $verses = $item->data['verses'] ?? '';
+            $mergeVerses = $this->config['mergeVerses'] ?? false;
+            $images = ABCMusic::images(
+                $song,
+                $verses,
+                ABCMusic::COLORS_NORMAL,
+                is_scalar($mergeVerses) && (bool) $mergeVerses
+            );
             foreach ($images as $image) {
                 $doc->getSection()->addImage($image, ['width' => Converter::cmToPoint(17.5)]);
             }
         } else {
+            $refrain = $songDetails['refrain'] ?? '';
+            $refrain = is_scalar($refrain) ? (string) $refrain : '';
             foreach ($helper->getActiveVerses() as $verse) {
                 if ($verse['refrain_before']) {
-                    $doc->renderNormalText($item->data['song']['song']['refrain'], ['italic' => true]);
+                    $doc->renderNormalText($refrain, ['italic' => true]);
                 }
-                $doc->renderNormalText($verse['number'].'. '.$verse['text']);
+                $number = $verse['number'] ?? '';
+                $verseText = $verse['text'] ?? '';
+                $doc->renderNormalText(
+                    (is_scalar($number) ? (string) $number : '').'. '
+                    .(is_scalar($verseText) ? (string) $verseText : '')
+                );
                 if ($verse['refrain_after']) {
-                    $doc->renderNormalText($item->data['song']['song']['refrain'], ['italic' => true]);
+                    $doc->renderNormalText($refrain, ['italic' => true]);
                 }
             }
         }

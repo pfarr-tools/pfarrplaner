@@ -2464,3 +2464,223 @@ erzeugt: **3700 Rohbefunde / 2418 Muster**. Der Gate bleibt grün: PHPStan
 Level 10, PHPDoc-Prüfung und vollständige PHP-Tests (1207) laufen ohne Fehler.
 Das technische Handbuch (`codequalitaet-und-workflow.md`) ist auf Level 10
 nachgezogen. Die Level-10-Altlasten sind die nächste Ratchet-Stufe.
+
+## Level-10-Welle 1
+
+| Messwert | Vorher | Nachher |
+|---|---:|---:|
+| Rohbefunde ohne Baseline | 3700 | 2969 |
+| Baseline-Muster | 2418 | 2039 |
+
+Drei Pakete: `BillBoardReport`, `HandlesAttachmentsTrait`, `SongPPTLiturgySheet`.
+Zusätzlich zentral: Permission-Migration, `TracksDeletedByTrait`,
+`DefaultWordDocument`. 400 obsolete PHPStan-Muster entfernt; 13 Restbefunde
+im `BillBoardReport` (Casts, Nullsafe, Magic-Attribute) zentral korrigiert.
+PHPDoc-Baseline auf 1007 Einträge aktualisiert. PHPStan Level 10,
+PHPDoc-Prüfung und vollständige PHP-Tests (1207) grün.
+
+## Level-10-Welle 2
+
+| Messwert | Vorher | Nachher |
+|---|---:|---:|
+| Rohbefunde ohne Baseline | 2969 | 2681 |
+| Baseline-Muster | 2039 | 1897 |
+
+Drei Pakete: `Announcements` (133), `BulletinReport` (78), `Broadcast` (64).
+Generics und Shape-Typen für Collections und Request-Daten, Google-API-
+Ressourcen über getippte Helfer, Null-Guards und `stringify()`-Helper.
+142 obsolete PHPStan-Muster entfernt; PHPDoc-Baseline auf 1011 Einträge
+aktualisiert. PHPStan Level 10, PHPDoc-Prüfung und PHP-Tests (1207) grün.
+
+## Level-10-Welle 3
+
+| Messwert | Vorher | Nachher |
+|---|---:|---:|
+| Rohbefunde ohne Baseline | 2681 | 2483 |
+| Baseline-Muster | 1897 | 1765 |
+
+Drei Pakete: `BulletinBLReport` (59), `Service`-Modell (55), `PapierkorbController`
+und `UserController` (86). Type-Narrowing für Request-/Setting-Werte,
+Shape-Typen für Collections, `stringify()`-Helper im Service-Modell.
+132 obsolete PHPStan-Muster entfernt; 17 Restbefunde zentral korrigiert.
+PHPDoc-Baseline auf 1011 Einträge aktualisiert. PHPStan Level 10,
+PHPDoc-Prüfung und PHP-Tests (1207) grün.
+
+## Level-10-Welle 4
+
+| Messwert | Vorher | Nachher |
+|---|---:|---:|
+| Rohbefunde ohne Baseline | 2483 | 2232 |
+| Baseline-Muster | 1765 | 1621 |
+
+Drei Pakete: Berichte A (`EKDStatsReport`, `AnnouncementsReport`), Liturgie
+(`SongItemHelper`, `BekanntgabenReplacer`), Berichte C (`MinistryRequestReport`,
+`SingleMinistryReport`, `EventListReport`). Shape-Typen für Request-/Event-Daten,
+`is_string`/`is_array`-Guards, `int`-Casts in Versbereichen. 144 obsolete
+PHPStan-Muster entfernt; 2 Restbefunde im `SongItemHelper` zentral korrigiert.
+PHPStan Level 10, PHPDoc-Prüfung und PHP-Tests (1207) grün.
+
+## Level-10-Welle 5
+
+| Messwert | Vorher | Nachher |
+|---|---:|---:|
+| Rohbefunde ohne Baseline | 2232 | 2028 |
+| Baseline-Muster | 1621 | 1498 |
+
+Drei Pakete: Paket A (`TermineReplacer`, `ServiceTableReport`), Paket B
+(`User`-Modell, `CalendarService`), Liturgie-Sheets (`FullText`,
+`A4WordSpecific`, `AIPrompt`). Shape-Typen für Event-/Request-Daten und
+Day-Maps, `instanceof`-Guards, `DateTimeInterface`-Annotationen. 123 obsolete
+PHPStan-Muster entfernt; 6 Restbefunde zentral korrigiert. PHPDoc-Baseline
+auf 1011 Einträge aktualisiert. PHPStan Level 10, PHPDoc-Prüfung und
+PHP-Tests (1207) grün.
+
+## Level-10-Welle 6
+
+| Messwert | Vorher | Nachher |
+|---|---:|---:|
+| Rohbefunde ohne Baseline | 2028 | 1803 |
+| Baseline-Muster | 1498 | 1365 |
+
+Drei Pakete: Berichte (`ServicesByWTCCategoryReport`,
+`ReplaceableServicesReport`, `ServiceExcelTableReport`), Attachments/Sheets
+(`HandlesAttachedImageTrait`, `SermonHandoutLiturgySheet`,
+`SongMailLiturgySheet`), Seating/API/Import (`RowBasedSeatFinder`,
+`Api/ServiceController`, `OPEventsImport`). Shape-Typen für Request-/Item-Daten,
+`is_string`/`is_array`-Guards, `class-string<Model>`-Annotationen. 133 obsolete
+PHPStan-Muster entfernt. PHPDoc-Baseline auf 1011 Einträge aktualisiert.
+PHPStan Level 10, PHPDoc-Prüfung und PHP-Tests (1207) grün.
+
+## Level-10-Welle 7
+
+| Messwert | Vorher | Nachher |
+|---|---:|---:|
+| Rohbefunde ohne Baseline | 1803 | 1607 |
+| Baseline-Muster | 1365 | 1235 |
+
+Drei Pakete: A (`ServiceThemesReport`, `InterstitialService`, `Wedding`),
+B (`EmbedWebBuilderReport`, `MinistrySignupSheetReport`, `PlanningInput`),
+C (`SongSheetLiturgySheet`, `ReadingItemHelper`, `BaptismController`).
+Shape-Typen für Request-/Config-Daten, Scalar-Narrowing für Item-/Versdaten,
+User-Guards in Controllern. 130 obsolete PHPStan-Muster entfernt.
+PHPDoc-Baseline auf 1011 Einträge aktualisiert. PHPStan Level 10,
+PHPDoc-Prüfung und PHP-Tests (1207) grün.
+
+## Level-10-Welle 8
+
+| Messwert | Vorher | Nachher |
+|---|---:|---:|
+| Rohbefunde ohne Baseline | 1607 | 1434 |
+| Baseline-Muster | 1235 | 1141 |
+
+Drei Pakete: Migrationen (`migrate_int_ids`, `add_cc_fields`,
+`add_service_fields2`), Berichte (`OfferingPlanReport`, `QuarterlyEventsReport`,
+`RitesReport`), Controller (`FuneralController`, `PublicController`,
+`WeddingController`). Blueprint-/JoinClause-Typen in Migrations-Closures,
+Shape-Typen für Request-Daten, `getAttribute()` für dynamische Rite-Attribute,
+`instanceof`-Guards. 94 obsolete PHPStan-Muster entfernt; 5 Restbefunde
+zentral korrigiert. PHPDoc-Baseline auf 1011 Einträge aktualisiert.
+PHPStan Level 10, PHPDoc-Prüfung und PHP-Tests (1207) grün.
+
+## Level-10-Welle 9
+
+| Messwert | Vorher | Nachher |
+|---|---:|---:|
+| Rohbefunde ohne Baseline | 1434 | 1275 |
+| Baseline-Muster | 1141 | 1015 |
+
+Drei Pakete: A (`ChildrensChurchInput`, `Item`, `NormalizesBaptismData`),
+B (`EventCalendarImport`, `SongBeamer/Song`, `ServicesByLocationCSVReport`),
+C (`WeeklyVerseReport`, `ServiceController`, `CalendarLiturgicalInfoResource`,
+`HasCityScopes`). Shape-Typen für validierte Daten und Liturgie-Einträge,
+`is_scalar`/`is_string`-Guards, präzise `@return`-Typen. 126 obsolete
+PHPStan-Muster entfernt. PHPDoc-Baseline auf 1008 Einträge aktualisiert.
+PHPStan Level 10, PHPDoc-Prüfung und PHP-Tests (1207) grün.
+
+## Level-10-Welle 10
+
+| Messwert | Vorher | Nachher |
+|---|---:|---:|
+| Rohbefunde ohne Baseline | 1275 | 904 |
+| Baseline-Muster | 1015 | 761 |
+
+Drei Pakete mit je 10 Dateien (Normalizer/DAV/HomeController/SongBeamer,
+Helpers/Modelle/Controller, Reports/Migrationen/StudyHelper). Erstmals größere
+Batches, da sich die restlichen Befunde auf über 300 Dateien mit je ~10–14
+Findings verteilen. Shape-Typen, `is_scalar`/`is_string`-Guards, `VEvent`-Typ,
+`getAttribute()` statt dynamischer Properties. 254 obsolete PHPStan-Muster
+entfernt; 4 Restbefunde zentral korrigiert. PHPDoc-Baseline auf 1024 Einträge
+aktualisiert. PHPStan Level 10, PHPDoc-Prüfung und PHP-Tests (1207) grün.
+
+## Level-10-Welle 11
+
+| Messwert | Vorher | Nachher |
+|---|---:|---:|
+| Rohbefunde ohne Baseline | 904 | 600 |
+| Baseline-Muster | 761 | 533 |
+
+Drei Pakete mit je 12 Dateien (Inputs/Helpers/Reports/Middleware, Controller/
+Resources/Modelle/Migrationen, Actions/Services/Migrationen). Guards für
+Request-/JSON-/API-Werte, getippte Closure-Parameter, `self::`-Konstanten,
+`setAttribute()` statt Magic-Property. 228 obsolete PHPStan-Muster entfernt;
+4 Restbefunde (CreateComment, Migration) zentral korrigiert.
+PHPDoc-Baseline auf 1024 Einträge aktualisiert. PHPStan Level 10,
+PHPDoc-Prüfung und PHP-Tests (1207) grün.
+
+## Level-10-Welle 12
+
+| Messwert | Vorher | Nachher |
+|---|---:|---:|
+| Rohbefunde ohne Baseline | 600 | 361 |
+| Baseline-Muster | 533 | 343 |
+
+Drei Pakete mit je 15 Dateien. Guards für `mixed` aus Request/`config()`/
+`json_decode()`, `@var`-Shapes für validierte Daten und DB-Zeilen,
+`self::`-Konstanten, `method_exists`-Guards für dynamische Actions,
+`Blueprint`-Hinweise in Migrationen. 190 obsolete PHPStan-Muster entfernt.
+PHPDoc-Baseline auf 1024 Einträge aktualisiert. PHPStan Level 10,
+PHPDoc-Prüfung und PHP-Tests (1207) grün.
+
+## Level-10-Welle 13
+
+| Messwert | Vorher | Nachher |
+|---|---:|---:|
+| Rohbefunde ohne Baseline | 361 | 186 |
+| Baseline-Muster | 343 | 178 |
+
+Drei Pakete mit je 20 Dateien (Actions/Controller/Rules/Seating/Migrationen,
+Controller/Requests/Resources/Parser/Migrationen, Actions/Modelle/Migrationen).
+Shape-Typen für validierte Daten, `Blueprint`-Closure-Parameter,
+`is_string`/`is_array`-Guards, `toArray()` → `all()`. 165 obsolete
+PHPStan-Muster entfernt. PHPDoc-Baseline auf 1024 Einträge aktualisiert.
+PHPStan Level 10, PHPDoc-Prüfung und PHP-Tests (1207) grün.
+
+## Level-10-Welle 14
+
+| Messwert | Vorher | Nachher |
+|---|---:|---:|
+| Rohbefunde ohne Baseline | 186 | 45 |
+| Baseline-Muster | 178 | 45 |
+
+Drei Pakete mit je 30 Dateien. Shape-/`@var`-Typen für validierte Daten und
+Konfigurationswerte, Typverengung mit `is_array`/`is_string`/`is_scalar`/
+`instanceof`, `self::`-Konstanten, `Blueprint`-Parameter. 133 obsolete
+PHPStan-Muster entfernt. PHPDoc-Baseline auf 1024 Einträge aktualisiert.
+PHPStan Level 10, PHPDoc-Prüfung und PHP-Tests (1207) grün.
+
+## Level-10-Welle 15 — Baseline auf 0
+
+| Messwert | Vorher | Nachher |
+|---|---:|---:|
+| Rohbefunde ohne Baseline | 45 | 0 |
+| Baseline-Muster | 45 | 0 |
+
+Drei Pakete mit je 15 Einzelbefunden in 15 Dateien. `is_string`/`is_scalar`/
+`is_array`-Guards, `instanceof`-Prüfungen, `@var`-Typen und `self::`-Konstanten.
+Ein Restbefund in `AdminModule::modules()` (Template-Type von `collect()`)
+zentral korrigiert. Baseline ist jetzt leer (`ignoreErrors: []`).
+PHPDoc-Baseline auf 1024 Einträge aktualisiert. PHPStan Level 10,
+PHPDoc-Prüfung und vollständige PHP-Tests (1207) grün.
+
+Damit ist das PHPStan-Ratchet vollständig: Level 6, Level 8 und Level 10
+jeweils von einer frischen Baseline auf 0 Rohbefunde abgebaut.

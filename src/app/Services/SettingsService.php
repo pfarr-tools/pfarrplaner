@@ -44,14 +44,17 @@ class SettingsService
      * Load all settings of a user into the cache if they are not cached yet.
      *
      * @param  User  $user  User whose settings are loaded.
-     * @return void
      */
     protected function cacheSettings(User $user): void
     {
         // cache all settings, if not done yet
         if (! is_array($this->settings) || (! isset($this->settings[$user->id])) || (count($this->settings[$user->id]) == 0)) {
             $this->settings[$user->id] = UserSetting::where('user_id', $user->id)->get()->mapWithKeys(function ($item) {
-                return [$item['key'] => $item];
+                /** @var UserSetting $item */
+                /** @var string $key */
+                $key = $item['key'];
+
+                return [$key => $item];
             });
         }
     }
@@ -84,6 +87,7 @@ class SettingsService
         } else {
             $setting = $this->settings[$user->id][$key];
         }
+        /** @var UserSetting $setting */
         $return = ($returnObject ? $setting : $setting->value);
         error_reporting($err);
 
@@ -96,7 +100,6 @@ class SettingsService
      *
      * @param  User  $user  User whose setting is checked.
      * @param  string  $key  Setting key.
-     * @return bool
      */
     public function has(User $user, string $key): bool
     {
@@ -121,6 +124,7 @@ class SettingsService
         }
         if ($this->has($user, $key)) {
             $setting = $this->get($user, $key, null, true);
+            /** @var UserSetting $setting */
             $setting->value = $value;
             $setting->save();
         } else {
@@ -151,6 +155,7 @@ class SettingsService
         $this->cacheSettings($user);
 
         return $this->settings[$user->id] ? $this->settings[$user->id]->map(function ($item) {
+            /** @var UserSetting $item */
             return $item->value;
         }) : [];
     }

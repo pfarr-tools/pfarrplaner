@@ -33,7 +33,12 @@ class OfferingCertificateMail extends Mailable implements ShouldQueue
      */
     public function __construct(private readonly Service $service)
     {
-        $this->from(config('mail.from.address'), config('mail.from.name'));
+        $address = config('mail.from.address');
+        $name = config('mail.from.name');
+        $this->from(
+            is_string($address) || is_array($address) || is_object($address) ? $address : '',
+            is_string($name) ? $name : null,
+        );
     }
 
     /**

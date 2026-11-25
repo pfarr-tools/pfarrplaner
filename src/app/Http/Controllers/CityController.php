@@ -114,10 +114,12 @@ class CityController extends AbstractCRUDController
         $user = Auth::user();
         abort_unless($user instanceof User, 401);
         $data['canDelete'] = $user->can('delete', $model);
+        /** @var \Illuminate\Database\Eloquent\Collection<int, City> $children */
+        $children = $model ? $model->children : collect();
         $data['possibleChildren'] = City::where('is_org', '!=', 1)
             ->whereNull('parent_id')
             ->get()
-            ->merge($model ? $model->children : collect())
+            ->merge($children)
             ->unique()
             ->sortBy('name');
         $data['streams'] = [];
@@ -165,6 +167,7 @@ class CityController extends AbstractCRUDController
         $today = Carbon::now('Europe/Berlin')->startOfDay();
         $services = $this->offeringServicesForDate($city, $today);
         $fallback = $services->isEmpty();
+        /** @var Collection<int, Service> $nearbyServices */
         $nearbyServices = collect();
 
         if ($fallback) {
@@ -196,6 +199,7 @@ class CityController extends AbstractCRUDController
      */
     public function savePublicOffering(Request $request, City $city)
     {
+        /** @var array<string, mixed> $data */
         $data = $request->validate([
             'service_id' => ['required', 'integer'],
             'offering_amount' => ['nullable', 'string', 'max:32'],
@@ -213,10 +217,14 @@ class CityController extends AbstractCRUDController
 
         abort_if(filled($service->offering_amount), 409, 'Die Opferangaben wurden bereits gespeichert.');
 
-        $denominations = $this->validatedOfferingDenominations($data['offering_denominations'] ?? []);
+        /** @var array<int|string, mixed> $denominationsInput */
+        $denominationsInput = $data['offering_denominations'] ?? [];
+        $denominations = $this->validatedOfferingDenominations($denominationsInput);
         $amount = $this->offeringAmountFromDenominations($denominations);
         if ($amount === null) {
-            $amount = $this->normalizeOfferingAmount($data['offering_amount'] ?? null);
+            /** @var string|null $amountInput */
+            $amountInput = $data['offering_amount'] ?? null;
+            $amount = $this->normalizeOfferingAmount($amountInput);
         }
 
         abort_unless($amount !== null, 422, 'Bitte eine gültige Opfersumme eingeben.');
@@ -347,6 +355,7 @@ class CityController extends AbstractCRUDController
         /** @var array<int|string, int> $result */
         $result = [];
         foreach ($input as $cents => $count) {
+            /** @var int|string $count */
             abort_unless(array_key_exists((int) $cents, $allowed), 422, 'Ungültige Stückelung.');
             abort_unless(filter_var($count, FILTER_VALIDATE_INT) !== false && (int) $count >= 0, 422, 'Ungültige Stückzahl.');
             if ((int) $count > 0) {

@@ -130,7 +130,7 @@ class AbstractLiturgySheet
     /**
      * Return the footer content for the generated document.
      *
-     * @return mixed Footer content.
+     * @return string Footer content.
      */
     protected function getFooter()
     {
@@ -351,10 +351,13 @@ class AbstractLiturgySheet
             return $this->defaultConfig;
         }
 
-        return $this->config = array_replace_recursive(
-            $this->defaultConfig,
-            $user->getSetting('liturgySheetConfig_'.$this->getKey()) ?: []
-        );
+        $setting = $user->getSetting('liturgySheetConfig_'.$this->getKey());
+        /** @var array<string, mixed> $setting */
+        $setting = is_array($setting) ? $setting : [];
+        /** @var array<string, mixed> $config */
+        $config = array_replace_recursive($this->defaultConfig, $setting);
+
+        return $this->config = $config;
     }
 
     /**
@@ -365,7 +368,9 @@ class AbstractLiturgySheet
      */
     public function setConfiguration(array $data)
     {
-        $this->config = array_replace_recursive($this->defaultConfig, $data);
+        /** @var array<string, mixed> $config */
+        $config = array_replace_recursive($this->defaultConfig, $data);
+        $this->config = $config;
         $user = Auth::user();
         if ($user === null) {
             return;

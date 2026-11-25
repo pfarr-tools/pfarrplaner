@@ -88,6 +88,7 @@ class EmbedStreamingReport extends AbstractEmbedReport
      */
     public function render(Request $request)
     {
+        /** @var array<string, mixed> $data Validierte Report-Parameter. */
         $data = $request->validate(
             [
                 'city' => 'required',

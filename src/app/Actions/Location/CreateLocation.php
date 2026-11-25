@@ -65,6 +65,7 @@ class CreateLocation extends AbstractCreateAction implements CreatesLocations
      */
     public function create(User $user, array $input)
     {
+        /** @var array{city_id: int|string, ...} $input */
         $input = Validator::make($input, Location::$validationRules)->validateWithBag('createLocation');
         $this->city = City::findOrFail((int) $input['city_id']);
         Gate::forUser($user)->authorize('create', [Location::class, $this->city]);

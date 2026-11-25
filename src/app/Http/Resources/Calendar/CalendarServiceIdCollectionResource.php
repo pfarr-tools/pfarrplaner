@@ -47,8 +47,10 @@ class CalendarServiceIdCollectionResource extends ResourceCollection
     {
         $items = [];
         foreach ($this->collection ?? collect() as $item) {
+            /** @var object{city_id: int, id: int} $item */
             $items[$item->city_id][] = $item;
             foreach (DB::select('SELECT city_id FROM city_service WHERE service_id=?', [$item->id]) as $id) {
+                /** @var object{city_id: int} $id */
                 $items[$id->city_id][] = $item;
             }
         }

@@ -114,12 +114,12 @@ class Booking extends AbstractModel
         });
     }
 
-    /**
-     * @return string
-     */
     public function getLabelAttribute(): string
     {
-        return trim(($this->name ?? '').(($this->first_name ?? '') ? ', '.$this->first_name : ''));
+        $name = is_scalar($this->name) ? (string) $this->name : '';
+        $firstName = is_scalar($this->first_name) ? (string) $this->first_name : '';
+
+        return trim($name.($firstName ? ', '.$firstName : ''));
     }
 
     public function fillDefaults(): array

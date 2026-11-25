@@ -105,7 +105,10 @@ class CalendarMonthServiceResource extends JsonResource
         $result = [];
 
         foreach ($service->participants->groupBy('pivot.category') as $category => $participants) {
-            $result[$category] = $participants->map(function ($participant) {
+            if (! is_int($category) && ! is_string($category)) {
+                continue;
+            }
+            $result[(string) $category] = $participants->map(function ($participant) {
                 /** @var User $participant */
                 return trim(implode(' ', array_filter([
                     $participant->title,

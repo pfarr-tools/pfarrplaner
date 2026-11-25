@@ -76,12 +76,14 @@ class ServicesByCitiesCSVReport extends AbstractCSVReport
                 'full_location' => 'boolean',
             ]
         );
-
+        /** @var array{start: string, end: string, cities: array<int, int>, full_location?: bool} $data */
         $start = Carbon::parse($data['start']);
         $end = Carbon::parse($data['end']);
         $cities = City::whereIn('id', $data['cities'])->get();
 
         Carbon::setLocale('de');
+        /** @var string $cityNames */
+        $cityNames = $cities->pluck('name')->join(' ');
 
         $services = Service::between($start, $end)
             ->notHidden()
@@ -95,22 +97,30 @@ class ServicesByCitiesCSVReport extends AbstractCSVReport
 
         return $this->csv(
             FileNameService::make(
-                static::FILE_TITLE.' '.$cities->pluck('name')->join(' '),
+                self::FILE_TITLE.' '.$cityNames,
                 null,
                 static::FILE_SIGNATURE,
                 [$start, $end]
             ),
             $services,
             [
-                'Datum' => function ($item, $key) {
-                    return $item[0]->date->setTimezone('Europe/Berlin')->isoFormat('dddd, DD. MMMM');
+                'Datum' => function ($item, $key): string {
+                    /** @var array<int, Service> $item */
+                    /** @var Carbon $date */
+                    $date = $item[0]->date;
+
+                    return $date->setTimezone('Europe/Berlin')->isoFormat('dddd, DD. MMMM');
                 },
-                'Gottesdienste' => function ($item, $key) use ($data) {
+                'Gottesdienste' => function ($item, $key) use ($data): string {
+                    /** @var array<int, Service> $item */
                     $records = [];
-                    /** @var Service $service */
                     foreach ($item as $service) {
+                        /** @var string $location */
+                        $location = ($data['full_location'] ?? false)
+                            ? $service->locationTextWithCity
+                            : $service->locationText();
                         $records[] = $service->timeText(true, ':', false, false, true)
-                            .'  '.($data['full_location'] ? $service->locationTextWithCity : $service->locationText())
+                            .'  '.$location
                             .($service->titleText() != 'GD' ? "\n                ".$service->titleText(false, true) : '');
                     }
 

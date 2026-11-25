@@ -56,6 +56,9 @@ class MinistryService
         $m = $includeBasicMinistries ? self::POMA() : [];
 
         foreach ($ministries as $ministry) {
+            if (! is_string($ministry)) {
+                continue;
+            }
             $m[$ministry] = $ministry;
         }
 
@@ -71,13 +74,22 @@ class MinistryService
     public static function title(string $title): string
     {
         if ($title == 'P') {
-            return config('labels.pastor');
+            /** @var string $label */
+            $label = config('labels.pastor');
+
+            return $label;
         }
         if ($title == 'O') {
-            return config('labels.organist');
+            /** @var string $label */
+            $label = config('labels.organist');
+
+            return $label;
         }
         if ($title == 'M') {
-            return config('labels.sacristan');
+            /** @var string $label */
+            $label = config('labels.sacristan');
+
+            return $label;
         }
         if ($title == 'A') {
             return 'Weitere Beteiligte';
@@ -93,7 +105,14 @@ class MinistryService
      */
     public static function POMA(): array
     {
-        return ['P' => config('labels.pastor'), 'O' => config('labels.organist'), 'M' => config('labels.sacristan'), 'A' => 'Weitere Beteiligte'];
+        /** @var string $pastor */
+        $pastor = config('labels.pastor');
+        /** @var string $organist */
+        $organist = config('labels.organist');
+        /** @var string $sacristan */
+        $sacristan = config('labels.sacristan');
+
+        return ['P' => $pastor, 'O' => $organist, 'M' => $sacristan, 'A' => 'Weitere Beteiligte'];
     }
 
     /**
@@ -105,6 +124,9 @@ class MinistryService
     {
         $ministries = [];
         foreach (Participant::query()->pluck('category')->unique() as $ministry) {
+            if (! is_string($ministry)) {
+                continue;
+            }
             $ministries[] = [
                 'id' => $ministry,
                 'name' => self::POMA()[$ministry] ?? $ministry,

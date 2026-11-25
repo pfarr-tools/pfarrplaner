@@ -65,7 +65,11 @@ class EncryptedAttribute implements CastsAttributes
     public static function getEncrypter()
     {
         if (! self::$encrypter) {
-            self::$encrypter = new Encrypter(self::parseKey(config('database.key')), config('database.cipher'));
+            /** @var string $key */
+            $key = config('database.key');
+            /** @var string $cipher */
+            $cipher = config('database.cipher');
+            self::$encrypter = new Encrypter(self::parseKey($key), $cipher);
         }
 
         return self::$encrypter;
@@ -77,7 +81,13 @@ class EncryptedAttribute implements CastsAttributes
      */
     private function isEncrypted($string)
     {
-        return isset(json_decode(base64_decode($string ?? ''), true)['mac']);
+        if (! is_string($string)) {
+            return false;
+        }
+
+        $payload = json_decode(base64_decode($string), true);
+
+        return is_array($payload) && isset($payload['mac']);
     }
 
     /**
@@ -114,6 +124,9 @@ class EncryptedAttribute implements CastsAttributes
      */
     public function get($model, $key, $value, $attributes)
     {
+        if (! is_string($value)) {
+            return $value;
+        }
         if ($this->isEncrypted($value)) {
             return self::getEncrypter()->decryptString($value);
         }

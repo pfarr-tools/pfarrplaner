@@ -2,7 +2,9 @@
 
 use App\Models\Service;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Query\JoinClause;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Schema\ColumnDefinition;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
@@ -99,7 +101,6 @@ return new class extends Migration
      *
      * @param  string  $tableName  Name of the table whose id column is migrated.
      * @param  string  $targetType  Blueprint column method for the target type.
-     * @return void
      */
     protected function migrateIdFieldWithAllConstraints(string $tableName, string $targetType): void
     {
@@ -116,17 +117,21 @@ return new class extends Migration
         // change child fields to correct type
         foreach ($constraints as $c) {
             Schema::table($c->fk_table, function (Blueprint $t) use ($c, $targetType) {
+                /** @var ColumnDefinition $column */
+                $column = $t->$targetType($c->fk_column);
                 if ($this->isColumnNullable($c->fk_table, $c->fk_column)) {
-                    $t->$targetType($c->fk_column)->nullable()->change();
+                    $column->nullable()->change();
                 } else {
-                    $t->$targetType($c->fk_column)->change();
+                    $column->change();
                 }
             });
         }
 
         // change id field to correct type (with auto-increment)
         Schema::table($tableName, function (Blueprint $t) use ($targetType) {
-            $t->$targetType('id', true)->change();
+            /** @var ColumnDefinition $column */
+            $column = $t->$targetType('id', true);
+            $column->change();
         });
 
         // rebuild constraints from cached rules
@@ -153,14 +158,15 @@ return new class extends Migration
      * Fetch the foreign key columns referencing the id column of a table.
      *
      * @param  string  $table  Name of the referenced table.
-     * @return array<int, \stdClass> Rows with fk_table, fk_column, DELETE_RULE, UPDATE_RULE and CONSTRAINT_NAME.
+     * @return array<int, object{fk_table: string, fk_column: string, DELETE_RULE: string, UPDATE_RULE: string, CONSTRAINT_NAME: string}> Rows with fk_table, fk_column, DELETE_RULE, UPDATE_RULE and CONSTRAINT_NAME.
      */
     public function foreignKeyColumnsReferencingTableId(string $table): array
     {
         $database = DB::getDatabaseName();
 
-        return DB::table('information_schema.REFERENTIAL_CONSTRAINTS as rc')
-            ->join('information_schema.KEY_COLUMN_USAGE as kcu', function ($join) {
+        /** @var array<int, object{fk_table: string, fk_column: string, DELETE_RULE: string, UPDATE_RULE: string, CONSTRAINT_NAME: string}> $constraints */
+        $constraints = DB::table('information_schema.REFERENTIAL_CONSTRAINTS as rc')
+            ->join('information_schema.KEY_COLUMN_USAGE as kcu', function (JoinClause $join) {
                 $join->on('rc.CONSTRAINT_NAME', '=', 'kcu.CONSTRAINT_NAME')
                     ->on('rc.CONSTRAINT_SCHEMA', '=', 'kcu.TABLE_SCHEMA');
             })
@@ -175,6 +181,8 @@ return new class extends Migration
                 'rc.CONSTRAINT_NAME',
             ])
             ->toArray();
+
+        return $constraints;
     }
 
     /**
@@ -194,10 +202,12 @@ return new class extends Migration
                 ->delete();
 
             Schema::table($foreignTable, function (Blueprint $t) use ($foreignTable, $foreignColumn, $tableName, $targetType) {
+                /** @var ColumnDefinition $column */
+                $column = $t->$targetType($foreignColumn);
                 if ($this->isColumnNullable($foreignTable, $foreignColumn)) {
-                    $t->$targetType($foreignColumn)->nullable()->change();
+                    $column->nullable()->change();
                 } else {
-                    $t->$targetType($foreignColumn)->change();
+                    $column->change();
                 }
                 $t->foreign($foreignColumn)->references('id')->on($tableName)->cascadeOnDelete();
             });
@@ -216,7 +226,7 @@ return new class extends Migration
 
         // Alle Spalten mit diesem Namen finden
         $columns = DB::table('information_schema.COLUMNS as c')
-            ->leftJoin('information_schema.KEY_COLUMN_USAGE as k', function ($join) {
+            ->leftJoin('information_schema.KEY_COLUMN_USAGE as k', function (JoinClause $join) {
                 $join->on('k.TABLE_SCHEMA', '=', 'c.TABLE_SCHEMA')
                     ->on('k.TABLE_NAME', '=', 'c.TABLE_NAME')
                     ->on('k.COLUMN_NAME', '=', 'c.COLUMN_NAME')
@@ -231,6 +241,7 @@ return new class extends Migration
         // In gewünschtes Format: table => field
         $result = [];
         foreach ($columns as $col) {
+            /** @var object{TABLE_NAME: string, COLUMN_NAME: string} $col */
             $result[$col->TABLE_NAME] = $col->COLUMN_NAME;
         }
 

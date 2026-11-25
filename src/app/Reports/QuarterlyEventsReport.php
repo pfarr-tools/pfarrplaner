@@ -93,7 +93,7 @@ class QuarterlyEventsReport extends AbstractWordDocumentReport
                 'notes2' => 'nullable|string',
             ]
         );
-
+        /** @var array{title: string, quarter: string, location: int|string, notes1?: string|null, notes2?: string|null} $data */
         $location = Location::findOrFail((int) $data['location']);
         $title = $data['title'] ?: 'Quartalsprogramm für '.$location->name;
         $quarter = Carbon::createFromFormat('Y-m-d', $data['quarter']);
@@ -153,14 +153,20 @@ class QuarterlyEventsReport extends AbstractWordDocumentReport
         $table->addRow();
         $table->addCell()->addText('Datum', ['bold' => true]);
         $table->addCell()->addText('Uhrzeit', ['bold' => true]);
+        /** @var string $pastorLabel */
+        $pastorLabel = config('labels.pastor');
+        /** @var string $organistLabel */
+        $organistLabel = config('labels.organist');
+        /** @var string $sacristanLabel */
+        $sacristanLabel = config('labels.sacristan');
         if ($request->get('includePastor')) {
-            $table->addCell()->addText(config('labels.pastor'), ['bold' => true]);
+            $table->addCell()->addText($pastorLabel, ['bold' => true]);
         }
         if ($request->get('includeOrganist')) {
-            $table->addCell()->addText(config('labels.organist'), ['bold' => true]);
+            $table->addCell()->addText($organistLabel, ['bold' => true]);
         }
         if ($request->get('includeSacristan')) {
-            $table->addCell()->addText(config('labels.sacristan'), ['bold' => true]);
+            $table->addCell()->addText($sacristanLabel, ['bold' => true]);
         }
         if ($request->get('includeDescription')) {
             $table->addCell()->addText('Hinweise', ['bold' => true]);
@@ -219,7 +225,7 @@ class QuarterlyEventsReport extends AbstractWordDocumentReport
 
         return $this->sendToBrowser(
             FileNameService::make(
-                static::FILE_TITLE,
+                self::FILE_TITLE,
                 'docx',
                 static::FILE_SIGNATURE,
                 $quarter,

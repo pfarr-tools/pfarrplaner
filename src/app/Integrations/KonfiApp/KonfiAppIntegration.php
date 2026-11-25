@@ -123,7 +123,7 @@ class KonfiAppIntegration extends AbstractIntegration
         }
 
         $response = $this->requestData('verwaltung/veranstaltungen/');
-        if ($response && isset($response->data->veranstaltungen)) {
+        if ($response instanceof stdClass && isset($response->data) && is_object($response->data) && isset($response->data->veranstaltungen)) {
             /** @var array<int, mixed> $rawEventTypes */
             $rawEventTypes = $response->data->veranstaltungen;
             $eventTypes = collect($rawEventTypes)->values()->all();
@@ -193,7 +193,7 @@ class KonfiAppIntegration extends AbstractIntegration
             $this->lastRequest['headers']['Accept'] = 'application/json';
             $this->lastRequest['headers']['Content-Type'] = 'application/json';
         }
-        $this->lastEndpoint = static::API_URL.$path;
+        $this->lastEndpoint = self::API_URL.$path;
         $this->lastRequestType = $requestType;
 
         try {
@@ -238,19 +238,24 @@ class KonfiAppIntegration extends AbstractIntegration
      */
     public function handleServiceUpdate(Service $service, $requestedChange)
     {
+        if (! is_int($requestedChange) && ! is_string($requestedChange)) {
+            return null;
+        }
+        $eventType = (int) $requestedChange;
+
         try {
             if ($requestedChange == '') {
                 return null;
             }
 
             if ($service->konfiapp_event_qr == '') {
-                $service->konfiapp_event_type = $requestedChange;
+                $service->konfiapp_event_type = $eventType;
 
                 return $this->addQRCodeToService($service);
             }
 
-            if (($service->konfiapp_event_type != '') && ($service->konfiapp_event_type != $requestedChange)) {
-                return $this->updateServiceQRCode($service, $requestedChange);
+            if (($service->konfiapp_event_type != '') && ($service->konfiapp_event_type != $eventType)) {
+                return $this->updateServiceQRCode($service, $eventType);
             }
         } catch (Throwable $exception) {
             Log::warning('KonfiApp: QR-Code konnte fuer Gottesdienst nicht aktualisiert werden.', [
@@ -348,7 +353,9 @@ class KonfiAppIntegration extends AbstractIntegration
             'POST'
         );
 
-        return $response->code ?? null;
+        $code = $response instanceof stdClass ? ($response->code ?? null) : null;
+
+        return is_string($code) ? $code : null;
     }
 
     /**
@@ -369,10 +376,16 @@ class KonfiAppIntegration extends AbstractIntegration
                 'veranstaltungID' => $type,
             ]
         );
-        $codes = $response->detail ?? [];
+        $codes = $response instanceof stdClass ? ($response->detail ?? []) : [];
+        if (! is_array($codes)) {
+            return;
+        }
 
         foreach ($codes as $qrcode) {
-            if ($qrcode->code == $code) {
+            if (! is_object($qrcode) || ! isset($qrcode->code, $qrcode->id)) {
+                continue;
+            }
+            if ($qrcode->code == $code && is_string($qrcode->id)) {
                 $this->deleteQRCode($qrcode->id);
             }
         }
@@ -429,7 +442,7 @@ class KonfiAppIntegration extends AbstractIntegration
         $data = json_decode((string) $response->getBody());
 
         /** @var array<int, mixed> $details */
-        $details = $data->detail ?? [];
+        $details = $data instanceof stdClass ? ($data->detail ?? []) : [];
 
         return collect($details);
     }

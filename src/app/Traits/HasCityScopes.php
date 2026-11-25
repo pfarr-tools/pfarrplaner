@@ -32,6 +32,7 @@ namespace App\Traits;
 
 use App\Models\Places\City;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Collection;
 
 trait HasCityScopes
 {
@@ -49,9 +50,11 @@ trait HasCityScopes
         if (is_string($cities)) {
             $cities = [$cities];
         }
+        /** @var array<array-key, City|int|string>|Collection<array-key, City|int|string> $cityList */
+        $cityList = $cities;
         $cityIds = collect();
-        foreach ($cities as $key => $city) {
-            $cities[$key] = $city = ($city instanceof City ? $city : City::query()->findOrFail((int) $city));
+        foreach ($cityList as $key => $city) {
+            $cityList[$key] = $city = ($city instanceof City ? $city : City::query()->findOrFail((int) $city));
             $cityIds->push($city->id);
             if ($city->is_org) {
                 $cityIds = $cityIds->merge($city->children->pluck('id'));

@@ -50,6 +50,7 @@ class InterstitialController extends Controller
      */
     public function update(Request $request, InterstitialService $interstitialService, string $key)
     {
+        /** @var array{action: string} $data */
         $data = $request->validate([
             'action' => 'required|string|in:'.implode(',', [
                 InterstitialService::ACTION_DISMISS,

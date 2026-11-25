@@ -49,12 +49,12 @@ class UpdateSong extends AbstractUpdateAction implements UpdatesSongs
      * Aktualisiert ein Lied und synchronisiert dessen Verse und Liederbücher.
      *
      * @param  array<string, mixed>  $input
-     * @return Song
      */
     public function update(User $user, Song $song, array $input): Song
     {
         Gate::forUser($user)->authorize('update', $song);
 
+        /** @var array<string, mixed> $validated Validierte Eingabedaten. */
         $validated = Validator::make($input, Song::$validationRules)->validateWithBag('updateSong');
         $song->update(collect($validated)->except(['verses', 'songbooks'])->all());
         $song->syncVersesFromRequest($validated);

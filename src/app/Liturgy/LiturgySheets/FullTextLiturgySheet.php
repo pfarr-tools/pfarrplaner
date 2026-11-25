@@ -144,11 +144,13 @@ class FullTextLiturgySheet extends AbstractLiturgySheet
         // heading
         $doc->renderServiceTitleHeading($service);
 
+        /** @var array{styles: array{paragraphs: array{titles: array<int, array<string, mixed>>}, fonts: array{titles: array<int, array<string, mixed>>}}} $docConfig */
+        $docConfig = $doc->getConfig();
         foreach ($service->liturgyBlocks as $block) {
             $doc->getSection()->addTitle($block->title, 1);
             foreach ($block->items as $item) {
-                $run = new TextRun($doc->getConfig()['styles']['paragraphs']['titles'][2]);
-                $run->addText($item->title, $doc->getConfig()['styles']['fonts']['titles'][2]);
+                $run = new TextRun($docConfig['styles']['paragraphs']['titles'][2] ?? null);
+                $run->addText($item->title, $docConfig['styles']['fonts']['titles'][2] ?? []);
                 if ($this->config['includeRecipients']) {
                     $run->addText(
                         "\t".implode(', ', $item->recipients()),
@@ -175,8 +177,15 @@ class FullTextLiturgySheet extends AbstractLiturgySheet
             $types = KonfiAppIntegration::get($city)->listEventTypes();
             $text = '';
             foreach ($types as $type) {
-                if ($type->id == $service->konfiapp_event_type) {
-                    $text = $type->punktzahl.' '.($type->punktzahl == 1 ? 'Punkt' : 'Punkte').' in der Kategorie "'.$type->name.'"';
+                if (! is_object($type)) {
+                    continue;
+                }
+                /** @var object{id: mixed, punktzahl: mixed, name: mixed} $eventType */
+                $eventType = $type;
+                if ($eventType->id == $service->konfiapp_event_type) {
+                    $punktzahl = is_scalar($eventType->punktzahl) ? (string) $eventType->punktzahl : '';
+                    $name = is_scalar($eventType->name) ? (string) $eventType->name : '';
+                    $text = $punktzahl.' '.($punktzahl == 1 ? 'Punkt' : 'Punkte').' in der Kategorie "'.$name.'"';
                 }
             }
             if ($text) {
@@ -286,7 +295,7 @@ class FullTextLiturgySheet extends AbstractLiturgySheet
                         if (trim($paragraph) === '') {
                             continue;
                         }
-                        $doc->renderText($paragraph, $doc::BLOCKQUOTE, ['size' => 10]);
+                        $doc->renderText($paragraph, DefaultWordDocument::BLOCKQUOTE, ['size' => 10]);
                     }
                 } else {
                     $html = (string) $dom->saveHTML($node);
@@ -308,16 +317,15 @@ class FullTextLiturgySheet extends AbstractLiturgySheet
      */
     protected function renderPsalmItem(DefaultWordDocument $doc, Item $item): void
     {
-        if (! isset($item->data['psalm'])) {
-            return;
-        }
-        if (! $item->data['psalm']['text']) {
+        $psalm = $item->data['psalm'] ?? null;
+        $text = is_array($psalm) ? ($psalm['text'] ?? null) : null;
+        if (! is_scalar($text) || ! $text) {
             return;
         }
         /** @var PsalmItemHelper $helper */
         $helper = $item->getHelper();
         $doc->getSection()->addTitle($helper->getTitleText(), 3);
-        $doc->renderNormalText($item->data['psalm']['text']);
+        $doc->renderNormalText((string) $text);
     }
 
     /**
@@ -328,30 +336,35 @@ class FullTextLiturgySheet extends AbstractLiturgySheet
      */
     protected function renderSongItem(DefaultWordDocument $doc, Item $item): void
     {
-        if (! isset($item->data['song'])) {
+        $song = $item->data['song'] ?? null;
+        if (! is_array($song)) {
             return;
         }
         /** @var SongItemHelper $helper */
         $helper = $item->getHelper();
         $doc->getSection()->addTitle($helper->getTitleText(), 3);
-        if (isset($item->data['song'])) {
-            if (isset($item->data['song']['song']['copyrights'])) {
-                if ($item->data['song']['song']['copyrights']) {
-                    $doc->renderNormalText($item->data['song']['song']['copyrights'], ['size' => 8]);
-                }
-            }
+        $songDetails = $song['song'] ?? null;
+        $songDetails = is_array($songDetails) ? $songDetails : [];
+        $copyrights = $songDetails['copyrights'] ?? null;
+        if (is_scalar($copyrights) && $copyrights) {
+            $doc->renderNormalText((string) $copyrights, ['size' => 8]);
         }
         if (! $this->config['includeSongTexts']) {
             return;
         }
 
+        $refrain = $songDetails['refrain'] ?? '';
+        $refrain = is_scalar($refrain) ? (string) $refrain : '';
         foreach ($helper->getActiveVerses() as $verse) {
             if ($verse['refrain_before']) {
-                $doc->renderNormalText($item->data['song']['song']['refrain'], ['italic' => true]);
+                $doc->renderNormalText($refrain, ['italic' => true]);
             }
-            $doc->renderNormalText($verse['number'].'. '.$verse['text']);
+            $number = $verse['number'] ?? '';
+            $verseText = $verse['text'] ?? '';
+            $doc->renderNormalText((is_scalar($number) ? (string) $number : '').'. '
+                .(is_scalar($verseText) ? (string) $verseText : ''));
             if ($verse['refrain_after']) {
-                $doc->renderNormalText($item->data['song']['song']['refrain'], ['italic' => true]);
+                $doc->renderNormalText($refrain, ['italic' => true]);
             }
         }
     }
@@ -369,6 +382,7 @@ class FullTextLiturgySheet extends AbstractLiturgySheet
         }
 
         $helper = new ReadingItemHelper($item);
-        $helper->renderToWordDocument($doc, $this->config['includeFullReadings'], true);
+        $includeFullReadings = $this->config['includeFullReadings'] ?? false;
+        $helper->renderToWordDocument($doc, is_scalar($includeFullReadings) && (bool) $includeFullReadings, true);
     }
 }

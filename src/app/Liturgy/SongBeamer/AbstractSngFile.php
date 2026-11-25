@@ -142,7 +142,9 @@ abstract class AbstractSngFile extends AbstractFile
     {
         if (! isset($this->headers['Editor'])) {
             $package = PackageService::info();
-            $this->addHeader('Editor', config('app.name').' '.$package['versionString']);
+            $appName = config('app.name');
+            $versionString = $package['versionString'] ?? null;
+            $this->addHeader('Editor', (is_string($appName) ? $appName : '').' '.(is_string($versionString) ? $versionString : ''));
         }
         if (! isset($this->headers['Version'])) {
             $this->addHeader('Version', '3');
@@ -156,7 +158,6 @@ abstract class AbstractSngFile extends AbstractFile
         return $text;
     }
 
-    /** @return string */
     public function getFileName(): string
     {
         return $this->fileName;
@@ -170,7 +171,6 @@ abstract class AbstractSngFile extends AbstractFile
         $this->fileName = $fileName;
     }
 
-    /** @return string */
     public function getTitle(): string
     {
         return $this->title;

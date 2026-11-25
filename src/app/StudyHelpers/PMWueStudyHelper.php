@@ -58,7 +58,9 @@ class PMWueStudyHelper extends AbstractStudyHelper
     public function getLinks(array $data): array
     {
         $myRecords = $this->getPMWueLinks($this->getDaySlug($data));
-        $data['links'] = array_merge($data['links'] ?? [], $myRecords);
+        /** @var array<string, string> $links Bereits vorhandene Links. */
+        $links = $data['links'] ?? [];
+        $data['links'] = array_merge($links, $myRecords);
 
         return $data;
     }
@@ -73,7 +75,9 @@ class PMWueStudyHelper extends AbstractStudyHelper
         if (! isset($data['title'])) {
             return '';
         }
-        $title = Str::contains($data['title'], '(') ? trim(Str::before($data['title'], '(')) : trim($data['title']);
+        /** @var string $title Titel des angeforderten Tages. */
+        $title = $data['title'];
+        $title = Str::contains($title, '(') ? trim(Str::before($title, '(')) : trim($title);
         $title = Str::replace('So.', 'Sonntag', $title);
         $title = Str::replace('. Advent', '. Sonntag im Advent', $title);
 

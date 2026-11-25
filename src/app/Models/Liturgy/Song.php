@@ -166,19 +166,21 @@ class Song extends AbstractModel
     }
 
     /**
-     * @param array<string, mixed> $data
+     * @param  array<string, mixed>  $data
      */
     public function syncVersesFromRequest(array $data): void
     {
         $this->verses()->delete();
-        foreach ($data['verses'] ?? [] as $verse) {
+        /** @var array<int, array<string, mixed>> $verses */
+        $verses = $data['verses'] ?? [];
+        foreach ($verses as $verse) {
             $verse['song_id'] = $this->id;
             SongVerse::create($verse);
         }
     }
 
     /**
-     * @param array<string, mixed> $data
+     * @param  array<string, mixed>  $data
      */
     public function syncSongbooksFromRequest(array $data): void
     {
@@ -187,7 +189,9 @@ class Song extends AbstractModel
         }
 
         $sync = [];
-        foreach ($data['songbooks'] as $item) {
+        /** @var array<int, array{code?: mixed, pivot?: array{songbook_id?: int|string|null, reference?: mixed, color?: mixed}}> $songbooks */
+        $songbooks = $data['songbooks'];
+        foreach ($songbooks as $item) {
             $songbookId = $item['pivot']['songbook_id'] ?? null;
             if (! $songbookId) {
                 continue;

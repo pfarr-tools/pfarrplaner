@@ -47,7 +47,9 @@ class BibleText
     public function __construct($version = 'LUT17')
     {
         $this->version = $version;
-        $textFile = config('bible.versions')[$version] ?? null;
+        /** @var array<string, string> $versions Konfigurierte Bibeltextdateien. */
+        $versions = config('bible.versions');
+        $textFile = $versions[$version] ?? null;
         if (! $textFile) {
             throw new \Exception('Bibeltextdatei für '.$version.' nicht gefunden.');
         }
@@ -70,7 +72,9 @@ class BibleText
         $result = [];
         $this->renderedVerses = [];
         foreach ($reference['parsed'] as $section) {
-            $section['text'] = $this->getSection($section['range']);
+            /** @var array<int, array<string, string>> $range Bereichsangaben der Perikope. */
+            $range = $section['range'];
+            $section['text'] = $this->getSection($range);
             $result[] = $section;
         }
 

@@ -36,9 +36,6 @@ class PruneTrash extends Command
      */
     protected $description = 'Permanently delete trash entries older than the retention period';
 
-    /**
-     * @return int
-     */
     public function handle(): int
     {
         $days = (int) $this->option('days');

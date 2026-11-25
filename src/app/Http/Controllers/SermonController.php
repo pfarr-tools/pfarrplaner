@@ -191,6 +191,7 @@ class SermonController extends Controller
      */
     protected function validateRequest(Request $request): array
     {
+        /** @var array<string, mixed> $data */
         $data = $request->validate(
             [
                 'title' => 'nullable|string',

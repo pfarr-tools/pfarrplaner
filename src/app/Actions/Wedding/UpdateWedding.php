@@ -44,7 +44,9 @@ class UpdateWedding extends AbstractUpdateAction implements UpdatesWeddings
         Gate::forUser($user)->authorize('update', $wedding);
 
         $input = $this->prepareInputForValidation(array_merge($wedding->only($wedding->getFillable()), $input));
-        $this->authorizeServiceWriteAccess($user, $input['service_id'] ?? null);
+        $serviceId = $input['service_id'] ?? null;
+        $this->authorizeServiceWriteAccess($user, is_int($serviceId) || is_string($serviceId) ? $serviceId : null);
+        /** @var array<string, mixed> $validated */
         $validated = Validator::make($input, Wedding::$validationRules)->validateWithBag('updateWedding');
 
         $wedding->update($this->normalizeValidatedInput($validated));

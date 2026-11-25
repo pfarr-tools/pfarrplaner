@@ -86,7 +86,9 @@ class LiturgyEditorController extends Controller
     public function save(Request $request, Service $service): RedirectResponse
     {
         Gate::authorize('update', $service);
-        foreach ($request->all() as $block) {
+        /** @var array<array{id: int|string, sortable: int, items: array<array{id: int|string, sortable: int}>}> $blocks */
+        $blocks = $request->all();
+        foreach ($blocks as $block) {
             $currentBlock = $service->liturgyBlocks()->whereKey($block['id'])->firstOrFail();
             $currentBlock->update(['sortable' => $block['sortable']]);
             foreach ($block['items'] as $item) {
@@ -128,7 +130,10 @@ class LiturgyEditorController extends Controller
         }
 
         if ($sheet->getConfigurationPage() !== null) {
-            $sheet->setConfiguration($request->get('config', []));
+            $config = $request->get('config', []);
+            abort_unless(is_array($config), 400);
+            /** @var array<string, mixed> $config */
+            $sheet->setConfiguration($config);
         }
 
         return $sheet->render($service);
@@ -314,6 +319,9 @@ class LiturgyEditorController extends Controller
     {
         $ministries = [];
         foreach (Participant::query()->pluck('category')->unique() as $ministry) {
+            if (! is_string($ministry)) {
+                continue;
+            }
             switch ($ministry) {
                 case 'P':
                 case 'O':

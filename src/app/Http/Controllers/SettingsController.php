@@ -59,6 +59,7 @@ class SettingsController extends Controller
     public function set(Request $request, User $user, string $key): JsonResponse|RedirectResponse
     {
         Gate::authorize('update', $user);
+        /** @var array<string, mixed> $data */
         $data = $request->validate(['value' => 'nullable']);
         $userSetting = Settings::set($user, $key, $data['value']);
 

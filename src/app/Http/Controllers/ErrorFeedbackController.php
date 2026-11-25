@@ -24,6 +24,7 @@ class ErrorFeedbackController extends Controller
      */
     public function store(Request $request, SentryFeedbackService $feedback): RedirectResponse
     {
+        /** @var array{event_id: string, name?: string|null, email?: string|null, comments: string} $data */
         $data = $request->validate([
             'event_id' => ['required', 'regex:/^[0-9a-f]{32}$/i'],
             'name' => ['nullable', 'string', 'max:120'],

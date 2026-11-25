@@ -150,7 +150,10 @@ class AdminModule extends AbstractModule
             $adminMenu[] = $config;
         }
 
-        /** @var array<int, mixed> $adminMenu */
-        return array_values(collect($adminMenu)->sortBy('text')->toArray());
+        /** @var array<int, array<string, mixed>> $adminMenu */
+        $modules = array_values(collect($adminMenu)->sortBy('text')->toArray());
+        /** @var array<int, array<string, mixed>> $modules */
+
+        return $modules;
     }
 }

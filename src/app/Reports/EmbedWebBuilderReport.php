@@ -42,6 +42,7 @@ use App\Models\Location;
 use App\Models\Scopes\ServicesOnlyScope;
 use App\Models\Tag;
 use Carbon\Carbon;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\URL;
@@ -104,8 +105,14 @@ class EmbedWebBuilderReport extends AbstractEmbedReport
         foreach ($allConfiguredLayouts as $configuredLayout) {
             $templates = 0;
             $existingTemplates = [];
-            foreach ($configuredLayout['templates'] ?? [] as $key => $template) {
-                if (ViewFacade::exists('embed.webbuilder.'.$configuredLayout['id'].'.'.$key)) {
+            $layoutId = $configuredLayout['id'] ?? null;
+            if (! is_string($layoutId) && ! is_int($layoutId)) {
+                continue;
+            }
+            /** @var array<int|string, mixed> $configuredTemplates */
+            $configuredTemplates = is_array($configuredLayout['templates'] ?? null) ? $configuredLayout['templates'] : [];
+            foreach ($configuredTemplates as $key => $template) {
+                if (ViewFacade::exists('embed.webbuilder.'.$layoutId.'.'.$key)) {
                     $existingTemplates[$key] = $template;
                     $templates++;
                 }
@@ -134,12 +141,12 @@ class EmbedWebBuilderReport extends AbstractEmbedReport
     }
 
     /**
-     * @return \Illuminate\Contracts\View\View|string
+     * @return View|string
      */
     public function render(Request $request)
     {
         $data = $request->validate($this->getFullValidationRules($request, true));
-
+        /** @var array{cities: array<int, int>, locations?: array<int, int>|null, tags?: array<int, int>|null, eventClass: string, maxDays?: int|null, limit?: int|null, 'cors-origin': string, template: string, adChannelCode?: string|null, options?: array<string, mixed>, report?: string} $data */
         $data['report'] = 'WebBuilder';
         $corsOrigin = $data['cors-origin'];
         unset($data['cors-origin']);
@@ -165,11 +172,22 @@ class EmbedWebBuilderReport extends AbstractEmbedReport
     {
         $validationRules = $this->validationRules;
         if ($request->has('template')) {
+            $template = $request->get('template');
+            if (! is_string($template)) {
+                return $validationRules;
+            }
             $layouts = collect($this->getAvailableLayouts())->keyBy('id')->toArray();
-            [$thisLayout, $thisTemplate] = explode('.', $request->get('template'));
-            foreach (Arr::get($layouts, $thisLayout.'.templates.'.$thisTemplate.'.fields', []) as $fieldKey => $field) {
-                if ($field['rules'] ?? false) {
-                    $validationRules[($addOptions ? 'options.' : '').$fieldKey] = $field['rules'];
+            $templateParts = explode('.', $template);
+            $thisLayout = $templateParts[0];
+            $thisTemplate = $templateParts[1] ?? '';
+            $fields = Arr::get($layouts, $thisLayout.'.templates.'.$thisTemplate.'.fields', []);
+            foreach (is_array($fields) ? $fields : [] as $fieldKey => $field) {
+                if (! is_string($fieldKey) || ! is_array($field)) {
+                    continue;
+                }
+                $rules = $field['rules'] ?? false;
+                if (is_string($rules) && $rules) {
+                    $validationRules[($addOptions ? 'options.' : '').$fieldKey] = $rules;
                 }
             }
         }
@@ -178,7 +196,7 @@ class EmbedWebBuilderReport extends AbstractEmbedReport
     }
 
     /**
-     * @return \Illuminate\Contracts\View\View
+     * @return View
      */
     public function embed(Request $request)
     {
@@ -191,7 +209,7 @@ class EmbedWebBuilderReport extends AbstractEmbedReport
             abort(404);
         }
         $data = $validator->validated();
-
+        /** @var array{cities: array<int, int>, locations?: array<int, int>|null, tags?: array<int, int>|null, eventClass: string, maxDays?: int|null, limit?: int|null, template: string, adChannelCode?: string|null} $data */
         $data['maxDays'] ??= 730;
 
         $start = Carbon::now();

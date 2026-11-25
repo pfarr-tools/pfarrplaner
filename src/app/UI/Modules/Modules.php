@@ -40,7 +40,9 @@ class Modules
     public static function tree(): array
     {
         $tree = [];
-        foreach (config('modules.groups') as $title => $group) {
+        /** @var array<string, array<int, class-string<AbstractModule>>> $groups */
+        $groups = config('modules.groups');
+        foreach ($groups as $title => $group) {
             $tree[$title] = [];
             foreach ($group as $class) {
                 /** @var AbstractModule $module */
@@ -66,7 +68,9 @@ class Modules
     public static function defaultConfig(): array
     {
         $config = [];
-        foreach (config('modules.groups') as $title => $group) {
+        /** @var array<string, array<int, class-string<AbstractModule>>> $groups */
+        $groups = config('modules.groups');
+        foreach ($groups as $title => $group) {
             foreach ($group as $class) {
                 /** @var AbstractModule $module */
                 $module = new $class([]);

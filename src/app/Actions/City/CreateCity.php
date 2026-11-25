@@ -56,6 +56,7 @@ class CreateCity extends AbstractCreateAction implements CreatesCities
     public function create(User $user, array $input): City
     {
         Gate::forUser($user)->authorize('create', City::class);
+        /** @var array<string, mixed> $input */
         $input = Validator::make($input, City::$validationRules)->validateWithBag('createCity');
         $city = City::create($input);
         $city->setChildrenFromInput($input);

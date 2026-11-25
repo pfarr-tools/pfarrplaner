@@ -122,8 +122,12 @@ class RecoverUserTwoFactor
                 ->whereNull('consumed_at')
                 ->update(['consumed_at' => now(), 'updated_at' => now()]);
 
-            DB::connection(config('database.default'))
-                ->table(config('session.table', 'sessions'))
+            /** @var string|null $databaseConnection */
+            $databaseConnection = config('database.default');
+            /** @var string $sessionTable */
+            $sessionTable = config('session.table', 'sessions');
+            DB::connection($databaseConnection)
+                ->table($sessionTable)
                 ->where('user_id', $lockedTarget->getKey())
                 ->delete();
 

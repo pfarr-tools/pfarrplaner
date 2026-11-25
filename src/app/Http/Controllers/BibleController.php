@@ -47,8 +47,10 @@ class BibleController extends Controller
     public function text(Request $request, string $reference, $version = 'LUT17')
     {
         $reference = str_replace('–', '-', $reference);
+        /** @var array{originalReference: string, correctedReference: string, version: string, versionCopyrights: string, parsed: array<int, array<string, mixed>>} $ref */
         $ref = ReferenceParser::getInstance()->parse($reference);
         $text = '';
+        /** @var array<int, array{text: array<int, array{verse: string, text: string}>}> $bibleText */
         $bibleText = (new BibleText($version))->get($ref);
 
         $showVerseNumbers = $request->get('showVerseNumbers', true);

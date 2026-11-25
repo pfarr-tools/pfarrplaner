@@ -206,7 +206,9 @@ class UserController extends Controller
      */
     protected function getRoles()
     {
-        $rolesQuery = Role::query()->whereIn('name', array_keys(config('roles.roles')));
+        /** @var array<string, mixed> $rolesConfig */
+        $rolesConfig = config('roles.roles');
+        $rolesQuery = Role::query()->whereIn('name', array_keys($rolesConfig));
 
         $authUser = Auth::user();
         abort_unless($authUser instanceof User, 403);
@@ -364,9 +366,17 @@ class UserController extends Controller
      */
     protected function compactIndexUser(User $user, Collection $allCities): array
     {
+        /** @var Collection<int, City> $homeCities */
+        $homeCities = $user->getRelation('homeCities');
+        /** @var Collection<int, City> $userCities */
+        $userCities = $user->getRelation('cities');
+        /** @var Collection<int, Role> $roles */
+        $roles = $user->getRelation('roles');
+        /** @var Collection<int, City> $adminCities */
         $adminCities = $user->hasRole(AuthServiceProvider::SUPER)
             ? $allCities
             : $user->getRelation('adminCities');
+        /** @var Collection<int, City> $writableCities */
         $writableCities = $user->hasRole(AuthServiceProvider::SUPER)
             ? $allCities
             : $user->getRelation('writableCities');
@@ -380,11 +390,11 @@ class UserController extends Controller
             'email' => $user->email,
             'isOfficialUser' => $user->isOfficialUser,
             'isAdmin' => $user->isAdmin,
-            'home_cities' => $this->compactOptions($user->getRelation('homeCities')),
-            'cities' => $this->compactOptions($user->getRelation('cities')),
+            'home_cities' => $this->compactOptions($homeCities),
+            'cities' => $this->compactOptions($userCities),
             'writable_cities' => $this->compactOptions($writableCities),
             'admin_cities' => $this->compactOptions($adminCities),
-            'roles' => $this->compactRoles($user->getRelation('roles')),
+            'roles' => $this->compactRoles($roles),
         ];
     }
 
@@ -395,6 +405,23 @@ class UserController extends Controller
      */
     protected function compactEditorUser(User $user): array
     {
+        /** @var Collection<int, City> $homeCities */
+        $homeCities = $user->getRelation('homeCities');
+        /** @var Collection<int, Parish> $parishes */
+        $parishes = $user->getRelation('parishes');
+        /** @var Collection<int, Role> $roles */
+        $roles = $user->getRelation('roles');
+        /** @var Collection<int, City> $cities */
+        $cities = $user->getRelation('cities');
+        /** @var Collection<int, City> $writableCities */
+        $writableCities = $user->getRelation('writableCities');
+        /** @var Collection<int, City> $adminCities */
+        $adminCities = $user->getRelation('adminCities');
+        /** @var Collection<int, User> $vacationAdmins */
+        $vacationAdmins = $user->getRelation('vacationAdmins');
+        /** @var Collection<int, User> $vacationApprovers */
+        $vacationApprovers = $user->getRelation('vacationApprovers');
+
         return [
             'id' => $user->id,
             'name' => $user->name,
@@ -412,14 +439,14 @@ class UserController extends Controller
             'isOfficialUser' => $user->isOfficialUser,
             'isLocked' => $user->isLocked,
             'isSuperAdmin' => $user->hasRole(AuthServiceProvider::SUPER),
-            'home_cities' => $this->compactIds($user->getRelation('homeCities')),
-            'parishes' => $this->compactIds($user->getRelation('parishes')),
-            'roles' => $this->compactIds($user->getRelation('roles')),
-            'cities' => $this->compactIds($user->getRelation('cities')),
-            'writable_cities' => $this->compactIds($user->getRelation('writableCities')),
-            'admin_cities' => $this->compactIds($user->getRelation('adminCities')),
-            'vacation_admins' => $this->compactIds($user->getRelation('vacationAdmins')),
-            'vacation_approvers' => $this->compactIds($user->getRelation('vacationApprovers')),
+            'home_cities' => $this->compactIds($homeCities),
+            'parishes' => $this->compactIds($parishes),
+            'roles' => $this->compactIds($roles),
+            'cities' => $this->compactIds($cities),
+            'writable_cities' => $this->compactIds($writableCities),
+            'admin_cities' => $this->compactIds($adminCities),
+            'vacation_admins' => $this->compactIds($vacationAdmins),
+            'vacation_approvers' => $this->compactIds($vacationApprovers),
         ];
     }
 
@@ -485,7 +512,10 @@ class UserController extends Controller
      */
     protected function compactIds(iterable $records): array
     {
-        return collect($records)->pluck('id')->values()->all();
+        /** @var array<int, int|string> $ids */
+        $ids = collect($records)->pluck('id')->values()->all();
+
+        return $ids;
     }
 
     /**
@@ -601,11 +631,15 @@ class UserController extends Controller
         $user->update($data);
 
         // set subscriptions
-        $user->setSubscriptionsFromArray($request->get('subscriptions') ?: []);
+        /** @var array<int|string, mixed> $subscriptions */
+        $subscriptions = $request->get('subscriptions') ?: [];
+        $user->setSubscriptionsFromArray($subscriptions);
 
         // settings
         if ($request->has('settings')) {
-            foreach ($request->get('settings', []) as $key => $setting) {
+            /** @var array<string, mixed> $settings */
+            $settings = $request->get('settings', []);
+            foreach ($settings as $key => $setting) {
                 $user->setSetting($key, $setting);
             }
         }
@@ -661,6 +695,7 @@ class UserController extends Controller
         /** @var User $user */
         $user = Auth::user();
         Gate::authorize('update', $user);
+        /** @var array{code: string} $validated */
         $validated = $request->validate(['code' => ['required', 'string']]);
         $code = str_replace([' ', '-'], '', $validated['code']);
 
@@ -670,7 +705,9 @@ class UserController extends Controller
             ]);
         }
 
-        $rateLimitKey = 'two-factor-confirm:'.$user->getKey();
+        /** @var int|string $userId */
+        $userId = $user->getKey();
+        $rateLimitKey = 'two-factor-confirm:'.$userId;
         if (RateLimiter::tooManyAttempts($rateLimitKey, 5)) {
             return response()->json(['message' => 'Zu viele Versuche. Bitte später erneut versuchen.'], 429);
         }
@@ -872,11 +909,17 @@ class UserController extends Controller
         );
         $user->roles()->sync($request->getRoles());
 
-        foreach ($request->get('settings', []) as $key => $setting) {
+        /** @var array<string, mixed> $settings */
+        $settings = $request->get('settings', []);
+        foreach ($settings as $key => $setting) {
             $user->setSetting($key, $setting);
         }
-        $user->setSubscriptionsFromArray($request->get('subscriptions') ?: []);
-        $user->updateCityPermissions($request->get('permissions') ?: [], $authUser);
+        /** @var array<int|string, mixed> $subscriptions */
+        $subscriptions = $request->get('subscriptions') ?: [];
+        $user->setSubscriptionsFromArray($subscriptions);
+        /** @var array<int|string, mixed> $permissions */
+        $permissions = $request->get('permissions') ?: [];
+        $user->updateCityPermissions($permissions, $authUser);
 
     }
 
@@ -962,7 +1005,9 @@ class UserController extends Controller
         if (! Session::has('adminUserSwitchBack')) {
             abort(403);
         }
-        $user = User::findOrFail((int) Session::get('adminUserSwitchBack'));
+        /** @var int|string|null $adminUserSwitchBack */
+        $adminUserSwitchBack = Session::get('adminUserSwitchBack');
+        $user = User::findOrFail((int) $adminUserSwitchBack);
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
@@ -1058,6 +1103,7 @@ class UserController extends Controller
             }
         }
 
+        /** @var array<string, mixed> $data */
         $data = $request->validate($rules);
 
         if (array_key_exists('isOfficialUser', $data)) {
@@ -1112,6 +1158,7 @@ class UserController extends Controller
         }
 
         // Union-Find: path-halving find
+        /** @var array<int, int> $parent */
         $parent = $allUsers->pluck('id', 'id')->toArray();
         $find = function (int $x) use (&$parent): int {
             while ($parent[$x] !== $x) {
@@ -1149,13 +1196,15 @@ class UserController extends Controller
 
         $possibleDuplicates = [];
         $withoutDuplicates = [];
+        /** @var Collection<int, User> $emptyDuplicates */
+        $emptyDuplicates = collect();
 
         foreach ($grouped as $group) {
             $group = collect($group);
             if ($group->count() <= 1) {
                 $user = $group->first();
                 abort_unless($user instanceof User, 500);
-                $user->duplicates = collect();
+                $user->duplicates = $emptyDuplicates;
                 $user->fullNameText = $user->fullName(true);
                 $withoutDuplicates[] = $user;
 
@@ -1167,9 +1216,9 @@ class UserController extends Controller
             $keeper = $sorted[0];
             abort_unless($keeper instanceof User, 500);
             $keeper->fullNameText = $keeper->fullName(true);
-            $keeper->duplicates = $sorted->slice(1)->map(function ($u) {
+            $keeper->duplicates = $sorted->slice(1)->map(function ($u) use ($emptyDuplicates) {
                 $u->fullNameText = $u->fullName(true);
-                $u->duplicates = collect();
+                $u->duplicates = $emptyDuplicates;
 
                 return $u;
             })->values();
@@ -1200,17 +1249,25 @@ class UserController extends Controller
             'groups.*.name_update.last_name' => 'sometimes|nullable|string|max:255',
         ]);
 
-        foreach ($request->input('groups', []) as $group) {
+        /** @var array<int, array{target_id: int, source_ids: array<int, int>, name_update?: array<string, string|null>}> $groups */
+        $groups = $request->input('groups', []);
+        foreach ($groups as $group) {
             $target = User::find($group['target_id']);
             if (! $target instanceof User) {
                 continue;
             }
 
-            if (! empty($group['name_update'])) {
-                $target->fill(array_filter($group['name_update'], fn ($v) => $v !== null))->save();
+            /** @var array<string, string|null> $nameUpdate */
+            $nameUpdate = $group['name_update'] ?? [];
+            if (! empty($nameUpdate)) {
+                /** @var array<string, mixed> $attributes */
+                $attributes = array_filter($nameUpdate, fn ($v) => $v !== null);
+                $target->fill($attributes)->save();
             }
 
-            foreach ($group['source_ids'] as $sourceId) {
+            /** @var array<int, int> $sourceIds */
+            $sourceIds = $group['source_ids'];
+            foreach ($sourceIds as $sourceId) {
                 $source = User::find($sourceId);
                 if ($source instanceof User && $source->id !== $target->id) {
                     $source->mergeInto($target);

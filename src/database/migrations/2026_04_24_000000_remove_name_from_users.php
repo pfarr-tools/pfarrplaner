@@ -27,7 +27,9 @@ return new class extends Migration
             ->where('name', '!=', '')
             ->orderBy('id')
             ->each(function ($user) {
-                $parts = explode(' ', trim($user->name), 2);
+                /** @var string $name */
+                $name = $user->name;
+                $parts = explode(' ', trim($name), 2);
                 if (count($parts) === 1) {
                     DB::table('users')->where('id', $user->id)->update(['last_name' => $parts[0]]);
                 } else {
@@ -51,7 +53,11 @@ return new class extends Migration
 
         // Restore name from first_name + last_name
         DB::table('users')->orderBy('id')->each(function ($user) {
-            $name = trim(($user->first_name ?? '').' '.($user->last_name ?? ''));
+            /** @var string $firstName */
+            $firstName = $user->first_name ?? '';
+            /** @var string $lastName */
+            $lastName = $user->last_name ?? '';
+            $name = trim($firstName.' '.$lastName);
             DB::table('users')->where('id', $user->id)->update(['name' => $name]);
         });
     }

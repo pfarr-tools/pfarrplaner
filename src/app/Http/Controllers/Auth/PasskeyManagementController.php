@@ -60,10 +60,13 @@ class PasskeyManagementController extends Controller
             abort(Response::HTTP_UNPROCESSABLE_ENTITY, 'Passkey-Einrichtung abgelaufen. Bitte erneut versuchen.');
         }
 
+        /** @var string $name */
+        $name = $request->validated('name');
+
         try {
             $passkey = $store(
                 $this->authenticatedUser($request),
-                $request->validated('name'),
+                $name,
                 $request->credential(),
                 $request->registrationOptions(),
             );
@@ -94,6 +97,7 @@ class PasskeyManagementController extends Controller
     public function rename(Request $request, Passkey $passkey): JsonResponse
     {
         $this->authorizeOwnedPasskey($request, $passkey);
+        /** @var array{name: string} $validated */
         $validated = $request->validate(['name' => ['required', 'string', 'max:255']]);
         $passkey->update(['name' => $validated['name']]);
 
@@ -122,6 +126,10 @@ class PasskeyManagementController extends Controller
     private function authorizeOwnedPasskey(Request $request, Passkey $passkey): void
     {
         $user = $this->authenticatedUser($request);
-        abort_unless((string) $passkey->user_id === (string) $user->getKey(), Response::HTTP_NOT_FOUND);
+        /** @var int|string|null $passkeyUserId */
+        $passkeyUserId = $passkey->user_id;
+        /** @var int|string|null $userId */
+        $userId = $user->getKey();
+        abort_unless((string) $passkeyUserId === (string) $userId, Response::HTTP_NOT_FOUND);
     }
 }

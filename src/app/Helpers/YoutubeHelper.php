@@ -70,9 +70,9 @@ class YoutubeHelper
      * Ermittelt den Videocode aus einer YouTube-URL.
      *
      * @param  string  $url  YouTube-URL
-     * @return mixed|string Videocode
+     * @return string Videocode
      */
-    public static function getCode(string $url)
+    public static function getCode(string $url): string
     {
         $code = '';
         if (strpos($url, 'youtu.be') !== false) {
@@ -80,6 +80,6 @@ class YoutubeHelper
             $code = end($tmp);
         }
 
-        return $code;
+        return is_string($code) ? $code : '';
     }
 }

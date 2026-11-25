@@ -56,6 +56,7 @@ class UpdateCity extends AbstractUpdateAction implements UpdatesCities
     public function update(User $user, City $city, array $input): City
     {
         Gate::forUser($user)->authorize('update', $city);
+        /** @var array<string, mixed> $input */
         $input = Validator::make($input, City::$validationRules)->validateWithBag('updateCity');
         $city->update($input);
         $city->setChildrenFromInput($input);

@@ -102,11 +102,10 @@ class Comment extends AbstractModel
         return $this->belongsTo(User::class);
     }
 
-    /**
-     * @return string
-     */
     public function getLabelAttribute(): string
     {
-        return (string) ($this->body ?? '');
+        $body = $this->body ?? '';
+
+        return is_scalar($body) ? (string) $body : '';
     }
 }

@@ -46,7 +46,12 @@ class SongItemHelper extends AbstractItemHelper
      */
     public function extractInfo(): void
     {
-        $rights = $this->item->data['song']['song']['copyrights'] ?? '';
+        $songData = $this->item->data['song'] ?? null;
+        $songData = is_array($songData) ? $songData : [];
+        $songDetails = $songData['song'] ?? null;
+        $songDetails = is_array($songDetails) ? $songDetails : [];
+        $rights = $songDetails['copyrights'] ?? '';
+        $rights = is_string($rights) ? $rights : '';
         if (str_contains($rights, '/')) {
             $parts = explode('/', $rights);
             foreach ($parts as $part) {
@@ -59,7 +64,7 @@ class SongItemHelper extends AbstractItemHelper
                 }
             }
         }
-        $this->info['rights'] = (string) $rights;
+        $this->info['rights'] = $rights;
     }
 
     /**
@@ -103,12 +108,26 @@ class SongItemHelper extends AbstractItemHelper
      */
     public function getCodeText(): string
     {
-        if (! isset($this->item->data['song'])) {
+        $songData = $this->item->data['song'] ?? null;
+        if (! is_array($songData)) {
             return '';
         }
-        $title = $this->item->data['song']['code'] ?? $this->getItem()->data['song']['songbook']['name'] ?? '';
-        $title .= ' '.($this->item->data['song']['reference'] ?? '')
-            .(isset($this->item->data['song']['song']) && isset($this->item->data['song']['song']['alt_eg']) ? ' (EG '.$this->item->data['song']['song']['alt_eg'].')' : '');
+        $code = $songData['code'] ?? null;
+        if ($code === null) {
+            $songbook = $songData['songbook'] ?? null;
+            $songbook = is_array($songbook) ? $songbook : [];
+            $code = $songbook['name'] ?? '';
+        }
+        $title = is_scalar($code) ? (string) $code : '';
+        $reference = $songData['reference'] ?? '';
+        $title .= ' '.(is_scalar($reference) ? (string) $reference : '');
+        $songDetails = $songData['song'] ?? null;
+        if (is_array($songDetails)) {
+            $altEg = $songDetails['alt_eg'] ?? null;
+            if (($altEg !== null) && is_scalar($altEg)) {
+                $title .= ' (EG '.(string) $altEg.')';
+            }
+        }
 
         return $title;
     }
@@ -118,17 +137,20 @@ class SongItemHelper extends AbstractItemHelper
      */
     public function getTitleText(): string
     {
-        if (! isset($this->item->data['song'])) {
+        $songData = $this->item->data['song'] ?? null;
+        if (! is_array($songData)) {
             return '';
         }
-        if (! isset($this->item->data['song']['song'])) {
+        $songDetails = $songData['song'] ?? null;
+        if (! is_array($songDetails)) {
             return '';
         }
-        if (! isset($this->item->data['song']['song']['title'])) {
+        $songTitle = $songDetails['title'] ?? null;
+        if (! is_scalar($songTitle)) {
             return '';
         }
         $code = $this->getCodeText();
-        $title = ($code ? $code.' ' : '').$this->item->data['song']['song']['title'];
+        $title = ($code ? $code.' ' : '').(string) $songTitle;
 
         return trim(str_replace('  ', ' ', $title));
     }
@@ -140,25 +162,42 @@ class SongItemHelper extends AbstractItemHelper
      */
     public function getActiveVerseNumbers(): array
     {
+        /** @var list<int|string> $verseRefs */
         $verseRefs = [];
-        if (($this->item->data['verses'] ?? '') == '') {
-            if (! isset($this->item->data['song'])) {
+        $versesValue = $this->item->data['verses'] ?? '';
+        $versesValue = is_scalar($versesValue) ? (string) $versesValue : '';
+        if ($versesValue === '') {
+            $songData = $this->item->data['song'] ?? null;
+            if (! is_array($songData)) {
                 return [];
             }
-            if (! isset($this->item->data['song']['song'])) {
+            $songDetails = $songData['song'] ?? null;
+            if (! is_array($songDetails)) {
                 return [];
             }
-            foreach ($this->item->data['song']['song']['verses'] as $verse) {
-                $verseRefs[] = $verse['number'];
+            $verses = $songDetails['verses'] ?? null;
+            if (! is_array($verses)) {
+                return [];
+            }
+            foreach ($verses as $verse) {
+                if (! is_array($verse)) {
+                    continue;
+                }
+                $number = $verse['number'] ?? null;
+                if (is_int($number) || is_string($number)) {
+                    $verseRefs[] = $number;
+                }
             }
         } else {
-            foreach (explode('+', $this->item->data['verses']) as $range) {
+            foreach (explode('+', $versesValue) as $range) {
                 $subRange = explode('-', $range);
                 if (count($subRange) == 1) {
                     $verseRefs[] = $subRange[0];
                 } else {
                     if (is_numeric($subRange[0]) && is_numeric($subRange[1]) && ($subRange[0] < $subRange[1])) {
-                        for ($i = $subRange[0]; $i <= $subRange[1]; $i++) {
+                        $start = (int) $subRange[0];
+                        $end = (int) $subRange[1];
+                        for ($i = $start; $i <= $end; $i++) {
                             $verseRefs[] = $i;
                         }
                     } else {
@@ -178,22 +217,31 @@ class SongItemHelper extends AbstractItemHelper
      */
     public function getActiveVerses(): array
     {
-        if (! isset($this->item->data['song'])) {
+        $songData = $this->item->data['song'] ?? null;
+        if (! is_array($songData)) {
             return [];
         }
-        if (! isset($this->item->data['song']['song'])) {
+        $songDetails = $songData['song'] ?? null;
+        if (! is_array($songDetails)) {
             return [];
         }
-        $verses = [];
+        $verses = $songDetails['verses'] ?? null;
+        $verses = is_array($verses) ? $verses : [];
+        /** @var list<array<string, mixed>> $activeVerses */
+        $activeVerses = [];
         foreach ($this->getActiveVerseNumbers() as $number) {
-            foreach ($this->item->data['song']['song']['verses'] ?? [] as $verse) {
-                if ($verse['number'] == $number) {
-                    $verses[] = $verse;
+            foreach ($verses as $verse) {
+                if (! is_array($verse)) {
+                    continue;
+                }
+                /** @var array<string, mixed> $verse */
+                if (($verse['number'] ?? null) == $number) {
+                    $activeVerses[] = $verse;
                 }
             }
         }
 
-        return $verses;
+        return $activeVerses;
     }
 
     /**
@@ -204,10 +252,12 @@ class SongItemHelper extends AbstractItemHelper
      */
     public function getActiveVerseCount($skipIfZero = false, $stropheText = false): int|string
     {
-        if (! isset($this->item->data['song'])) {
+        $songData = $this->item->data['song'] ?? null;
+        if (! is_array($songData)) {
             return 0;
         }
-        if (! isset($this->item->data['song']['song'])) {
+        $songDetails = $songData['song'] ?? null;
+        if (! is_array($songDetails)) {
             return 0;
         }
         $count = count($this->getActiveVerseNumbers());
@@ -225,18 +275,32 @@ class SongItemHelper extends AbstractItemHelper
      */
     public function forceVerseString($prefix = ''): string
     {
-        if (! isset($this->item->data['song'])) {
+        $songData = $this->item->data['song'] ?? null;
+        if (! is_array($songData)) {
             return '';
         }
-        if (! isset($this->item->data['song']['song'])) {
+        $songDetails = $songData['song'] ?? null;
+        if (! is_array($songDetails)) {
             return '';
         }
         if (isset($this->item->data['verses'])) {
-            return $prefix.$this->item->data['verses'];
+            $versesValue = $this->item->data['verses'];
+
+            return $prefix.(is_scalar($versesValue) ? (string) $versesValue : '');
         }
+        /** @var list<int|string> $verseRefs */
         $verseRefs = [];
-        foreach ($this->item->data['song']['song']['verses'] as $verse) {
-            $verseRefs[] = $verse['number'];
+        $verses = $songDetails['verses'] ?? null;
+        if (is_array($verses)) {
+            foreach ($verses as $verse) {
+                if (! is_array($verse)) {
+                    continue;
+                }
+                $number = $verse['number'] ?? null;
+                if (is_int($number) || is_string($number)) {
+                    $verseRefs[] = $number;
+                }
+            }
         }
         if (count($verseRefs) == 0) {
             return '';

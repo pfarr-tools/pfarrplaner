@@ -36,6 +36,7 @@ use PhpOffice\PhpWord\Shared\ZipArchive;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use SimpleXMLElement;
+use SplFileInfo;
 
 /**
  * Class IDML
@@ -137,10 +138,13 @@ class IDML
 
         $added = [];
         foreach ($files as $name => $file) {
+            if (! $file instanceof SplFileInfo) {
+                continue;
+            }
             // Skip directories (they would be added automatically)
             if (! $file->isDir()) {
                 // Get real and relative path for current file
-                $filePath = $file->getRealPath();
+                $filePath = (string) $file->getRealPath();
                 $relativePath = substr($filePath, strlen($rootPath) + 1);
 
                 // Add current file to archive

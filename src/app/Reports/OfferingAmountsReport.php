@@ -96,7 +96,7 @@ class OfferingAmountsReport extends AbstractExcelDocumentReport
                 'end' => 'required|date',
             ]
         );
-
+        /** @var array{cities: array<int, int>, locations?: array<int, int>|null, start: string, end: string} $data */
         $cities = City::whereIn('id', $data['cities'])->get();
 
         $services = Service::inCitiesAndLocations($data['cities'], $data['locations'] ?? null)
@@ -172,9 +172,12 @@ class OfferingAmountsReport extends AbstractExcelDocumentReport
         }
 
         // output
+        /** @var string $cityNames */
+        $cityNames = $cities->pluck('name')->join(', ');
+
         return $this->sendToBrowser(
             FileNameService::make(
-                static::FILE_TITLE.' '.$cities->pluck('name')->join(', '),
+                self::FILE_TITLE.' '.$cityNames,
                 'xlsx',
                 static::FILE_SIGNATURE,
                 [$data['start'], $data['end']])

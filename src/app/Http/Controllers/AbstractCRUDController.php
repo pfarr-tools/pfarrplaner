@@ -185,7 +185,11 @@ class AbstractCRUDController extends Controller
      */
     public function store(Request $request)
     {
+        /** @var AbstractAction $creator */
         $creator = app(($this->modelClass)::getContractName('create'));
+        if (! method_exists($creator, 'create')) {
+            abort(500);
+        }
         $model = $creator->create($request->user(), $request->all());
 
         return $this->returnResult($creator, $model);
@@ -220,7 +224,11 @@ class AbstractCRUDController extends Controller
     public function update(Request $request, int|string $modelId)
     {
         $model = $this->getSingleModel($request, $modelId);
+        /** @var AbstractAction $updater */
         $updater = $model->getContractedAction('update');
+        if (! method_exists($updater, 'update')) {
+            abort(500);
+        }
         $model = $updater->update($request->user(), $model, $request->all());
 
         if ($request->boolean('_autosave')) {
@@ -239,7 +247,11 @@ class AbstractCRUDController extends Controller
     public function destroy(Request $request, int|string $modelId)
     {
         $model = $this->getSingleModel($request, $modelId);
+        /** @var AbstractAction $deleter */
         $deleter = $model->getContractedAction('delete');
+        if (! method_exists($deleter, 'delete')) {
+            abort(500);
+        }
         $result = $deleter->delete($request->user(), $model);
 
         return $this->returnResult($deleter, $result);

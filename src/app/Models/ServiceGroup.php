@@ -63,7 +63,7 @@ class ServiceGroup extends AbstractModel
     protected $fillable = ['name'];
 
     /**
-     * @param list<int|string> $list Service group identifiers or names to ensure.
+     * @param  list<int|string>  $list  Service group identifiers or names to ensure.
      * @return list<int|string> Resolved service group identifiers.
      */
     public static function createIfMissing($list)

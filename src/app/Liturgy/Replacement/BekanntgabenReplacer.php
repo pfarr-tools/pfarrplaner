@@ -109,15 +109,33 @@ class BekanntgabenReplacer extends AbstractReplacer
         $ctr = 0;
         $lastDay = $nextWeek->format('Ymd');
         foreach ($events as $eventsArray) {
+            if (! is_array($eventsArray)) {
+                continue;
+            }
             foreach ($eventsArray as $event) {
-                $eventStart = is_array($event) ? $event['start'] : $event->date;
+                if (! is_array($event) && ! $event instanceof Service) {
+                    continue;
+                }
+
+                $eventStart = is_array($event) ? ($event['start'] ?? null) : $event->date;
+                if (! $eventStart instanceof \DateTimeInterface) {
+                    continue;
+                }
+                $eventTitle = '';
+                $eventPlace = '';
+                if (is_array($event)) {
+                    $title = $event['title'] ?? '';
+                    $eventTitle = is_scalar($title) ? (string) $title : '';
+                    $place = $event['place'] ?? '';
+                    $eventPlace = is_scalar($place) ? (string) $place : '';
+                }
                 $dateFormat = $ctr ? '%A, %d. %B' : '%A, %d. %B %Y';
                 $done = false;
 
                 if (is_array($event)) {
                     if ($service->trueDate()->format('Ymd') == $eventStart->format('Ymd')) {
-                        if ($event['allDay']) {
-                            $text .= $this->renderParagraph($event['title']);
+                        if ($event['allDay'] ?? false) {
+                            $text .= $this->renderParagraph($eventTitle);
                             $done = true;
                         }
                     }
@@ -142,31 +160,39 @@ class BekanntgabenReplacer extends AbstractReplacer
                                 '%H.%M Uhr',
                                 $eventStart->getTimestamp()
                             )."\t".trim(
-                                StringTool::sanitizeXMLString(
-                                    $event['title']
-                                ).' ('.StringTool::sanitizeXMLString($event['place']).')'
+                                StringTool::sanitizeXMLString($eventTitle).' ('.StringTool::sanitizeXMLString($eventPlace).')'
                             )
                         );
                     } else {
                         $description = $event->descriptionText();
+                        $description = is_scalar($description) ? (string) $description : '';
                         $description = $description ? ' mit '.$description : '';
                         // take care of ampersands
                         $description = (string) preg_replace('/&(?![A-Za-z0-9#]{1,7};)/', '&amp;', $description);
+                        $timeText = $event->timeText(true, '.');
+                        $serviceTitle = $event->title;
+                        $serviceTitle = is_scalar($serviceTitle) ? (string) $serviceTitle : '';
+                        $serviceTitle = $serviceTitle ?: 'Gottesdienst';
+                        $location = $event->locationText();
                         $text .= $this->renderParagraph(
-                            $event->timeText(true, '.')."\t".trim(
-                                ($event->title ?: 'Gottesdienst').$description.' ('.$event->locationText().')'
+                            (is_scalar($timeText) ? (string) $timeText : '')."\t".trim(
+                                $serviceTitle.$description.' ('.(is_scalar($location) ? (string) $location : '').')'
                             )
                         );
 
                         // add children's church
                         if ($event->cc) {
+                            $startTime = $event->cc_alt_time ?? $event->time;
+                            $startTime = is_scalar($startTime) ? (string) $startTime : '';
                             $childChurchStart = Carbon::createFromFormat(
                                 'Y-m-d H:i',
-                                $event->trueDate()->format('Y-m-d').' '.($event->cc_alt_time ?? $event->time)
+                                $event->trueDate()->format('Y-m-d').' '.$startTime
                             );
                             if ($childChurchStart !== null) {
+                                $childChurchLocation = $event->cc_location ?? $event->locationText();
+                                $childChurchLocation = is_scalar($childChurchLocation) ? (string) $childChurchLocation : '';
                                 $text .= $this->renderParagraph(
-                                    $childChurchStart->isoFormat('HH.mm \U\h\r')."\t".'Kinderkirche'.' ('.($event->cc_location ?? $event->locationText()).')'
+                                    $childChurchStart->isoFormat('HH.mm \U\h\r')."\t".'Kinderkirche'.' ('.$childChurchLocation.')'
                                 );
                             }
                         }

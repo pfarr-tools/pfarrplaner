@@ -48,14 +48,10 @@ class ODP extends AbstractZIPBasedFileFormat
      * @param  array<array-key, string>  $slideNames  Slide names keyed by slide index
      * @return void
      */
-    public function applySlideNameFix(array $slideNames)
-    {
-        return;
-    }
+    public function applySlideNameFix(array $slideNames) {}
 
     /**
      * @param  string  $basPath  Basic macro path.
-     * @return void
      */
     public function injectBasicMacroFromBas(
         string $basPath
@@ -201,6 +197,7 @@ class ODP extends AbstractZIPBasedFileFormat
 
     /**
      * @param  list<string>  $libraryNames  Names of the Basic libraries to register
+     *
      * @throws \DOMException
      */
     private function buildScriptLc(array $libraryNames): string
@@ -342,7 +339,6 @@ class ODP extends AbstractZIPBasedFileFormat
     /**
      * @param  string  $odfEventName  ODF event name.
      * @param  string  $macroUrl  Macro URL.
-     * @return void
      */
     public function registerContentXmlEvent(string $odfEventName, string $macroUrl): void
     {

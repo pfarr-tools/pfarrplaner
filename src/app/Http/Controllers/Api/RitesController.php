@@ -89,7 +89,8 @@ class RitesController extends Controller
                 })->get() as $riteRecord
             ) {
                 foreach ($queryFields as $queryField) {
-                    if (str_contains(strtolower($riteRecord->$queryField), $query)) {
+                    $name = $riteRecord->$queryField;
+                    if (is_string($name) && str_contains(strtolower($name), $query)) {
                         $ids[] = $riteRecord->id;
                     }
                 }

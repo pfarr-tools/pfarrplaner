@@ -34,6 +34,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Sabre\VObject\Component\VCalendar;
+use Sabre\VObject\Component\VEvent;
 
 class DAVCalendarItem
 {
@@ -83,9 +84,20 @@ class DAVCalendarItem
         $categories = array_merge(['Pfarrplaner'], $categories);
 
         $this->vObject = new VCalendar;
-        /** @var mixed $vEvent */
+        /** @var VEvent $vEvent */
         $vEvent = $this->vObject->create('VEVENT');
-        $vEvent->UID = $this->objectId(true);
+        /**
+         * Setzt eine Kalendereigenschaft und ersetzt dabei einen vorhandenen Wert.
+         *
+         * @param  VEvent  $event  Kalendereintrag.
+         * @param  string  $name  Name der Eigenschaft.
+         * @param  mixed  $value  Wert der Eigenschaft.
+         */
+        $setProperty = static function (VEvent $event, string $name, mixed $value): void {
+            $event->remove($name);
+            $event->add($name, $value);
+        };
+        $setProperty($vEvent, 'UID', $this->objectId(true));
         if ($config['allDay'] ?? false) {
             $dtStart = $this->vObject->createProperty('DTSTART', $start->format('Ymd'));
             $dtStart['VALUE'] = 'DATE';
@@ -94,18 +106,18 @@ class DAVCalendarItem
             $dtEnd['VALUE'] = 'DATE';
             $vEvent->add($dtEnd);
         } else {
-            $vEvent->DTSTART = $start;
-            $vEvent->DTEND = $end;
+            $setProperty($vEvent, 'DTSTART', $start);
+            $setProperty($vEvent, 'DTEND', $end);
         }
-        $vEvent->DTSTAMP = $this->object->created_at;
-        $vEvent->CREATED = $this->object->created_at;
-        $vEvent->SUMMARY = $title;
-        $vEvent->LOCATION = $location;
-        $vEvent->DESCRIPTION = $body;
-        $vEvent->TRANSP = ($config['busy'] ?? 'true') ? 'OPAQUE' : 'TRANSPARENT';
-        $vEvent->{'X-MICROSOFT-CDO-BUSYSTATUS'} = $config['busyStatus'] ?? 'BUSY';
-        $vEvent->CATEGORIES = implode(',', $categories);
-        $vEvent->SEQUENCE = ($this->object->created_at == $this->object->updated_at) ? 1 : $this->object->updated_at->timestamp;
+        $setProperty($vEvent, 'DTSTAMP', $this->object->created_at);
+        $setProperty($vEvent, 'CREATED', $this->object->created_at);
+        $setProperty($vEvent, 'SUMMARY', $title);
+        $setProperty($vEvent, 'LOCATION', $location);
+        $setProperty($vEvent, 'DESCRIPTION', $body);
+        $setProperty($vEvent, 'TRANSP', ($config['busy'] ?? 'true') ? 'OPAQUE' : 'TRANSPARENT');
+        $setProperty($vEvent, 'X-MICROSOFT-CDO-BUSYSTATUS', $config['busyStatus'] ?? 'BUSY');
+        $setProperty($vEvent, 'CATEGORIES', implode(',', $categories));
+        $setProperty($vEvent, 'SEQUENCE', ($this->object->created_at == $this->object->updated_at) ? 1 : $this->object->updated_at->timestamp);
         $this->vObject->add($vEvent);
     }
 

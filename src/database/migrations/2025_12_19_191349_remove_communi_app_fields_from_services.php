@@ -15,6 +15,7 @@ return new class extends Migration
     {
         foreach (Service::whereNotNull('communiapp_listing_start')->get() as $service) {
             $date = is_object($service->date) ? $service->date : Carbon\Carbon::parse($service->date);
+            /** @var string|Carbon\Carbon $attribute */
             $attribute = $service->getAttribute('communiapp_listing_start');
             /** @var Carbon\Carbon $listStart */
             $listStart = is_object($attribute) ? $attribute : Carbon\Carbon::parse($attribute);

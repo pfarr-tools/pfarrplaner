@@ -244,7 +244,12 @@ class Wedding extends AbstractModel implements HasDAVCalendarItems
 
     public function getLabelAttribute(): string
     {
-        return trim($this->spouse1_name.' / '.$this->spouse2_name, ' /');
+        /** @var string|null $spouse1Name */
+        $spouse1Name = $this->spouse1_name;
+        /** @var string|null $spouse2Name */
+        $spouse2Name = $this->spouse2_name;
+
+        return trim($spouse1Name.' / '.$spouse2Name, ' /');
     }
 
     /**
@@ -272,19 +277,32 @@ class Wedding extends AbstractModel implements HasDAVCalendarItems
         }
         $records = [];
 
+        /** @var string|null $spouse1Name */
+        $spouse1Name = $this->spouse1_name;
+        /** @var string|null $spouse1Phone */
+        $spouse1Phone = $this->spouse1_phone;
+        /** @var string|null $spouse1Email */
+        $spouse1Email = $this->spouse1_email;
+        /** @var string|null $spouse2Name */
+        $spouse2Name = $this->spouse2_name;
+        /** @var string|null $spouse2Phone */
+        $spouse2Phone = $this->spouse2_phone;
+        /** @var string|null $spouse2Email */
+        $spouse2Email = $this->spouse2_email;
+
         $description = '<p>Trauung am '.$service->trueDate()->format('d.m.Y').' um '.$service->timeText(
         ).' ('.$service->locationText().')</p>'
             .'<p><a href="'.route('weddings.edit', $this->id).'">Trauung im Pfarrplaner öffnen</a></p>'
             .'<p>Kontakt:<br />'
-            .trim(' - '.$this->spouse1_name.': '.$this->spouse1_phone.' '.$this->spouse1_email).'<br />'
-            .trim(' - '.$this->spouse2_name.': '.$this->spouse2_phone.' '.$this->spouse2_email)
+            .trim(' - '.$spouse1Name.': '.$spouse1Phone.' '.$spouse1Email).'<br />'
+            .trim(' - '.$spouse2Name.': '.$spouse2Phone.' '.$spouse2Email)
             .'</p>'
             .AbstractSyncEngine::AUTO_WARNING;
 
         $records['wedding_prep_'.$this->id] = [
             'startDate' => $this->appointment->copy(),
             'endDate' => $this->appointment->copy()->addHour(),
-            'title' => 'Traugespräch '.$this->spouse1_name.' / '.$this->spouse2_name,
+            'title' => 'Traugespräch '.$spouse1Name.' / '.$spouse2Name,
             'description' => $description,
             'location' => '',
             'categories' => ['Pfarrplaner', 'Traugespräch', 'Amtskalender: Amtshandlungen'],
@@ -293,7 +311,7 @@ class Wedding extends AbstractModel implements HasDAVCalendarItems
             $records['wedding_anniversary_'.$this->id] = [
                 'startDate' => $service->trueDate()->copy()->addYears(1),
                 'endDate' => $service->trueDate()->copy()->addYears(1),
-                'title' => '1. Jahrestag der Trauung von '.$this->spouse1_name.' / '.$this->spouse2_name,
+                'title' => '1. Jahrestag der Trauung von '.$spouse1Name.' / '.$spouse2Name,
                 'description' => $description,
                 'location' => '',
                 'categories' => ['Pfarrplaner', 'Traugespräch', 'Amtskalender: Amtshandlungen'],
@@ -344,13 +362,29 @@ class Wedding extends AbstractModel implements HasDAVCalendarItems
         if ($service === null) {
             throw new \InvalidArgumentException('Trauung ohne Gottesdienst kann keinen Kalendereintrag erzeugen.');
         }
+
+        /** @var string|null $spouse1Name */
+        $spouse1Name = $this->spouse1_name;
+        /** @var string|null $spouse1Phone */
+        $spouse1Phone = $this->spouse1_phone;
+        /** @var string|null $spouse1Email */
+        $spouse1Email = $this->spouse1_email;
+        /** @var string|null $spouse2Name */
+        $spouse2Name = $this->spouse2_name;
+        /** @var string|null $spouse2Phone */
+        $spouse2Phone = $this->spouse2_phone;
+        /** @var string|null $spouse2Email */
+        $spouse2Email = $this->spouse2_email;
+        /** @var string $appointmentAddress */
+        $appointmentAddress = $this->appointment_address ?? '';
+
         $description = 'Trauung am '.$service->trueDate()->format('d.m.Y').' um '.$service->timeText(
         ).' ('.$service->locationText().")\n\n"
             .'Trauung im Pfarrplaner öffnen: '
             .route('weddings.edit', $this->id)
             ."\n\nKontakt:\n"
-            .trim(' - '.$this->spouse1_name.': '.$this->spouse1_phone.' '.$this->spouse1_email)."\n"
-            .trim(' - '.$this->spouse2_name.': '.$this->spouse2_phone.' '.$this->spouse2_email)
+            .trim(' - '.$spouse1Name.': '.$spouse1Phone.' '.$spouse1Email)."\n"
+            .trim(' - '.$spouse2Name.': '.$spouse2Phone.' '.$spouse2Email)
             ."\n\n".DAVCalendarItem::AUTO_WARNING;
 
         switch ($itemType) {
@@ -362,10 +396,10 @@ class Wedding extends AbstractModel implements HasDAVCalendarItems
 
                 return new DAVCalendarItem(
                     $this,
-                    'Traugespräch '.$this->spouse1_name.' / '.$this->spouse2_name,
+                    'Traugespräch '.$spouse1Name.' / '.$spouse2Name,
                     $appointment->copy(),
                     $appointment->copy()->addHour(),
-                    $this->appointment_address ?? '',
+                    $appointmentAddress,
                     $description,
                     'prep',
                     ['busyStatus' => 'BUSY'],
@@ -374,7 +408,7 @@ class Wedding extends AbstractModel implements HasDAVCalendarItems
             case 'anniv':
                 return new DAVCalendarItem(
                     $this,
-                    '1. Jahrestag der Trauung von '.$this->spouse1_name.' / '.$this->spouse2_name,
+                    '1. Jahrestag der Trauung von '.$spouse1Name.' / '.$spouse2Name,
                     $service->trueDate()->copy()->addYears(1),
                     $service->trueDate()->copy()->addYears(1)->addDays(1)->startOfDay(),
                     '',

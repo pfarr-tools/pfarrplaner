@@ -43,7 +43,7 @@ class AttachmentFactory
      * deren Name mit „Abstract“ beginnt, werden als Basisklassen ausgeschlossen.
      *
      * @param  string  $type  Typ des zugehörigen Eintrags (baptism, funeral oder wedding).
-     * @return array<int, mixed>|Collection<array-key, mixed> Metadaten der verfügbaren Attachments.
+     * @return array<int, mixed>|Collection<int, mixed> Metadaten der verfügbaren Attachments.
      */
     public static function getList(string $type): array|Collection
     {
@@ -58,11 +58,14 @@ class AttachmentFactory
             return $class::getInfo();
         };
 
-        return collect(glob(app_path('Attachments/'.ucfirst($type).'/*.php')) ?: [])
+        /** @var Collection<int, mixed> $attachments Metadaten der verfügbaren Attachments. */
+        $attachments = collect(glob(app_path('Attachments/'.ucfirst($type).'/*.php')) ?: [])
             ->reject(function (string $file) {
                 return Str::startsWith(basename($file), 'Abstract');
             })
             ->map($infoMapper);
+
+        return $attachments;
     }
 
     /**
@@ -75,14 +78,14 @@ class AttachmentFactory
      */
     public static function get(string $type, string $key, int|string $id): ?AbstractAttachment
     {
+        /** @var array{key: string, class: class-string<AbstractAttachment>}|null $item Gefundenes Attachment-Metadatum. */
         $item = collect(static::getList($type))->first(function ($item) use ($key) {
-            return $item['key'] == $key;
+            return is_array($item) && ($item['key'] ?? null) == $key;
         });
         if (! $item) {
             return null;
         }
 
-        /** @var class-string<AbstractAttachment> $class */
         $class = $item['class'];
 
         return $class::fromId($id);

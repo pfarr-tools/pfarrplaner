@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
+use Stringable;
 
 class FirstRunInstallerService
 {
@@ -185,7 +186,7 @@ class FirstRunInstallerService
             return $value ? 'true' : 'false';
         }
 
-        $value = (string) $value;
+        $value = is_scalar($value) || $value instanceof Stringable ? (string) $value : '';
 
         if ($value === '') {
             return '';
@@ -201,7 +202,11 @@ class FirstRunInstallerService
     /** Apply one environment value to the current process configuration. */
     protected function setEnvironmentValue(string $key, mixed $value): void
     {
-        $stringValue = is_bool($value) ? ($value ? 'true' : 'false') : (string) $value;
+        if (is_bool($value)) {
+            $stringValue = $value ? 'true' : 'false';
+        } else {
+            $stringValue = is_scalar($value) || $value instanceof Stringable ? (string) $value : '';
+        }
 
         putenv($key.'='.$stringValue);
         $_ENV[$key] = $stringValue;

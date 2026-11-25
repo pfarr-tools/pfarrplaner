@@ -29,6 +29,7 @@
  */
 
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 /**
@@ -46,6 +47,7 @@ class AddDefaultTimeField extends Migration
         Schema::table(
             'locations',
             function ($table) {
+                /** @var Blueprint $table */
                 $table->time('default_time')->nullable();
             }
         );
@@ -61,6 +63,7 @@ class AddDefaultTimeField extends Migration
         Schema::table(
             'locations',
             function ($table) {
+                /** @var Blueprint $table */
                 $table->dropColumn('default_time');
             }
         );

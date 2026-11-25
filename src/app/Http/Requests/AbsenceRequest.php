@@ -159,10 +159,12 @@ class AbsenceRequest extends FormRequest
         $data['to'] = $this->normalizePlannerDate($data['to'], true);
 
         if (isset($data['approved_at'])) {
-            if (strlen($data['approved_at']) == 10) {
-                $data['approved_at'] .= ' 0:00:00';
+            /** @var string $approvedAt */
+            $approvedAt = $data['approved_at'];
+            if (strlen($approvedAt) == 10) {
+                $approvedAt .= ' 0:00:00';
             }
-            $data['approved_at'] = Carbon::parse($data['approved_at']);
+            $data['approved_at'] = Carbon::parse($approvedAt);
         }
 
         // check if admin/approver id needs to be set

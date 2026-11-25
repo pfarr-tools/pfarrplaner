@@ -95,10 +95,13 @@ class ServiceController extends Controller
             ['location', 'city', 'participants', 'weddings', 'funerals', 'baptisms', 'day', 'tags', 'serviceGroups']
         );
         $day = $service->day;
-        $service->liturgy = $day !== null && $day->date !== null
+        $liturgy = $day !== null && $day->date !== null
             ? LiturgyService::getLiturgyInfoByDate($day->date->toDateString())
             : [];
-        if ($day !== null && isset($service->liturgy['Bezeichnung']) && $day->name == '') {
+        /** @var array<string, mixed> $liturgy */
+        $service->liturgy = $liturgy;
+        if ($day !== null && isset($service->liturgy['Bezeichnung']) && $day->name == ''
+            && is_string($service->liturgy['title'])) {
             $day->name = $service->liturgy['title'];
         }
 
@@ -139,9 +142,11 @@ class ServiceController extends Controller
             ->get();
 
         foreach ($services as $service) {
-            $service->liturgy = $service->date !== null
+            $liturgy = $service->date !== null
                 ? LiturgyService::getLiturgyInfoByDate($service->date->toDateString())
                 : [];
+            /** @var array<string, mixed> $liturgy */
+            $service->liturgy = $liturgy;
         }
 
         return response()->json(compact('services'))->header('Access-Control-Allow-Origin', '*');
@@ -165,11 +170,15 @@ class ServiceController extends Controller
         }
 
         if ($request->has('tags')) {
-            $service->tags()->sync($request->get('tags') ?: []);
+            /** @var array<int|string>|int|string|null $tags */
+            $tags = $request->get('tags');
+            $service->tags()->sync($tags ?: []);
         }
 
         if ($request->has('serviceGroups')) {
-            $service->serviceGroups()->sync(ServiceGroup::createIfMissing($request->get('serviceGroups') ?: []));
+            /** @var list<int|string> $serviceGroups */
+            $serviceGroups = $request->get('serviceGroups') ?: [];
+            $service->serviceGroups()->sync(ServiceGroup::createIfMissing($serviceGroups));
         }
         $this->handleAttachments($request, $service);
 
@@ -203,20 +212,34 @@ class ServiceController extends Controller
             'exclusive' => 'required|bool',
             'no-toggle' => 'nullable|bool',
         ]);
+        /** @var array<string, mixed> $data */
         $participants = $service->getSyncableParticipantsArray();
-        if (! is_array($data['ministry'])) {
-            $data['ministry'] = [$data['ministry']];
+        if (! isset($data['ministry']) || ! is_array($data['ministry'])) {
+            $data['ministry'] = [$data['ministry'] ?? ''];
         }
+        $users = $data['users'] ?? [];
+        if (! is_array($users)) {
+            $users = [];
+        }
+        $exclusive = (bool) ($data['exclusive'] ?? false);
+        $noToggle = (bool) ($data['no-toggle'] ?? false);
         foreach ($data['ministry'] as $ministry) {
+            if (! is_scalar($ministry)) {
+                continue;
+            }
+            $ministry = (string) $ministry;
             if (! isset($participants[$ministry])) {
                 $participants[$ministry] = [];
             }
             $existing = $participants[$ministry];
-            if ($data['exclusive']) {
+            if ($exclusive) {
                 $participants[$ministry] = [];
             }
-            foreach ($data['users'] as $userId) {
-                if (! ($data['no-toggle'] ?? false)) {
+            foreach ($users as $userId) {
+                if (! is_int($userId) && ! is_string($userId)) {
+                    continue;
+                }
+                if (! $noToggle) {
                     if (isset($existing[$userId])) {
                         unset($participants[$ministry][$userId]);
                     } else {

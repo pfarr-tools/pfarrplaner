@@ -141,16 +141,19 @@ return new class extends Migration
     {
         /** @var Item $item */
         foreach (Item::where('data_type', 'song')->get() as $item) {
+            /** @var array<string, mixed> $data */
             $data = $item->data;
             if (isset($data['song'])) {
-                $reference = SongReference::where('code', $data['song']['songbook_abbreviation'])
-                    ->where('reference', $data['song']['reference'])->first();
+                /** @var array{songbook_abbreviation: string, reference: string} $song */
+                $song = $data['song'];
+                $reference = SongReference::where('code', $song['songbook_abbreviation'])
+                    ->where('reference', $song['reference'])->first();
                 if ($reference) {
                     $data['song'] = json_decode((string) json_encode($reference), true);
                     $item->update(['serialized_data' => serialize($data)]);
                 } else {
-                    if (trim($data['song']['songbook_abbreviation'].$data['song']['reference'])) {
-                        echo "No reference found for LiturgyItem #{$item->id}: {$data['song']['songbook_abbreviation']} {$data['song']['reference']}\n";
+                    if (trim($song['songbook_abbreviation'].$song['reference'])) {
+                        echo "No reference found for LiturgyItem #{$item->id}: {$song['songbook_abbreviation']} {$song['reference']}\n";
                     }
                 }
             }

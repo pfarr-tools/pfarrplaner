@@ -64,11 +64,11 @@ class ChangeUserFields extends Migration
     {
         Schema::table(
             'users',
-            function ($table) {
-                $table->integer('isAdmin')->nullable;
-                $table->integer('canEditGeneral')->nullable;
-                $table->integer('canEditChurch')->nullable;
-                $table->string('canEditFields')->nullable;
+            function (Blueprint $table) {
+                $table->integer('isAdmin');
+                $table->integer('canEditGeneral');
+                $table->integer('canEditChurch');
+                $table->string('canEditFields');
                 $table->dropColumn(['first_name', 'last_name', 'title']);
             }
         );

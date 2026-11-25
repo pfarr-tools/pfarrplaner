@@ -32,6 +32,7 @@ namespace App\Integrations\KonfiApp;
 
 use App\Events\ServiceBeforeUpdate;
 use App\Models\Places\City;
+use Carbon\Carbon;
 
 class ServiceBeforeUpdateListener
 {
@@ -50,7 +51,10 @@ class ServiceBeforeUpdateListener
             return;
         }
         if (isset($event->data['date'])) {
-            $event->service->date = $event->data['date'];
+            $date = $event->data['date'];
+            if ($date instanceof Carbon || is_string($date)) {
+                $event->service->date = $date instanceof Carbon ? $date : Carbon::parse($date);
+            }
         }
 
         $this->resolveIntegration($city)->handleServiceUpdate(

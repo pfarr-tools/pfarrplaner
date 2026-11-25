@@ -115,8 +115,14 @@ class AbstractHomeScreenTab
      */
     public function setConfig($config): void
     {
+        if (! is_array($config)) {
+            $config = [];
+        }
+        /** @var array<string, mixed> $config */
         if (isset($config[$this->getKey()])) {
-            $this->config = $config[$this->getKey()];
+            $tabConfig = $config[$this->getKey()];
+            /** @var array<string, mixed> $tabConfig */
+            $this->config = is_array($tabConfig) ? $tabConfig : [];
         } else {
             $this->config = $config;
         }
@@ -130,7 +136,8 @@ class AbstractHomeScreenTab
     protected function setDefaultConfig(array $config, array $defaults)
     {
         if (isset($config[$this->getKey()])) {
-            $config = $config[$this->getKey()];
+            $tabConfig = $config[$this->getKey()];
+            $config = is_array($tabConfig) ? $tabConfig : [];
         }
         foreach ($defaults as $key => $val) {
             if (! isset($config[$key])) {

@@ -31,6 +31,7 @@
 namespace App\Http\Controllers;
 
 use App\Attachments\AttachmentFactory;
+use App\Contracts\Baptism\CreatesBaptisms;
 use App\Liturgy\PronounSets\PronounSets;
 use App\Models\Attachment;
 use App\Models\People\User;
@@ -44,6 +45,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
@@ -77,8 +79,13 @@ class BaptismController extends AbstractCRUDController
         } else {
             Gate::authorize('create', Baptism::class);
         }
+        $user = $request->user();
+        abort_unless($user instanceof User, 401);
+        /** @var array<string, mixed> $input */
+        $input = $request->all();
+        /** @var CreatesBaptisms $creator */
         $creator = app(Baptism::getContractName('create'));
-        $baptism = $creator->create($request->user(), $request->all());
+        $baptism = $creator->create($user, $input);
 
         return redirect()->route('baptisms.edit', $baptism->id);
     }
@@ -136,6 +143,7 @@ class BaptismController extends AbstractCRUDController
         $cities = $user->writableCities;
         $pronounSets = PronounSets::toArray();
 
+        /** @var Collection<int, Service> $otherServices */
         $otherServices = $this->getBaptismalServices(0);
 
         $attachments = AttachmentFactory::getList('baptism');

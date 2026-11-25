@@ -93,7 +93,7 @@ class ReplaceableServicesReport extends AbstractPDFDocumentReport
                 'end' => 'required|date',
             ]
         );
-
+        /** @var array{person: int|string, start: string, end: string} $data */
         $user = User::findOrFail((int) $data['person']);
 
         $services = Service::with(['location'])
@@ -127,10 +127,10 @@ class ReplaceableServicesReport extends AbstractPDFDocumentReport
 
         return $this->sendToBrowser(
             FileNameService::make(
-                static::FILE_TITLE,
+                self::FILE_TITLE,
                 'pdf',
                 static::FILE_SIGNATURE,
-                [$request->get('start'), $request->get('end')],
+                [$data['start'], $data['end']],
                 false,
                 $user
             ),
@@ -161,7 +161,7 @@ class ReplaceableServicesReport extends AbstractPDFDocumentReport
                 'end' => 'required|date',
             ]
         );
-
+        /** @var array{person: int|string, start: string, end: string} $data */
         $user = User::findOrFail((int) $data['person']);
         $people = ListedPerson::select(['id', 'name'])
             ->visibleFor($this->authenticatedUser())

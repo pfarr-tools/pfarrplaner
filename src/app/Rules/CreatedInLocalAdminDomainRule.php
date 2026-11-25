@@ -58,10 +58,18 @@ class CreatedInLocalAdminDomainRule implements Rule
         if ($user === null) {
             return false;
         }
+        if (! is_array($value)) {
+            return false;
+        }
+
         $cityIds = $user->adminCities->pluck('id');
         $pass = false;
         foreach ($cityIds as $cityId) {
-            if (($value[$cityId]['permission'] ?? 'n') != 'n') {
+            if (! is_int($cityId) && ! is_string($cityId)) {
+                continue;
+            }
+            $entry = $value[$cityId] ?? null;
+            if (is_array($entry) && ($entry['permission'] ?? 'n') != 'n') {
                 $pass = true;
             }
         }

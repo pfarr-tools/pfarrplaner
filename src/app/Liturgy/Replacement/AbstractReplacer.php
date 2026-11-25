@@ -66,14 +66,8 @@ abstract class AbstractReplacer
         return str_replace('['.$this->getKey().']', $this->getReplacementText(), $text);
     }
 
-    /**
-     * @return string
-     */
     abstract protected function getReplacementText(): string;
 
-    /**
-     * @return Service
-     */
     public function getService(): Service
     {
         return $this->service;
@@ -98,9 +92,6 @@ abstract class AbstractReplacer
         return $text.PHP_EOL;
     }
 
-    /**
-     * @return string
-     */
     public function getDescription(): string
     {
         return $this->description;

@@ -85,7 +85,9 @@ class PixabayController extends Controller
     /** Proxy an approved Pixabay image URL for local cropper processing. */
     public function image(Request $request): Response
     {
-        $url = (string) $request->validate(['url' => 'required|url'])['url'];
+        /** @var array{url: string} $validated */
+        $validated = $request->validate(['url' => 'required|url']);
+        $url = $validated['url'];
         $host = parse_url($url, PHP_URL_HOST);
         abort_unless(in_array($host, ['pixabay.com', 'cdn.pixabay.com', 'pixabayusercontent.com'], true), 422, 'Ungültige Pixabay-Bildadresse.');
 

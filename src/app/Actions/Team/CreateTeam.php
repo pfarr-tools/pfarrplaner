@@ -55,10 +55,13 @@ class CreateTeam extends AbstractCreateAction implements CreatesTeams
         Gate::forUser($user)->authorize('create', Team::class);
 
         $input = $this->normalizeInput($input);
+        /** @var array<string, mixed> $validated */
         $validated = Validator::make($input, Team::$validationRules)->validateWithBag('createTeam');
 
         $team = Team::create(collect($validated)->except('users')->all());
-        $team->users()->sync($validated['users'] ?? []);
+        /** @var array<int, int> $userIds */
+        $userIds = $validated['users'] ?? [];
+        $team->users()->sync($userIds);
         $team->load(Team::$relationsForEditor);
 
         CreatedTeam::dispatch($user, $team);

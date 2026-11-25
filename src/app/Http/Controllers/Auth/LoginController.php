@@ -90,7 +90,10 @@ class LoginController extends Controller
      */
     public function demoLogin(Request $request): RedirectResponse
     {
-        abort_unless(config('app.demo_mode'), 404);
+        /** @var bool $demoMode */
+        $demoMode = config('app.demo_mode');
+        abort_unless($demoMode, 404);
+        /** @var array{email: string} $validated */
         $validated = $request->validate(['email' => ['required', 'email']]);
         $user = User::where('email', mb_strtolower(trim($validated['email'])))
             ->where('is_official_user', true)
@@ -147,6 +150,7 @@ class LoginController extends Controller
             return redirect()->route('login');
         }
 
+        /** @var array{code: string} $validated */
         $validated = $request->validate(['code' => ['required', 'string', 'max:128']]);
         $result = DB::transaction(function () use ($challenge, $validated, $request): array {
             $user = User::query()->lockForUpdate()->whereKey($challenge['user_id'])->first();
@@ -154,7 +158,9 @@ class LoginController extends Controller
                 return ['state' => 'inactive'];
             }
 
-            $key = 'two-factor-login:'.$user->getKey().':'.$request->ip();
+            /** @var int|string $userId */
+            $userId = $user->getKey();
+            $key = 'two-factor-login:'.$userId.':'.$request->ip();
             if (RateLimiter::tooManyAttempts($key, 5)) {
                 return ['state' => 'limited', 'key' => $key, 'user' => $user];
             }
@@ -189,7 +195,7 @@ class LoginController extends Controller
         }
 
         RateLimiter::clear($key);
-        if (isset($challenge['throttle_key'])) {
+        if (isset($challenge['throttle_key']) && is_string($challenge['throttle_key'])) {
             RateLimiter::clear($challenge['throttle_key']);
         }
         $request->session()->forget('login.challenge');

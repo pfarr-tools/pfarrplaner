@@ -30,6 +30,7 @@
 
 namespace App\Http\Resources\Calendar;
 
+use App\Models\Service;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 
@@ -49,7 +50,14 @@ class CalendarServicesCollectionResource extends ResourceCollection
 
         $items = [];
         foreach ($this->collection ?? collect() as $item) {
-            $items[$item->city_id][] = $item;
+            if (! $item instanceof Service) {
+                continue;
+            }
+            $cityId = $item->city_id;
+            if (! is_int($cityId) && ! is_string($cityId)) {
+                continue;
+            }
+            $items[$cityId][] = $item;
         }
 
         return $items;

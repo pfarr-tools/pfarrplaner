@@ -38,6 +38,7 @@ use App\Liturgy\ItemHelpers\PsalmItemHelper;
 use App\Liturgy\ItemHelpers\SongItemHelper;
 use App\Liturgy\Replacement\Replacement;
 use App\Models\Liturgy\Item;
+use App\Models\People\User;
 use App\Models\Service;
 use Illuminate\Support\Facades\Auth;
 use PhpOffice\PhpWord\Element\TextRun;
@@ -103,8 +104,10 @@ class SermonHandoutLiturgySheet extends AbstractLiturgySheet
      */
     protected function title(FoldedFlyerWordDocument $doc, $text, $level = 0)
     {
-        $run = new TextRun($doc->getConfig()['styles']['paragraphs']['titles'][$level + 1]);
-        $run->addText($text, $doc->getConfig()['styles']['fonts']['titles'][$level + 1]);
+        /** @var array{styles: array{paragraphs: array{titles: array<int, array<string, mixed>|string>}, fonts: array{titles: array<int, array<string, mixed>>}}} $config */
+        $config = $doc->getConfig();
+        $run = new TextRun($config['styles']['paragraphs']['titles'][$level + 1]);
+        $run->addText($text, $config['styles']['fonts']['titles'][$level + 1]);
         $doc->getSection()->addTitle($run, 0);
     }
 
@@ -311,6 +314,7 @@ class SermonHandoutLiturgySheet extends AbstractLiturgySheet
      */
     protected function podcastText($podcast, $fullText = false)
     {
+        /** @var User $podcast */
         $sites = [];
         if ($podcast->own_podcast_itunes) {
             $sites[] = 'iTunes';
@@ -323,7 +327,8 @@ class SermonHandoutLiturgySheet extends AbstractLiturgySheet
         if (count($sites)) {
             $text .= implode(' und ', $sites).' unter ';
         }
-        $text .= '"'.$podcast->own_podcast_title.'"';
+        $podcastTitle = $podcast->own_podcast_title;
+        $text .= '"'.(is_scalar($podcastTitle) ? (string) $podcastTitle : '').'"';
         if ($fullText) {
             $text .= ' veröffentlicht.';
         }
@@ -336,16 +341,16 @@ class SermonHandoutLiturgySheet extends AbstractLiturgySheet
      */
     protected function renderPsalmItem(DefaultWordDocument $doc, Item $item)
     {
-        if (! isset($item->data['psalm'])) {
-            return;
-        }
-        if (! $item->data['psalm']['text']) {
+        /** @var array{psalm?: array{text?: mixed}} $data */
+        $data = $item->data;
+        $psalmText = $data['psalm']['text'] ?? null;
+        if (! $psalmText) {
             return;
         }
         /** @var PsalmItemHelper $helper */
         $helper = $item->getHelper();
         $doc->renderNormalText($helper->getTitleText(), ['size' => 9, 'bold' => true]);
-        $doc->renderNormalText($item->data['psalm']['text'], ['size' => 9]);
+        $doc->renderNormalText(is_scalar($psalmText) ? (string) $psalmText : '', ['size' => 9]);
     }
 
     /**
@@ -353,23 +358,31 @@ class SermonHandoutLiturgySheet extends AbstractLiturgySheet
      */
     protected function renderSongItem(DefaultWordDocument $doc, Item $item)
     {
-        if (! isset($item->data['song'])) {
+        /** @var array{song?: array{song?: array{copyrights?: mixed, refrain?: mixed}}} $data */
+        $data = $item->data;
+        $songDetails = $data['song']['song'] ?? null;
+        if (! is_array($songDetails)) {
             return;
         }
         /** @var SongItemHelper $helper */
         $helper = $item->getHelper();
         $doc->renderNormalText($helper->getTitleText(), ['size' => 9, 'bold' => true]);
-        if ($item->data['song']['song']['copyrights']) {
-            $doc->renderNormalText($item->data['song']['song']['copyrights'], ['size' => 7]);
+        $copyrights = $songDetails['copyrights'] ?? null;
+        if ($copyrights) {
+            $doc->renderNormalText(is_scalar($copyrights) ? (string) $copyrights : '', ['size' => 7]);
         }
 
+        $refrain = $songDetails['refrain'] ?? null;
+        $refrainText = is_scalar($refrain) ? (string) $refrain : '';
         foreach ($helper->getActiveVerses() as $verse) {
             if ($verse['refrain_before']) {
-                $doc->renderNormalText($item->data['song']['song']['refrain'], ['italic' => true, 'size' => 9]);
+                $doc->renderNormalText($refrainText, ['italic' => true, 'size' => 9]);
             }
-            $doc->renderNormalText($verse['number'].'. '.$verse['text'], ['size' => 9]);
+            $verseNumber = $verse['number'] ?? '';
+            $verseText = $verse['text'] ?? '';
+            $doc->renderNormalText((is_scalar($verseNumber) ? (string) $verseNumber : '').'. '.(is_scalar($verseText) ? (string) $verseText : ''), ['size' => 9]);
             if ($verse['refrain_after']) {
-                $doc->renderNormalText($item->data['song']['song']['refrain'], ['italic' => true, 'size' => 9]);
+                $doc->renderNormalText($refrainText, ['italic' => true, 'size' => 9]);
             }
         }
     }

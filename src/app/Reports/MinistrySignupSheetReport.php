@@ -75,6 +75,12 @@ class MinistrySignupSheetReport extends AbstractPDFDocumentReport
         return Inertia::render('Report/MinistrySignupSheet/Setup', compact('cities', 'ministries'));
     }
 
+    /**
+     * Erzeugt einen leeren Dienstplan als PDF-Download.
+     *
+     * @param  Request  $request  Anfrage mit Städten, Diensten und Zeitraum.
+     * @return string Der PDF-Download.
+     */
     public function render(Request $request)
     {
         $data = $request->validate([
@@ -83,27 +89,37 @@ class MinistrySignupSheetReport extends AbstractPDFDocumentReport
             'start' => 'required|date_format:d.m.Y',
             'end' => 'required|date_format:d.m.Y',
         ]);
-
+        /** @var array{cities: array<int, int|string>, ministries: array<int, string>, start: string, end: string} $data */
+        $cities = [];
         foreach ($data['cities'] as $key => $id) {
-            $data['cities'][$key] = City::findOrFail($id);
+            $cities[$key] = City::findOrFail($id);
         }
-        /** @var array<int, mixed> $cityIds */
-        $cityIds = $data['cities'];
-        $data['cities'] = collect($cityIds);
-        $data['start'] = $this->requireParsedDate(Carbon::createFromFormat('d.m.Y H:i:s', $data['start'].' 0:00:00'));
-        $data['end'] = $this->requireParsedDate(Carbon::createFromFormat('d.m.Y H:i:s', $data['end'].' 23:59:00'));
-        $data['services'] = Service::between($data['start'], $data['end'])
-            ->inCities($data['cities']->pluck('id'))->ordered()->get();
+        $cities = collect($cities);
+        $start = $this->requireParsedDate(Carbon::createFromFormat('d.m.Y H:i:s', $data['start'].' 0:00:00'));
+        $end = $this->requireParsedDate(Carbon::createFromFormat('d.m.Y H:i:s', $data['end'].' 23:59:00'));
+        $services = Service::between($start, $end)
+            ->inCities($cities->pluck('id'))->ordered()->get();
 
-        return $this->sendToBrowser(
+        $viewData = [
+            'cities' => $cities,
+            'ministries' => $data['ministries'],
+            'start' => $start,
+            'end' => $end,
+            'services' => $services,
+        ];
+
+        /** @var string $result */
+        $result = $this->sendToBrowser(
             FileNameService::make(
-                static::FILE_TITLE.' '.implode(', ', $data['ministries']),
+                self::FILE_TITLE.' '.implode(', ', $data['ministries']),
                 'pdf',
                 static::FILE_SIGNATURE,
-                [$data['start'], $data['end']]
+                [$start, $end]
             ),
-            $data,
+            $viewData,
             null
         );
+
+        return $result;
     }
 }

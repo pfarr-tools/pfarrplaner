@@ -62,21 +62,25 @@ class SeatingValidators
         /** @var AbstractSeatFinder $seatFinder */
         $seatFinder = $service->getSeatFinder();
 
-        if (isset($parameters[0]) && isset($data[$parameters[0]])) {
+        $parameter = $parameters[0] ?? null;
+        if ((is_string($parameter) || is_int($parameter)) && isset($data[$parameter])) {
             // existing booking
-            $booking = Booking::find($data[$parameters[0]]);
+            $booking = Booking::find($data[$parameter]);
             if (! $booking instanceof Booking) {
                 return false;
             }
             $success = $seatFinder->checkIfBookingCanBeChanged($booking, $data);
         } else {
             // new booking
-            $success = $seatFinder->find(
-                $data['number'],
-                $data['fixed_seat'],
-                $data['override_seats'],
-                $data['override_split']
-            );
+            /** @var int $number */
+            $number = $data['number'];
+            /** @var string $fixedSeat */
+            $fixedSeat = $data['fixed_seat'];
+            /** @var string $overrideSeats */
+            $overrideSeats = $data['override_seats'];
+            /** @var string $overrideSplit */
+            $overrideSplit = $data['override_split'];
+            $success = $seatFinder->find($number, $fixedSeat, $overrideSeats, $overrideSplit);
         }
 
         return $success;

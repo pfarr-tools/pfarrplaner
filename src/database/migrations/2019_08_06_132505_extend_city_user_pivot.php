@@ -47,6 +47,7 @@ class ExtendCityUserPivot extends Migration
         Schema::table(
             'city_user',
             function ($table) {
+                /** @var Blueprint $table */
                 $table->char('permission')->nullable()->default('w');
                 $table->integer('sorting')->nullable()->default(0);
             }

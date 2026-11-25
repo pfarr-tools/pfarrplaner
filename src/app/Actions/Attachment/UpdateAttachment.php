@@ -54,7 +54,9 @@ class UpdateAttachment extends AbstractUpdateAction implements UpdatesAttachment
     {
         Gate::forUser($user)->authorize('update', $attachment);
 
+        /** @var array<int, mixed> $files */
         $files = $input['attachments'] ?? [];
+        /** @var string|null $cut */
         $cut = $input['cut'] ?? null;
 
         foreach ($files as $file) {

@@ -88,6 +88,7 @@ class EmbedEventsTableReport extends AbstractEmbedReport
      */
     public function render(Request $request)
     {
+        /** @var array<string, mixed> $data Validierte Report-Parameter. */
         $data = $request->validate(
             [
                 'cors-origin' => 'required|url',
@@ -122,6 +123,7 @@ class EmbedEventsTableReport extends AbstractEmbedReport
             abort(404);
         }
 
+        /** @var int|string $days Angeforderte Anzahl der Tage. */
         $days = $request->get('days', 8);
 
         $start = Carbon::now('Europe/Berlin')->startOfDay();

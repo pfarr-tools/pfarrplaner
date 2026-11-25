@@ -64,10 +64,11 @@ class FreetextItemHelper extends AbstractItemHelper
      */
     public function getText(int|false $shorten = false): string
     {
-        if (! $this->item->data[$this->field]) {
+        $value = $this->item->data[$this->field];
+        if (! $value) {
             return '';
         }
-        $s = strtr($this->item->data[$this->field], [
+        $s = strtr(is_scalar($value) ? (string) $value : '', [
             '</p>' => "\r\n",
             '<br>' => "\n",
             '<br/>' => "\n",

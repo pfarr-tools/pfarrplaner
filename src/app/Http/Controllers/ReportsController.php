@@ -112,7 +112,10 @@ class ReportsController extends Controller
             404
         );
 
-        return $report->$step($request);
+        /** @var RedirectResponse $response */
+        $response = $report->$step($request);
+
+        return $response;
     }
 
     /**

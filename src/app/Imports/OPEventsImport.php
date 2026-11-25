@@ -74,30 +74,52 @@ class OPEventsImport
         }
 
         $myEvents = $this->getEvents();
+        if (! is_array($myEvents)) {
+            return $events;
+        }
         foreach ($myEvents as $myEvent) {
+            if (! is_array($myEvent)) {
+                continue;
+            }
             $myEvent['record_type'] = 'OP_Event';
             $this->fixTimeAndDates($myEvent);
-            if (($myEvent['start']) <= $end && ((! isset($myEvent['end']) || ($myEvent['end'] >= $start)))) {
-                foreach ($myEvent['event_dates'] as $key => $date) {
-                    $this->fixTimeAndDates($myEvent['event_dates'][$key]);
-                }
-                $myEvent['place'] = $myEvent['locationtitle'].($myEvent['locationlocation'] ? ', '.$myEvent['locationlocation'] : '');
-
-                // check for existing events
-                if ($removeMatching) {
-                    $matches = [];
-                    if (isset($events[$myEvent['start']->format('YmdHis')])) {
-                        foreach ($events[$myEvent['start']->format('YmdHis')] as $matchKey => $existingEvent) {
-                            if ($existingEvent['title'] == $myEvent['title']) {
-                                $matches[] = $matchKey;
-                            }
+            $eventStart = $myEvent['start'] ?? null;
+            if (! $eventStart instanceof Carbon) {
+                continue;
+            }
+            if (($eventStart <= $end && ((! isset($myEvent['end']) || ($myEvent['end'] >= $eventStart))))) {
+                if (isset($myEvent['event_dates']) && is_array($myEvent['event_dates'])) {
+                    foreach ($myEvent['event_dates'] as $key => $date) {
+                        if (! is_array($myEvent['event_dates'][$key])) {
+                            continue;
                         }
-                        foreach ($matches as $match) {
-                            unset($events[$myEvent['start']->format('YmdHis')][$match]);
-                        }
+                        $this->fixTimeAndDates($myEvent['event_dates'][$key]);
                     }
                 }
-                $events[$myEvent['start']->format('YmdHis')][] = $myEvent;
+                $locationTitle = $myEvent['locationtitle'] ?? '';
+                $locationLocation = $myEvent['locationlocation'] ?? null;
+                $myEvent['place'] = (is_scalar($locationTitle) ? (string) $locationTitle : '')
+                    .(is_scalar($locationLocation) && $locationLocation ? ', '.(string) $locationLocation : '');
+
+                // check for existing events
+                $startKey = $eventStart->format('YmdHis');
+                $existingGroup = $events[$startKey] ?? [];
+                if (! is_array($existingGroup)) {
+                    $existingGroup = [];
+                }
+                if ($removeMatching) {
+                    $matches = [];
+                    foreach ($existingGroup as $matchKey => $existingEvent) {
+                        if (is_array($existingEvent) && ($existingEvent['title'] ?? null) == $myEvent['title']) {
+                            $matches[] = $matchKey;
+                        }
+                    }
+                    foreach ($matches as $match) {
+                        unset($existingGroup[$match]);
+                    }
+                }
+                $existingGroup[] = $myEvent;
+                $events[$startKey] = $existingGroup;
             }
         }
 
@@ -146,21 +168,25 @@ class OPEventsImport
      * Normalize the start and end timestamps of an event.
      *
      * @param  array<array-key, mixed>  $event  Event data to normalize in place.
-     * @return void
      *
      * @throws Exception
      */
     protected function fixTimeAndDates(array &$event): void
     {
-        $event['start'] = new Carbon($event['startdate'], 'Europe/Berlin');
-        if ($event['timestart'] !== null) {
-            $event['start']->setTimeFromTimeString($event['timestart']);
+        /** @var string|int|float|\DateTimeInterface|null $startDate */
+        $startDate = $event['startdate'] ?? null;
+        $event['start'] = new Carbon($startDate, 'Europe/Berlin');
+        $timeStart = $event['timestart'] ?? null;
+        if (is_scalar($timeStart)) {
+            $event['start']->setTimeFromTimeString((string) $timeStart);
         }
-        if ($event['enddate']) {
-            $event['end'] = new Carbon($event['enddate'], 'Europe/Berlin');
+        $endDate = $event['enddate'] ?? null;
+        if ($endDate && is_scalar($endDate)) {
+            $event['end'] = new Carbon((string) $endDate, 'Europe/Berlin');
         }
-        if ($event['timeend'] !== null) {
-            $event['end']->setTimeFromTimeString($event['timeend']);
+        $timeEnd = $event['timeend'] ?? null;
+        if (is_scalar($timeEnd) && isset($event['end']) && $event['end'] instanceof Carbon) {
+            $event['end']->setTimeFromTimeString((string) $timeEnd);
         } else {
             unset($event['end']);
         }

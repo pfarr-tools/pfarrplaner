@@ -79,7 +79,10 @@ class Day extends Model
      */
     public function getLiturgyAttribute(): array
     {
-        return LiturgyService::getLiturgyInfoByDate($this->date);
+        /** @var array<string, mixed> $liturgy */
+        $liturgy = LiturgyService::getLiturgyInfoByDate($this->date);
+
+        return is_array($liturgy) ? $liturgy : [];
     }
     // END ACCESSORS
 
@@ -88,7 +91,6 @@ class Day extends Model
      * Accept a d.m.Y-formatted string as date attribute
      *
      * @param  Carbon|string  $date  Date to set.
-     * @return void
      */
     public function setDateAttribute($date): void
     {
@@ -122,7 +124,8 @@ class Day extends Model
      */
     public function scopeVisibleForCities(Builder $query, $cities)
     {
-        if (count($cities) && isset($cities->first()->id)) {
+        $firstCity = $cities->first();
+        if (count($cities) && is_object($firstCity) && isset($firstCity->id)) {
             $cities = $cities->pluck('id');
         }
 

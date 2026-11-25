@@ -118,11 +118,13 @@ class RowBasedSeatFinder extends AbstractSeatFinder
         ksort($this->grid);
         echo '<table>';
         foreach ($this->grid as $key => $place) {
-            echo '<tr><td>'.$key.'</td><td>['.$place['row']->seats.']</td><td>'.
-                (($place['booking'] !== null) ? $place['booking']['name'] : '')
-                .' ('
-                .(($place['booking'] !== null) ? $place['booking']['number'] : '')
-                .')</td></tr>';
+            /** @var int $seats */
+            $seats = $place['row']->seats;
+            /** @var string $name */
+            $name = $place['booking'] !== null ? $place['booking']['name'] : '';
+            /** @var string $number */
+            $number = $place['booking'] !== null ? $place['booking']['number'] : '';
+            echo '<tr><td>'.$key.'</td><td>['.$seats.']</td><td>'.$name.' ('.$number.')</td></tr>';
         }
         echo '</table><hr />';
     }
@@ -187,7 +189,10 @@ class RowBasedSeatFinder extends AbstractSeatFinder
             return $item->id != $booking->id;
         });
         $remain = $this->remain;
-        $this->remain += $booking['number'];
+        /** @var int $bookingNumber */
+        $bookingNumber = $booking['number'];
+        $this->remain += $bookingNumber;
+        /** @var array{number: int, fixed_seat: string, override_seats: string, override_split: string} $data */
         $success = $this->find(
             $data['number'],
             $data['fixed_seat'],
@@ -286,11 +291,17 @@ class RowBasedSeatFinder extends AbstractSeatFinder
 
                 return true;
             } else {
+                /** @var Booking $existingBooking */
+                $existingBooking = $this->grid[$rowKey]['booking'];
+                /** @var string $existingName */
+                $existingName = $existingBooking->name;
+                /** @var string $existingFirstName */
+                $existingFirstName = $existingBooking->first_name;
                 $this->setError(
                     'fixed_seat',
                     'Der gewünschte Platz '.$rowKey.' ist bereits für '
-                    .$this->grid[$rowKey]['booking']->name
-                    .($this->grid[$rowKey]['booking']->first_name ? ', '.$this->grid[$rowKey]['booking']->first_name : '')
+                    .$existingName
+                    .($existingFirstName ? ', '.$existingFirstName : '')
                     .' reserviert.'
                 );
 
@@ -362,6 +373,10 @@ class RowBasedSeatFinder extends AbstractSeatFinder
     {
         $found = 0;
         $foundKey = null;
+        /** @var SeatingRow $row */
+        $row = $place['row'];
+        /** @var int $rowSeats */
+        $rowSeats = $row->seats;
 
         foreach ($this->grid as $searchKey => $searchPlace) {
             if (
@@ -369,7 +384,7 @@ class RowBasedSeatFinder extends AbstractSeatFinder
                 && ($searchPlace['booking']->fixed_seat == '')
                 && ($searchKey > $key)
                 && ($searchPlace['booking']->number > $found)
-                && ($searchPlace['booking']->number <= $place['row']->seats)
+                && ($searchPlace['booking']->number <= $rowSeats)
             ) {
                 $found = $searchPlace['booking']->number;
                 $foundKey = $searchKey;
@@ -470,7 +485,11 @@ class RowBasedSeatFinder extends AbstractSeatFinder
         $number = 0;
         foreach ($this->grid as $key => $place) {
             if ($place['booking'] !== null) {
-                $sortKey = $place['booking']->name.($place['booking']->first_name ? ', '.$place['booking']->first_name : '');
+                /** @var string $bookingName */
+                $bookingName = $place['booking']->name;
+                /** @var string $bookingFirstName */
+                $bookingFirstName = $place['booking']->first_name;
+                $sortKey = $bookingName.($bookingFirstName ? ', '.$bookingFirstName : '');
                 $number += $place['booking']->number;
                 while (isset($final[$sortKey])) {
                     $sortKey .= '_';
@@ -566,9 +585,9 @@ class RowBasedSeatFinder extends AbstractSeatFinder
      * Split a row into its parts
      *
      * @param  string  $key  Grid key
-     * @param  array<string, array{row: SeatingRow, booking: Booking|null}>|null  $grid  Optional: use alternative grid array instead of $this->grid
+     * @param  array<string, array{row: SeatingRow, booking: Booking|null}>|array<string, SeatingRow>|null  $grid  Optional: use alternative grid array instead of $this->grid
      * @param  bool  $isRowGrid  Optional: Grid only contains rows, no bookings
-     * @return array<string, array{row: SeatingRow, booking: Booking|null}> Grid with split row
+     * @return array<string, array{row: SeatingRow, booking: Booking|null}>|array<string, SeatingRow> Grid with split row
      */
     protected function splitRow($key, $grid = null, $isRowGrid = false)
     {
@@ -712,9 +731,22 @@ class RowBasedSeatFinder extends AbstractSeatFinder
     public function getAllRows()
     {
         $rows = [];
-        foreach ($this->getAvailableSections() as $section) {
-            foreach ($section->seatingRows as $row) {
-                $rows[$row->title] = $row;
+        $sections = $this->getAvailableSections();
+        if ($sections instanceof Collection) {
+            foreach ($sections as $section) {
+                if (! $section instanceof SeatingSection) {
+                    continue;
+                }
+                foreach ($section->seatingRows as $row) {
+                    if (! $row instanceof SeatingRow) {
+                        continue;
+                    }
+                    $title = $row->title;
+                    if (! is_string($title)) {
+                        continue;
+                    }
+                    $rows[$title] = $row;
+                }
             }
         }
 
@@ -869,8 +901,9 @@ class RowBasedSeatFinder extends AbstractSeatFinder
 
         foreach ($this->originalGrid as $placeKey => $place) {
             $grid[$placeKey] = $place['row'];
-            if ($place['row']['split']) {
-                foreach (explode(',', $place['row']['split']) as $splitKey => $splitSeats) {
+            $split = $place['row']['split'];
+            if (is_string($split) && $split !== '') {
+                foreach (explode(',', $split) as $splitKey => $splitSeats) {
                     $row = clone $place['row'];
                     /** @var int<0, max> $rowSeats */
                     $rowSeats = (int) $splitSeats;

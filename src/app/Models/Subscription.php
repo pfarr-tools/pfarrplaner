@@ -87,7 +87,7 @@ class Subscription extends Model
         // add additional subscribers
         if (! is_null($additionalSubscribers)) {
             foreach ($additionalSubscribers as $subscriber) {
-                if (! $subscribers->contains($subscriber)) {
+                if ($subscriber instanceof User && ! $subscribers->contains($subscriber)) {
                     $subscribers->push($subscriber);
                 }
             }

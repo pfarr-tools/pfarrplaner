@@ -102,6 +102,7 @@ class KonfiAppQRReport extends AbstractPDFDocumentReport
      */
     public function render(Request $request)
     {
+        /** @var array{city: int, start: string, end: string, copies: int} $data */
         $data = $request->validate(
             [
                 'city' => 'required|int|exists:cities,id',
@@ -137,7 +138,7 @@ class KonfiAppQRReport extends AbstractPDFDocumentReport
 
         return $this->sendToFile(
             FileNameService::make(
-                static::FILE_TITLE,
+                self::FILE_TITLE,
                 'pdf',
                 static::FILE_SIGNATURE,
                 $lastService->trueDate()),
@@ -157,7 +158,9 @@ class KonfiAppQRReport extends AbstractPDFDocumentReport
      */
     public function single(Request $request)
     {
-        $service = Service::findOrFail((int) $request->get('service'));
+        $serviceId = $request->get('service');
+        abort_unless(is_int($serviceId) || is_string($serviceId), 404);
+        $service = Service::findOrFail((int) $serviceId);
         $services[$service->locationText()][] = $service;
         $city = $service->city;
         if ($city === null) {

@@ -60,6 +60,9 @@ class ContactFormMessage extends Mailable implements ShouldQueue
      */
     public function build()
     {
-        return $this->subject('Kontaktformular: '.$this->data['subject'])->markdown('mail.contactform.message', $this->data);
+        $subject = $this->data['subject'] ?? '';
+        $subject = is_scalar($subject) ? (string) $subject : '';
+
+        return $this->subject('Kontaktformular: '.$subject)->markdown('mail.contactform.message', $this->data);
     }
 }

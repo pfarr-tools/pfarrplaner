@@ -30,6 +30,7 @@
 
 use App\Casts\EncryptedAttribute;
 use App\Casts\EncryptedSerializedAttribute;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Output\ConsoleOutput;
@@ -52,6 +53,13 @@ return new class extends Migration
 
         foreach ($this->getModels() as $model) {
             $ct = 1;
+            /**
+             * @var array{
+             *     class: class-string<Model>,
+             *     table: string,
+             *     encrypted: array<int, array{field: string, cast: class-string<EncryptedAttribute>}>
+             * } $model
+             */
             $records = $model['class']::all();
             foreach ($records as $record) {
                 $update = [];
@@ -65,8 +73,12 @@ return new class extends Migration
                         if (! is_string($value)) {
                             $value = '_____'.serialize($value);
                         }
-                    } else {
+                    } elseif (is_string($value)) {
                         $value = $this->unquote($value);
+                    } elseif (is_scalar($value)) {
+                        $value = $this->unquote((string) $value);
+                    } else {
+                        $value = '';
                     }
                     $update[$field] = $property['cast']::encrypt($value);
                 }
@@ -131,7 +143,8 @@ return new class extends Migration
                 ];
 
                 $model['encrypted'] = [];
-                foreach ($reflectionClass->getProperty('casts')->getValue($instance) as $field => $cast) {
+                $casts = $reflectionClass->getProperty('casts')->getValue($instance);
+                foreach (is_array($casts) ? $casts : [] as $field => $cast) {
                     if ($cast == EncryptedAttribute::class || $cast == EncryptedSerializedAttribute::class) {
                         $model['encrypted'][] = ['field' => $field, 'cast' => $cast];
                     }

@@ -108,8 +108,6 @@ class RouteServiceProvider extends ServiceProvider
 
     /**
      * Define the extranet routes for the application.
-     *
-     * @return void
      */
     protected function mapExtranetRoutes(): void
     {

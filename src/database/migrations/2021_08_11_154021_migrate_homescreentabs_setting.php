@@ -66,6 +66,9 @@ class MigrateHomescreentabsSetting extends Migration
         }
         $newConfig = [];
         foreach ($config as $tabKey => $tab) {
+            if (! is_array($tab) || ! isset($tab['type']) || ! is_string($tab['type'])) {
+                continue;
+            }
             $newConfig[$tab['type']] = $tab['config'];
         }
 
@@ -80,8 +83,9 @@ class MigrateHomescreentabsSetting extends Migration
     public function up()
     {
         foreach (User::all() as $user) {
+            /** @var array<string, mixed>|null $setting */
             $setting = $user->getSetting('homeScreenTabsConfig', null);
-            if ($setting) {
+            if ($setting && is_array($setting)) {
                 if (! isset($setting['migrated'])) {
                     echo 'Migrating User #'.$user->id.'... ';
                     $user->setSetting('homeScreenTabsConfig', $this->migrateHomeScreenTabConfig($setting));
@@ -99,8 +103,9 @@ class MigrateHomescreentabsSetting extends Migration
     public function down()
     {
         foreach (User::all() as $user) {
+            /** @var array<string, mixed>|null $setting */
             $setting = $user->getSetting('homeScreenTabsConfig', null);
-            if ($setting) {
+            if ($setting && is_array($setting)) {
                 if (isset($setting['migrated'])) {
                     echo 'Migrating User #'.$user->id.' back... ';
                     $user->setSetting('homeScreenTabsConfig', $this->migrateBack($setting));

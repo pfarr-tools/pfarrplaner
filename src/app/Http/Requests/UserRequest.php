@@ -141,7 +141,12 @@ class UserRequest extends FormRequest
     {
         $table ??= $key;
 
-        return $this->validate([$key => 'nullable|exists:'.$table.','.$tableKey])[$key] ?? [];
+        /** @var array<string, mixed> $validated Validierte Relation-IDs. */
+        $validated = $this->validate([$key => 'nullable|exists:'.$table.','.$tableKey]);
+        /** @var array<int, int|string> $ids IDs der zu synchronisierenden Relation. */
+        $ids = $validated[$key] ?? [];
+
+        return $ids;
     }
 
     /**
@@ -161,7 +166,7 @@ class UserRequest extends FormRequest
 
         $actor = $this->user();
         if (! $actor instanceof User) {
-            return $roles->toArray();
+            return $roles->all();
         }
 
         if (! $actor->hasRole(RoleService::ROLE_SUPER_ADMIN)) {
@@ -176,6 +181,6 @@ class UserRequest extends FormRequest
             });
         }
 
-        return $roles->toArray();
+        return $roles->all();
     }
 }

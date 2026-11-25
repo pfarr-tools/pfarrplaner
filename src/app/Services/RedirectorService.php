@@ -39,8 +39,6 @@ class RedirectorService
 {
     /**
      * Store the current URL as the route to return to.
-     *
-     * @return void
      */
     public static function saveCurrentRoute(): void
     {
@@ -51,7 +49,6 @@ class RedirectorService
      * Store the URL to return to.
      *
      * @param  string  $route  URL that later redirects should use.
-     * @return void
      */
     public static function setReturnRoute(string $route): void
     {
@@ -75,6 +72,8 @@ class RedirectorService
      */
     public static function backRoute(): string
     {
-        return Session::get('returnRoute', route('home'));
+        $route = Session::get('returnRoute', route('home'));
+
+        return is_string($route) ? $route : route('home');
     }
 }

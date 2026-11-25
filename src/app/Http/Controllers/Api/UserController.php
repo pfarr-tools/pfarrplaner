@@ -110,6 +110,7 @@ class UserController extends Controller
      */
     public function email(Request $request)
     {
+        /** @var array<string, mixed> $validated */
         $validated = $request->validate([
             'email' => ['required', 'email', 'max:255'],
         ]);

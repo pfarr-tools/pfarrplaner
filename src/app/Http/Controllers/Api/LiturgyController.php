@@ -60,10 +60,18 @@ class LiturgyController extends Controller
     {
         Gate::authorize('update', $service);
         $blockIds = $service->liturgyBlocks()->pluck('id');
-        foreach ($request->get('blocks') as $block) {
+        $blocks = $request->get('blocks');
+        foreach (is_iterable($blocks) ? $blocks : [] as $block) {
+            if (! is_array($block)) {
+                continue;
+            }
             $currentBlock = $service->liturgyBlocks()->whereKey($block['id'])->firstOrFail();
             $currentBlock->update(['sortable' => $block['sortable']]);
-            foreach ($block['items'] as $item) {
+            $items = $block['items'] ?? [];
+            foreach (is_iterable($items) ? $items : [] as $item) {
+                if (! is_array($item)) {
+                    continue;
+                }
                 Item::whereIn('liturgy_block_id', $blockIds)->whereKey($item['id'])->firstOrFail()->update(
                     [
                         'sortable' => $item['sortable'],
@@ -170,7 +178,9 @@ class LiturgyController extends Controller
 
         $item = Item::create($data);
         if (isset($data['data'])) {
-            $item->data = $data['data'];
+            /** @var array<string, mixed> $itemData */
+            $itemData = $data['data'];
+            $item->data = $itemData;
             $item->performTypeSpecificActionsOnCreate();
             $item->save();
         }
@@ -216,7 +226,9 @@ class LiturgyController extends Controller
         Gate::authorize('update', $block->service);
         $data = $this->validateItemRequest($request);
         $item->update($data);
-        $item->data = $data['data'];
+        /** @var array<string, mixed> $itemData */
+        $itemData = $data['data'];
+        $item->data = $itemData;
         $item->save();
         $item->refresh();
 
@@ -301,7 +313,8 @@ class LiturgyController extends Controller
      */
     protected function validateItemRequest(Request $request): array
     {
-        return $request->validate(
+        /** @var array<string, mixed> $validated */
+        $validated = $request->validate(
             [
                 'title' => 'required|string',
                 'instructions' => 'nullable|string',
@@ -310,6 +323,8 @@ class LiturgyController extends Controller
                 'data' => 'nullable',
             ]
         );
+
+        return $validated;
     }
 
     /**
@@ -319,12 +334,15 @@ class LiturgyController extends Controller
      */
     protected function validateBlockRequest(Request $request): array
     {
-        return $request->validate(
+        /** @var array<string, mixed> $validated */
+        $validated = $request->validate(
             [
                 'title' => 'required|string',
                 'instructions' => 'nullable|string',
                 'service_id' => 'int|exists:services,id',
             ]
         );
+
+        return $validated;
     }
 }

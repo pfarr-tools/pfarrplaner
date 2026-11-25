@@ -88,6 +88,7 @@ class EmbedServiceTableReport extends AbstractEmbedReport
      */
     public function render(Request $request)
     {
+        /** @var array{listType: string, limit: int, cities?: array<int, int>, locations?: array<int, int>, maxBaptisms?: int, cors-origin: string} $data */
         $data = $request->validate(
             [
                 'listType' => 'required',
@@ -101,7 +102,7 @@ class EmbedServiceTableReport extends AbstractEmbedReport
         );
 
         $listType = $request->get('listType');
-        $ids = $data['listType'] == 'table-locations' ? implode(',', $data['locations']) : implode(',', $data['cities']);
+        $ids = $data['listType'] == 'table-locations' ? implode(',', $data['locations'] ?? []) : implode(',', $data['cities'] ?? []);
 
         $limit = $data['limit'] ?? 5;
         $maxBaptisms = $data['maxBaptisms'] ?? null;

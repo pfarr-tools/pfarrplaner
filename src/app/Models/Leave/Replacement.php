@@ -256,7 +256,8 @@ class Replacement extends AbstractModel
     {
         $absentUserId = null;
         if ($this->relationLoaded('absence')) {
-            $absentUserId = $this->getRelation('absence')?->user_id;
+            $absence = $this->getRelation('absence');
+            $absentUserId = $absence instanceof Absence ? $absence->user_id : null;
         } elseif ($this->absence_id) {
             $absentUserId = Absence::query()
                 ->whereKey($this->absence_id)
@@ -279,6 +280,9 @@ class Replacement extends AbstractModel
     protected function normalizeDateAttribute($value, bool $endOfDay = false): ?string
     {
         if (! $value) {
+            return null;
+        }
+        if (! is_string($value) && ! is_int($value) && ! is_float($value) && ! $value instanceof \DateTimeInterface) {
             return null;
         }
 

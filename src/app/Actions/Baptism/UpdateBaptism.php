@@ -59,7 +59,10 @@ class UpdateBaptism extends AbstractUpdateAction implements UpdatesBaptisms
         Gate::forUser($user)->authorize('update', $baptism);
 
         $input = $this->prepareInputForValidation(array_merge($baptism->only($baptism->getFillable()), $input));
-        $this->authorizeCityWriteAccess($user, $input['city_id'] ?? null);
+        /** @var int|string|null $cityId */
+        $cityId = $input['city_id'] ?? null;
+        $this->authorizeCityWriteAccess($user, $cityId);
+        /** @var array<string, mixed> $validated */
         $validated = Validator::make($input, Baptism::$validationRules)->validateWithBag('updateBaptism');
 
         $baptism->update($this->normalizeValidatedInput($validated));

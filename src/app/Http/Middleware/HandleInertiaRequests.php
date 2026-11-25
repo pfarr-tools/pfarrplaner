@@ -73,6 +73,7 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request)
     {
+        /** @var array{version: string} $packageConfig */
         $packageConfig = json_decode((string) file_get_contents(base_path('package.json')), true);
         $version = $packageConfig['version'];
 
@@ -100,7 +101,7 @@ class HandleInertiaRequests extends Middleware
             'activeTab' => request()->get('tab', 'home'),
             'labels' => fn () => config('labels'),
             'bible' => fn () => [
-                'versions' => array_keys(config('bible.versions', [])),
+                'versions' => array_keys((array) config('bible.versions', [])),
             ],
         ]);
 
@@ -130,13 +131,16 @@ class HandleInertiaRequests extends Middleware
         if (! $routeName) {
             return 'benutzerhandbuch';
         }
-        foreach (config('manual', []) as $chapter => $prefixes) {
+        /** @var array<string, mixed> $manualConfig */
+        $manualConfig = config('manual', []);
+        foreach ($manualConfig as $chapter => $prefixes) {
             if (! is_array($prefixes)) {
                 continue;
             }
 
             $manual = 'benutzerhandbuch';
             if (isset($prefixes['prefixes'])) {
+                /** @var string $manual */
                 $manual = $prefixes['manual'] ?? $manual;
                 $prefixes = $prefixes['prefixes'];
             }
@@ -149,6 +153,7 @@ class HandleInertiaRequests extends Middleware
                 if (is_array($prefix)) {
                     return 'benutzerhandbuch';
                 }
+                /** @var string $prefix */
                 if (str_starts_with($routeName, $prefix) || $routeName === $prefix) {
                     return trim($manual.'/'.$chapter, '/');
                 }

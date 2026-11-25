@@ -30,6 +30,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Contracts\Wedding\CreatesWeddings;
 use App\Liturgy\PronounSets\PronounSets;
 use App\Models\Attachment;
 use App\Models\Location;
@@ -71,8 +72,13 @@ class WeddingController extends AbstractCRUDController
     {
         $service = Service::findOrFail($request->get('service') ?: $request->get('service_id'));
         Gate::authorize('create', [Wedding::class, $service]);
+        $user = $request->user();
+        abort_unless($user instanceof User, 401);
+        /** @var array<string, mixed> $input */
+        $input = $request->all();
+        /** @var CreatesWeddings $creator */
         $creator = app(Wedding::getContractName('create'));
-        $wedding = $creator->create($request->user(), $request->all());
+        $wedding = $creator->create($user, $input);
 
         return redirect()->route('weddings.edit', $wedding->id);
     }
@@ -119,6 +125,16 @@ class WeddingController extends AbstractCRUDController
         Gate::authorize('create', Wedding::class);
         $user = Auth::user();
         abort_unless($user instanceof User, 401);
+        /**
+         * @var array{
+         *     date: string,
+         *     city: int|string,
+         *     location: int|string,
+         *     spouse1_name: string,
+         *     spouse2_name: string,
+         *     pastor: array<int, int|string|array{id: int|string}|null>|int|string|null
+         * } $data
+         */
         $data = $request->validate(
             [
                 'date' => 'required|date_format:d.m.Y H:i',
@@ -135,7 +151,7 @@ class WeddingController extends AbstractCRUDController
         }
         $date = Carbon::createFromFormat('d.m.Y H:i', $data['date'], 'Europe/Berlin');
         abort_unless($date !== null, 422);
-        $data['date'] = $date->setTimezone('UTC');
+        $date = $date->setTimezone('UTC');
 
         $city = City::query()->whereKey($data['city'])->firstOrFail();
         abort_unless($user->writableCities->pluck('id')->contains($city->id), 403);
@@ -144,24 +160,24 @@ class WeddingController extends AbstractCRUDController
         if ((! is_numeric($data['location'])) || (Location::find($data['location']) === null)) {
             $specialLocation = $data['location'];
             $data['location'] = 0;
-            $time = $data['date']->format('H:i');
+            $time = $date->format('H:i');
             $ccLocation = $request->get('cc_location') ?: '';
         } else {
             if ($data['location']) {
                 $location = Location::query()->whereKey($data['location'])->firstOrFail();
-                $time = $data['date']->format('H:i');
+                $time = $date->format('H:i');
                 $ccLocation = $request->get('cc_location') ?: ($request->get(
                     'cc'
                 ) ? $location->cc_default_location : '');
             } else {
-                $time = $data['date']->format('H:i');
+                $time = $date->format('H:i');
                 $ccLocation = $request->get('cc_location') ?: '';
             }
         }
 
         $service = Service::create(
             [
-                'date' => $data['date'],
+                'date' => $date,
                 'location_id' => ($location ? $location->id : null),
                 'special_location' => $specialLocation ?? null,
                 'city_id' => $city->id,
@@ -190,10 +206,11 @@ class WeddingController extends AbstractCRUDController
         } else {
             $sync = [];
             foreach ($data['pastor'] as $person) {
-                if ($person !== null) {
-                    $sync[(is_numeric($person) ? $person : $person['id'])] = ['category' => 'P'];
+                if (is_array($person)) {
+                    $sync[$person['id']] = ['category' => 'P'];
+                } elseif (is_int($person) || is_string($person)) {
+                    $sync[$person] = ['category' => 'P'];
                 }
-
             }
             $service->pastors()->sync($sync);
         }

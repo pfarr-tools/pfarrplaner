@@ -36,7 +36,7 @@ class CreateWedding extends AbstractCreateAction implements CreatesWeddings
     public function create(User $user, array $input): Wedding
     {
         $serviceId = $input['service_id'] ?? $input['service'] ?? null;
-        $service = Service::findOrFail((int) $serviceId);
+        $service = Service::findOrFail(is_scalar($serviceId) ? (int) $serviceId : 0);
 
         Gate::forUser($user)->authorize('create', [Wedding::class, $service]);
 

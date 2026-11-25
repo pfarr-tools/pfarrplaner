@@ -43,10 +43,12 @@ class AmazonService
      */
     public static function getInfoForISBN(string $isbn): ?SimpleXMLElement
     {
+        /** @var string $ItemId */
         $ItemId = $_GET['isbn'];
         $ResponseGroup = 'Offers';
         $Timestamp = gmdate("Y-m-d\TH:i:s\Z");
-        $AWSAccessKeyId = '/'.config('amazon.id').'/';
+        $amazonId = config('amazon.id');
+        $AWSAccessKeyId = '/'.(is_string($amazonId) ? $amazonId : '').'/';
         $Version = '2013-08-01';
         $str = 'Service=AWSECommerceService&Operation=ItemLookup&ResponseGroup='.$ResponseGroup.'&IdType=ASIN&ItemId='.urlencode(
             $ItemId

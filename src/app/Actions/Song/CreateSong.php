@@ -52,6 +52,7 @@ class CreateSong extends AbstractCreateAction implements CreatesSongs
     {
         Gate::forUser($user)->authorize('create', Song::class);
 
+        /** @var array<string, mixed> $validated Validierte Eingabedaten. */
         $validated = Validator::make($input, Song::$validationRules)->validateWithBag('createSong');
         $song = Song::create(collect($validated)->except(['verses', 'songbooks'])->all());
         $song->syncVersesFromRequest($validated);

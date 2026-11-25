@@ -25,9 +25,16 @@ class SentryFeedbackService
      */
     public function send(string $eventId, ?string $name, ?string $email, string $comments): bool
     {
+        /** @var array{token?: mixed, organization?: mixed, project?: mixed, endpoint?: mixed} $feedback */
         $feedback = config('sentry.feedback');
 
-        if (blank($feedback['token'] ?? null) || blank($feedback['organization'] ?? null) || blank($feedback['project'] ?? null)) {
+        $token = $feedback['token'] ?? null;
+        $organization = $feedback['organization'] ?? null;
+        $project = $feedback['project'] ?? null;
+        $configuredEndpoint = $feedback['endpoint'] ?? null;
+
+        if (! is_string($token) || ! is_string($organization) || ! is_string($project)
+            || blank($token) || blank($organization) || blank($project)) {
             Log::warning('Sentry user feedback is not configured.', [
                 'event_id' => $eventId,
             ]);
@@ -35,12 +42,12 @@ class SentryFeedbackService
             return false;
         }
 
-        $url = rtrim($this->endpoint($feedback['endpoint'] ?? null), '/')
-            .'/projects/'.rawurlencode($feedback['organization'])
-            .'/'.rawurlencode($feedback['project']).'/user-feedback/';
+        $url = rtrim($this->endpoint(is_string($configuredEndpoint) ? $configuredEndpoint : null), '/')
+            .'/projects/'.rawurlencode($organization)
+            .'/'.rawurlencode($project).'/user-feedback/';
 
         /** @var PendingRequest $request */
-        $request = Http::withToken($feedback['token'])
+        $request = Http::withToken($token)
             ->acceptJson()
             ->asJson()
             ->timeout(10);

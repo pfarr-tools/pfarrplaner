@@ -48,11 +48,19 @@ class Song extends AbstractSngFile
         parent::__construct($this->helper->getTitleText());
     }
 
+    /**
+     * Erzeugt den SNG-Text des Liedes aus den Item-Daten.
+     *
+     * @return string SNG-Text des Liedes
+     */
     public function toText()
     {
+        $songDetails = $this->songDetails();
+        $songTitle = $songDetails['title'] ?? '';
+        $songTitle = is_string($songTitle) ? $songTitle : '';
         $this->setHeaders([
             'LangCount' => 1,
-            'Title' => $this->item->data['song']['song']['title'] ?? '',
+            'Title' => $songTitle,
             'ChurchSongID' => $this->helper->getCodeText(),
             'Songbook' => $this->helper->getCodeText(),
             'CCLI' => '-',
@@ -72,16 +80,27 @@ class Song extends AbstractSngFile
 
         $text = $this->headersToText();
 
-        if ($this->item->data['song']['song']['refrain'] ?? '') {
+        $refrain = $songDetails['refrain'] ?? '';
+        $refrain = is_string($refrain) ? $refrain : '';
+        if ($refrain) {
             $text .= $this->line('---')
                 .$this->line('Refrain')
-                .$this->wordWrap($this->item->data['song']['song']['refrain'] ?? '');
+                .$this->wordWrap($refrain);
         }
 
-        foreach ($this->item->data['song']['song']['verses'] ?? [] as $verse) {
+        $verses = $songDetails['verses'] ?? [];
+        $verses = is_array($verses) ? $verses : [];
+        foreach ($verses as $verse) {
+            if (! is_array($verse)) {
+                continue;
+            }
+            $number = $verse['number'] ?? '';
+            $number = is_scalar($number) ? (string) $number : '';
+            $verseText = $verse['text'] ?? '';
+            $verseText = is_string($verseText) ? $verseText : '';
             $text .= $this->line('---')
-                .$this->line('Vers '.$verse['number'])
-                .$this->wordWrap($verse['text'] ?? '');
+                .$this->line('Vers '.$number)
+                .$this->wordWrap($verseText);
         }
 
         return utf8_decode($text);
@@ -98,6 +117,11 @@ class Song extends AbstractSngFile
         return $scheduleItem;
     }
 
+    /**
+     * Ermittelt die Reihenfolge der aktiven Strophen inklusive Refrains.
+     *
+     * @return string Komma-getrennte Strophenreihenfolge
+     */
     public function getVerseOrder(): string
     {
         $order = [];
@@ -105,7 +129,8 @@ class Song extends AbstractSngFile
             if ($verse['refrain_before']) {
                 $order[] = 'Refrain';
             }
-            $order[] = 'Vers '.$verse['number'];
+            $number = $verse['number'] ?? '';
+            $order[] = 'Vers '.(is_scalar($number) ? (string) $number : '');
             if ($verse['refrain_after']) {
                 $order[] = 'Refrain';
             }
@@ -124,8 +149,36 @@ class Song extends AbstractSngFile
         $this->item = $item;
     }
 
+    /**
+     * Gibt die Beschriftung des Liedes mit Strophenangabe zurück.
+     *
+     * @return string Beschriftung des Liedes
+     */
     public function getCaption()
     {
-        return $this->item->title.': '.$this->getTitle().($this->item->data['verses'] ? ', '.$this->item->data['verses'] : '');
+        $verses = $this->item->data['verses'] ?? '';
+        $verses = is_scalar($verses) ? (string) $verses : '';
+
+        return $this->item->title.': '.$this->getTitle().($verses ? ', '.$verses : '');
+    }
+
+    /**
+     * Liest die Lieddetails aus den serialisierten Item-Daten.
+     *
+     * @return array<string, mixed> Lieddetails oder leeres Array bei fehlenden Daten
+     */
+    private function songDetails(): array
+    {
+        $songData = $this->item->data['song'] ?? null;
+        if (! is_array($songData)) {
+            return [];
+        }
+        $songDetails = $songData['song'] ?? null;
+        if (! is_array($songDetails)) {
+            return [];
+        }
+
+        /** @var array<string, mixed> $songDetails */
+        return $songDetails;
     }
 }

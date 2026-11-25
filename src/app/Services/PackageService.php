@@ -42,8 +42,10 @@ class PackageService
      */
     public static function info(): array
     {
+        /** @var array{version: string, ...} $packageInfo Paketmetadaten aus package.json. */
+        $packageInfo = json_decode(file_get_contents(base_path('package.json')) ?: '', true);
         $package = [
-            'info' => json_decode(file_get_contents(base_path('package.json')) ?: '', true),
+            'info' => $packageInfo,
             'date' => (new Carbon((int) filemtime(base_path('package.json'))))->setTimeZone(
                 'Europe/Berlin'
             ),

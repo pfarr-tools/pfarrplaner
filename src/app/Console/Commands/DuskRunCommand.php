@@ -171,13 +171,15 @@ class DuskRunCommand extends Command
 
     protected function prepareFrontendBuild(): int
     {
+        /** @var array<string, string|\Stringable|false> $environment */
+        $environment = array_merge($_ENV, $_SERVER, [
+            'npm_config_cache' => '/tmp/.npm',
+            'NPM_CONFIG_CACHE' => '/tmp/.npm',
+        ]);
         $process = (new Process(
             ['npm', 'run', 'build'],
             base_path(),
-            array_merge($_ENV, $_SERVER, [
-                'npm_config_cache' => '/tmp/.npm',
-                'NPM_CONFIG_CACHE' => '/tmp/.npm',
-            ]),
+            $environment,
         ))->setTimeout(null);
 
         try {
@@ -273,7 +275,8 @@ class DuskRunCommand extends Command
 
     protected function resetDuskDatabase(): void
     {
-        if ((string) Env::get('DB_CONNECTION') !== 'sqlite') {
+        $connection = Env::get('DB_CONNECTION');
+        if (! is_string($connection) || $connection !== 'sqlite') {
             return;
         }
 
@@ -396,14 +399,14 @@ class DuskRunCommand extends Command
     /**
      * Get the PHP binary environment variables.
      *
-     * @return array<string, mixed>
+     * @return array<string, string|\Stringable|false>
      */
     protected function env()
     {
         $variables = [];
 
         if ($this->option('browse') && ! isset($_ENV['CI']) && ! isset($_SERVER['CI'])) {
-            $variables['DUSK_HEADLESS_DISABLED'] = true;
+            $variables['DUSK_HEADLESS_DISABLED'] = '1';
         }
 
         if ($this->shouldUseCollisionPrinter($this->forwardedPhpUnitOptions())) {
@@ -683,9 +686,12 @@ class DuskRunCommand extends Command
     {
         $expectedDatabase = dirname(__DIR__, 3).'/database/database.dusk.sqlite';
 
+        $connection = $environment['DB_CONNECTION'] ?? '';
+        $database = $environment['DB_DATABASE'] ?? '';
+
         if (
-            (string) ($environment['DB_CONNECTION'] ?? '') !== 'sqlite'
-            || (string) ($environment['DB_DATABASE'] ?? '') !== $expectedDatabase
+            ! is_string($connection) || $connection !== 'sqlite'
+            || ! is_string($database) || $database !== $expectedDatabase
         ) {
             throw new \RuntimeException(
                 'Dusk benötigt die isolierte SQLite-Testdatenbank: '.$expectedDatabase
@@ -871,6 +877,15 @@ class DuskRunCommand extends Command
      */
     protected function resolvedAppUrl(): string
     {
-        return getenv('APP_URL') ?: ($_ENV['APP_URL'] ?? 'http://127.0.0.1:8000');
+        $environmentUrl = getenv('APP_URL');
+        $configuredUrl = $_ENV['APP_URL'] ?? null;
+
+        if (is_string($environmentUrl) && $environmentUrl !== '') {
+            return $environmentUrl;
+        }
+
+        return is_string($configuredUrl) && $configuredUrl !== ''
+            ? $configuredUrl
+            : 'http://127.0.0.1:8000';
     }
 }

@@ -24,7 +24,7 @@ class NotHashMatch implements ValidationRule
 
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        if (Hash::check($value, $this->hash)) {
+        if (is_string($value) && Hash::check($value, $this->hash)) {
             $fail('validation.not_hash')->translate();
         }
     }

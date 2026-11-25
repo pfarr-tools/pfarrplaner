@@ -60,7 +60,6 @@ class StringTool
     /**
      * @param  Carbon  $from  Start.
      * @param  Carbon  $to  End.
-     * @return string
      */
     public static function durationText(Carbon $from, Carbon $to): string
     {
@@ -128,7 +127,7 @@ class StringTool
         $leadingZero = false
     ) {
         if (! is_numeric($time)) {
-            $time = strtotime($time);
+            $time = strtotime(is_string($time) ? $time : '');
         }
         $format = ($leadingZero ? '%H' : '%k').$separator.'%M';
         if ($skipMinutes) {
@@ -165,7 +164,6 @@ class StringTool
 
     /**
      * @param  string  $s  Input text.
-     * @return string
      */
     public static function sanitizeXMLString(string $s): string
     {

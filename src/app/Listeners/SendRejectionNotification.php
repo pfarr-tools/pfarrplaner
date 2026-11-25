@@ -54,7 +54,6 @@ class SendRejectionNotification
      *
      * Das Legacy-Event liefert die Abwesenheit als dynamische Eigenschaft.
      *
-     * @param  AbsenceRejected  $event
      * @return void
      */
     public function handle(AbsenceRejected $event)

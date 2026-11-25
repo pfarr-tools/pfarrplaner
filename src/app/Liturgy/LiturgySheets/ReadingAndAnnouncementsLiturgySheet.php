@@ -233,7 +233,8 @@ class ReadingAndAnnouncementsLiturgySheet extends AbstractLiturgySheet
      */
     protected function renderReadingItemRow(DefaultWordDocument $doc, Table $table, Item $item)
     {
-        $this->renderRow($table, $item, $item->data['reference'] ?? '');
+        $reference = $item->data['reference'] ?? '';
+        $this->renderRow($table, $item, is_scalar($reference) ? (string) $reference : '');
     }
 
     /**

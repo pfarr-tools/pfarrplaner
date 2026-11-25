@@ -50,8 +50,6 @@ class PsalmPolicy
 
     /**
      * Determine whether the user can view the index of all psalms.
-     *
-     * @return bool
      */
     public function viewAny(User $user): bool
     {
@@ -60,8 +58,6 @@ class PsalmPolicy
 
     /**
      * Determine whether the user can access the psalm index.
-     *
-     * @return bool
      */
     public function index(User $user): bool
     {

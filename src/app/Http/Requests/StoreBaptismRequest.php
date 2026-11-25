@@ -106,15 +106,28 @@ class StoreBaptismRequest extends FormRequest
         $data['signed'] ??= 0;
         $data['registered'] ??= 0;
 
-        $data['dob'] ? $data['dob'] = Carbon::createFromFormat('d.m.Y', $data['dob']) : $data['dob'] = null;
-        $data['first_contact_on'] ? $data['first_contact_on'] = Carbon::createFromFormat('d.m.Y', $data['first_contact_on']) : $data['first_contact_on'] = null;
-        $data['dimissorial_requested'] ? $data['dimissorial_requested'] = Carbon::createFromFormat('d.m.Y', $data['dimissorial_requested']) : $data['dimissorial_requested'] = null;
-        $data['dimissorial_received'] ? $data['dimissorial_received'] = Carbon::createFromFormat('d.m.Y', $data['dimissorial_received']) : $data['dimissorial_received'] = null;
+        if (isset($data['dob'])) {
+            $dob = $data['dob'];
+            $data['dob'] = is_string($dob) ? Carbon::createFromFormat('d.m.Y', $dob) : null;
+        }
+        if (isset($data['first_contact_on'])) {
+            $firstContactOn = $data['first_contact_on'];
+            $data['first_contact_on'] = is_string($firstContactOn) ? Carbon::createFromFormat('d.m.Y', $firstContactOn) : null;
+        }
+        if (isset($data['dimissorial_requested'])) {
+            $dimissorialRequested = $data['dimissorial_requested'];
+            $data['dimissorial_requested'] = is_string($dimissorialRequested) ? Carbon::createFromFormat('d.m.Y', $dimissorialRequested) : null;
+        }
+        if (isset($data['dimissorial_received'])) {
+            $dimissorialReceived = $data['dimissorial_received'];
+            $data['dimissorial_received'] = is_string($dimissorialReceived) ? Carbon::createFromFormat('d.m.Y', $dimissorialReceived) : null;
+        }
 
         if (isset($data['appointment'])) {
-            $data['appointment'] = Carbon::parse($data['appointment'], 'Europe/Berlin')->setTimezone('UTC')->format(
-                'd.m.Y H:i'
-            );
+            $appointment = $data['appointment'];
+            $data['appointment'] = is_string($appointment)
+                ? Carbon::parse($appointment, 'Europe/Berlin')->setTimezone('UTC')->format('d.m.Y H:i')
+                : null;
         }
 
         return $data;

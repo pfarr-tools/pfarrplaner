@@ -35,6 +35,7 @@ use App\Liturgy\ItemHelpers\PsalmItemHelper;
 use App\Liturgy\ItemHelpers\ReadingItemHelper;
 use App\Liturgy\ItemHelpers\SongItemHelper;
 use App\Models\Announcements;
+use App\Models\People\User;
 use App\Models\Places\City;
 use App\Models\Service;
 use App\Services\FileNameService;
@@ -152,6 +153,7 @@ class AnnouncementsReport extends AbstractWordDocumentReport
     public function services(Request $request)
     {
         $data = $request->validate(['city' => 'required|int']);
+        /** @var array{city: int} $data */
         $city = City::findOrFail((int) $data['city']);
         $serviceList = Service::with(['location'])
             ->regularForCity($city)
@@ -182,7 +184,7 @@ class AnnouncementsReport extends AbstractWordDocumentReport
             'city' => 'required|int|exists:cities,id',
             'service' => 'required|int|exists:services,id',
         ]);
-
+        /** @var array{city: int, service: int} $data */
         $city = City::findOrFail((int) $data['city']);
         $service = Service::findOrFail((int) $data['service']);
 
@@ -199,6 +201,9 @@ class AnnouncementsReport extends AbstractWordDocumentReport
 
         $lastServiceDays = [];
         foreach ($days as $day) {
+            if (! is_string($day)) {
+                continue;
+            }
             $lastServiceDays[] = ['id' => $day, 'name' => Carbon::parse($day)->isoFormat('dddd, DD. MMMM YYYY')];
         }
 
@@ -214,6 +219,7 @@ class AnnouncementsReport extends AbstractWordDocumentReport
             'city' => 'required|int|exists:cities,id',
             'day' => 'required|date',
         ]);
+        /** @var array{city: int, day: string} $data */
         $services = Service::whereDate('date', Carbon::parse($data['day']))
             ->where('city_id', $data['city'])
             ->get();
@@ -234,7 +240,11 @@ class AnnouncementsReport extends AbstractWordDocumentReport
         if (! $request->has('service')) {
             abort(404);
         }
-        $service = Service::findOrFail((int) $request->get('service'));
+        $serviceId = $request->get('service');
+        if (! is_numeric($serviceId)) {
+            abort(404);
+        }
+        $service = Service::findOrFail((int) $serviceId);
         $lastService = Service::where('offering_amount', '!=', '')
             ->endingAt($service->dateTime)
             ->orderedDesc()
@@ -257,6 +267,7 @@ class AnnouncementsReport extends AbstractWordDocumentReport
      */
     public function renderReport($data)
     {
+        /** @var array{service: int|null, city: int|null, lastService: string|null, offerings: string|int|float|null, excludeRegularWeekly?: bool|null} $data */
         $service = Service::findOrFail((int) $data['service']);
         $city = City::findOrFail((int) $data['city']);
 
@@ -281,10 +292,11 @@ class AnnouncementsReport extends AbstractWordDocumentReport
 
         $this->doc->getPhpWord()?->getSettings()->setBookFoldPrinting(true);
 
+        $liturgicalTitle = $service->liturgicalInfo['title'] ?? null;
         $textRun = $this->doc->getSection()?->addTextRun('Bekanntgaben');
         $textRun?->addText(
             $service->trueDate()?->isoFormat('DD. MMMM YYYY')
-            .(($service->liturgicalInfo['title'] ?? false) ? ' - '.$service->liturgicalInfo['title'] : ''),
+            .(is_string($liturgicalTitle) && $liturgicalTitle ? ' - '.$liturgicalTitle : ''),
             ['bold' => true]
         );
 
@@ -326,6 +338,7 @@ class AnnouncementsReport extends AbstractWordDocumentReport
         $announcements->setUseTabs(true);
         // dd($announcements->render($lastService, $offerings, null, "\n", ['last_offerings', 'final_song']));
         $announcements->render($lastService, $offerings, function ($key, $items) {
+            /** @var list<string> $items */
             if ($key == 'events') {
                 foreach ($items as $item) {
                     if (Str::contains($item, "\t")) {
@@ -346,7 +359,7 @@ class AnnouncementsReport extends AbstractWordDocumentReport
 
         return $this->sendToBrowser(
             FileNameService::make(
-                static::FILE_TITLE,
+                self::FILE_TITLE,
                 '.docx',
                 static::FILE_SIGNATURE,
                 $service->trueDate()
@@ -384,6 +397,9 @@ class AnnouncementsReport extends AbstractWordDocumentReport
      */
     protected function renderName($s)
     {
+        if (! is_string($s)) {
+            return $s;
+        }
         if (strpos($s, ',') !== false) {
             $t = explode(',', $s);
             $s = trim($t[1]).' '.trim($t[0]);
@@ -401,10 +417,16 @@ class AnnouncementsReport extends AbstractWordDocumentReport
     {
         $names = collect();
         foreach ($people as $person) {
+            if (! $person instanceof User) {
+                continue;
+            }
             $names->push(NameService::fromUser($person)->format(NameService::TITLE_FIRST_LAST));
         }
 
-        return $names->join(', ', $and);
+        /** @var string $line */
+        $line = $names->join(', ', $and);
+
+        return $line;
     }
 
     /**
@@ -414,6 +436,8 @@ class AnnouncementsReport extends AbstractWordDocumentReport
      */
     protected function renderMinistryLine($ministry, $people)
     {
+        /** @var string $ministry */
+        /** @var array<int, mixed>|Collection<int, mixed> $people */
         $this->doc->renderParagraph(self::INDENT, [
             [$ministry.":\t".$this->getNameListLine($people), []],
         ]);
@@ -434,17 +458,19 @@ class AnnouncementsReport extends AbstractWordDocumentReport
             ]);
             foreach ($block->items as $item) {
                 $title = '';
+                $verses = $item->data['verses'] ?? '';
+                $reference = $item->data['reference'] ?? '';
                 if ($item->data_type == 'song') {
                     $helper = new SongItemHelper($item);
                     $title = ': '.$helper->getTitleText(
-                    ).(($item->data['verses'] ?? '') ? ', '.$item->data['verses'] : '');
+                    ).(is_string($verses) && $verses ? ', '.$verses : '');
                 }
                 if ($item->data_type == 'psalm') {
                     $helper = new PsalmItemHelper($item);
                     $title = ': '.$helper->getTitleText();
                 }
                 if ($item->data_type == 'reading') {
-                    $title = ': '.($item->data['reference'] ?? '');
+                    $title = ': '.(is_string($reference) ? $reference : '');
                 }
 
                 $this->doc->renderParagraph(self::NO_INDENT, [
@@ -462,8 +488,9 @@ class AnnouncementsReport extends AbstractWordDocumentReport
         foreach ($service->liturgyBlocks as $block) {
             foreach ($block->items as $item) {
                 if ($item->data_type == 'reading') {
-                    if ($item->data['reference']) {
-                        $title = 'Schriftlesung aus '.$item->data['reference'];
+                    $reference = $item->data['reference'] ?? null;
+                    if (is_string($reference) && $reference) {
+                        $title = 'Schriftlesung aus '.$reference;
 
                         /** @var ReadingItemHelper $helper */
                         $helper = $item->getHelper();
@@ -509,8 +536,15 @@ class AnnouncementsReport extends AbstractWordDocumentReport
         $types = KonfiAppIntegration::get($city)->listEventTypes();
         $text = '';
         foreach ($types as $type) {
-            if ($type->id == $service->konfiapp_event_type) {
-                $text = $type->punktzahl.' '.($type->punktzahl == 1 ? 'Punkt' : 'Punkte').' in der Kategorie "'.$type->name.'". ';
+            if (! is_object($type)) {
+                continue;
+            }
+            if (($type->id ?? null) == $service->konfiapp_event_type) {
+                $points = $type->punktzahl ?? '';
+                $name = $type->name ?? '';
+                $text = (is_scalar($points) ? (string) $points : '').' '
+                    .($points == 1 ? 'Punkt' : 'Punkte').' in der Kategorie "'
+                    .(is_scalar($name) ? (string) $name : '').'". ';
             }
         }
         $this->doc->renderNormalText(

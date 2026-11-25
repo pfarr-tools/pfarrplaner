@@ -93,7 +93,13 @@ class EFPStudyHelper extends AbstractStudyHelper
                 $colIdx++;
             }
             if (isset($record['date'], $record['ref'], $record['url'])) {
-                $records[$record['date']] = ['[Exegese für die Predigt] '.$record['date'].': '.$record['ref'] => $record['url']];
+                /** @var string $date Datum des Eintrags. */
+                $date = $record['date'];
+                /** @var string $reference Bibelreferenz des Eintrags. */
+                $reference = $record['ref'];
+                /** @var non-falsy-string $url URL des Eintrags. */
+                $url = $record['url'];
+                $records[$date] = ['[Exegese für die Predigt] '.$date.': '.$reference => $url];
             }
         }
         $this->records = $records;
@@ -106,7 +112,11 @@ class EFPStudyHelper extends AbstractStudyHelper
      */
     public function getLinks(array $data): array
     {
-        $data['links'] = array_merge($data['links'] ?? [], $this->records[$data['date']] ?? []);
+        /** @var array<string, string> $links Bereits vorhandene Links. */
+        $links = $data['links'] ?? [];
+        /** @var string $date Angefragtes Datum. */
+        $date = $data['date'];
+        $data['links'] = array_merge($links, $this->records[$date] ?? []);
 
         return $data;
     }

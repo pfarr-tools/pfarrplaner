@@ -94,16 +94,22 @@ class TravelRequestFormReport extends AbstractPDFDocumentReport
     public function render(Request $request)
     {
         $data = $request->validate(['absence' => 'int|exists:absences,id']);
+        /** @var array<string, mixed> $data */
+        $absenceId = $data['absence'] ?? null;
+        if (! is_numeric($absenceId)) {
+            abort(404);
+        }
+        $absence = Absence::findOrFail((int) $absenceId);
 
-        $data['absence'] = Absence::findOrFail((int) $data['absence']);
-
-        $data['duration'] = $data['absence']->to->diff($data['absence']->from)->days + 1;
+        $data['absence'] = $absence;
+        $data['duration'] = $absence->to->diff($absence->from)->days + 1;
 
         $packageContents = file_get_contents(base_path('package.json'));
         if ($packageContents === false) {
             throw new \RuntimeException('Die Anwendungsmetadaten konnten nicht gelesen werden.');
         }
         $packageConfig = json_decode($packageContents, true);
+        /** @var array{version: string} $packageConfig */
         $data['version'] = $packageConfig['version'];
 
         $pdf = PDF::fromView($this->getRenderViewName(), $data, $this->header, $this->footer);
@@ -112,7 +118,7 @@ class TravelRequestFormReport extends AbstractPDFDocumentReport
             self::FILE_TITLE,
             'pdf',
             self::FILE_SIGNATURE,
-            [$data['absence']->from, $data['absence']->to],
+            [$absence->from, $absence->to],
             false,
             $this->authenticatedUser(),
         );

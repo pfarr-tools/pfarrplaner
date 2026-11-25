@@ -64,6 +64,7 @@ class PPTUnitsHelper
         }
 
         // Convert from $fromUnit to EMU
+        /** @var int $value */
         switch ($fromUnit) {
             case self::UNIT_MILLIMETER:
                 $value *= 36000;
@@ -97,7 +98,7 @@ class PPTUnitsHelper
                 $value /= 914400;
                 break;
             case self::UNIT_PIXEL:
-                $value = Drawing::emuToPixels($value);
+                $value = Drawing::emuToPixels((int) $value);
                 break;
             case self::UNIT_POINT:
                 $value /= 12700;
@@ -171,6 +172,7 @@ class PPTUnitsHelper
             return (int) (mb_strlen($text) * ($fontSizePx * 0.55));
         }
 
+        /** @var array<int, int> $box */
         return (int) abs($box[2] - $box[0]);
     }
 
@@ -277,6 +279,7 @@ class PPTUnitsHelper
         if ($box === false) {
             return (int) round($fontSizePx * 1.25);
         }
+        /** @var array<int, int> $box */
         $height = abs($box[7] - $box[1]); // y coords
 
         // Add a little leading

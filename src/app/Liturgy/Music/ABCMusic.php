@@ -66,7 +66,8 @@ class ABCMusic
         $verseRefs = [];
         if (empty($rangeString)) {
             foreach ($song->verses as $verse) {
-                $verseRefs[] = (int) $verse['number'];
+                $number = is_array($verse) ? ($verse['number'] ?? null) : null;
+                $verseRefs[] = is_scalar($number) ? (int) $number : 0;
             }
         } else {
             foreach (explode('+', $rangeString) as $range) {

@@ -93,15 +93,20 @@ class LeaveRequestFormReport extends AbstractPDFDocumentReport
      */
     public function render(Request $request)
     {
+        /** @var array<string, mixed> $data */
         $data = $request->validate(['absence' => 'required|int|exists:absences,id']);
-        $data['absence'] = Absence::findOrFail((int) $data['absence']);
+        /** @var int|string $absenceId */
+        $absenceId = $data['absence'];
+        $absence = Absence::findOrFail((int) $absenceId);
+        $data['absence'] = $absence;
 
-        $data['duration'] = $data['absence']->to->diff($data['absence']->from)->days + 1;
+        $data['duration'] = $absence->to->diff($absence->from)->days + 1;
 
         $packageContents = file_get_contents(base_path('package.json'));
         if ($packageContents === false) {
             throw new \RuntimeException('Die Anwendungsmetadaten konnten nicht gelesen werden.');
         }
+        /** @var array<string, mixed> $packageConfig */
         $packageConfig = json_decode($packageContents, true);
         $data['version'] = $packageConfig['version'];
 
@@ -111,7 +116,7 @@ class LeaveRequestFormReport extends AbstractPDFDocumentReport
             self::FILE_TITLE,
             'pdf',
             self::FILE_SIGNATURE,
-            [$data['absence']->from, $data['absence']->to],
+            [$absence->from, $absence->to],
             false,
             $this->authenticatedUser(),
         );

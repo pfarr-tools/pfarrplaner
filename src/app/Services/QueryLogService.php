@@ -32,6 +32,7 @@ namespace App\Services;
 
 use Carbon\Carbon;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
+use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
@@ -116,20 +117,25 @@ class QueryLogService
          */
         DB::listen(
             function ($query) {
-                $bindings = $query->bindings ?? [];
+                /** @var QueryExecuted $query */
+                $bindings = $query->bindings;
                 $normalizedBindings = array_map(
                     function ($binding) {
-                        if (is_a($binding, \DateTime::class)) {
+                        if (is_object($binding) && is_a($binding, \DateTime::class)) {
                             return '"'.$binding->format('Y-m-d H:i:s').'"';
                         }
                         if (is_object($binding) && method_exists($binding, '__toString')) {
-                            return '"'.$binding->__toString().'"';
+                            /** @var string $stringValue */
+                            $stringValue = $binding->__toString();
+
+                            return '"'.$stringValue.'"';
                         }
 
                         return is_string($binding) ? '"'.$binding.'"' : $binding;
                     },
                     $bindings
                 );
+                /** @var list<string> $normalizedBindings */
                 $sql = Str::replaceArray('?', $normalizedBindings, $query->sql);
                 $keyword = explode(' ', $sql)[0];
                 if ($keyword !== 'select') {

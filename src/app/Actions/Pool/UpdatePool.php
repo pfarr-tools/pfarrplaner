@@ -54,10 +54,15 @@ class UpdatePool extends AbstractUpdateAction implements UpdatesPools
     public function update(User $user, Pool $pool, array $input): Pool
     {
         Gate::forUser($user)->authorize('update', $pool);
+        /** @var array<string, mixed> $input Validierte Eingabedaten. */
         $input = Validator::make($input, Pool::$validationRules)->validateWithBag('updatePool');
         $pool->update($input);
-        $pool->cities()->sync($input['cities'] ?? []);
-        $pool->users()->sync($input['users'] ?? []);
+        /** @var array<int, int|string> $cities Validierte Städte-IDs. */
+        $cities = $input['cities'] ?? [];
+        $pool->cities()->sync($cities);
+        /** @var array<int, int|string> $users Validierte Benutzer-IDs. */
+        $users = $input['users'] ?? [];
+        $pool->users()->sync($users);
         $pool->refresh();
         UpdatedPool::dispatch($user, $pool);
         $this->messages = ['success' => 'Der Pool wurde geändert.'];

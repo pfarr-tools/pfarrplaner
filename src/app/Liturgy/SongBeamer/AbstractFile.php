@@ -75,9 +75,6 @@ abstract class AbstractFile
         $zipArchive->addFromString($this->pathInZip, $this->toText(), ZipArchive::FL_OVERWRITE);
     }
 
-    /**
-     * @return string
-     */
     public function getPathInZip(): string
     {
         return $this->pathInZip;
@@ -85,7 +82,6 @@ abstract class AbstractFile
 
     /**
      * @param  string  $pathInZip  Path inside the archive.
-     * @return void
      */
     public function setPathInZip(string $pathInZip): void
     {

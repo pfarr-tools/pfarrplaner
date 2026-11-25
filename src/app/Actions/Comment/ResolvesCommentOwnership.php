@@ -30,12 +30,17 @@
 
 namespace App\Actions\Comment;
 
+use Illuminate\Database\Eloquent\Model;
+
 trait ResolvesCommentOwnership
 {
     protected function resolveOwner(string $commentableType, int $commentableId): mixed
     {
         abort_unless(class_exists($commentableType), 404);
 
-        return app($commentableType)->findOrFail($commentableId);
+        /** @var Model $model */
+        $model = app($commentableType);
+
+        return $model->newQuery()->findOrFail($commentableId);
     }
 }

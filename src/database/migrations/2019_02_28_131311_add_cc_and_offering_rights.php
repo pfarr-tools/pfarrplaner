@@ -29,6 +29,7 @@
  */
 
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 /**
@@ -45,7 +46,7 @@ class AddCcAndOfferingRights extends Migration
     {
         Schema::table(
             'users',
-            function ($table) {
+            function (Blueprint $table) {
                 $table->integer('canEditOfferings')->nullable();
                 $table->integer('canEditCC')->nullable();
             }
@@ -61,7 +62,7 @@ class AddCcAndOfferingRights extends Migration
     {
         Schema::table(
             'users',
-            function ($table) {
+            function (Blueprint $table) {
                 $table->dropColumn(['canEditOfferings', 'canEditCC']);
             }
         );

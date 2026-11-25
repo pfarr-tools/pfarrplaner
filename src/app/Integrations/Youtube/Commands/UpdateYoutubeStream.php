@@ -35,6 +35,7 @@ use App\Integrations\Youtube\YoutubeIntegration;
 use App\Models\Places\City;
 use App\Models\Service;
 use Carbon\Carbon;
+use Google\Service\YouTube\Resource\LiveBroadcasts;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 
@@ -133,8 +134,10 @@ class UpdateYoutubeStream extends Command
 
                         if ($last !== null) {
                             // check status
+                            /** @var string $videoId */
+                            $videoId = YoutubeHelper::getCode($last->youtube_url ?? '');
                             /** @var \Google_Service_YouTube_Video|null $lastVideo */
-                            $lastVideo = $youtube->getVideo(YoutubeHelper::getCode($last->youtube_url ?? ''));
+                            $lastVideo = $youtube->getVideo($videoId);
                             if ($lastVideo !== null) {
                                 if ($this->videoHasEnded($lastVideo)) {
                                     $this->output('Last service #'.$last->id.' ('.$last->formatTime('YYYY-MM-DD HH:mm').') has ended.');
@@ -183,7 +186,9 @@ class UpdateYoutubeStream extends Command
         }
 
         $autoStartStop = $active;
-        $broadcasts = $youtube->getYoutube()->liveBroadcasts->listLiveBroadcasts(
+        /** @var LiveBroadcasts $liveBroadcasts */
+        $liveBroadcasts = $youtube->getYoutube()->liveBroadcasts;
+        $broadcasts = $liveBroadcasts->listLiveBroadcasts(
             'id,contentDetails',
             ['id' => YoutubeHelper::getCode($service->youtube_url ?? '')]);
 
@@ -195,7 +200,7 @@ class UpdateYoutubeStream extends Command
             if (($contentDetails->getBoundStreamId() == ($active ? $city->youtube_passive_stream_id : $city->youtube_active_stream_id))
                 || ($contentDetails->getBoundStreamId() === null)) {
                 $this->output('Setting '.($active ? 'active' : 'passive').' stream key for service #'.$service->id);
-                $youtube->getYoutube()->liveBroadcasts->bind($broadcast->getId(), 'id,snippet,status', ['streamId' => ($active ? $city->youtube_active_stream_id : $city->youtube_passive_stream_id)]);
+                $liveBroadcasts->bind($broadcast->getId(), 'id,snippet,status', ['streamId' => ($active ? $city->youtube_active_stream_id : $city->youtube_passive_stream_id)]);
             } else {
                 $this->output('Stream is not set to '.($active ? 'passive' : 'active').' key, but to '.$contentDetails->getBoundStreamId().' --> leaving it alone.');
             }
@@ -205,7 +210,7 @@ class UpdateYoutubeStream extends Command
                     $contentDetails->setEnableAutoStart((bool) $autoStartStop);
                     $contentDetails->setEnableAutoStop((bool) $autoStartStop);
                     $broadcast->setContentDetails($contentDetails);
-                    $youtube->getYoutube()->liveBroadcasts->update('contentDetails', $broadcast);
+                    $liveBroadcasts->update('contentDetails', $broadcast);
                 }
             }
         }

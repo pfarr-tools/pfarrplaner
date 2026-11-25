@@ -37,7 +37,7 @@ class ColorService
     /**
      * Get an evenly spaced rainbow spectrum of colors
      *
-     * @param array<int|string> $a Array whose values are used as keys in the result
+     * @param  array<int|string>  $a  Array whose values are used as keys in the result
      *
      * @source https://stackoverflow.com/a/7419630
      *
@@ -95,8 +95,7 @@ class ColorService
     /**
      * Get an evenly spaced rainbow spectrum of colors for each character of a text
      *
-     * @param string $text Text to generate the colors for
-     *
+     * @param  string  $text  Text to generate the colors for
      * @return array<int|string, string> Array with colors, keyed by character position
      */
     public static function rainbowTextArray($text): array
@@ -109,7 +108,7 @@ class ColorService
     /**
      * Find the best contrasting text color
      *
-     * @param string $color Base color, #rrggbb notation
+     * @param  string  $color  Base color, #rrggbb notation
      *
      * @source https://stackoverflow.com/questions/3942878/how-to-decide-font-color-in-white-or-black-depending-on-background-color
      *

@@ -122,7 +122,11 @@ class KasualienReplacer extends AbstractReplacer
                         ) > 1 ? 'werden' : 'wird').' getauft:');
                     }
                     foreach ($baptisms as $baptism) {
-                        $text .= $this->renderParagraph($this->renderName($baptism->candidate_name).', '.$baptism->candidate_address);
+                        /** @var string $candidateName */
+                        $candidateName = $baptism->candidate_name;
+                        /** @var string $candidateAddress */
+                        $candidateAddress = $baptism->candidate_address;
+                        $text .= $this->renderParagraph($this->renderName($candidateName).', '.$candidateAddress);
                     }
                 }
             }
@@ -157,8 +161,12 @@ class KasualienReplacer extends AbstractReplacer
                         ).' '.$wedding->service->atText().' werden kirchlich getraut:');
                     }
                     foreach ($weddings as $wedding) {
-                        $text .= $this->renderParagraph($this->renderName($wedding->spouse1_name).' &amp; '.$this->renderName(
-                            $wedding->spouse2_name));
+                        /** @var string $spouse1Name */
+                        $spouse1Name = $wedding->spouse1_name;
+                        /** @var string $spouse2Name */
+                        $spouse2Name = $wedding->spouse2_name;
+                        $text .= $this->renderParagraph($this->renderName($spouse1Name).' &amp; '.$this->renderName(
+                            $spouse2Name));
                     }
                 }
             }
@@ -191,7 +199,11 @@ class KasualienReplacer extends AbstractReplacer
                                 'wurden'
                             ).' kirchlich bestattet:', );
                 foreach ($funeralArray['past'] as $funeral) {
-                    $text .= $this->renderParagraph($this->renderName($funeral->buried_name).', '.$funeral->buried_address
+                    /** @var string $buriedName */
+                    $buriedName = $funeral->buried_name;
+                    /** @var string $buriedAddress */
+                    $buriedAddress = $funeral->buried_address;
+                    $text .= $this->renderParagraph($this->renderName($buriedName).', '.$buriedAddress
                                 .($funeral->age ? ', '.$funeral->age.' Jahre' : '').'.');
                 }
                 if (count($funeralArray['future'])) {
@@ -214,8 +226,12 @@ class KasualienReplacer extends AbstractReplacer
                     if ($mode == 'Erdbestattung') {
                         $mode = 'Bestattung';
                     }
-                    $text .= $this->renderParagraph($this->renderName($funeral->buried_name).', '
-                                .$funeral->buried_address
+                    /** @var string $buriedName */
+                    $buriedName = $funeral->buried_name;
+                    /** @var string $buriedAddress */
+                    $buriedAddress = $funeral->buried_address;
+                    $text .= $this->renderParagraph($this->renderName($buriedName).', '
+                                .$buriedAddress
                                 .($funeral->age ? ', '.$funeral->age.' Jahre' : '')
                                 .'. Die '.$mode.' findet am '.$funeral->service->trueDate()->isoFormat(
                                     'dddd, DD. MMMM'

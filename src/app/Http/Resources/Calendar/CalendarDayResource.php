@@ -48,7 +48,10 @@ class CalendarDayResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        $date = Carbon::parse($this->resource);
+        /** @var string $dateValue */
+        $dateValue = $this->resource;
+        $date = Carbon::parse($dateValue);
+        /** @var array<int, array{Bezeichnung: string, 'CSS-Farbe': string, Festkreis: string, Predigt: string}> $liturgy */
         $liturgy = LiturgyService::getLiturgyInfoByDate($date);
 
         // use raw query to avoid any relationships

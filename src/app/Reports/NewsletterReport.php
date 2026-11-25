@@ -84,6 +84,7 @@ class NewsletterReport extends AbstractWordDocumentReport
      */
     public function render(Request $request)
     {
+        /** @var array{cities: array<int, int>, locations?: array<int, int>|null, start: string, end: string, includeWeeklyVerse?: bool} $data */
         $data = $request->validate(
             [
                 'cities.*' => 'required|int|exists:cities,id',

@@ -39,6 +39,7 @@ class UpdateSeatingSection extends AbstractUpdateAction implements UpdatesSeatin
     public function update(User $user, SeatingSection $seatingSection, array $input): SeatingSection
     {
         Gate::forUser($user)->authorize('update', $seatingSection);
+        /** @var array{location_id: int|string, ...} $input */
         $input = Validator::make($input, SeatingSection::$validationRules)->validateWithBag('updateSeatingSection');
 
         $this->location = Location::findOrFail((int) $input['location_id']);

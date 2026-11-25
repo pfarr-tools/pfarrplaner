@@ -90,6 +90,7 @@ class SingleMinistryReport extends AbstractPDFDocumentReport
      */
     public function render(Request $request)
     {
+        /** @var array<string, mixed> $data */
         $data = $request->validate(
             [
                 'start' => 'required|date',
@@ -103,23 +104,32 @@ class SingleMinistryReport extends AbstractPDFDocumentReport
             ]
         );
 
+        /** @var array<int, string> $requestedMinistries */
+        $requestedMinistries = $data['ministries'] ?? [];
         $allMinistries = $this->getAvailableMinistries();
         $ministries = [];
-        foreach ($data['ministries'] as $ministry) {
+        foreach ($requestedMinistries as $ministry) {
             $ministries[$ministry] = $allMinistries[$ministry];
         }
         $data['ministries'] = $ministries;
 
+        /** @var string $startDate */
+        $startDate = $data['start'];
+        /** @var string $endDate */
+        $endDate = $data['end'];
+        /** @var string $fileFormat */
+        $fileFormat = $data['file_format'];
+
         $services = Service::with(['location'])
             ->where('event_class', 'service') // I wonder why the global scope doesn't work here?
-            ->between(Carbon::parse($data['start']), Carbon::parse($data['end']))
+            ->between(Carbon::parse($startDate), Carbon::parse($endDate))
             ->whereDoesntHave('funerals')
             ->whereDoesntHave('weddings')
             ->inCitiesAndLocations($data['cities'], $data['locations'] ?? null)
             ->ordered()
             ->get();
 
-        $methodName = 'renderDataTo'.strtoupper($data['file_format']);
+        $methodName = 'renderDataTo'.strtoupper($fileFormat);
         if (method_exists($this, $methodName)) {
             return $this->$methodName($data, $services);
         }
@@ -135,18 +145,25 @@ class SingleMinistryReport extends AbstractPDFDocumentReport
      */
     public function renderDataToPDF(array $data, Collection $services)
     {
+        /** @var array<string, string> $ministries */
+        $ministries = $data['ministries'];
+        /** @var string $startDate */
+        $startDate = $data['start'];
+        /** @var string $endDate */
+        $endDate = $data['end'];
+
         return $this->sendToBrowser(
             FileNameService::make(
-                static::FILE_TITLE.' '.implode(',', $data['ministries']),
+                self::FILE_TITLE.' '.implode(',', $ministries),
                 'pdf',
                 static::FILE_SIGNATURE,
-                [$data['start'], $data['end']]
+                [$startDate, $endDate]
             ),
             [
-                'start' => $data['start'],
-                'end' => $data['end'],
+                'start' => $startDate,
+                'end' => $endDate,
                 'services' => $services,
-                'ministries' => $data['ministries'],
+                'ministries' => $ministries,
                 'cities' => $data['cities'],
                 'includeHeader' => $data['includeHeader'],
             ],
@@ -163,6 +180,15 @@ class SingleMinistryReport extends AbstractPDFDocumentReport
      */
     public function renderDataToXLSX(array $data, Collection $services)
     {
+        /** @var array<string, string> $ministries */
+        $ministries = $data['ministries'];
+        /** @var string $startDate */
+        $startDate = $data['start'];
+        /** @var string $endDate */
+        $endDate = $data['end'];
+        /** @var array<int, int> $cities */
+        $cities = $data['cities'];
+
         $spreadsheet = new Spreadsheet;
         $spreadsheet->getDefaultStyle()
             ->getFont()
@@ -184,10 +210,10 @@ class SingleMinistryReport extends AbstractPDFDocumentReport
             ->setFooter(0);
         $sheet->getHeaderFooter()
             ->setOddHeader(
-                '&LDienstplan '.implode(',', $data['ministries']).' &RBlatt &P von &N'
+                '&LDienstplan '.implode(',', $ministries).' &RBlatt &P von &N'
             )
             ->setEvenHeader(
-                '&LDienstplan '.implode(',', $data['ministries']).' &RBlatt &P von &N'
+                '&LDienstplan '.implode(',', $ministries).' &RBlatt &P von &N'
             )
             ->setOddFooter('&CAusdruck vom &D, &T')
             ->setEvenFooter('&CAusdruck vom &D, &T');
@@ -196,10 +222,10 @@ class SingleMinistryReport extends AbstractPDFDocumentReport
         if ($data['includeHeader']) {
             // title row
             $sheet->getRowDimension(1)->setRowHeight(21);
-            $sheet->setCellValue('A1', 'Dienstplan für '.implode(', ', $data['ministries']))
+            $sheet->setCellValue('A1', 'Dienstplan für '.implode(', ', $ministries))
                 ->getStyle('A1')
                 ->getFont()->setBold(true)->setSize(16);
-            $sheet->setCellValue('A2', 'Von '.$data['start'].' bis '.$data['end'])
+            $sheet->setCellValue('A2', 'Von '.$startDate.' bis '.$endDate)
                 ->getStyle('A2')
                 ->getFont()->setBold(true);
             $sheet->setCellValue(
@@ -218,10 +244,10 @@ class SingleMinistryReport extends AbstractPDFDocumentReport
             'Ort' => 15,
             '-' => 15,
         ];
-        foreach ($data['ministries'] as $ministryKey => $ministry) {
+        foreach ($ministries as $ministryKey => $ministry) {
             $cols[$ministry] = 12;
         }
-        if (count($data['cities']) < 2) {
+        if (count($cities) < 2) {
             unset($cols['-']);
         }
 
@@ -240,12 +266,12 @@ class SingleMinistryReport extends AbstractPDFDocumentReport
             $sheet->setCellValue('A'.$row, $service->trueDate()->format('d.m.Y'));
             $sheet->setCellValue('B'.$row, $service->timeText());
             $c = 67;
-            if (count($data['cities']) > 1) {
+            if (count($cities) > 1) {
                 $sheet->setCellValue('C'.$row, $service->city->name ?? '');
                 $c = 68;
             }
             $sheet->setCellValue(chr($c).$row, $service->locationText());
-            foreach ($data['ministries'] as $ministryKey => $ministry) {
+            foreach ($ministries as $ministryKey => $ministry) {
                 $c++;
                 $sheet->setCellValue(chr($c).$row, $service->participantsText($ministryKey));
             }
@@ -254,10 +280,10 @@ class SingleMinistryReport extends AbstractPDFDocumentReport
         }
 
         return $this->sendXlsxToBrowser($fileName = FileNameService::make(
-            static::FILE_TITLE.' '.implode(',', $data['ministries']),
+            self::FILE_TITLE.' '.implode(',', $ministries),
             'xlsx',
             static::FILE_SIGNATURE,
-            [$data['start'], $data['end']]
+            [$startDate, $endDate]
         ), $spreadsheet);
 
     }
@@ -275,20 +301,29 @@ class SingleMinistryReport extends AbstractPDFDocumentReport
 
         $ministries = [];
         foreach ($tmpMinistries as $ministry) {
+            if (! is_string($ministry)) {
+                continue;
+            }
             switch ($ministry) {
                 case 'P':
                     if ($this->authenticatedUser()->can('gd-pfarrer-bearbeiten')) {
-                        $ministries[$ministry] = config('labels.pastor');
+                        /** @var string $label */
+                        $label = config('labels.pastor');
+                        $ministries[$ministry] = $label;
                     }
                     break;
                 case 'O':
                     if ($this->authenticatedUser()->can('gd-organist-bearbeiten')) {
-                        $ministries[$ministry] = config('labels.organist');
+                        /** @var string $label */
+                        $label = config('labels.organist');
+                        $ministries[$ministry] = $label;
                     }
                     break;
                 case 'M':
                     if ($this->authenticatedUser()->can('gd-mesner-bearbeiten')) {
-                        $ministries[$ministry] = config('labels.sacristan');
+                        /** @var string $label */
+                        $label = config('labels.sacristan');
+                        $ministries[$ministry] = $label;
                     }
                     break;
                 case 'A':

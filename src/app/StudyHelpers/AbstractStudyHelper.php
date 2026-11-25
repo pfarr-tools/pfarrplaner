@@ -92,17 +92,39 @@ abstract class AbstractStudyHelper
      */
     public function assign(array $data): array
     {
-        $studyData = $this->read($data);
+        /** @var array<string, mixed> $readData */
+        $readData = $data;
+        $studyData = $this->read($readData);
         foreach ($studyData as $date => $record) {
             $date = Carbon::createFromFormat('d.m.Y', $date);
             if ($date === null) {
                 continue;
             }
-            if (isset($data[$date->year]['Tage'][$date->format('Y-m-d')])) {
-                foreach ($data[$date->year]['Tage'][$date->format('Y-m-d')] as $key => $tmp) {
-                    $data[$date->year]['Tage'][$date->format('Y-m-d')][$key]['Links'] = array_merge($data[$date->year]['Tage'][$date->format('Y-m-d')][$key]['Links'] ?? [], $record);
-                }
+            $year = $date->year;
+            $day = $date->format('Y-m-d');
+            $yearData = $data[$year] ?? null;
+            if (! is_array($yearData) || ! isset($yearData['Tage']) || ! is_array($yearData['Tage'])) {
+                continue;
             }
+            $days = $yearData['Tage'];
+            $entries = $days[$day] ?? null;
+            if (! is_array($entries)) {
+                continue;
+            }
+            foreach ($entries as $key => $tmp) {
+                if (! is_array($tmp)) {
+                    continue;
+                }
+                $links = $tmp['Links'] ?? [];
+                if (! is_array($links)) {
+                    $links = [];
+                }
+                $tmp['Links'] = array_merge($links, $record);
+                $entries[$key] = $tmp;
+            }
+            $days[$day] = $entries;
+            $yearData['Tage'] = $days;
+            $data[$year] = $yearData;
         }
 
         return $data;

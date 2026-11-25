@@ -90,11 +90,13 @@ class ServicesByWTCCategoryReport extends AbstractExcelDocumentReport
                 'end' => 'required|date',
             ]
         );
-
-        $data['start'] = $this->requireParsedDate(Carbon::createFromFormat('d.m.Y', $data['start'], 'Europe/Berlin'))->setTime(0, 0, 0);
-        $data['end'] = $this->requireParsedDate(Carbon::createFromFormat('d.m.Y', $data['end'], 'Europe/Berlin'))->setTime(23, 59, 59);
+        /** @var array{cities: array<int, int>, people: array<int, int>, start: string, end: string} $data */
+        $start = $this->requireParsedDate(Carbon::createFromFormat('d.m.Y', $data['start'], 'Europe/Berlin'))->setTime(0, 0, 0);
+        $end = $this->requireParsedDate(Carbon::createFromFormat('d.m.Y', $data['end'], 'Europe/Berlin'))->setTime(23, 59, 59);
 
         $cities = City::whereIn('id', $data['cities'])->get();
+        /** @var string $cityNames */
+        $cityNames = $cities->pluck('name')->join(', ');
 
         $records = [];
         foreach ($data['people'] as $userId) {
@@ -103,8 +105,8 @@ class ServicesByWTCCategoryReport extends AbstractExcelDocumentReport
 
             // get all the user's services for a year
             $serviceIds = Service::select('services.id')
-                ->startingFrom($data['start'])
-                ->endingAt($data['end'])
+                ->startingFrom($start)
+                ->endingAt($end)
                 ->inCities($data['cities'])
                 ->userParticipates($user)
                 ->pluck('id');
@@ -115,6 +117,7 @@ class ServicesByWTCCategoryReport extends AbstractExcelDocumentReport
                 ->unique();
 
             foreach ($ptcCategories as $ptcCategory) {
+                /** @var string $ptcCategory */
                 $record['categories'][$ptcCategory] = [
                     'HG' => Service::whereIn('services.id', $serviceIds)
                         ->userParticipates($user, $ptcCategory)
@@ -177,7 +180,7 @@ class ServicesByWTCCategoryReport extends AbstractExcelDocumentReport
             'Summe',
         ];
 
-        $sheet->setCellValue('A1', 'AZE-Statistik vom '.$data['start']->format('d.m.Y').' bis '.$data['end']->format('d.m.Y'));
+        $sheet->setCellValue('A1', 'AZE-Statistik vom '.$start->format('d.m.Y').' bis '.$end->format('d.m.Y'));
         $sheet->getStyle('A1')->getFont()->setBold(true);
         $sheet->getStyle('A1')->getFont()->setSize(16);
 
@@ -244,16 +247,16 @@ class ServicesByWTCCategoryReport extends AbstractExcelDocumentReport
         }
 
         // output
-        $filename = 'AZE-Statistik von '.Carbon::parse($data['start'])->format('Y-m-d').' bis '.Carbon::parse($data['end'])->format(
+        $filename = 'AZE-Statistik von '.Carbon::parse($start)->format('Y-m-d').' bis '.Carbon::parse($end)->format(
             'Y-m-d'
-        ).' -- '.$cities->pluck('name')->join(', ');
+        ).' -- '.$cityNames;
 
         return $this->sendToBrowser(
             FileNameService::make(
-                static::FILE_TITLE.' '.$cities->pluck('name')->join(', '),
+                self::FILE_TITLE.' '.$cityNames,
                 'xlsx',
                 static::FILE_SIGNATURE,
-                [$data['start'], $data['end']]),
+                [$start, $end]),
         );
 
     }

@@ -71,8 +71,6 @@ class AbstractWordDocumentReport extends AbstractReport
 
     /**
      * Prepare the DefaultWordDocument
-     *
-     * @return void
      */
     protected function prepareWordDocument(): void
     {
@@ -81,7 +79,6 @@ class AbstractWordDocumentReport extends AbstractReport
 
     /**
      * @param  string  $filename  Name of the downloaded file.
-     * @return BinaryFileResponse
      *
      * @throws Exception
      */

@@ -46,17 +46,11 @@ class AbstractSeatingModel
     /** @var array<int, Booking> */
     protected $bookings = [];
 
-    /**
-     * @return string
-     */
     public function getKey(): string
     {
         return str_replace('App\\Seating\\', '', basename(get_called_class()));
     }
 
-    /**
-     * @return string
-     */
     public function getTitle(): string
     {
         return $this->title;
@@ -64,7 +58,6 @@ class AbstractSeatingModel
 
     /**
      * @param  string  $title  Title.
-     * @return void
      */
     public function setTitle(string $title): void
     {

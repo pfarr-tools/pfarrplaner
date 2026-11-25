@@ -91,12 +91,14 @@ class PfefferBibleInlayAttachment extends AbstractBaptismAttachment
         ]);
         $section = $doc->getSection();
         $service = $this->baptism->service;
+        /** @var string $candidateName */
+        $candidateName = $this->baptism->candidate_name;
         $section->addText('Dieses Buch gehört', static::FONT20, static::PARAGRAPH_SPC_BOTTOM);
         $this->coloredText(
             $doc->getSection(),
-            "Familie\n".NameService::fromName($this->baptism->candidate_name)->getLastName(),
-            static::FONT34,
-            static::PARAGRAPH
+            "Familie\n".NameService::fromName($candidateName)->getLastName(),
+            self::FONT34,
+            self::PARAGRAPH
         );
         $section->addText('Es ist ein Geschenk', static::FONT20, static::PARAGRAPH_SPC_TOP);
         $section->addText('zur Tauferinnerung', static::FONT20, static::PARAGRAPH);
@@ -104,9 +106,9 @@ class PfefferBibleInlayAttachment extends AbstractBaptismAttachment
         $section->addTextBreak(1);
         $this->coloredText(
             $doc->getSection(),
-            NameService::fromName($this->baptism->candidate_name)->getFirstName(),
-            static::FONT34,
-            static::PARAGRAPH
+            NameService::fromName($candidateName)->getFirstName(),
+            self::FONT34,
+            self::PARAGRAPH
         );
         $section->addTextBreak(1);
         $section->addText(
@@ -129,7 +131,6 @@ class PfefferBibleInlayAttachment extends AbstractBaptismAttachment
      * @param  string  $text  Text to render in rainbow colors.
      * @param  array<string, mixed>  $fontStyle  Font style settings applied to each character.
      * @param  array<string, mixed>|string  $paragraphStyle  Paragraph style settings or style name.
-     * @return void
      */
     protected function coloredText(
         Section $section,

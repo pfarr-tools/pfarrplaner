@@ -59,7 +59,9 @@ class CommentController extends Controller
         abort_unless($user instanceof User, 401);
         try {
             $creator = app(CreatesComments::class);
-            $comment = $creator->create($user, $request->all());
+            /** @var array<string, mixed> $input */
+            $input = $request->all();
+            $comment = $creator->create($user, $input);
 
             return response()->json($comment);
         } catch (AuthorizationException $exception) {

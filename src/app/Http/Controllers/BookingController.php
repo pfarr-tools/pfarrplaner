@@ -30,6 +30,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\AbstractAction;
 use App\Documents\PDF;
 use App\Models\Seating\Booking;
 use App\Models\Service;
@@ -129,6 +130,7 @@ class BookingController extends AbstractCRUDController
     protected function pin(Request $request, Booking $booking)
     {
         Gate::authorize('update', $booking);
+        /** @var array<string, mixed> $data */
         $data = $request->validate(['fixed_seat' => ['required', 'string', new SeatableFixed('booking_id')]]);
         $booking->update($data);
 
@@ -138,7 +140,11 @@ class BookingController extends AbstractCRUDController
     public function destroy(Request $request, $modelId)
     {
         $model = $this->getSingleModel($request, $modelId);
+        /** @var AbstractAction $deleter */
         $deleter = $model->getContractedAction('delete');
+        if (! method_exists($deleter, 'delete')) {
+            abort(500);
+        }
         $deleter->delete($request->user(), $model);
 
         return response()->json();

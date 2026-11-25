@@ -29,6 +29,7 @@
  */
 
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 /**
@@ -45,7 +46,7 @@ class ChangeBaptismAppointmentColumn extends Migration
     {
         Schema::table(
             'baptisms',
-            function ($table) {
+            function (Blueprint $table) {
                 $table->datetime('appointment')->change();
             }
         );
@@ -60,7 +61,7 @@ class ChangeBaptismAppointmentColumn extends Migration
     {
         Schema::table(
             'baptisms',
-            function ($table) {
+            function (Blueprint $table) {
                 $table->date('appointment')->change();
             }
         );

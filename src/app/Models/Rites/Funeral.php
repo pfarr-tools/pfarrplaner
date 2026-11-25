@@ -328,7 +328,10 @@ class Funeral extends AbstractModel implements HasDAVCalendarItems
 
     public function getLabelAttribute(): string
     {
-        return $this->buried_name ?: '';
+        /** @var string|null $buriedName */
+        $buriedName = $this->buried_name;
+
+        return $buriedName ?: '';
     }
 
     /**
@@ -413,6 +416,7 @@ class Funeral extends AbstractModel implements HasDAVCalendarItems
             return $date;
         }
 
+        /** @var string $date */
         return Carbon::createFromFormat('d.m.Y', $date);
     }
 
@@ -430,6 +434,7 @@ class Funeral extends AbstractModel implements HasDAVCalendarItems
             return $date;
         }
 
+        /** @var string $date */
         return Carbon::createFromFormat('d.m.Y H:i', $date);
     }
 
@@ -472,6 +477,10 @@ class Funeral extends AbstractModel implements HasDAVCalendarItems
      */
     public function getAdditionalEvents($config = [])
     {
+        /** @var string $buriedName */
+        $buriedName = $this->buried_name;
+        /** @var string $relativeContactData */
+        $relativeContactData = $this->relative_contact_data;
         $records = [];
         $service = $this->service;
         $appointment = $this->appointment;
@@ -479,14 +488,14 @@ class Funeral extends AbstractModel implements HasDAVCalendarItems
             $records['funeral_prep_'.$this->id] = [
                 'startDate' => $appointment->copy(),
                 'endDate' => $appointment->copy()->addHour(),
-                'title' => 'Trauergespräch '.$this->buried_name,
+                'title' => 'Trauergespräch '.$buriedName,
                 'description' => '<p>'.$this->type.' am '.($service?->date?->format('d.m.Y') ?? '')
                     .' um '.($service?->timeText() ?? '').' ('.($service?->locationText() ?? '').')</p>'
                     .'<p><a href="'.route(
                         'funerals.edit',
                         $this->id
                     ).'">Bestattung im Pfarrplaner öffnen</a></p>'
-                    .'<p>Kontakt: '.nl2br($this->relative_contact_data).'</p>'
+                    .'<p>Kontakt: '.nl2br($relativeContactData).'</p>'
                     .AbstractSyncEngine::AUTO_WARNING,
                 'location' => $this->appointment_address,
                 'categories' => ['Pfarrplaner', 'Trauergespräch', 'Amtskalender: Seelsorge/Diakonie'],
@@ -502,11 +511,11 @@ class Funeral extends AbstractModel implements HasDAVCalendarItems
             $records['funeral_anniversary_'.$this->id] = [
                 'startDate' => $date->copy()->addYears(1),
                 'endDate' => $date->copy()->addYears(1),
-                'title' => '1. Jahrestag der Beerdigung von '.$this->buried_name,
+                'title' => '1. Jahrestag der Beerdigung von '.$buriedName,
                 'description' => '<p>'.$this->type.' am '.$date->format('d.m.Y')
                     .' um '.($service->timeText() ?? '').' ('.($service->locationText() ?? '').')</p>'
                     .'<p><a href="'.route('funerals.edit', $this->id).'">Bestattung im Pfarrplaner öffnen</a></p>'
-                    .'<p>Kontakt: '.nl2br($this->relative_contact_data).'</p>'
+                    .'<p>Kontakt: '.nl2br($relativeContactData).'</p>'
                     .AbstractSyncEngine::AUTO_WARNING,
                 'location' => $this->appointment_address,
                 'categories' => ['Pfarrplaner', 'Jahrestag Beerdigung'],
@@ -553,6 +562,14 @@ class Funeral extends AbstractModel implements HasDAVCalendarItems
      */
     public function getCalendarItem(string $itemType): DAVCalendarItem
     {
+        /** @var string $buriedName */
+        $buriedName = $this->buried_name;
+        /** @var string|null $type */
+        $type = $this->type;
+        /** @var string $relativeContactData */
+        $relativeContactData = $this->relative_contact_data;
+        /** @var string|null $relativeAddress */
+        $relativeAddress = $this->relative_address;
         $service = $this->service;
         switch ($itemType) {
             case 'prep':
@@ -563,15 +580,15 @@ class Funeral extends AbstractModel implements HasDAVCalendarItems
 
                 return new DAVCalendarItem(
                     $this,
-                    'Trauergespräch '.$this->buried_name,
+                    'Trauergespräch '.$buriedName,
                     $appointment->copy(),
                     $appointment->copy()->addHour(),
                     $this->appointment_address ?? '',
-                    $this->type.' am '.($service?->date?->format('d.m.Y') ?? '')
+                    $type.' am '.($service?->date?->format('d.m.Y') ?? '')
                     .' um '.($service?->timeText() ?? '').' ('.($service?->locationText() ?? '').")\n"
                     .'Bestattung im Pfarrplaner öffnen: '
                     .route('funerals.edit', $this->id)
-                    ."\nKontakt: ".$this->relative_contact_data."\n\n".DAVCalendarItem::AUTO_WARNING,
+                    ."\nKontakt: ".$relativeContactData."\n\n".DAVCalendarItem::AUTO_WARNING,
                     'prep',
                     ['busyStatus' => 'BUSY'],
                     ['Trauergespräch', 'Amtskalender: Seelsorge/Diakonie']
@@ -584,15 +601,15 @@ class Funeral extends AbstractModel implements HasDAVCalendarItems
 
                 return new DAVCalendarItem(
                     $this,
-                    '1. Jahrestag der Beerdigung von '.$this->buried_name,
+                    '1. Jahrestag der Beerdigung von '.$buriedName,
                     $date->copy()->addYears(1),
                     $date->copy()->addYears(1)->addDays(1)->startOfDay(),
-                    $this->relative_address ?? '',
-                    $this->type.' am '.$date->format('d.m.Y')
+                    $relativeAddress ?? '',
+                    $type.' am '.$date->format('d.m.Y')
                     .' um '.($service->timeText() ?? '').' ('.($service->locationText() ?? '')
                     .")\nBestattung im Pfarrplaner öffnen:  "
                     .route('funerals.edit', $this->id)
-                    ."\nKontakt: ".$this->relative_contact_data."\n\n".DAVCalendarItem::AUTO_WARNING,
+                    ."\nKontakt: ".$relativeContactData."\n\n".DAVCalendarItem::AUTO_WARNING,
                     'anniv',
                     ['allDay' => true, 'busy' => false, 'busyStatus' => 'FREE'],
                     ['Jahrestag Beerdigung']

@@ -31,6 +31,7 @@
 namespace App\Attachments;
 
 use Illuminate\Support\Str;
+use Symfony\Component\HttpFoundation\Response;
 
 abstract class AbstractAttachment
 {
@@ -109,7 +110,7 @@ abstract class AbstractAttachment
     /**
      * Erzeugt die Datei und gibt sie zum Download aus.
      *
-     * @return \Symfony\Component\HttpFoundation\Response Dateiantwort.
+     * @return Response Dateiantwort.
      */
     abstract public function download();
 

@@ -46,7 +46,7 @@ class LiturgyService
     /** @var array<int|string, mixed> Liturgical calendars keyed by year. */
     protected static $calendars = [];
 
-    /** @var array<int|string, mixed> Lectionary data keyed by year. */
+    /** @var array<int|string, array<string, mixed>> Lectionary data keyed by year. */
     protected static $lectionaryYears = [];
 
     /**
@@ -71,7 +71,10 @@ class LiturgyService
     public static function getLiturgyByCode($year, $code)
     {
         $year = static::getYear($year);
-        foreach ($year['Tage'] as $date => $items) {
+        /** @var array{Tage?: array<string, mixed>} $year */
+        $days = $year['Tage'] ?? [];
+        /** @var array<string, array<int, array<string, mixed>>> $days */
+        foreach ($days as $date => $items) {
             foreach ($items as $item) {
                 if ($item['Code'] == $code) {
                     $item['Datum'] = $date;
@@ -94,6 +97,7 @@ class LiturgyService
     public static function getPropriumDateByCode($year, $code)
     {
         $proprium = static::getLiturgyByCode($year, $code);
+        /** @var array{Datum?: string} $proprium */
         if (isset($proprium['Datum'])) {
             return Carbon::parse($proprium['Datum']);
         }
@@ -113,7 +117,10 @@ class LiturgyService
             $date = $date->format('Y-m-d');
         }
 
-        return (static::getYear(substr($date, 0, 4))['Tage'] ?? [])[$date] ?? [];
+        $year = static::getYear(substr($date, 0, 4));
+        /** @var array{Tage?: array<string, mixed>} $year */
+
+        return ($year['Tage'] ?? [])[$date] ?? [];
     }
 
     /**
@@ -149,7 +156,10 @@ class LiturgyService
             Storage::put('liturgy/lesejahr-'.$year.'.json', static::fetchCalendarJson('https://kirchenjahr.pfarr.tools/api/lesejahr/'.$year));
         }
 
-        return static::$lectionaryYears[$year] = json_decode(Storage::get('liturgy/lesejahr-'.$year.'.json') ?? '', true);
+        /** @var array<string, mixed> $lectionaryYear */
+        $lectionaryYear = json_decode(Storage::get('liturgy/lesejahr-'.$year.'.json') ?? '', true);
+
+        return static::$lectionaryYears[$year] = $lectionaryYear;
     }
 
     /**
@@ -168,7 +178,10 @@ class LiturgyService
             return [];
         }
         if ($lectionaryYear = static::getLectionaryYear($year)) {
-            return $lectionaryYear[$subCode] ?? [];
+            /** @var array<string, mixed> $lectionaryData */
+            $lectionaryData = $lectionaryYear[$subCode] ?? [];
+
+            return $lectionaryData;
         }
 
         return [];

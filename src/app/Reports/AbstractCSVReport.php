@@ -85,7 +85,10 @@ abstract class AbstractCSVReport extends AbstractReport
         }
 
         foreach ($records as $record) {
-            fputcsv($handle, array_values($record));
+            fputcsv($handle, array_map(
+                static fn ($value): bool|float|int|string|null => is_scalar($value) || $value === null ? $value : null,
+                array_values($record)
+            ));
         }
         fclose($handle);
 

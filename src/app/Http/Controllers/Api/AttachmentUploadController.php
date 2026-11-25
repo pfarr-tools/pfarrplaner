@@ -19,7 +19,8 @@ class AttachmentUploadController extends Controller
     /** Start an authenticated resumable upload session. */
     public function start(Request $request): JsonResponse
     {
-        $session = $this->uploads->start($this->authenticatedUser($request), $request->validate([
+        /** @var array<string, mixed> $input */
+        $input = $request->validate([
             'target_type' => ['required', 'string'],
             'target_id' => ['required', 'integer'],
             'filename' => ['required', 'string'],
@@ -28,7 +29,8 @@ class AttachmentUploadController extends Controller
             'total_chunks' => ['required', 'integer', 'min:1'],
             'title' => ['required', 'string'],
             'cut' => ['nullable', 'string'],
-        ]));
+        ]);
+        $session = $this->uploads->start($this->authenticatedUser($request), $input);
 
         return response()->json([
             'session' => $session->id,

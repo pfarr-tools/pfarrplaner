@@ -53,7 +53,7 @@ class VersionInfo
     {
         $data = json_decode((string) file_get_contents(base_path('composer.json')), true);
 
-        return $data['version'];
+        return is_array($data) ? ($data['version'] ?? null) : null;
     }
 
     /**

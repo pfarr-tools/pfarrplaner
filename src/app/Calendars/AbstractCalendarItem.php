@@ -102,7 +102,9 @@ class AbstractCalendarItem
     {
         foreach ($data as $key => $val) {
             if (in_array($key, $this->dates)) {
-                $val = new Carbon($val);
+                /** @var \DateTimeInterface|float|int|string|null $date */
+                $date = $val;
+                $val = new Carbon($date);
             }
             if (property_exists($this, $key)) {
                 $setter = 'set'.ucfirst($key);

@@ -51,14 +51,17 @@ class ServiceRealtimeChanged implements ShouldBroadcast, ShouldDispatchAfterComm
         ?string $oldDate = null
     ) {
         $this->change = $change;
-        $this->serviceId = (int) $service->getKey();
+        $serviceKey = $service->getKey();
+        $this->serviceId = is_int($serviceKey) || is_string($serviceKey) ? (int) $serviceKey : 0;
         $this->cityId = $service->city_id ? (int) $service->city_id : null;
         $this->date = $service->date?->copy()->setTimezone('Europe/Berlin')->toDateString();
         $this->oldCityId = $oldCityId;
         $this->oldDate = $oldDate;
         $this->channelCityIds = array_values(array_unique(array_filter(array_merge(
             [$this->cityId, $this->oldCityId],
-            $service->relatedCities()->pluck('cities.id')->map(fn ($id): int => (int) $id)->all()
+            $service->relatedCities()->pluck('cities.id')->map(
+                fn ($id): int => is_int($id) || is_string($id) ? (int) $id : 0,
+            )->all()
         ))));
     }
 

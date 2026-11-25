@@ -56,10 +56,15 @@ class ReadingItemHelper extends AbstractItemHelper
     public function __construct(Item $item)
     {
         parent::__construct($item);
-        $this->reference = ReferenceParser::getInstance()->parse($item->data['reference']);
+        $reference = $item->data['reference'] ?? '';
+        $reference = is_scalar($reference) ? (string) $reference : '';
+        /** @var array{originalReference: string, correctedReference: string, version: string, versionCopyrights: string, parsed: array<int, array<string, mixed>>} $parsedReference */
+        $parsedReference = ReferenceParser::getInstance()->parse($reference);
+        $this->reference = $parsedReference;
 
         if ($this->reference['version'] == 'Eigener Text') {
-            $this->reference['versionCopyrights'] = $this->item->data['customSource'] ?? '';
+            $customSource = $this->item->data['customSource'] ?? '';
+            $this->reference['versionCopyrights'] = is_scalar($customSource) ? (string) $customSource : '';
         }
     }
 
@@ -88,13 +93,25 @@ class ReadingItemHelper extends AbstractItemHelper
     public function getHtml(): string
     {
         if ($this->reference['version'] == 'Eigener Text') {
-            return $this->item->data['customText'];
+            $customText = $this->item->data['customText'] ?? '';
+
+            return is_scalar($customText) ? (string) $customText : '';
         }
         $bibleText = (new BibleText($this->reference['version']))->get($this->reference);
         $text = '';
         foreach ($bibleText as $section) {
-            foreach ($section['text'] as $verse) {
-                $text .= '<sup>'.$verse['verse'].'</sup> '.$verse['text'];
+            $verses = $section['text'] ?? [];
+            if (! is_array($verses)) {
+                continue;
+            }
+            foreach ($verses as $verse) {
+                if (! is_array($verse)) {
+                    continue;
+                }
+                $verseNumber = $verse['verse'] ?? '';
+                $verseText = $verse['text'] ?? '';
+                $text .= '<sup>'.(is_scalar($verseNumber) ? (string) $verseNumber : '')
+                    .'</sup> '.(is_scalar($verseText) ? (string) $verseText : '');
             }
         }
 
@@ -116,14 +133,21 @@ class ReadingItemHelper extends AbstractItemHelper
         if (! $includeFullReadings) {
             return;
         }
+        /** @var array{styles: array{paragraphs: array{default: array{spaceAfter: int}}}} $docConfig */
+        $docConfig = $doc->getConfig();
         if ($this->reference['versionCopyrights']) {
-            $doc->renderNormalText($this->reference['versionCopyrights'], ['size' => 8], $doc->getConfig()['styles']['paragraphs']['default']['spaceAfter'] == 0);
+            $doc->renderNormalText(
+                $this->reference['versionCopyrights'],
+                ['size' => 8],
+                $docConfig['styles']['paragraphs']['default']['spaceAfter'] == 0
+            );
         }
 
         // Include intro to reading?
-        if ($includeIntro && ($intro = $this->item->data['intro'] ?? false)) {
-            foreach (explode("\n", $intro) as $line) {
-                $doc->renderParagraph($doc::NORMAL, [[$line, ['italic' => true]]]);
+        $intro = $includeIntro ? ($this->item->data['intro'] ?? '') : '';
+        if (is_scalar($intro) && $intro) {
+            foreach (explode("\n", (string) $intro) as $line) {
+                $doc->renderParagraph(DefaultWordDocument::NORMAL, [[$line, ['italic' => true]]]);
             }
         }
 
@@ -131,15 +155,24 @@ class ReadingItemHelper extends AbstractItemHelper
 
         $run = [];
         foreach ($bibleText as $range) {
-            foreach ($range['text'] as $verse) {
-                if ($range['verse'] ?? false) {
-                    $run[] = [$verse['verse'].' ', ['superScript' => true]];
+            $verses = $range['text'] ?? [];
+            if (! is_array($verses)) {
+                continue;
+            }
+            foreach ($verses as $verse) {
+                if (! is_array($verse)) {
+                    continue;
                 }
-                $run[] = [$verse['text']."\n", []];
+                if ($range['verse'] ?? false) {
+                    $verseNumber = $verse['verse'] ?? '';
+                    $run[] = [(is_scalar($verseNumber) ? (string) $verseNumber : '').' ', ['superScript' => true]];
+                }
+                $verseText = $verse['text'] ?? '';
+                $run[] = [(is_scalar($verseText) ? (string) $verseText : '')."\n", []];
             }
         }
 
-        $doc->renderParagraph($doc::NORMAL, $run);
+        $doc->renderParagraph(DefaultWordDocument::NORMAL, $run);
 
     }
 

@@ -31,6 +31,8 @@
 namespace App\Models\Leave;
 
 use App\Calendars\AbstractCalendarItem;
+use App\Contracts\Replacement\CreatesReplacements;
+use App\Contracts\Replacement\DeletesReplacements;
 use App\DAV\DAVCalendarItem;
 use App\DAV\HasDAVCalendarItems;
 use App\Models\Attachment;
@@ -193,7 +195,10 @@ class Absence extends Model implements HasDAVCalendarItems
         }
 
         if ($method === 'replacementText') {
-            return $this->formatReplacementText($parameters[0] ?? '');
+            /** @var string $prefix */
+            $prefix = $parameters[0] ?? '';
+
+            return $this->formatReplacementText($prefix);
         }
 
         return parent::__call($method, $parameters);
@@ -303,12 +308,15 @@ class Absence extends Model implements HasDAVCalendarItems
      */
     public static function getByDays($absences, $days)
     {
+        /** @var array<int|string, Collection<int, Absence>> $dayAbsences */
         $dayAbsences = [];
         foreach ($days as $day) {
-            $dayAbsences[$day] = collect();
+            /** @var Collection<int, Absence> $dayList */
+            $dayList = collect();
+            $dayAbsences[$day] = $dayList;
             foreach ($absences as $absence) {
                 if ($absence->containsDate($day)) {
-                    $dayAbsences[$day]->push($absence);
+                    $dayList->push($absence);
                 }
             }
         }
@@ -425,12 +433,17 @@ class Absence extends Model implements HasDAVCalendarItems
     {
         $this->load('replacements');
         if (count($this->replacements)) {
+            /** @var DeletesReplacements $deleter */
+            $deleter = app(Replacement::getContractName('delete'));
             foreach ($this->replacements as $replacement) {
-                app(Replacement::getContractName('delete'))->delete($user, $replacement);
+                $deleter->delete($user, $replacement);
             }
         }
+        /** @var CreatesReplacements $creator */
+        $creator = app(Replacement::getContractName('create'));
         foreach ($data as $replacementData) {
-            $replacement = app(Replacement::getContractName('create'))->create($user, $this, [
+            /** @var array{from: mixed, to: mixed, pool_id?: mixed, users?: mixed} $replacementData */
+            $replacement = $creator->create($user, $this, [
                 'absence_id' => $this->id,
                 'from' => max($this->normalizePlannerDateValue($replacementData['from']), $this->from),
                 'to' => min($this->normalizePlannerDateValue($replacementData['to'], true), $this->to),
@@ -482,6 +495,7 @@ class Absence extends Model implements HasDAVCalendarItems
             return Carbon::parse($value)->setTimezone('UTC');
         }
 
+        /** @var \DateTimeInterface|float|int|string|null $value */
         $date = Carbon::parse($value)->setTimezone('Europe/Berlin');
 
         return $date
@@ -568,6 +582,7 @@ class Absence extends Model implements HasDAVCalendarItems
             return null;
         }
 
+        /** @var \DateTimeInterface|float|int|string $value */
         return Carbon::parse($value)->setTimezone('Europe/Berlin')->toDateString();
     }
 
@@ -676,6 +691,7 @@ class Absence extends Model implements HasDAVCalendarItems
     {
         $line = $this->requiredUser()->formatName(NameService::TITLE_FIRST_LAST).' ist'
             .$this->periodText($this->from, $this->to).' abwesend.';
+        /** @var Collection<int, string> $replacements */
         $replacements = collect();
         $replaceCtr = 0;
         foreach ($this->replacements as $replacement) {

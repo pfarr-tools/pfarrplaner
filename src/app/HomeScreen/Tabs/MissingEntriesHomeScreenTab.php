@@ -110,10 +110,15 @@ class MissingEntriesHomeScreenTab extends AbstractHomeScreenTab
      */
     public function getMissing()
     {
-        $missing = Service::havingOpenMinistries($this->config['ministries'])
+        $ministries = $this->config['ministries'] ?? [];
+        $ministries = is_array($ministries)
+            ? array_values(array_map(static fn ($ministry): string => is_string($ministry) ? $ministry : '', $ministries))
+            : [];
+        $missing = Service::havingOpenMinistries($ministries)
             ->startingFrom(Carbon::now());
-        if (count($this->config['locations'] ?? [])) {
-            $missing->whereIn('location_id', $this->config['locations']);
+        $locations = $this->config['locations'] ?? [];
+        if (is_array($locations) && count($locations) > 0) {
+            $missing->whereIn('location_id', $locations);
         }
 
         return $missing->get();

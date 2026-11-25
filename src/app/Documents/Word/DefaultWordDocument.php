@@ -83,14 +83,19 @@ class DefaultWordDocument
     /**
      * @param  array<string, mixed>  $config  Document configuration.
      */
-    public function __construct($config = [])
+    public function __construct(array $config = [])
     {
 
-        $this->config = array_replace_recursive($this->getBaseConfig(), $this->config, $config);
+        /** @var array<string, mixed> $mergedConfig */
+        $mergedConfig = array_replace_recursive($this->getBaseConfig(), $this->config, $config);
+        $this->config = $mergedConfig;
         Settings::setOutputEscapingEnabled(true);
         $this->phpWord = new PhpWord;
         $this->phpWord->getSettings()->setThemeFontLang(new Language(Language::DE_DE));
-        $this->configureLayout($config['layout'] ?? []);
+        $layout = $config['layout'] ?? [];
+        /** @var array<string, mixed> $layoutConfig */
+        $layoutConfig = is_array($layout) ? $layout : [];
+        $this->configureLayout($layoutConfig);
         $this->setDefaultDocumentStyles($config);
     }
 
@@ -104,12 +109,13 @@ class DefaultWordDocument
      */
     public function getBaseConfig(): array
     {
+        /** @var array{styles: array{paragraphs: array<string, array{tabs?: array<int, array{position: int, type: string}>}>}} $baseConfig */
         $baseConfig = config('documents.word.default');
         foreach ($baseConfig['styles']['paragraphs'] as $pKey => $pStyle) {
             if (isset($pStyle['tabs'])) {
                 $tabs = [];
                 foreach ($pStyle['tabs'] as $tab) {
-                    $tabs[] = new Tab($tab['type'], $tab['position']);
+                    $tabs[] = new Tab((string) $tab['type'], (int) $tab['position']);
                 }
                 $baseConfig['styles']['paragraphs'][$pKey]['tabs'] = $tabs;
             }
@@ -119,7 +125,12 @@ class DefaultWordDocument
                 if (isset($pStyle['tabs'])) {
                     $tabs = [];
                     foreach ($pStyle['tabs'] as $tab) {
-                        $tabs[] = new Tab($tab['type'], $tab['position']);
+                        if (! is_array($tab)) {
+                            continue;
+                        }
+                        $tabType = $tab['type'] ?? '';
+                        $tabPosition = $tab['position'] ?? 0;
+                        $tabs[] = new Tab(is_string($tabType) ? $tabType : '', is_int($tabPosition) ? $tabPosition : 0);
                     }
                     $baseConfig['styles']['paragraphs'][$sKey][$pKey]['tabs'] = $tabs;
                 }
@@ -145,24 +156,43 @@ class DefaultWordDocument
     protected function setDefaultDocumentStyles($config = [])
     {
         $phpWord = $this->phpWord;
-        $phpWord->setDefaultFontName($config['defaultFont'] ?? 'Sarabun Light');
-        $phpWord->setDefaultFontSize($config['defaultFontSize'] ?? 11);
+        $fontName = $config['defaultFont'] ?? 'Sarabun Light';
+        $fontSize = $config['defaultFontSize'] ?? 11;
+        $phpWord->setDefaultFontName(is_string($fontName) ? $fontName : 'Sarabun Light');
+        $phpWord->setDefaultFontSize(is_int($fontSize) ? $fontSize : 11);
+
+        $styles = $this->config['styles'] ?? [];
+        if (! is_array($styles)) {
+            return;
+        }
+        $paragraphs = $styles['paragraphs'] ?? [];
+        $fonts = $styles['fonts'] ?? [];
+        if (! is_array($paragraphs) || ! is_array($fonts)) {
+            return;
+        }
 
         // Standard
-        $phpWord->setDefaultParagraphStyle($this->config['styles']['paragraphs']['default'] ?? []);
-        $phpWord->addFontStyle(self::NORMAL, $this->config['styles']['fonts'][self::NORMAL]);
+        $defaultParagraphStyle = $paragraphs['default'] ?? [];
+        $phpWord->setDefaultParagraphStyle(is_array($defaultParagraphStyle) ? $defaultParagraphStyle : []);
+        $normalFont = $fonts[self::NORMAL] ?? [];
+        $phpWord->addFontStyle(self::NORMAL, is_array($normalFont) ? $normalFont : []);
 
         // title styles
-        foreach ($this->config['styles']['paragraphs']['titles'] as $level => $pStyle) {
-            $phpWord->addTitleStyle($level, $this->config['styles']['fonts']['titles'][$level] ?? [], $pStyle);
+        $titles = $paragraphs['titles'] ?? [];
+        $titleFonts = $fonts['titles'] ?? [];
+        foreach (is_array($titles) ? $titles : [] as $level => $pStyle) {
+            $titleFont = is_array($titleFonts) ? ($titleFonts[$level] ?? []) : [];
+            $phpWord->addTitleStyle((int) $level, is_array($titleFont) ? $titleFont : [], is_array($pStyle) ? $pStyle : []);
         }
 
-        foreach ($this->config['styles']['paragraphs']['custom'] as $pKey => $pStyle) {
-            $phpWord->addParagraphStyle($pKey, $pStyle);
+        $customParagraphs = $paragraphs['custom'] ?? [];
+        foreach (is_array($customParagraphs) ? $customParagraphs : [] as $pKey => $pStyle) {
+            $phpWord->addParagraphStyle((string) $pKey, is_array($pStyle) ? $pStyle : []);
         }
 
-        foreach ($this->config['styles']['fonts']['custom'] as $fKey => $fStyle) {
-            $phpWord->addFontStyle($fKey, $fStyle);
+        $customFonts = $fonts['custom'] ?? [];
+        foreach (is_array($customFonts) ? $customFonts : [] as $fKey => $fStyle) {
+            $phpWord->addFontStyle((string) $fKey, is_array($fStyle) ? $fStyle : []);
         }
 
     }
@@ -206,9 +236,10 @@ class DefaultWordDocument
     ) {
         $textRun = $existingTextRun ?: $this->section->addTextRun($template);
         foreach ($blocks as $block) {
-            if ($block[0] !== null) {
+            $text = is_array($block) ? ($block[0] ?? null) : null;
+            if ($text !== null) {
                 $ct = 0;
-                foreach (explode("\n", $block[0]) as $item) {
+                foreach (explode("\n", is_string($text) ? $text : '') as $item) {
                     if ($ct > 0) {
                         $textRun->addTextBreak();
                     }
@@ -464,13 +495,20 @@ class DefaultWordDocument
      */
     public function renderServiceTitleHeading(Service $service)
     {
-        $run = new TextRun($this->config['styles']['paragraphs']['titles'][1]);
-        $run->addText($service->titleText(false), $this->config['styles']['fonts']['titles'][1]);
+        $styles = $this->config['styles'] ?? [];
+        $paragraphStyles = is_array($styles) ? ($styles['paragraphs'] ?? []) : [];
+        $fontStyles = is_array($styles) ? ($styles['fonts'] ?? []) : [];
+        $titleParagraphs = is_array($paragraphStyles) ? ($paragraphStyles['titles'] ?? []) : [];
+        $titleFonts = is_array($fontStyles) ? ($fontStyles['titles'] ?? []) : [];
+        $titleParagraph = is_array($titleParagraphs) ? ($titleParagraphs[1] ?? []) : [];
+        $titleFont = is_array($titleFonts) ? ($titleFonts[1] ?? []) : [];
+        $run = new TextRun(is_array($titleParagraph) ? $titleParagraph : []);
+        $run->addText($service->titleText(false), is_array($titleFont) ? $titleFont : []);
         $run->addTextBreak();
         $run->addText(
             $service->trueDate()->setTimeZone('Europe/Berlin')->isoFormat('DD.MM.YYYY, HH:mm').' Uhr'.', '
             .$service->locationText(),
-            $this->config['styles']['fonts']['titles'][1]
+            is_array($titleFont) ? $titleFont : []
         );
         $this->getSection()->addTitle($run, 0);
     }

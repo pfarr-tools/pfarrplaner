@@ -42,6 +42,9 @@ trait HasAttachmentsTrait
     public static function bootHasAttachmentsTrait(): void
     {
         static::forceDeleted(function ($model) {
+            if (! $model instanceof self) {
+                return;
+            }
             $model->purgeAttachments();
         });
     }

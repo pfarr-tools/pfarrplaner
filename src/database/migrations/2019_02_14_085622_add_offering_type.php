@@ -29,6 +29,7 @@
  */
 
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 /**
@@ -45,7 +46,7 @@ class AddOfferingType extends Migration
     {
         Schema::table(
             'services',
-            function ($table) {
+            function (Blueprint $table) {
                 $table->string('offering_type')->nullable()->default('');
             }
         );
@@ -60,7 +61,7 @@ class AddOfferingType extends Migration
     {
         Schema::table(
             'services',
-            function ($table) {
+            function (Blueprint $table) {
                 $table->dropColumn('offering_type');
             }
         );

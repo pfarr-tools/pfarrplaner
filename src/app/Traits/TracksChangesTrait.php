@@ -61,7 +61,9 @@ trait TracksChangesTrait
     public function trackChanges()
     {
         if (isset($this->forceTracking)) {
-            $this->load($this->forceTracking);
+            /** @var array<int|string, list<string>|string>|string $forceTracking */
+            $forceTracking = $this->forceTracking;
+            $this->load($forceTracking);
         }
         $this->dataBeforeChanges = $this->createSnapshot();
     }
@@ -99,7 +101,10 @@ trait TracksChangesTrait
             }
         }
 
-        return $this->normalizeSnapshotValue($snapshot);
+        /** @var array<string, mixed> $normalized */
+        $normalized = $this->normalizeSnapshotValue($snapshot);
+
+        return $normalized;
     }
 
     /**
@@ -130,6 +135,7 @@ trait TracksChangesTrait
             }
 
             if (array_is_list($value) && $value !== [] && $this->containsIdentifiableRecords($value)) {
+                /** @var list<array{id: mixed}> $value */
                 usort($value, fn (array $left, array $right): int => $left['id'] <=> $right['id']);
             } else {
                 ksort($value, SORT_STRING);

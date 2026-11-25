@@ -41,6 +41,7 @@ use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
@@ -82,6 +83,13 @@ class CalendarController extends Controller
         $month ??= $user->getSetting('display-month') ?: date('m');
         $year ??= $user->getSetting('display-year') ?: date('Y');
 
+        /** @var int|string $yearValue */
+        $yearValue = $year;
+        /** @var int|string $monthValue */
+        $monthValue = $month;
+        $year = (int) $yearValue;
+        $month = (int) $monthValue;
+
         $monthStart = Carbon::create($year, $month, 1);
         abort_unless($monthStart instanceof Carbon, 500);
         $monthEnd = $monthStart->copy()->addMonth()->subSecond();
@@ -94,7 +102,9 @@ class CalendarController extends Controller
         if ($request->has('sort')) {
             $user->setSetting('sorted_cities', $request->get('sort'));
         }
-        $cities = $sortedCities = $user->getSortedCities();
+        /** @var Collection<int|string, mixed> $sortedCities */
+        $sortedCities = $user->getSortedCities();
+        $cities = $sortedCities;
         $unusedCities = $user->cities->whereNotIn('id', $sortedCities->pluck('id'));
 
         // filter days:

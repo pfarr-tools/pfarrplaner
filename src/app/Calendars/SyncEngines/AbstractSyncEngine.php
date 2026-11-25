@@ -141,7 +141,9 @@ abstract class AbstractSyncEngine
 
         /** @var AbstractCalendarItem $item */
         if ($item) {
-            Log::debug('Updating existing external calendar event #'.$item->getID(), [$item]);
+            /** @var int|string $itemId */
+            $itemId = $item->getID();
+            Log::debug('Updating existing external calendar event #'.$itemId, [$item]);
             $item->update($record);
         } else {
             // obsolete entry? (there's no associated item on the server)
@@ -163,7 +165,9 @@ abstract class AbstractSyncEngine
                         'foreign_id' => $item->getID(),
                     ]
                 );
-                Log::debug('Calendar item created with #'.$item->getID().', local reference entry #'.$entry->id);
+                /** @var int|string $itemId */
+                $itemId = $item->getID();
+                Log::debug('Calendar item created with #'.$itemId.', local reference entry #'.$entry->id);
             } else {
                 Log::error(
                     'Failed to create calendar item for service #'.$service->id
@@ -183,6 +187,7 @@ abstract class AbstractSyncEngine
                         ]);
                         if ($result) {
                             foreach ($result as $prepKey => $prepEvent) {
+                                /** @var array<string, mixed> $prepEvent */
                                 $this->syncSingleAlternateEvent($prepKey, $prepEvent);
                             }
                         }
@@ -214,9 +219,10 @@ abstract class AbstractSyncEngine
         }
         if ($item) {
             $item->update($record);
+            /** @var int|string $itemId */
+            $itemId = $item->getID();
             Log::debug(
-                'Updated record #'.$item->getID(
-                ).' for alternate event #'.$key.' on CalendarConnection '.$this->calendarConnection->id
+                'Updated record #'.$itemId.' for alternate event #'.$key.' on CalendarConnection '.$this->calendarConnection->id
             );
         } else {
             if ($entry) {
@@ -236,9 +242,10 @@ abstract class AbstractSyncEngine
                         'foreign_id' => $item->getID(),
                     ]
                 );
+                /** @var int|string $itemId */
+                $itemId = $item->getID();
                 Log::debug(
-                    'Created record #'.$item->getID(
-                    ).' for alternate event #'.$key.' on CalendarConnection '.$this->calendarConnection->id
+                    'Created record #'.$itemId.' for alternate event #'.$key.' on CalendarConnection '.$this->calendarConnection->id
                 );
             } else {
                 Log::error(
@@ -342,6 +349,7 @@ abstract class AbstractSyncEngine
             return;
         }
         foreach ($absence->getCalendarEvent($user) as $key => $event) {
+            /** @var array<string, mixed> $event */
             $this->syncSingleAlternateEvent($key, $event);
         }
     }

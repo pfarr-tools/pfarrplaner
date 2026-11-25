@@ -46,6 +46,7 @@ class ServiceRealtimeObserver
      */
     private function originalCityId(Service $service): ?int
     {
+        /** @var int|string|null $cityId Frühere Kennung der Stadt. */
         $cityId = $service->getOriginal('city_id');
 
         return $cityId === null ? null : (int) $cityId;
@@ -57,6 +58,7 @@ class ServiceRealtimeObserver
      */
     private function originalDate(Service $service): ?string
     {
+        /** @var string|null $date Frühes Datum des Gottesdienstes. */
         $date = $service->getOriginal('date');
 
         return $date ? Carbon::parse($date)->setTimezone('Europe/Berlin')->toDateString() : null;

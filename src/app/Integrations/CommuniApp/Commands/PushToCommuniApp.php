@@ -87,9 +87,10 @@ class PushToCommuniApp extends Command
                         if ($service === null) {
                             continue;
                         }
+                        $locationText = $service->locationTextWithCity;
                         $this->line('Pushing event #'.$event->id.' ('
                                     .$event->start->setTimeZone('Europe/Berlin')->format('d.m.Y, H:i')
-                                        .', '.$service->locationTextWithCity
+                                        .', '.(is_string($locationText) ? $locationText : '')
                                     .') '.$service->titleText(false, true));
                         if (! $this->option('dry-run')) {
                             $communiApp->publish($event);

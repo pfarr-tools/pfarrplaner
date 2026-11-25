@@ -90,9 +90,6 @@ class Poolmaster extends AbstractModel
         return false;
     }
 
-    /**
-     * @return string
-     */
     public function getLabelAttribute(): string
     {
         return ($this->pool ? $this->pool->name.', ' : '').$this->start.'-'.$this->end;
@@ -119,7 +116,9 @@ class Poolmaster extends AbstractModel
      */
     public function setStartAttribute($value): void
     {
-        $this->attributes['start'] = $value ? Carbon::parse($value)->toDateString() : null;
+        $this->attributes['start'] = $value && (is_string($value) || is_int($value) || is_float($value) || $value instanceof \DateTimeInterface)
+            ? Carbon::parse($value)->toDateString()
+            : null;
     }
 
     /**
@@ -129,6 +128,8 @@ class Poolmaster extends AbstractModel
      */
     public function setEndAttribute($value): void
     {
-        $this->attributes['end'] = $value ? Carbon::parse($value)->toDateString() : null;
+        $this->attributes['end'] = $value && (is_string($value) || is_int($value) || is_float($value) || $value instanceof \DateTimeInterface)
+            ? Carbon::parse($value)->toDateString()
+            : null;
     }
 }

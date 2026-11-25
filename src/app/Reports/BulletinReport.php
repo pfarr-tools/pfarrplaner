@@ -53,7 +53,7 @@ class BulletinReport extends AbstractWordDocumentReport
 {
     public const FILE_SIGNATURE = '91.8';
 
-    public const FILE_TITLE = 'Gottesdienstliste Gemeindebrief';
+    public const string FILE_TITLE = 'Gottesdienstliste Gemeindebrief';
 
     /**
      * @var string
@@ -96,6 +96,7 @@ class BulletinReport extends AbstractWordDocumentReport
      */
     public function render(Request $request)
     {
+        /** @var array<string, mixed> $data */
         $data = $request->validate(
             [
                 'includeCities' => 'required',
@@ -106,24 +107,35 @@ class BulletinReport extends AbstractWordDocumentReport
             ]
         );
 
-        $cities = City::whereIn('id', $data['includeCities'])->get();
+        /** @var array<int, int> $includeCities */
+        $includeCities = $data['includeCities'];
+        $cities = City::whereIn('id', $includeCities)->get();
 
-        $start = Carbon::parse($data['start']);
+        /** @var string $startDate */
+        $startDate = $data['start'];
+        /** @var string $endDate */
+        $endDate = $data['end'];
+        $start = Carbon::parse($startDate);
         $serviceList = Service::where('event_class', 'service')
-            ->between($start, Carbon::parse($data['end']))
+            ->between($start, Carbon::parse($endDate))
             ->displayable($start)
             ->inCities($cities)
             ->ordered()
             ->get()
             ->groupBy('key_date');
 
-        $this->cities = $data['includeCities'];
+        $this->cities = $includeCities;
 
-        $format = ucfirst(Str::slug($data['format'] ?? $this->formats[0]));
+        /** @var string $formatInput */
+        $formatInput = $data['format'] ?? $this->formats[0];
+        $format = ucfirst(Str::slug($formatInput));
 
         $renderMethod = "render{$format}Format";
         if (method_exists($this, $renderMethod)) {
-            return $this->$renderMethod($serviceList);
+            /** @var RedirectResponse|string $result */
+            $result = $this->$renderMethod($serviceList);
+
+            return $result;
         } else {
             return redirect()->route('reports.setup', $this->getKey());
         }
@@ -133,7 +145,7 @@ class BulletinReport extends AbstractWordDocumentReport
      * @param  $days
      */
     /**
-     * @param  array<int|string, mixed>  $serviceList  Services grouped by day.
+     * @param  array<int|string, array<int, Service>>  $serviceList  Services grouped by day.
      * @return BinaryFileResponse
      */
     public function renderTailfingenFormat($serviceList)
@@ -153,12 +165,14 @@ class BulletinReport extends AbstractWordDocumentReport
                     $textRun->addText($service->trueDate()->format('d.m.Y'));
                 }
                 if ($ctr == 2) {
-                    $textRun->addText(htmlspecialchars(LiturgyService::getLiturgyInfoByDate($service->trueDate())['Bezeichnung'] ?? ''));
+                    /** @var array{Bezeichnung?: string, 0?: array{Bezeichnung?: string, Predigt?: array{Bibelstelle?: string}}} $liturgy */
+                    $liturgy = LiturgyService::getLiturgyInfoByDate($service->trueDate());
+                    $textRun->addText(htmlspecialchars($liturgy['Bezeichnung'] ?? ''));
                 }
                 $textRun->addText("\t");
                 $textRun->addText($service->timeText()."\t");
                 if (! $service->location instanceof Location) {
-                    $textRun->addText(htmlspecialchars($service->special_location)."\t");
+                    $textRun->addText(htmlspecialchars($service->special_location ?? '')."\t");
                 } else {
                     $textRun->addText(htmlspecialchars($service->location->name)."\t");
                 }
@@ -213,7 +227,7 @@ class BulletinReport extends AbstractWordDocumentReport
      * @param  $days
      */
     /**
-     * @param  array<int|string, mixed>  $serviceList  Services grouped by day.
+     * @param  array<int|string, array<int, Service>>  $serviceList  Services grouped by day.
      * @return BinaryFileResponse
      */
     public function renderTruchtelfingenFormat($serviceList)
@@ -222,6 +236,7 @@ class BulletinReport extends AbstractWordDocumentReport
         $table = $section->addTable('table');
 
         foreach ($serviceList as $day => $dayList) {
+            /** @var array{Bezeichnung?: string, 0?: array{Bezeichnung?: string, Predigt?: array{Bibelstelle?: string}}} $liturgy */
             $liturgy = LiturgyService::getLiturgyInfoByDate(Carbon::parse((string) $day));
             /** @var Service $service */
             $first = true;
@@ -234,7 +249,7 @@ class BulletinReport extends AbstractWordDocumentReport
                 $table->addCell((int) Converter::cmToTwip(2.32))->addText($service->descriptionText());
                 $table->addCell((int) Converter::cmToTwip(3.52))->addText($service->participantsText('P', false, false));
                 $table->addCell((int) Converter::cmToTwip(2.25))->addText(
-                    isset($liturgy[0]['Predigt']) ? $liturgy[0]['Predigt']['Bibelstelle'] : ''
+                    isset($liturgy[0]['Predigt']) ? ($liturgy[0]['Predigt']['Bibelstelle'] ?? '') : ''
                 );
                 $table->addCell((int) Converter::cmToTwip(2.5))->addText(
                     $service->offeringGoal() ? 'Opfer für '.$service->offeringGoal() : ''
@@ -254,7 +269,7 @@ class BulletinReport extends AbstractWordDocumentReport
     }
 
     /**
-     * @param  array<int|string, mixed>  $serviceList  Services grouped by day.
+     * @param  array<int|string, array<int, Service>>  $serviceList  Services grouped by day.
      * @return BinaryFileResponse
      */
     public function renderGaufeldenFormat($serviceList)
@@ -262,7 +277,9 @@ class BulletinReport extends AbstractWordDocumentReport
         $this->wordDocument->setDefaultFontSize(10);
         $this->wordDocument->setDefaultFontName('Lora');
         $section = $this->commonDocumentSetup();
-        Carbon::setLocale(config('app.locale'));
+        /** @var string $locale */
+        $locale = config('app.locale');
+        Carbon::setLocale($locale);
 
         /** @var Service|null $lastService */
         $lastService = null;
@@ -270,6 +287,7 @@ class BulletinReport extends AbstractWordDocumentReport
             $run = $section->addTextRun(['spaceAfter' => 0]);
             $dayDate = Carbon::parse($date)->startOfDay();
 
+            /** @var array{Bezeichnung?: string, 0?: array{Bezeichnung?: string, Predigt?: array{Bibelstelle?: string}}} $liturgy */
             $liturgy = LiturgyService::getLiturgyInfoByDate($dayDate);
 
             $run->addText(
@@ -280,7 +298,7 @@ class BulletinReport extends AbstractWordDocumentReport
                 ['name' => 'Lora', 'bold' => true, 'size' => 10]
             );
             if (count($liturgy)) {
-                $run->addText(' | '.$liturgy[0]['Bezeichnung'], ['name' => 'Lora', 'bold' => true, 'size' => 8]);
+                $run->addText(' | '.($liturgy[0]['Bezeichnung'] ?? ''), ['name' => 'Lora', 'bold' => true, 'size' => 8]);
             }
 
             $index = 0;
@@ -303,11 +321,12 @@ class BulletinReport extends AbstractWordDocumentReport
 
                 $location = $service->locationText();
                 // if (!Str::contains($location, $service->city->name)) $location .= ' '.$service->city->name;
-                $run->addText($service->city->name."\t", ['name' => 'Lora', 'bold' => true, 'size' => 10, 'color' => 'a1a1a1']);
+                $run->addText(($service->city->name ?? '')."\t", ['name' => 'Lora', 'bold' => true, 'size' => 10, 'color' => 'a1a1a1']);
                 $run->addText($location."\t", ['name' => 'Lora', 'bold' => false, 'size' => 10]);
 
-                if ($service->description && (substr($service->description, 0, 1) == '"')) {
-                    $run->addText($service->description."\t", ['name' => 'Lora']);
+                $description = $service->description;
+                if ($description && substr($description, 0, 1) == '"') {
+                    $run->addText($description."\t", ['name' => 'Lora']);
                 }
 
                 $run->addText(

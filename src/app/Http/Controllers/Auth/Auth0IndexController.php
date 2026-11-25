@@ -47,7 +47,12 @@ class Auth0IndexController extends Controller
      */
     public function login()
     {
-        return App::make('auth0')->login(null, null, ['scope' => 'openid email email_verified'], 'code');
+        $auth0 = App::make('auth0');
+        if (! is_object($auth0) || ! method_exists($auth0, 'login')) {
+            abort(500);
+        }
+
+        return $auth0->login(null, null, ['scope' => 'openid email email_verified'], 'code');
     }
 
     /**

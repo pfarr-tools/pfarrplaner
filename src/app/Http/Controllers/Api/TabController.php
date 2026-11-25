@@ -54,9 +54,10 @@ class TabController extends Controller
     {
         $user = Auth::user();
         abort_unless($user instanceof User, 401);
+        /** @var array{tabs: array<int, array<string, mixed>>} $config */
         $config = $user->getSetting('homeScreenTabsConfig') ?? [];
         $tabIndex = filter_var($tab, FILTER_SANITIZE_NUMBER_INT);
-        $tab = HomeScreenTabFactory::getOne($config['tabs'][$tabIndex], (int) $tabIndex);
+        $tab = HomeScreenTabFactory::getOne($config['tabs'][(int) $tabIndex], (int) $tabIndex);
 
         return $tab instanceof JsonResource ? $tab : response()->json(['data' => $tab]);
     }
@@ -71,9 +72,10 @@ class TabController extends Controller
     {
         $user = Auth::user();
         abort_unless($user instanceof User, 401);
+        /** @var array{tabs: array<int, array<string, mixed>>} $config */
         $config = $user->getSetting('homeScreenTabsConfig') ?? [];
         $tabIndex = filter_var($tab, FILTER_SANITIZE_NUMBER_INT);
 
-        return response()->json(['key' => $tab, 'count' => HomeScreenTabFactory::getCount($config['tabs'][$tabIndex], (int) $tabIndex)]);
+        return response()->json(['key' => $tab, 'count' => HomeScreenTabFactory::getCount($config['tabs'][(int) $tabIndex], (int) $tabIndex)]);
     }
 }

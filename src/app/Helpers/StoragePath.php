@@ -27,7 +27,9 @@ class StoragePath
      */
     public static function for(string $path): string
     {
-        $disk = Storage::disk(config('filesystems.default'));
+        /** @var string|null $diskName */
+        $diskName = config('filesystems.default');
+        $disk = Storage::disk($diskName);
         if (method_exists($disk, 'path')) {
             $localPath = $disk->path($path);
             if (is_file($localPath)) {

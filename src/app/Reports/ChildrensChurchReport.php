@@ -87,7 +87,7 @@ class ChildrensChurchReport extends AbstractPDFDocumentReport
                 'end' => 'required|date',
             ]
         );
-
+        /** @var array{city: int|string, start: string, end: string} $data */
         $serviceList = Service::between(Carbon::parse($data['start']), Carbon::parse($data['end']))
             ->displayable()
             ->where('city_id', $data['city'])
@@ -117,9 +117,12 @@ class ChildrensChurchReport extends AbstractPDFDocumentReport
             return redirect()->back()->with('error', 'In der gewählten Zeit findet kein Kindergottesdienst statt.');
         }
 
+        /** @var string $cityName */
+        $cityName = $city->name;
+
         return $this->sendToBrowser(
             FileNameService::make(
-                static::FILE_TITLE.' '.$city->name,
+                self::FILE_TITLE.' '.$cityName,
                 'pdf',
                 static::FILE_SIGNATURE,
                 now()),

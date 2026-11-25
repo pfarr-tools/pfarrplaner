@@ -56,6 +56,7 @@ class AddDayTypes extends Migration
         Schema::table(
             'days',
             function ($table) {
+                /** @var Blueprint $table */
                 $table->integer('day_type')->nullable();
             }
         );
@@ -72,6 +73,7 @@ class AddDayTypes extends Migration
         Schema::table(
             'days',
             function ($table) {
+                /** @var Blueprint $table */
                 $table->dropColumn('day_type');
             }
         );

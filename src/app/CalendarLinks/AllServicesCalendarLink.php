@@ -80,7 +80,11 @@ class AllServicesCalendarLink extends AbstractCalendarLink
      */
     public function setDataFromRequest(Request $request)
     {
-        $this->data['cities'] = implode('-', $request->get('includeCities') ?: []);
+        $cities = $request->get('includeCities');
+        $this->data['cities'] = implode('-', array_map(
+            static fn ($city): string => is_scalar($city) ? (string) $city : '',
+            is_array($cities) ? $cities : [],
+        ));
     }
 
     /**
@@ -88,7 +92,8 @@ class AllServicesCalendarLink extends AbstractCalendarLink
      */
     public function getRenderData(Request $request, User $user)
     {
-        $cityIds = explode('-', $request->get('cities', ''));
+        $cities = $request->get('cities', '');
+        $cityIds = explode('-', is_string($cities) ? $cities : '');
         $serviceQuery = Service::with(['location'])
             ->inCities($cityIds)->startingFrom(Carbon::now()->subYears(1)->startOfYear());
         if (! $request->get('includeHidden', 0)) {

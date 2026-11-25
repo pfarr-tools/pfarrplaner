@@ -116,11 +116,17 @@ class Pool extends AbstractModel
         parent::boot();
 
         static::creating(function ($pool) {
-            $pool->slug = Str::slug($pool->name, '-', 'de');
+            /** @var self $pool */
+            $name = $pool->name;
+            /** @var string $name */
+            $pool->slug = Str::slug($name, '-', 'de');
         });
 
         static::updating(function ($pool) {
-            $pool->slug = Str::slug($pool->name, '-', 'de');
+            /** @var self $pool */
+            $name = $pool->name;
+            /** @var string $name */
+            $pool->slug = Str::slug($name, '-', 'de');
         });
     }
 }

@@ -53,6 +53,7 @@ class CreateAdConfig extends AbstractCreateAction implements CreatesAdConfigs
     {
         Gate::forUser($user)->authorize('create', [AdConfig::class, $service]);
         $input['service_id'] = $service->id;
+        /** @var array<string, mixed> $input Validierte Eingabedaten. */
         $input = Validator::make($input, AdConfig::$validationRules)->validateWithBag('createAdConfig');
         $adConfig = AdConfig::create($input);
         CreatedAdConfig::dispatch($user, $adConfig);

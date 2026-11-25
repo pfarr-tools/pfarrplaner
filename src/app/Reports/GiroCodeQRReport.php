@@ -101,6 +101,7 @@ class GiroCodeQRReport extends AbstractPDFDocumentReport
      */
     public function render(Request $request)
     {
+        /** @var array{city: int, start: string, end: string, copies: int} $data */
         $data = $request->validate(
             [
                 'city' => 'required|int|exists:cities,id',
@@ -131,9 +132,12 @@ class GiroCodeQRReport extends AbstractPDFDocumentReport
             return redirect()->route('reports.setup', 'konfiAppQR');
         }
 
+        /** @var string $title */
+        $title = static::FILE_TITLE;
+
         return $this->sendToFile(
             FileNameService::make(
-                static::FILE_TITLE,
+                $title,
                 'pdf',
                 static::FILE_SIGNATURE,
                 $lastService->trueDate()),
@@ -152,7 +156,9 @@ class GiroCodeQRReport extends AbstractPDFDocumentReport
      */
     public function single(Request $request)
     {
-        $service = Service::findOrFail((int) $request->get('service'));
+        /** @var int|string|null $serviceId */
+        $serviceId = $request->get('service');
+        $service = Service::findOrFail((int) $serviceId);
         $services[$service->locationText()][] = $service;
         $city = $service->city;
         if ($city === null) {

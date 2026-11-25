@@ -22,7 +22,7 @@ class RRule implements CastsAttributes
             return null;
         }
 
-        return new Rule($value);
+        return new Rule(is_string($value) ? $value : null);
     }
 
     /**

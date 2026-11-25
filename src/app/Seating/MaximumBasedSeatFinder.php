@@ -65,11 +65,13 @@ class MaximumBasedSeatFinder extends AbstractSeatFinder
 
     /**
      * @param  mixed  $data  Proposed booking data.
-     * @return bool
      */
     public function checkIfBookingCanBeChanged(Booking $booking, $data): bool
     {
-        return ($this->remainingCapacity() + $booking->number - $data['number']) >= 0;
+        /** @var array{number: int} $bookingData Vorgeschlagene Buchungsdaten. */
+        $bookingData = $data;
+
+        return ($this->remainingCapacity() + $booking->number - $bookingData['number']) >= 0;
     }
 
     public function finalList()
@@ -79,7 +81,11 @@ class MaximumBasedSeatFinder extends AbstractSeatFinder
         /** @var Booking $booking */
         foreach ($this->service->bookings as $booking) {
             $number += $booking->number;
-            $sortKey = $booking->name.($booking->first_name ? ', '.$booking->first_name : '');
+            /** @var string $name Name der Buchung. */
+            $name = $booking->name;
+            /** @var string|null $firstName Vorname der Buchung. */
+            $firstName = $booking->first_name;
+            $sortKey = $name.($firstName ? ', '.$firstName : '');
             $final[$sortKey] = ['booking' => $booking, 'row' => new SeatingRow(['title' => ''])];
         }
         ksort($final);

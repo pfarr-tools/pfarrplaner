@@ -76,8 +76,6 @@ class SongReference extends Model
 
     /**
      * Gibt die alternative EG-Nummer des Liedes zurück.
-     *
-     * @return string
      */
     public function getAltEGAttribute(): string
     {

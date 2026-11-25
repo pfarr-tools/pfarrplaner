@@ -30,6 +30,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Contracts\Funeral\CreatesFunerals;
 use App\Documents\PDF;
 use App\Liturgy\PronounSets\PronounSets;
 use App\Models\Attachment;
@@ -81,8 +82,13 @@ class FuneralController extends AbstractCRUDController
     {
         $service = Service::findOrFail($request->get('service') ?: $request->get('service_id'));
         Gate::authorize('create', [Funeral::class, $service]);
+        $user = $request->user();
+        abort_unless($user instanceof User, 401);
+        /** @var array<string, mixed> $input */
+        $input = $request->all();
+        /** @var CreatesFunerals $creator */
         $creator = app(Funeral::getContractName('create'));
-        $funeral = $creator->create($request->user(), $request->all());
+        $funeral = $creator->create($user, $input);
 
         return redirect()->route('funerals.edit', $funeral->id);
     }
@@ -120,6 +126,15 @@ class FuneralController extends AbstractCRUDController
         Gate::authorize('create', Funeral::class);
         $user = Auth::user();
         abort_unless($user instanceof User, 401);
+        /**
+         * @var array{
+         *     date: string,
+         *     city: int|string,
+         *     location: int|string,
+         *     name: string,
+         *     pastor: array<int, int|string|array{id: int|string}|null>|int|string|null
+         * } $data
+         */
         $data = $request->validate(
             [
                 'date' => 'required|date',
@@ -132,7 +147,7 @@ class FuneralController extends AbstractCRUDController
         if (is_numeric($data['location'])) {
             $request->validate(['location' => 'exists:locations,id']);
         }
-        $data['date'] = Carbon::parse($data['date'], 'Europe/Berlin')->setTimezone('UTC');
+        $date = Carbon::parse($data['date'], 'Europe/Berlin')->setTimezone('UTC');
 
         $city = City::query()->whereKey($data['city'])->firstOrFail();
         abort_unless($this->getWritableFuneralCities($user)->pluck('id')->contains($city->id), 403);
@@ -141,24 +156,25 @@ class FuneralController extends AbstractCRUDController
         if ((! is_numeric($data['location'])) || (Location::find($data['location']) === null)) {
             $specialLocation = $data['location'];
             $data['location'] = 0;
-            $time = $data['date']->format('H:i');
+            $time = $date->format('H:i');
             $ccLocation = $request->get('cc_location') ?: '';
         } else {
             if ($data['location']) {
-                $location = Location::find($data['location']);
-                $time = $data['date']->format('H:i');
+                $location = Location::find((int) $data['location']);
+                abort_unless($location instanceof Location, 404);
+                $time = $date->format('H:i');
                 $ccLocation = $request->get('cc_location') ?: ($request->get(
                     'cc'
                 ) ? $location->cc_default_location : '');
             } else {
-                $time = $data['date']->format('H:i');
+                $time = $date->format('H:i');
                 $ccLocation = $request->get('cc_location') ?: '';
             }
         }
 
         $service = Service::create(
             [
-                'date' => $data['date'],
+                'date' => $date,
                 'location_id' => ($location ? $location->id : null),
                 'special_location' => $specialLocation ?? null,
                 'city_id' => $city->id,
@@ -187,8 +203,10 @@ class FuneralController extends AbstractCRUDController
         } else {
             $sync = [];
             foreach ($data['pastor'] as $person) {
-                if ($person !== null) {
-                    $sync[(is_numeric($person) ? $person : $person['id'])] = ['category' => 'P'];
+                if (is_array($person)) {
+                    $sync[$person['id']] = ['category' => 'P'];
+                } elseif (is_int($person) || is_string($person)) {
+                    $sync[$person] = ['category' => 'P'];
                 }
             }
             $service->pastors()->sync($sync);
@@ -229,7 +247,9 @@ class FuneralController extends AbstractCRUDController
         $service->load('location', 'city');
         $date = $service->date;
         abort_unless($date !== null, 404);
-        $filename = $date->format('Ymd').' '.$funeral->buried_name.' KRA.pdf';
+        /** @var string $buriedName */
+        $buriedName = $funeral->buried_name;
+        $filename = $date->format('Ymd').' '.$buriedName.' KRA.pdf';
 
         return PDF::fromView('funerals.pdf.form', compact('funeral'))
             ->format('A5')

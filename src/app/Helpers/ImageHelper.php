@@ -178,11 +178,12 @@ class ImageHelper
             return [];
         }
         $dimensions = getimagesize($image, $meta);
-        if (! isset($meta['APP13'])) {
+        if (! is_array($meta) || ! isset($meta['APP13'])) {
             return [];
         }
+        $app13 = $meta['APP13'];
 
-        return iptcparse($meta['APP13']) ?: [];
+        return is_string($app13) ? (iptcparse($app13) ?: []) : [];
     }
 
     /**
@@ -201,7 +202,11 @@ class ImageHelper
         if (! isset($iptc[self::IPTC_COPYRIGHT_STRING])) {
             return '';
         }
-        $copyright = is_array($iptc[self::IPTC_COPYRIGHT_STRING]) ? $iptc[self::IPTC_COPYRIGHT_STRING][0] : $iptc[self::IPTC_COPYRIGHT_STRING];
+        $copyrightValue = $iptc[self::IPTC_COPYRIGHT_STRING];
+        $copyright = is_array($copyrightValue) ? ($copyrightValue[0] ?? null) : $copyrightValue;
+        if (! is_string($copyright)) {
+            return '';
+        }
 
         if (! $withUrl) {
             if (false !== ($x = strpos($copyright, 'http'))) {

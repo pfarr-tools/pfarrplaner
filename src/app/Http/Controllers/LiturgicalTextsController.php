@@ -122,7 +122,9 @@ class LiturgicalTextsController extends Controller
      */
     public function import(Request $request): RedirectResponse
     {
-        $data = $request->validate(['data' => 'required|string'])['data'];
+        /** @var array{data: string} $validated Validierte Import-Daten. */
+        $validated = $request->validate(['data' => 'required|string']);
+        $data = $validated['data'];
         $records = [];
         $record = $newRecord = [
             'agenda_code' => '',
@@ -173,11 +175,15 @@ class LiturgicalTextsController extends Controller
     }
 
     /**
-     * @return mixed
+     * Validiert die Eingaben für einen liturgischen Text.
+     *
+     * @param  Request  $request  Request mit den Textdaten.
+     * @return array<string, mixed> Validierte Textdaten.
      */
     protected function validateRequest(Request $request)
     {
-        return $request->validate(
+        /** @var array<string, mixed> $validated Validierte Textdaten. */
+        $validated = $request->validate(
             [
                 'title' => 'required|string',
                 'text' => 'required|string',
@@ -187,6 +193,8 @@ class LiturgicalTextsController extends Controller
                 'notice' => 'nullable|string',
             ]
         );
+
+        return $validated;
     }
 
     /**

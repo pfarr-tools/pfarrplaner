@@ -103,7 +103,11 @@ class ZVStudyHelper extends AbstractStudyHelper
      */
     public function getLinks(array $data): array
     {
-        $data['links'] = array_merge($data['links'] ?? [], $this->records[$data['date']] ?? []);
+        /** @var array<string, string> $links Bereits vorhandene Links. */
+        $links = $data['links'] ?? [];
+        /** @var string $date Angefragtes Datum. */
+        $date = $data['date'];
+        $data['links'] = array_merge($links, $this->records[$date] ?? []);
 
         return $data;
     }

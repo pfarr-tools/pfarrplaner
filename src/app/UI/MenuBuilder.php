@@ -71,10 +71,10 @@ class MenuBuilder
         /** @var array<string, list<class-string<AbstractModule>>> $modulesGroups */
         $modulesGroups = config('modules.groups');
         $user = Auth::user() ?? throw new AuthenticationException;
-        $modulesConfig = array_merge(
-            Modules::defaultConfig(),
-            $user->getSetting('modules', [])
-        );
+        /** @var array<string, mixed> $moduleSettings */
+        $moduleSettings = $user->getSetting('modules', []);
+        /** @var array<string, mixed> $modulesConfig */
+        $modulesConfig = array_merge(Modules::defaultConfig(), $moduleSettings);
 
         $menu = [];
         foreach ($modulesGroups as $groupTitle => $modulesGroup) {
@@ -96,6 +96,7 @@ class MenuBuilder
             }
         }
 
+        /** @var array<int, string|array<string, mixed>> $menu */
         return $menu;
     }
 }

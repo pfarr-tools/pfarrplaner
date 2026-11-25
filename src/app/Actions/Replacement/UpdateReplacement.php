@@ -52,12 +52,16 @@ class UpdateReplacement extends AbstractUpdateAction implements UpdatesReplaceme
     {
         Gate::forUser($user)->authorize('update', $replacement);
         $users = $input['users'] ?? [];
+        if (! is_array($users)) {
+            $users = [];
+        }
         foreach ($users as $id => $userData) {
-            $users[$id] = $userData['id'] ?? $userData;
+            $users[$id] = is_array($userData) ? ($userData['id'] ?? $userData) : $userData;
         }
 
         $input['absence_id'] = $replacement->absence_id;
         unset($input['users']);
+        /** @var array<string, mixed> $input */
         $input = Validator::make($input, Replacement::$validationRules)->validateWithBag('updateReplacement');
         $replacement->update($input);
         if ($users) {

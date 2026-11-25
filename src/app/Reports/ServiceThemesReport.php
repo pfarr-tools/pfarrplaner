@@ -110,7 +110,7 @@ class ServiceThemesReport extends AbstractExcelDocumentReport
                 'year' => 'required|integer',
             ]
         );
-
+        /** @var array{cities: array<int, int>, locations?: array<int, int>|null, year: int, ministries?: array<int, string>|null, name_format?: int} $data */
         Carbon::setLocale('de');
 
         $serviceList = Service::between(
@@ -123,6 +123,8 @@ class ServiceThemesReport extends AbstractExcelDocumentReport
             ->groupBy('key_date');
 
         $cities = City::whereIn('id', $data['cities'])->get();
+        /** @var string $cityNames */
+        $cityNames = $cities->pluck('name')->join(', ');
 
         $ministries = $data['ministries'] ?? [];
         $nameFormat = $data['name_format'] ?? User::NAME_FORMAT_DEFAULT;
@@ -188,14 +190,10 @@ class ServiceThemesReport extends AbstractExcelDocumentReport
             ->setFooter(0);
         $sheet->getHeaderFooter()
             ->setOddHeader(
-                '&LEvangelische Kirchengemeinde'.(count($cities) > 1 ? 'n ' : ' ').$cities->pluck('name')->join(
-                    ', '
-                ).'&Themenplan '.$data['year'].' - Blatt &P von &N'
+                '&LEvangelische Kirchengemeinde'.(count($cities) > 1 ? 'n ' : ' ').$cityNames.'&Themenplan '.$data['year'].' - Blatt &P von &N'
             )
             ->setEvenHeader(
-                '&LEvangelische Kirchengemeinde'.(count($cities) > 1 ? 'n ' : ' ').$cities->pluck('name')->join(
-                    ', '
-                ).'&Themenplan für Gottesdienste '.$data['year'].' - Blatt &P von &N'
+                '&LEvangelische Kirchengemeinde'.(count($cities) > 1 ? 'n ' : ' ').$cityNames.'&Themenplan für Gottesdienste '.$data['year'].' - Blatt &P von &N'
             )
             ->setOddFooter('&CAusdruck vom &D, &T')
             ->setEvenFooter('&CAusdruck vom &D, &T');
@@ -257,28 +255,36 @@ class ServiceThemesReport extends AbstractExcelDocumentReport
                     throw new \LogicException('Die Schriftart für die Tabellenzelle konnte nicht geladen werden.');
                 }
                 $font->setName('Arial')->setSize(8)->setBold(true);
+                /** @var array<string, mixed> $liturgicalInfo */
+                $liturgicalInfo = $service->liturgicalInfo;
                 $sheet->getCell($this->cellAddress('A', $row))->setValue($richtext);
                 $sheet->setCellValue("B{$row}", $service->city->name ?? '');
-                $sheet->setCellValue($this->cellAddress('C', $row), $service->liturgicalInfo['title'] ?? '');
+                $sheet->setCellValue($this->cellAddress('C', $row), $liturgicalInfo['title'] ?? '');
                 $sheet->setCellValue($this->cellAddress('D', $row), $service->descriptionText());
                 $sheet->setCellValue($this->cellAddress('E', $row), $service->timeText(false));
                 $sheet->setCellValue($this->cellAddress('F', $row), $service->locationText());
-                $sheet->setCellValue($this->cellAddress('G', $row), $service->liturgicalInfo['push_text'] ?? '');
-                if ($service->liturgicalInfo['litTextsWeeklyQuoteText'] ?? false) {
-                    $sheet->setCellValue($this->cellAddress('H', $row), $service->liturgicalInfo['litTextsWeeklyQuoteText']
-                                                                               .' ('.$service->liturgicalInfo['litTextsWeeklyQuote'].')');
+                $sheet->setCellValue($this->cellAddress('G', $row), $liturgicalInfo['push_text'] ?? '');
+                if ($liturgicalInfo['litTextsWeeklyQuoteText'] ?? false) {
+                    /** @var string $weeklyQuoteText */
+                    $weeklyQuoteText = $liturgicalInfo['litTextsWeeklyQuoteText'];
+                    /** @var string $weeklyQuote */
+                    $weeklyQuote = $liturgicalInfo['litTextsWeeklyQuote'];
+                    $sheet->setCellValue($this->cellAddress('H', $row), $weeklyQuoteText.' ('.$weeklyQuote.')');
                 }
-                if ($service->liturgicalInfo['perikope'] ?? false) {
-                    $sheet->setCellValue(
-                        $this->cellAddress('I', $row),
-                        $service->liturgicalInfo['litTextsPerikope'.$service->liturgicalInfo['perikope']]
-                    );
+                if ($liturgicalInfo['perikope'] ?? false) {
+                    /** @var int|string $perikope */
+                    $perikope = $liturgicalInfo['perikope'];
+                    /** @var string $perikopeText */
+                    $perikopeText = $liturgicalInfo['litTextsPerikope'.$perikope] ?? '';
+                    $sheet->setCellValue($this->cellAddress('I', $row), $perikopeText);
                 }
 
                 // liturgical color
-                if ($service->liturgicalInfo['litColor'] ?? false) {
+                if ($liturgicalInfo['litColor'] ?? false) {
+                    /** @var string $litColor */
+                    $litColor = $liturgicalInfo['litColor'];
                     $sheet->getStyle($this->cellAddress('B', $row))->getFill()->setFillType(Fill::FILL_SOLID)
-                        ->getStartColor()->setARGB($colors[$service->liturgicalInfo['litColor']]);
+                        ->getStartColor()->setARGB($colors[$litColor]);
                 }
 
                 // yellow for special location
@@ -290,9 +296,12 @@ class ServiceThemesReport extends AbstractExcelDocumentReport
         }
 
         // output
+        /** @var string $fileTitle */
+        $fileTitle = static::FILE_TITLE;
+
         return $this->sendToBrowser(
             FileNameService::make(
-                static::FILE_TITLE.' '.$cities->pluck('name')->join(', '),
+                $fileTitle.' '.$cityNames,
                 'xlsx',
                 static::FILE_SIGNATURE,
                 $data['year'].'-01-01', false, null, 'Y')

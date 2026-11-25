@@ -66,6 +66,7 @@ class OfferingCertificateReport extends AbstractPDFDocumentReport
      */
     public function render(Request $request)
     {
+        /** @var array{service: int} $data */
         $data = $request->validate(['service' => ['required', 'integer']]);
         $service = $this->accessibleServices()->whereKey($data['service'])->firstOrFail();
         /** @var City $city */

@@ -110,9 +110,10 @@ class SendAbsenceWorkflowNotification
         // dd($recipients, $event->absence, $event->absence->user->vacationAdmins);
 
         if ($recipients->count() && ($message !== null)) {
+            $emails = $recipients->pluck('email')->unique()->join(', ');
             Log::debug('SendAbsenceWorkflowNotification: Sende Workflow-Update ('
                        .get_class($message)
-                       .') an '.$recipients->pluck('email')->unique()->join(', '));
+                       .') an '.(is_string($emails) ? $emails : ''));
             Mail::to($recipients)->queue($message);
         }
 

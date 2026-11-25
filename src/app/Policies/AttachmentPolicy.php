@@ -43,8 +43,7 @@ class AttachmentPolicy
 
     /**
      * @param  User  $user  Benutzer.
-     *      * @param  Attachment  $attachment  Attachment.
-     *      * @return bool
+     *                      * @param  Attachment  $attachment  Attachment.
      */
     public function update(User $user, Attachment $attachment): bool
     {

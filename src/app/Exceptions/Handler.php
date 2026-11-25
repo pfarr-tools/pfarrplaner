@@ -30,8 +30,10 @@
 
 namespace App\Exceptions;
 
+use App\Models\People\User;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Routing\Route;
 use Illuminate\Session\TokenMismatchException;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -88,6 +90,8 @@ class Handler extends ExceptionHandler
         try {
             if ((int) $response->getStatusCode() === 419) {
                 $route = $request->route();
+                $user = $request->user();
+                $sessionCookie = config('session.cookie');
 
                 Log::channel('csrf419')->warning('HTTP 419 rendered', [
                     'time' => now()->toIso8601String(),
@@ -98,8 +102,8 @@ class Handler extends ExceptionHandler
                     'path' => $request->path(),
 
                     // Route info (falls vorhanden)
-                    'route_name' => optional($route)->getName(),
-                    'route_uri' => optional($route)->uri(),
+                    'route_name' => $route instanceof Route ? $route->getName() : null,
+                    'route_uri' => $route instanceof Route ? $route->uri() : null,
 
                     // Exception context
                     'exception' => get_class($e),
@@ -107,14 +111,14 @@ class Handler extends ExceptionHandler
                     'is_token_mismatch' => $e instanceof TokenMismatchException,
 
                     // Client context
-                    'user_id' => optional($request->user())->id,
+                    'user_id' => $user instanceof User ? $user->id : null,
                     'ip' => $request->ip(),
                     'user_agent' => (string) $request->userAgent(),
                     'referer' => $request->headers->get('referer'),
                     'origin' => $request->headers->get('origin'),
 
                     // Cookie/Header presence (keine Werte!)
-                    'cookie_session_present' => $request->cookies->has(config('session.cookie')),
+                    'cookie_session_present' => is_string($sessionCookie) && $request->cookies->has($sessionCookie),
                     'cookie_xsrf_present' => $request->cookies->has('XSRF-TOKEN'),
                     'xsrf_header_present' => $request->headers->has('X-XSRF-TOKEN') || $request->headers->has('X-CSRF-TOKEN'),
 

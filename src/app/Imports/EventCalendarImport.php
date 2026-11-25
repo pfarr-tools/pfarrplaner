@@ -92,9 +92,18 @@ class EventCalendarImport
 
         $theseEvents = $this->getEvents($weekStart, $weekEnd, $removeServices);
         foreach ($theseEvents as $dateCode => $subEvents) {
-            foreach ($subEvents as $event) {
-                $events[$dateCode][] = $event;
+            if (! is_array($subEvents)) {
+                continue;
             }
+            $stringKey = (string) $dateCode;
+            $target = $events[$stringKey] ?? [];
+            if (! is_array($target)) {
+                $target = [];
+            }
+            foreach ($subEvents as $event) {
+                $target[] = $event;
+            }
+            $events[$stringKey] = $target;
         }
 
         ksort($events);
@@ -108,7 +117,7 @@ class EventCalendarImport
      * @param  Carbon  $weekStart  Beginn des zu berücksichtigenden Zeitraums.
      * @param  Carbon  $weekEnd  Ende des zu berücksichtigenden Zeitraums.
      * @param  bool  $removeServices  Gottesdienste aus dem Ergebnis entfernen.
-     * @return array<string, mixed> Nach Datum sortierte Veranstaltungsmap.
+     * @return array<int|string, mixed> Nach Datum sortierte Veranstaltungsmap; numerische Datumsschlüssel werden von PHP zu Ganzzahlen umgewandelt.
      */
     public function getEvents(Carbon $weekStart, Carbon $weekEnd, $removeServices = false): array
     {
@@ -133,12 +142,24 @@ class EventCalendarImport
             return [];
         }
         foreach ($events as $key => $event) {
+            if (! is_array($event)) {
+                continue;
+            }
+            /** @var array<string, mixed> $event */
+            $start = $event['start'] ?? null;
+            $end = $event['end'] ?? null;
+            $title = $event['title'] ?? null;
+            if (! is_string($start) || ! is_string($end) || ! is_string($title)) {
+                continue;
+            }
+
+            $startDate = $this->sanitizeTimeString($start);
             $event['record_type'] = 'Outlook_Event';
-            $event['start'] = $this->sanitizeTimeString($event['start']);
-            $event['end'] = $this->sanitizeTimeString($event['end']);
+            $event['start'] = $startDate;
+            $event['end'] = $this->sanitizeTimeString($end);
 
             // sanitize title
-            $lines = explode("\r\n", $event['title']);
+            $lines = explode("\r\n", $title);
             $event['title'] = $this->sanitizeTitle($lines[0], $event);
             if (isset($lines[1])) {
                 if (substr(trim($lines[1]), 0, 4) == 'Ort:') {
@@ -150,12 +171,13 @@ class EventCalendarImport
                 $event['place'] = '';
             }
 
-            if (($event['start'] >= $weekStart) and ($event['start'] <= $weekEnd)) {
+            if (($startDate >= $weekStart) and ($startDate <= $weekEnd)) {
                 if (! ($event['allDay'] && ($event['place'] == ''))) {
                     if ((! $removeServices) || ((strtoupper(substr($event['title'], 0, 2)) != 'GD')
                             && (strtoupper(substr($event['title'], 0, 13)) != 'GOTTESDIENST ')
                             && (strtoupper($event['title']) != 'GOTTESDIENST'))) {
-                        $filteredEvents[$event['start']->format('YmdHis')][] = $event;
+                        $dateCode = $startDate->format('YmdHis');
+                        $filteredEvents[$dateCode][] = $event;
                     }
                 }
             }

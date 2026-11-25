@@ -29,6 +29,7 @@
  */
 
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 /**
@@ -38,8 +39,6 @@ class RemoveRevisionsTable extends Migration
 {
     /**
      * Entfernt die Tabelle revisions.
-     *
-     * @return void
      */
     public function up(): void
     {
@@ -56,7 +55,7 @@ class RemoveRevisionsTable extends Migration
         if (! Schema::hasTable('revisions')) {
             Schema::create(
                 'revisions',
-                function ($table) {
+                function (Blueprint $table) {
                     $table->increments('id');
                     $table->string('revisionable_type');
                     $table->integer('revisionable_id');

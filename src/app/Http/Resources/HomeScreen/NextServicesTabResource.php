@@ -20,6 +20,7 @@ class NextServicesTabResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        /** @var array<string, mixed> $data */
         $data = $this->resource;
         $data['services'] = CalendarServiceResource::collection($data['services']);
 

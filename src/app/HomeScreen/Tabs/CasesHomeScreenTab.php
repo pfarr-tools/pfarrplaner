@@ -61,7 +61,9 @@ class CasesHomeScreenTab extends AbstractHomeScreenTab
 
     public function getTitle(): string
     {
-        return $this->config['title'] ?: $this->title;
+        $title = $this->config['title'];
+
+        return is_string($title) && $title ? $title : $this->title;
     }
 
     /**

@@ -17,6 +17,7 @@ use App\Models\People\User;
 use App\Models\Rites\Wedding;
 use App\Models\Service;
 use Carbon\Carbon;
+use DateTimeInterface;
 use Illuminate\Validation\ValidationException;
 
 trait NormalizesWeddingData
@@ -92,8 +93,9 @@ trait NormalizesWeddingData
         if ($value instanceof Carbon) {
             return $value;
         }
-        if (preg_match('/^\d{2}\.\d{2}\.\d{4}$/', (string) $value)) {
-            return Carbon::createFromFormat('d.m.Y', $value);
+        /** @var string|int|float|DateTimeInterface $value */
+        if (is_scalar($value) && preg_match('/^\d{2}\.\d{2}\.\d{4}$/', (string) $value)) {
+            return Carbon::createFromFormat('d.m.Y', (string) $value);
         }
 
         return Carbon::parse($value);
@@ -110,7 +112,8 @@ trait NormalizesWeddingData
         if ($value instanceof Carbon) {
             return $value;
         }
-        if (preg_match('/^\d{2}\.\d{2}\.\d{4} \d{2}:\d{2}$/', (string) $value)) {
+        /** @var string|int|float|DateTimeInterface $value */
+        if (is_scalar($value) && preg_match('/^\d{2}\.\d{2}\.\d{4} \d{2}:\d{2}$/', (string) $value)) {
             $parsed = Carbon::createFromFormat('d.m.Y H:i', (string) $value, 'Europe/Berlin');
 
             return ($parsed ?: Carbon::parse($value, 'Europe/Berlin'))->setTimezone('UTC');

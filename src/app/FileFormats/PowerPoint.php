@@ -100,8 +100,8 @@ class PowerPoint extends AbstractZIPBasedFileFormat
                 /** @var DOMElement $def */
                 if (strtolower($def->getAttribute('Extension')) === 'bin') {
                     // wenn vorhanden, ggf. ContentType korrigieren
-                    if ($def->getAttribute('ContentType') !== static::CT_VBA_BIN) {
-                        $def->setAttribute('ContentType', static::CT_VBA_BIN);
+                    if ($def->getAttribute('ContentType') !== self::CT_VBA_BIN) {
+                        $def->setAttribute('ContentType', self::CT_VBA_BIN);
                     }
                     $hasBinDefault = true;
                     break;
@@ -111,7 +111,7 @@ class PowerPoint extends AbstractZIPBasedFileFormat
             if (! $hasBinDefault) {
                 $newDef = $doc->createElement('Default');
                 $newDef->setAttribute('Extension', 'bin');
-                $newDef->setAttribute('ContentType', static::CT_VBA_BIN);
+                $newDef->setAttribute('ContentType', self::CT_VBA_BIN);
 
                 // Einfügen „im Bereich <Types>“ – wir hängen ans Ende (robust)
                 $types->appendChild($newDef);
@@ -122,7 +122,7 @@ class PowerPoint extends AbstractZIPBasedFileFormat
             foreach ($types->getElementsByTagName('Override') as $ovr) {
                 /** @var DOMElement $ovr */
                 if ($ovr->getAttribute('PartName') === '/ppt/presentation.xml') {
-                    $ovr->setAttribute('ContentType', static::CT_PPTM_MAIN);
+                    $ovr->setAttribute('ContentType', self::CT_PPTM_MAIN);
                     $hasPresentationOverride = true;
                     break;
                 }
@@ -131,7 +131,7 @@ class PowerPoint extends AbstractZIPBasedFileFormat
             if (! $hasPresentationOverride) {
                 $newOvr = $doc->createElement('Override');
                 $newOvr->setAttribute('PartName', '/ppt/presentation.xml');
-                $newOvr->setAttribute('ContentType', static::CT_PPTM_MAIN);
+                $newOvr->setAttribute('ContentType', self::CT_PPTM_MAIN);
                 $types->appendChild($newOvr);
             }
 
@@ -168,7 +168,7 @@ class PowerPoint extends AbstractZIPBasedFileFormat
 
             foreach ($relsRoot->getElementsByTagName('Relationship') as $rel) {
                 /** @var DOMElement $rel */
-                if ($rel->getAttribute('Type') === static::VBA_REL_TYPE && $rel->getAttribute('Target') === 'vbaProject.bin') {
+                if ($rel->getAttribute('Type') === self::VBA_REL_TYPE && $rel->getAttribute('Target') === 'vbaProject.bin') {
                     $already = true;
                 }
                 $id = $rel->getAttribute('Id'); // rIdN
@@ -182,7 +182,7 @@ class PowerPoint extends AbstractZIPBasedFileFormat
 
                 $newRel = $doc->createElement('Relationship');
                 $newRel->setAttribute('Id', $newId);
-                $newRel->setAttribute('Type', static::VBA_REL_TYPE);
+                $newRel->setAttribute('Type', self::VBA_REL_TYPE);
                 $newRel->setAttribute('Target', 'vbaProject.bin');
 
                 $relsRoot->appendChild($newRel);
@@ -218,7 +218,7 @@ class PowerPoint extends AbstractZIPBasedFileFormat
             return $doc;
         });
 
-        $this->zip->addFromString('customUI/customUI.xml', static::CUSTOM_UI);
+        $this->zip->addFromString('customUI/customUI.xml', self::CUSTOM_UI);
     }
 
     /**

@@ -44,7 +44,9 @@ class CreatePermissionTables extends Migration
      */
     public function up()
     {
+        /** @var array<string, string> $tableNames */
         $tableNames = config('permission.table_names');
+        /** @var array<string, string> $columnNames */
         $columnNames = config('permission.column_names');
 
         Schema::create(
@@ -129,9 +131,11 @@ class CreatePermissionTables extends Migration
             }
         );
 
+        $cacheStore = config('permission.cache.store');
+        $cacheKey = config('permission.cache.key');
         app('cache')
-            ->store(config('permission.cache.store') != 'default' ? config('permission.cache.store') : null)
-            ->forget(config('permission.cache.key'));
+            ->store(is_string($cacheStore) && $cacheStore !== 'default' ? $cacheStore : null)
+            ->forget(is_string($cacheKey) ? $cacheKey : 'spatie.permission.cache');
     }
 
     /**
@@ -141,6 +145,7 @@ class CreatePermissionTables extends Migration
      */
     public function down()
     {
+        /** @var array<string, string> $tableNames */
         $tableNames = config('permission.table_names');
 
         Schema::drop($tableNames['role_has_permissions']);

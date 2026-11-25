@@ -39,16 +39,13 @@ class AbstractItemHelper
 
     /**
      * @param  Item  $item  Liturgy item.
-     *      * @return void
+     *                      * @return void
      */
     public function __construct(Item $item)
     {
         $this->item = $item;
     }
 
-    /**
-     * @return Item
-     */
     public function getItem(): Item
     {
         return $this->item;
@@ -56,7 +53,6 @@ class AbstractItemHelper
 
     /**
      * @param  Item  $item  Liturgy item.
-     *      * @return void
      */
     public function setItem(Item $item): void
     {

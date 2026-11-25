@@ -30,6 +30,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Actions\AbstractAction;
 use App\Models\Seating\Booking;
 use Illuminate\Http\Request;
 
@@ -50,7 +51,11 @@ class BookingController extends AbstractApiCRUDController
     public function destroy(Request $request, $modelId)
     {
         $model = $this->getSingleModel($request, $modelId);
+        /** @var AbstractAction $deleter */
         $deleter = $model->getContractedAction('delete');
+        if (! method_exists($deleter, 'delete')) {
+            abort(500);
+        }
         $deleter->delete($request->user(), $model);
 
         return response()->noContent();

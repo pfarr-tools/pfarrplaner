@@ -134,7 +134,7 @@ class SermonTextLiturgySheet extends AbstractLiturgySheet
                         if (trim($paragraph) === '') {
                             continue;
                         }
-                        $doc->renderText($paragraph, $doc::BLOCKQUOTE, ['size' => 10]);
+                        $doc->renderText($paragraph, DefaultWordDocument::BLOCKQUOTE, ['size' => 10]);
                     }
                 } else {
                     Html::addHtml(

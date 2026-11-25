@@ -86,6 +86,7 @@ class OfferingsInput extends AbstractInput
      */
     public function input(Request $request)
     {
+        /** @var array<string, mixed> $setup */
         $setup = $request->validate(
             [
                 'from' => 'required|date_format:d.m.Y',
@@ -103,8 +104,12 @@ class OfferingsInput extends AbstractInput
             }
         }
 
-        $from = Carbon::createFromFormat('d.m.Y', $setup['from']);
-        $to = Carbon::createFromFormat('d.m.Y', $setup['to']);
+        /** @var string $fromInput */
+        $fromInput = $setup['from'];
+        /** @var string $toInput */
+        $toInput = $setup['to'];
+        $from = Carbon::createFromFormat('d.m.Y', $fromInput);
+        $to = Carbon::createFromFormat('d.m.Y', $toInput);
         abort_unless($from !== null && $to !== null, 422);
 
         $query = Service::setEagerLoads([])
@@ -133,8 +138,10 @@ class OfferingsInput extends AbstractInput
             ->whereIn('services.city_id', $cityIds->unique()->values())
             ->ordered();
 
-        if (count($setup['locations'] ?? [])) {
-            $query->whereIn('services.location_id', $setup['locations']);
+        /** @var array<int, int|string> $locations */
+        $locations = $setup['locations'] ?? [];
+        if (count($locations)) {
+            $query->whereIn('services.location_id', $locations);
         }
 
         $services = $query->get();
@@ -148,6 +155,7 @@ class OfferingsInput extends AbstractInput
      */
     public function save(Request $request)
     {
+        /** @var array<string, mixed> $data */
         $data = $request->validate([
             'id' => 'required|exists:services,id',
             'offering_goal' => 'nullable|string',

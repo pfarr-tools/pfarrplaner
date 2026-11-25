@@ -88,7 +88,8 @@ class CityEventsCalendarLink extends AbstractCalendarLink
     public function setDataFromRequest(Request $request)
     {
         if ($request->has('cities')) {
-            $this->data['cities'] = explode(',', $request->get('cities'));
+            $cities = $request->get('cities');
+            $this->data['cities'] = explode(',', is_string($cities) ? $cities : '');
         } elseif ($request->has('city')) {
             $this->data['cities'] = [$request->get('city')];
         } else {
@@ -134,7 +135,7 @@ class CityEventsCalendarLink extends AbstractCalendarLink
     public function filename()
     {
         return 'veranstaltungen-'.City::whereIn('id', $this->data['cities'] ?? [])->pluck('name')->map(function ($item) {
-            return Str::replace('/', '_', Str::slug($item));
+            return Str::replace('/', '_', Str::slug(is_string($item) ? $item : ''));
         })->implode('-').'.ics';
     }
 }

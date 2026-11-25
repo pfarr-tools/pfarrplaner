@@ -55,10 +55,12 @@ class UpdateTeam extends AbstractUpdateAction implements UpdatesTeams
         Gate::forUser($user)->authorize('update', $team);
 
         $input = $this->normalizeInput($input);
+        /** @var array<string, mixed> $validated */
         $validated = Validator::make($input, Team::$validationRules)->validateWithBag('updateTeam');
 
         $team->update(collect($validated)->except('users')->all());
-        $team->users()->sync($validated['users'] ?? []);
+        $users = $validated['users'] ?? [];
+        $team->users()->sync(is_array($users) ? $users : []);
         $team->load(Team::$relationsForEditor);
 
         UpdatedTeam::dispatch($user, $team);

@@ -70,21 +70,24 @@ class GoogleApiController extends Controller
         abort_unless(YoutubeIntegration::isConfigured(), 503, 'Die Google-YouTube-Integration ist nicht konfiguriert.');
 
         if ($request->has('state')) {
-            $state = json_decode($request->get('state'), true);
-            if (! isset($state['city'])) {
-                abort(404);
-            }
+            $stateParam = $request->get('state');
+            abort_unless(is_string($stateParam), 404);
+            $state = json_decode($stateParam, true);
+            abort_unless(is_array($state) && isset($state['city']), 404);
             $city = City::query()->whereKey($state['city'])->firstOrFail();
-            $nextStep = $state['nextStep'];
+            $nextStep = $state['nextStep'] ?? '';
         } elseif ($request->has('city')) {
             $city = City::query()->whereKey($request->get('city'))->firstOrFail();
             $nextStep = $request->get('nextStep', '');
         } else {
             abort(404);
         }
+        abort_unless(is_string($nextStep), 404);
 
         $client = new Google_Client;
-        $client->setAuthConfig(config('google'));
+        $googleConfig = config('google');
+        abort_unless(is_array($googleConfig), 500);
+        $client->setAuthConfig($googleConfig);
         $client->addScope(Google_Service_YouTube::YOUTUBE);
         $client->setRedirectUri(route('google-auth'));
         $client->setAccessType('offline');
@@ -117,8 +120,10 @@ class GoogleApiController extends Controller
             }
         } else {
             $code = $request->get('code');
+            abort_unless(is_string($code), 400);
             $client->fetchAccessTokenWithAuthCode($code);
             $token = $client->getAccessToken();
+            abort_unless(is_array($token) && isset($token['access_token']), 500);
             Session::put('google_access_token', $token);
             $data = [
                 'google_auth_code' => $code,

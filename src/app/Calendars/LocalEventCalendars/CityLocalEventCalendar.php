@@ -75,6 +75,7 @@ class CityLocalEventCalendar extends AbstractLocalEventCalendar
 
         $data['location_id'] = $location->id;
 
+        /** @var Carbon $date */
         $date = $data['date'] ?? Carbon::parse('next Sunday');
         if ($location->default_time) {
             $data['date'] ??= Carbon::parse($date->format('Y-m-d').' '.$location->default_time, 'Europe/Berlin');

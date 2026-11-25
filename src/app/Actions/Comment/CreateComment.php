@@ -35,6 +35,7 @@ use App\Contracts\Comment\CreatesComments;
 use App\Events\Models\Comment\CreatedComment;
 use App\Models\Comment;
 use App\Models\People\User;
+use App\Models\Service;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
 
@@ -59,7 +60,14 @@ class CreateComment extends AbstractCreateAction implements CreatesComments
             'commentable_id' => 'required|int',
         ])->validateWithBag('createComment');
 
-        $owner = $this->resolveOwner($validated['commentable_type'], $validated['commentable_id']);
+        /** @var string $commentableType */
+        $commentableType = $validated['commentable_type'];
+        /** @var int $commentableId */
+        $commentableId = $validated['commentable_id'];
+        $owner = $this->resolveOwner($commentableType, $commentableId);
+        if (! $owner instanceof Service) {
+            abort(404);
+        }
         Gate::forUser($user)->authorize('create', [Comment::class, $owner]);
 
         $comment = $owner->comments()->create([

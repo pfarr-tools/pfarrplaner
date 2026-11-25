@@ -68,7 +68,8 @@ class ServiceExcelTableReport extends AbstractExcelDocumentReport
         $cities = $user->cities;
         $locations = Location::inCities($cities->pluck('id'))->get();
         $ministries = MinistryService::selectList();
-        $settings = $user->getSetting(static::SETTINGS_KEY, []);
+        $settings = $user->getSetting(self::SETTINGS_KEY, []);
+        /** @var array{ministries?: array<int, string>|null, readable_headers?: int|string|null, services_only?: int|string|null} $settings */
         $savedMinistries = is_array($settings['ministries'] ?? null) ? $settings['ministries'] : [];
         $readableHeaders = (int) ($settings['readable_headers'] ?? 0);
         $servicesOnly = (int) ($settings['services_only'] ?? 1);
@@ -111,13 +112,13 @@ class ServiceExcelTableReport extends AbstractExcelDocumentReport
                 'services_only' => 'nullable|boolean',
             ]
         );
-
+        /** @var array{cities: array<int, int>, locations?: array<int, int>|null, start: string, end: string, ministries?: array<int, string>|null, readable_headers?: bool|null, services_only?: bool|null} $data */
         $user = $this->authenticatedUser();
         $ministries = array_values(array_unique($data['ministries'] ?? []));
         $readableHeaders = (bool) ($data['readable_headers'] ?? false);
         $servicesOnly = (bool) ($data['services_only'] ?? true);
         $user->setSetting(
-            static::SETTINGS_KEY,
+            self::SETTINGS_KEY,
             [
                 'ministries' => $ministries,
                 'readable_headers' => $readableHeaders ? 1 : 0,
@@ -128,6 +129,8 @@ class ServiceExcelTableReport extends AbstractExcelDocumentReport
         $start = Carbon::parse($data['start'])->startOfDay();
         $end = Carbon::parse($data['end'])->endOfDay();
         $cities = City::whereIn('id', $data['cities'])->get();
+        /** @var string $cityNames */
+        $cityNames = $cities->pluck('name')->join(', ');
 
         $query = Service::with(['city', 'location'])->between($start, $end)
             ->inCitiesAndLocations($data['cities'], $data['locations'] ?? null)
@@ -231,7 +234,7 @@ class ServiceExcelTableReport extends AbstractExcelDocumentReport
 
         return $this->sendToBrowser(
             FileNameService::make(
-                static::FILE_TITLE.' '.$cities->pluck('name')->join(', '),
+                self::FILE_TITLE.' '.$cityNames,
                 'xlsx',
                 static::FILE_SIGNATURE,
                 [$data['start'], $data['end']]
@@ -407,7 +410,9 @@ class ServiceExcelTableReport extends AbstractExcelDocumentReport
             return $colors['red'];
         }
 
-        return $colors[$liturgy['CSS-Farbe'] ?? 'white'] ?? $colors['white'];
+        $color = $liturgy['CSS-Farbe'] ?? 'white';
+
+        return is_string($color) ? ($colors[$color] ?? $colors['white']) : $colors['white'];
     }
 
     /**

@@ -95,6 +95,7 @@ class MultipleServicesInput extends AbstractInput
      */
     public function save(Request $request)
     {
+        /** @var array{services?: array<array{date: string, time: string, location: int}>, eventType?: int} $data */
         $data = $request->validate([
             'title' => 'nullable|string',
             'services.*.date' => 'date',

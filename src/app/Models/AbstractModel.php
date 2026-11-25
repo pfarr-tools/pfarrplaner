@@ -406,7 +406,9 @@ class AbstractModel extends Model
     /** Return a display label derived from the model's name attribute. */
     public function getLabelAttribute(): string
     {
-        return $this->name ?? '';
+        $name = $this->name ?? '';
+
+        return is_scalar($name) ? (string) $name : '';
     }
 
     /**

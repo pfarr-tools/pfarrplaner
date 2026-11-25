@@ -50,8 +50,6 @@ class TeamPolicy
 
     /**
      * Determine whether the user can view the team index.
-     *
-     * @return bool
      */
     public function index(User $user): bool
     {
@@ -60,8 +58,6 @@ class TeamPolicy
 
     /**
      * Determine whether the user can view any teams.
-     *
-     * @return bool
      */
     public function viewAny(User $user): bool
     {
@@ -70,8 +66,6 @@ class TeamPolicy
 
     /**
      * Determine whether the user can create teams.
-     *
-     * @return bool
      */
     public function create(User $user): bool
     {
@@ -80,8 +74,6 @@ class TeamPolicy
 
     /**
      * Determine whether the user can update the team.
-     *
-     * @return bool
      */
     public function update(User $user, Team $team): bool
     {
@@ -90,8 +82,6 @@ class TeamPolicy
 
     /**
      * Determine whether the user can delete the team.
-     *
-     * @return bool
      */
     public function delete(User $user, Team $team): bool
     {

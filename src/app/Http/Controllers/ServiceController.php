@@ -87,8 +87,13 @@ class ServiceController extends Controller
         $service->associateParticipants($request, $service);
         $service->checkIfPredicantNeeded();
 
-        $service->tags()->sync($request->get('tags') ?: []);
-        $service->serviceGroups()->sync(ServiceGroup::createIfMissing($request->get('serviceGroups') ?: []));
+        /** @var array<array-key, mixed>|int|string|null $tags */
+        $tags = $request->get('tags');
+        /** @var list<int|string>|null $serviceGroups */
+        $serviceGroups = $request->get('serviceGroups');
+
+        $service->tags()->sync($tags ?: []);
+        $service->serviceGroups()->sync(ServiceGroup::createIfMissing($serviceGroups ?: []));
         $service->updateRelatedCitiesFromRequest($request);
         $service->setAdConfigFromRequest($request);
     }
@@ -295,6 +300,7 @@ class ServiceController extends Controller
 
         $closeAfterSaving = $request->get('closeAfterSaving', 1);
         if ($closeAfterSaving) {
+            /** @var string $route */
             $route = $request->get('routeBack') ?: '';
             if ($route) {
                 return redirect($route)->with('success', $success);
@@ -419,7 +425,9 @@ class ServiceController extends Controller
         );
 
         // tie in automatic month switching
-        $timestamp2 = Carbon::createFromTimestamp($authUser->getSetting('display-timestamp', 0));
+        /** @var float|int|string $displayTimestamp */
+        $displayTimestamp = $authUser->getSetting('display-timestamp', 0);
+        $timestamp2 = Carbon::createFromTimestamp($displayTimestamp);
         if ($timestamp2 > $timestamp) {
             $timestamp = $timestamp2;
             $route = route(
@@ -466,7 +474,7 @@ class ServiceController extends Controller
 
     /**
      * @param  string  $key  Request key.
-     * @return array<mixed>|mixed
+     * @return array<mixed>
      */
     private function arrayFromRequest(Request $request, $key)
     {
@@ -475,7 +483,9 @@ class ServiceController extends Controller
         }
         $value = $request->get($key);
         if (! is_array($value)) {
-            $value = explode(',', $value);
+            /** @var string $stringValue */
+            $stringValue = $value;
+            $value = explode(',', $stringValue);
         }
 
         return $value;
@@ -515,7 +525,9 @@ class ServiceController extends Controller
             $service->setAppends($appends);
         }
         foreach ($load as $l) {
-            $service->load($l);
+            /** @var string $relation */
+            $relation = $l;
+            $service->load($relation);
         }
 
         // NOTE: This overrides buggy JSON conversion in JsonResponse
@@ -530,6 +542,7 @@ class ServiceController extends Controller
     public function setSermon(Request $request, Service $service)
     {
         Gate::authorize('update', $service);
+        /** @var array{sermon_id: int|null} $data */
         $data = $request->validate(['sermon_id' => 'int|nullable|exists:sermons,id']);
         $service->update(['sermon_id' => $data['sermon_id']]);
 
@@ -552,7 +565,10 @@ class ServiceController extends Controller
             abort(404);
         }
 
-        $type = $request->validate(['type' => 'nullable|int'])['type'] ?? $city->konfiapp_default_type ?? null;
+        /** @var array{type: int|null} $validated */
+        $validated = $request->validate(['type' => 'nullable|int']);
+        /** @var int|null $type */
+        $type = $validated['type'] ?? $city->konfiapp_default_type ?? null;
         if (! $type) {
             abort(403);
         }

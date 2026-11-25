@@ -36,7 +36,6 @@ use App\Models\Rites\Funeral;
 use App\Models\Rites\Wedding;
 use App\Models\Service;
 use App\Services\NameService;
-use Carbon\Carbon;
 use Illuminate\Database\Migrations\Migration;
 
 return new class extends Migration
@@ -53,6 +52,7 @@ return new class extends Migration
         /** @var Item $item */
         foreach ($items as $item) {
             // fix wrong marker
+            /** @var array{text: string} $data */
             $data = $item->data;
             $data['text'] = str_replace('[taufe:taeufling_', '[taufe:', $data['text']);
             $item->data = $data;
@@ -121,8 +121,9 @@ return new class extends Migration
                     if (! $funeral instanceof Funeral) {
                         break;
                     }
+                    $buriedName = is_string($funeral->buried_name) ? $funeral->buried_name : '';
                     /** @var list<string> $nameParts Last and first name of the buried person. */
-                    $nameParts = NameService::fromName($funeral->buried_name)->format(NameService::LAST_FIRST_ARRAY);
+                    $nameParts = NameService::fromName($buriedName)->format(NameService::LAST_FIRST_ARRAY);
                     [$lastName, $firstName] = $nameParts;
                     foreach (
                         [
@@ -154,8 +155,9 @@ return new class extends Migration
                     if (! $baptism instanceof Baptism) {
                         break;
                     }
+                    $candidateName = is_string($baptism->candidate_name) ? $baptism->candidate_name : '';
                     /** @var list<string> $nameParts Last and first name of the baptism candidate. */
-                    $nameParts = NameService::fromName($baptism->candidate_name)->format(NameService::LAST_FIRST_ARRAY);
+                    $nameParts = NameService::fromName($candidateName)->format(NameService::LAST_FIRST_ARRAY);
                     [$lastName, $firstName] = $nameParts;
                     foreach (
                         [
@@ -180,11 +182,13 @@ return new class extends Migration
                     if (! $wedding instanceof Wedding) {
                         break;
                     }
+                    $spouse1Name = is_string($wedding->spouse1_name) ? $wedding->spouse1_name : '';
                     /** @var list<string> $nameParts1 Last and first name of the first spouse. */
-                    $nameParts1 = NameService::fromName($wedding->spouse1_name)->format(NameService::LAST_FIRST_ARRAY);
+                    $nameParts1 = NameService::fromName($spouse1Name)->format(NameService::LAST_FIRST_ARRAY);
                     [$lastName1, $firstName1] = $nameParts1;
+                    $spouse2Name = is_string($wedding->spouse2_name) ? $wedding->spouse2_name : '';
                     /** @var list<string> $nameParts2 Last and first name of the second spouse. */
-                    $nameParts2 = NameService::fromName($wedding->spouse2_name)->format(NameService::LAST_FIRST_ARRAY);
+                    $nameParts2 = NameService::fromName($spouse2Name)->format(NameService::LAST_FIRST_ARRAY);
                     [$lastName2, $firstName2] = $nameParts2;
                     foreach (
                         [
@@ -211,5 +215,4 @@ return new class extends Migration
 
         return $text;
     }
-
 };

@@ -29,6 +29,7 @@
  */
 
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 /**
@@ -45,7 +46,7 @@ class AddPredicantField extends Migration
     {
         Schema::table(
             'services',
-            function ($table) {
+            function (Blueprint $table) {
                 $table->integer('need_predicant')->nullable()->default(0);
             }
         );
@@ -60,7 +61,7 @@ class AddPredicantField extends Migration
     {
         Schema::table(
             'services',
-            function ($table) {
+            function (Blueprint $table) {
                 $table->dropColumn('need_predicant');
             }
         );

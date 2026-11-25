@@ -74,6 +74,7 @@ class ChildrensChurchInput extends AbstractInput
      */
     public function input(Request $request)
     {
+        /** @var array{from: string, to: string, cities: array<int, int>, locations: array<int, int>} $setup */
         $setup = $request->validate(
             [
                 'from' => 'required|date_format:d.m.Y',
@@ -112,6 +113,7 @@ class ChildrensChurchInput extends AbstractInput
      */
     public function save(Request $request)
     {
+        /** @var array<string, mixed> $data */
         $data = $request->validate([
             'id' => 'required|exists:services,id',
             'cc' => 'nullable|bool',

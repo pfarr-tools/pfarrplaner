@@ -30,6 +30,8 @@
 
 namespace App\Models;
 
+use App\Contracts\StreetRange\CreatesStreetRanges;
+use App\Contracts\StreetRange\DeletesStreetRanges;
 use App\Models\People\User;
 use App\Models\Places\City;
 use App\Models\Places\StreetRange;
@@ -120,9 +122,11 @@ class Parish extends AbstractModel
      */
     public function importStreetsFromCSV(User $user, string $csv)
     {
-        /** @var StreetRange $streetRange */
         foreach ($this->streetRanges as $streetRange) {
-            app(StreetRange::getContractName('delete'))->delete($user, $streetRange);
+            /** @var DeletesStreetRanges $deleter */
+            $deleter = app(StreetRange::getContractName('delete'));
+            /** @var StreetRange $streetRange */
+            $deleter->delete($user, $streetRange);
         }
 
         $ctr = 0;
@@ -138,7 +142,9 @@ class Parish extends AbstractModel
                 if ($record[4] == $this->code) {
                     $record[5] = array_pad(explode(' bis ', (is_string($record[5] ?? null) ? $record[5] : ''), 2), 2, '');
                     $record[6] = array_pad(explode(' bis ', (is_string($record[6] ?? null) ? $record[6] : ''), 2), 2, '');
-                    app(StreetRange::getContractName('create'))->create($user, $this, [
+                    /** @var CreatesStreetRanges $creator */
+                    $creator = app(StreetRange::getContractName('create'));
+                    $creator->create($user, $this, [
                         'parish_id' => $this->id,
                         'name' => $record[0],
                         'odd_start' => $record[5][0],

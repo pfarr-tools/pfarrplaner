@@ -59,7 +59,9 @@ class AttachmentController extends Controller
         $user = $request->user();
         abort_unless($user instanceof User, 401);
         $attachment = Attachment::findOrFail($modelId);
-        $attachment = app(UpdatesAttachments::class)->update($user, $attachment, $request->all());
+        /** @var array<string, mixed> $input */
+        $input = $request->all();
+        $attachment = app(UpdatesAttachments::class)->update($user, $attachment, $input);
 
         /** @var Model&object{attachments: Collection<int, Attachment>} $attachable */
         $attachable = $attachment->attachable;

@@ -61,6 +61,7 @@ class Vacations
             $date = Carbon::parse($date);
         }
         $vacationers = [];
+        /** @var array<int|string, array{start: Carbon, end: Carbon, title: string}> $vacationData */
         $vacationData = self::getVacationDataFromCache();
 
         foreach ($vacationData as $key => $datum) {
@@ -82,14 +83,25 @@ class Vacations
     protected static function getVacationDataFromCache()
     {
         if (! Cache::has('vacationData')) {
-            $contents = file_get_contents((string) config('calendar.vacation_url'));
+            /** @var string $vacationUrl */
+            $vacationUrl = config('calendar.vacation_url');
+            $contents = file_get_contents((string) $vacationUrl);
             $vacationData = json_decode($contents ?: '', true);
             if (! is_array($vacationData)) {
                 $vacationData = [];
             }
+            /** @var array<int|string, array<string, mixed>> $vacationData */
             foreach ($vacationData as $key => $datum) {
-                $vacationData[$key]['start'] = Carbon::createFromTimeString($datum['start']);
-                $vacationData[$key]['end'] = Carbon::createFromTimeString($datum['end']);
+                if (! is_array($datum)) {
+                    continue;
+                }
+                $start = $datum['start'] ?? null;
+                $end = $datum['end'] ?? null;
+                if (! is_string($start) || ! is_string($end)) {
+                    continue;
+                }
+                $vacationData[$key]['start'] = Carbon::createFromTimeString($start);
+                $vacationData[$key]['end'] = Carbon::createFromTimeString($end);
             }
             Cache::put('vacationData', $vacationData, 10000);
         } else {

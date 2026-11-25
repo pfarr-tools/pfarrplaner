@@ -31,6 +31,9 @@ class PreventImpersonatedSecurityChanges
     {
         abort_if($request->session()->has('adminUserSwitchBack'), Response::HTTP_FORBIDDEN);
 
-        return $next($request);
+        /** @var Response $response */
+        $response = $next($request);
+
+        return $response;
     }
 }

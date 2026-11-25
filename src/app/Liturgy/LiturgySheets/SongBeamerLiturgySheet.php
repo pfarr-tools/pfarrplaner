@@ -155,36 +155,53 @@ class SongBeamerLiturgySheet extends AbstractLiturgySheet
     {
         $slideText = '';
 
+        /** @var array<int, array{ref: string, verses: string, image: string, code: string, color: string, psalm: bool}> $listItems */
         $listItems = [];
         foreach ($service->liturgyBlocks as $block) {
             foreach ($block->items as $item) {
-                if (($item->data_type == 'song') && (isset($item->data['song']))) {
+                /** @var array<string, mixed> $data */
+                $data = $item->data;
+                if (($item->data_type == 'song') && isset($data['song'])) {
+                    /** @var array{id?: int|string, reference?: string, songbook?: array{image?: string, code?: string}} $song */
+                    $song = $data['song'];
                     $refColor = '';
-                    if (isset($item->data['song']['id'])) {
-                        $songRef = SongReference::find($item->data['song']['id']);
-                        $refColor = $songRef->color ?? '';
+                    if (isset($song['id'])) {
+                        $songRef = SongReference::find($song['id']);
+                        /** @var string|null $color */
+                        $color = $songRef->color ?? null;
+                        $refColor = $color ?? '';
                     }
+                    /** @var string $verses */
+                    $verses = $data['verses'] ?? '';
+                    /** @var string $songbookImage */
+                    $songbookImage = $song['songbook']['image'] ?? '';
+                    /** @var string $songbookCode */
+                    $songbookCode = $song['songbook']['code'] ?? '';
                     $listItems[] = [
-                        'ref' => $item->data['song']['reference'] ?? '',
-                        'verses' => $item->data['verses'],
-                        'image' => isset($item->data['song']['songbook']) ? ($item->data['song']['songbook']['image'] ?? '') : '',
-                        'code' => isset($item->data['song']['songbook']) ? ($item->data['song']['songbook']['code'] ?? '') : '',
+                        'ref' => $song['reference'] ?? '',
+                        'verses' => $verses,
+                        'image' => $songbookImage,
+                        'code' => $songbookCode,
                         'color' => $refColor,
                         'psalm' => false,
                     ];
-                } elseif (($item->data_type == 'psalm') && isset($item->data['psalm'])) {
+                } elseif (($item->data_type == 'psalm') && isset($data['psalm'])) {
+                    /** @var array{songbook_abbreviation?: string, reference?: string, title?: string} $psalm */
+                    $psalm = $data['psalm'];
                     $refColor = '';
                     $songbook = null;
-                    if (isset($item->data['psalm']['songbook_abbreviation'])) {
-                        $refColor = ($item->data['psalm']['songbook_abbreviation'] == 'EG') ? '#c8baf7' : '';
-                        $songbook = Songbook::where('code', $item->data['psalm']['songbook_abbreviation'])->first();
+                    if (isset($psalm['songbook_abbreviation'])) {
+                        $refColor = ($psalm['songbook_abbreviation'] == 'EG') ? '#c8baf7' : '';
+                        $songbook = Songbook::where('code', $psalm['songbook_abbreviation'])->first();
                     }
 
+                    /** @var string|null $songbookImage */
+                    $songbookImage = $songbook ? $songbook->image : null;
                     $listItems[] = [
-                        'ref' => $item->data['psalm']['reference'] ?? '',
-                        'verses' => $item->data['psalm']['title'] ?? '',
-                        'image' => $songbook ? $songbook->image : '',
-                        'code' => $item->data['psalm']['songbook_abbreviation'] ?? '',
+                        'ref' => $psalm['reference'] ?? '',
+                        'verses' => $psalm['title'] ?? '',
+                        'image' => $songbookImage ?? '',
+                        'code' => $psalm['songbook_abbreviation'] ?? '',
                         'color' => $refColor,
                         'psalm' => true,
                     ];

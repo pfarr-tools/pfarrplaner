@@ -49,9 +49,13 @@ class CalendarMinistriesResource extends JsonResource
 
         $data = [];
         foreach ($service->participantsWithMinistry->groupBy('pivot.category') as $category => $participants) {
-            $data[$category] = [];
+            if (! is_int($category) && ! is_string($category)) {
+                continue;
+            }
+            $key = (string) $category;
+            $data[$key] = [];
             foreach ($participants as $participant) {
-                $data[$category][] = new CalendarParticipantResource($participant);
+                $data[$key][] = new CalendarParticipantResource($participant);
             }
         }
 

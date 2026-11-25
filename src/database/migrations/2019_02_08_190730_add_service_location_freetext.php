@@ -29,6 +29,7 @@
  */
 
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 /**
@@ -45,7 +46,7 @@ class AddServiceLocationFreetext extends Migration
     {
         Schema::table(
             'services',
-            function ($table) {
+            function (Blueprint $table) {
                 $table->integer('city_id')->nullable();
                 $table->string('special_location')->nullable();
             }
@@ -61,7 +62,7 @@ class AddServiceLocationFreetext extends Migration
     {
         Schema::table(
             'locations',
-            function ($table) {
+            function (Blueprint $table) {
                 $table->dropColumn(['city_id', 'special_location']);
             }
         );

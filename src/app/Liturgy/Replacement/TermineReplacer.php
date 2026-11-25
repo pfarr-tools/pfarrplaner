@@ -79,8 +79,10 @@ class TermineReplacer extends AbstractReplacer
 
         $ctr = 0;
         $lastDay = $nextWeek->format('Ymd');
+        /** @var array<array-key, array{start: Carbon, allDay: bool, title: string, place: string}|Service> $eventsArray */
         foreach ($events as $eventsArray) {
             foreach ($eventsArray as $event) {
+                /** @var Carbon $eventStart */
                 $eventStart = is_array($event) ? $event['start'] : $event->trueDate();
                 $dateFormat = $ctr ? '%A, %d. %B' : '%A, %d. %B %Y';
                 $done = false;
@@ -125,7 +127,7 @@ class TermineReplacer extends AbstractReplacer
                         $description = (string) preg_replace('/&(?![A-Za-z0-9#]{1,7};)/', '&amp;', $description);
                         $text .= $this->renderParagraph(
                             $event->timeText(true, '.')."\t".trim(
-                                ($event->title ?: 'Gottesdienst').$description.' ('.$event->locationText().')'
+                                (string) ($event->title ?: 'Gottesdienst').$description.' ('.$event->locationText().')'
                             )
                         );
 
@@ -133,11 +135,11 @@ class TermineReplacer extends AbstractReplacer
                         if ($event->cc) {
                             $childChurchStart = Carbon::createFromFormat(
                                 'Y-m-d H:i',
-                                $event->trueDate()->format('Y-m-d').' '.($event->cc_alt_time ?? $event->time)
+                                $event->trueDate()->format('Y-m-d').' '.(string) ($event->cc_alt_time ?? $event->time)
                             );
                             if ($childChurchStart !== null) {
                                 $text .= $this->renderParagraph(
-                                    $childChurchStart->isoFormat('HH.mm \U\h\r')."\t".'Kinderkirche'.' ('.($event->cc_location ?? $event->locationText()).')'
+                                    $childChurchStart->isoFormat('HH.mm \U\h\r')."\t".'Kinderkirche'.' ('.(string) ($event->cc_location ?? $event->locationText()).')'
                                 );
                             }
                         }

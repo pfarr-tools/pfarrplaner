@@ -30,10 +30,13 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Contracts\Song\CreatesSongs;
+use App\Contracts\Song\UpdatesSongs;
 use App\Liturgy\Music\ABCMusic;
 use App\Models\Liturgy\Psalm;
 use App\Models\Liturgy\Song;
 use App\Models\Liturgy\SongReference;
+use App\Models\People\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -167,9 +170,13 @@ class SongController extends AbstractApiCRUDController
      */
     public function store(Request $request)
     {
+        /** @var array<string, mixed> $data */
         $data = $this->validateRequest($request)['song'];
+        /** @var User $user */
+        $user = $request->user();
+        /** @var CreatesSongs $creator */
         $creator = app(Song::getContractName('create'));
-        $song = $creator->create($request->user(), $data);
+        $song = $creator->create($user, $data);
 
         return response()->json($song);
     }
@@ -182,16 +189,23 @@ class SongController extends AbstractApiCRUDController
     {
         /** @var Song $song */
         $song = $this->getSingleModel($request, $modelId);
+        /** @var array<string, mixed> $data */
         $data = $this->validateRequest($request)['song'];
+        /** @var User $user */
+        $user = $request->user();
+        /** @var UpdatesSongs $updater */
         $updater = $song->getContractedAction('update');
-        $song = $updater->update($request->user(), $song, $data);
+        /** @var Song $song */
+        $song = $updater->update($user, $song, $data);
         $song->refresh();
         $song->load(Song::$relationsForEditor);
 
         $id = $request->get('ref');
         if ($id < 1000000) {
+            /** @var array{id: int|string} $songbook */
+            $songbook = $request->get('songbook');
             $songReference = SongReference::where('song_id', $song->id)
-                ->where('songbook_id', $request->get('songbook')['id'])
+                ->where('songbook_id', $songbook['id'])
                 ->firstOrFail();
             $listEntry = [
                 'id' => $songReference->id,
@@ -213,7 +227,8 @@ class SongController extends AbstractApiCRUDController
      */
     protected function validateRequest(Request $request)
     {
-        return $request->validate(
+        /** @var array<string, mixed> $validated */
+        $validated = $request->validate(
             [
                 'song.title' => 'required|string',
                 'song.refrain' => 'nullable|string',
@@ -235,6 +250,8 @@ class SongController extends AbstractApiCRUDController
                 'song.songbooks.*.pivot.color' => 'nullable|string',
             ]
         );
+
+        return $validated;
     }
 
     /**

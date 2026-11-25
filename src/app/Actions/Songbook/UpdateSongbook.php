@@ -51,6 +51,7 @@ class UpdateSongbook extends AbstractUpdateAction implements UpdatesSongbooks
     public function update(User $user, Songbook $songbook, array $input): Songbook
     {
         Gate::forUser($user)->authorize('update', $songbook);
+        /** @var array<string, mixed> $input */
         $input = Validator::make($input, Songbook::$validationRules)->validateWithBag('updateSongbook');
         $songbook->update($input);
         UpdatedSongbook::dispatch($user, $songbook);

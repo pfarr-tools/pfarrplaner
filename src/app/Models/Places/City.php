@@ -258,14 +258,19 @@ class City extends AbstractModel
      */
     public function getDefaultAdChannels()
     {
+        /** @var array<array-key, mixed> $channels */
         $channels = [];
-        foreach (config('ads.channels') as $key => $channelConfig) {
-            if ($channelConfig['depends_on'] ?? false) {
+        /** @var array<array-key, array<string, mixed>> $channelsConfig */
+        $channelsConfig = config('ads.channels');
+        foreach ($channelsConfig as $key => $channelConfig) {
+            /** @var string $dependsOn */
+            $dependsOn = $channelConfig['depends_on'] ?? '';
+            if ($dependsOn) {
                 /*
                     some adChannels have a dependency on a specific property of the City model
                     e.g. a CommuniApp AdChannel will only be shown if the city has a communiapp_token
                 */
-                if ($this->{$channelConfig['depends_on']}) {
+                if ($this->{$dependsOn}) {
                     $channels[$key] = $channelConfig;
                 }
             } else {
@@ -312,7 +317,10 @@ class City extends AbstractModel
      */
     public function getDefaultMinistriesAttribute()
     {
-        return explode('||', $this->attributes['default_ministries']);
+        /** @var string $defaultMinistries */
+        $defaultMinistries = $this->attributes['default_ministries'];
+
+        return explode('||', $defaultMinistries);
     }
 
     /**
@@ -342,8 +350,10 @@ class City extends AbstractModel
     public function setChildrenFromInput(array $input)
     {
         $this->children()->update(['parent_id' => null]);
-        if (count($input['childIds'] ?? [])) {
-            City::whereIn('id', $input['childIds'])->update(['parent_id' => $this->id]);
+        /** @var array<int, int> $childIds */
+        $childIds = $input['childIds'] ?? [];
+        if (count($childIds)) {
+            City::whereIn('id', $childIds)->update(['parent_id' => $this->id]);
         }
 
     }

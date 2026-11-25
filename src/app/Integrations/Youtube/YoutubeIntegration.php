@@ -32,6 +32,9 @@ namespace App\Integrations\Youtube;
 
 use App\Integrations\AbstractIntegration;
 use App\Models\Places\City;
+use Google\Service\YouTube\Resource\LiveChatMessages;
+use Google\Service\YouTube\Resource\LiveStreams;
+use Google\Service\YouTube\Resource\Videos;
 use Google_Client;
 use Google_Service_YouTube;
 use Google_Service_YouTube_LiveChatMessage;
@@ -64,7 +67,9 @@ class YoutubeIntegration extends AbstractIntegration
     public function __construct()
     {
         $client = new Google_Client;
-        $client->setAuthConfig(config('google'));
+        $googleConfig = config('google');
+        abort_unless(is_array($googleConfig), 500);
+        $client->setAuthConfig($googleConfig);
         $client->addScope(Google_Service_YouTube::YOUTUBE);
         $this->setClient($client);
 
@@ -116,7 +121,10 @@ class YoutubeIntegration extends AbstractIntegration
      */
     public function getVideo($id)
     {
-        return $this->youtube->videos->listVideos('snippet,contentDetails,statistics,status,liveStreamingDetails', ['id' => $id])->getItems()[0] ?? null;
+        /** @var Videos $videos */
+        $videos = $this->youtube->videos;
+
+        return $videos->listVideos('snippet,contentDetails,statistics,status,liveStreamingDetails', ['id' => $id])->getItems()[0] ?? null;
     }
 
     /**
@@ -128,7 +136,10 @@ class YoutubeIntegration extends AbstractIntegration
      */
     public function getLiveChat($id, $data = [])
     {
-        return $this->getYoutube()->liveChatMessages->listLiveChatMessages($id, 'id,snippet,authorDetails', $data);
+        /** @var LiveChatMessages $liveChatMessages */
+        $liveChatMessages = $this->getYoutube()->liveChatMessages;
+
+        return $liveChatMessages->listLiveChatMessages($id, 'id,snippet,authorDetails', $data);
     }
 
     /**
@@ -170,7 +181,9 @@ class YoutubeIntegration extends AbstractIntegration
         $liveChatInsert = new Google_Service_YouTube_LiveChatMessage;
         $liveChatInsert->setSnippet($snippet);
 
-        $this->getYoutube()->liveChatMessages->insert('snippet', $liveChatInsert);
+        /** @var LiveChatMessages $liveChatMessages */
+        $liveChatMessages = $this->getYoutube()->liveChatMessages;
+        $liveChatMessages->insert('snippet', $liveChatInsert);
     }
 
     /**
@@ -199,7 +212,9 @@ class YoutubeIntegration extends AbstractIntegration
     public function getAllStreams(): array
     {
         $streams = [];
-        $allStreams = $this->getYoutube()->liveStreams->listLiveStreams('id,snippet', ['mine' => 'true', 'maxResults' => 50]);
+        /** @var LiveStreams $liveStreams */
+        $liveStreams = $this->getYoutube()->liveStreams;
+        $allStreams = $liveStreams->listLiveStreams('id,snippet', ['mine' => 'true', 'maxResults' => 50]);
         foreach ($allStreams as $stream) {
             /** @var \Google_Service_YouTube_LiveStream $stream */
             $streams[$stream->getId()] = $stream->getSnippet()->getTitle();

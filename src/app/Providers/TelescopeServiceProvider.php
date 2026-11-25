@@ -23,8 +23,10 @@ class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
         $isLocal = $this->app->environment('local');
 
         Telescope::filter(function (IncomingEntry $entry) use ($isLocal) {
+            $content = $entry->content;
+            $uri = is_array($content) ? ($content['uri'] ?? '') : '';
             $requestPath = $entry->type === 'request'
-                ? parse_url((string) ($entry->content['uri'] ?? ''), PHP_URL_PATH)
+                ? parse_url(is_string($uri) ? $uri : '', PHP_URL_PATH)
                 : null;
             if (is_string($requestPath) && (
                 preg_match('#^/login/link(?:/|$)#', $requestPath)
@@ -75,7 +77,9 @@ class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
     protected function gate(): void
     {
         Gate::define('viewTelescope', function ($user) {
-            return in_array($user->email, [
+            $email = is_object($user) && isset($user->email) && is_string($user->email) ? $user->email : null;
+
+            return in_array($email, [
                 //
             ]);
         });

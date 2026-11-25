@@ -103,6 +103,7 @@ class EventListReport extends AbstractWordDocumentReport
      */
     public function render(Request $request)
     {
+        /** @var array<string, mixed> $data */
         $data = $request->validate(
             [
                 'city' => 'required|int',
@@ -113,9 +114,15 @@ class EventListReport extends AbstractWordDocumentReport
             ]
         );
 
-        $start = Carbon::parse($data['start']);
-        $end = Carbon::parse($data['end']);
-        $city = City::findOrFail((int) $data['city']);
+        /** @var string $startDate */
+        $startDate = $data['start'];
+        /** @var string $endDate */
+        $endDate = $data['end'];
+        /** @var int|string $cityId */
+        $cityId = $data['city'];
+        $start = Carbon::parse($startDate);
+        $end = Carbon::parse($endDate);
+        $city = City::findOrFail((int) $cityId);
 
         $services = Service::with(['location'])
             ->regularForCity($city)
@@ -195,13 +202,25 @@ class EventListReport extends AbstractWordDocumentReport
 
         // render services
         foreach ($events as $theseEvents) {
+            if (! is_array($theseEvents)) {
+                continue;
+            }
             foreach ($theseEvents as $event) {
                 if (is_object(($event))) {
                     /** @var Service $event */
                     // only services this time
 
-                    $liturgy = LiturgyService::getLiturgyInfoByDate($event->trueDate())[0] ?? [];
-                    $pericope = (string) (isset($liturgy['perikope']) ? $liturgy['litTextsPerikope'.$liturgy['perikope']] : '');
+                    /** @var array<int, array<string, mixed>> $liturgyDays */
+                    $liturgyDays = LiturgyService::getLiturgyInfoByDate($event->trueDate());
+                    /** @var array<string, mixed> $liturgy */
+                    $liturgy = $liturgyDays[0] ?? [];
+                    $pericope = '';
+                    if (isset($liturgy['perikope']) && is_string($liturgy['perikope'])) {
+                        $pericopeText = $liturgy['litTextsPerikope'.$liturgy['perikope']] ?? '';
+                        $pericope = is_string($pericopeText) ? $pericopeText : '';
+                    }
+                    $liturgyName = $liturgy['Bezeichnung'] ?? null;
+                    $liturgyName = is_string($liturgyName) ? $liturgyName : null;
 
                     // remove optional verses
                     if ($pericope) {
@@ -221,11 +240,11 @@ class EventListReport extends AbstractWordDocumentReport
                         0
                     );
 
-                    if (isset($liturgy['Bezeichnung'])) {
+                    if ($liturgyName !== null) {
                         $this->renderParagraph(
                             self::DEFAULT,
                             [
-                                [$liturgy['Bezeichnung'].' – ', []],
+                                [$liturgyName.' – ', []],
                             ],
                             0,
                             $run
@@ -274,11 +293,11 @@ class EventListReport extends AbstractWordDocumentReport
                             0,
                             $run
                         );
-                    } elseif (isset($liturgy['Bezeichnung'])) {
+                    } elseif ($liturgyName !== null) {
                         $this->renderParagraph(
                             self::DEFAULT,
                             [
-                                ["<w:br />\t\t".$liturgy['Bezeichnung'], []],
+                                ["<w:br />\t\t".$liturgyName, []],
                             ],
                             0,
                             $run
@@ -297,13 +316,15 @@ class EventListReport extends AbstractWordDocumentReport
                     }
 
                     if ($event->cc) {
+                        $ccLocation = $event->ccLocationText();
+                        $ccLocation = is_string($ccLocation) ? $ccLocation : '';
                         $this->renderParagraph(
                             self::DEFAULT,
                             [
                                 [
                                     "<w:br />\t\tKinderkirche: ".$event->ccTimeText(
                                         false
-                                    ).', '.$event->ccLocationText(),
+                                    ).', '.$ccLocation,
                                     [],
                                 ],
                             ],
@@ -336,24 +357,36 @@ class EventListReport extends AbstractWordDocumentReport
 
         // render other events
         foreach ($events as $theseEvents) {
+            if (! is_array($theseEvents)) {
+                continue;
+            }
             foreach ($theseEvents as $event) {
-                if (! is_object(($event))) {
+                if (! is_object(($event)) && is_array($event)) {
+                    $eventStart = $event['start'] ?? null;
+                    $eventTitle = $event['title'] ?? '';
+                    if (! $eventStart instanceof Carbon) {
+                        continue;
+                    }
+                    $eventTitle = is_string($eventTitle) ? $eventTitle : '';
                     $run = $this->renderParagraph(
                         self::LIST2,
                         [
-                            [$event['start']->isoFormat('dd.'), []],
-                            ["\t".$event['start']->format('d.m.'), []],
-                            ["\t".$event['start']->format('H:i').' Uhr', []],
-                            ["\t".$event['title'], []],
+                            [$eventStart->isoFormat('dd.'), []],
+                            ["\t".$eventStart->format('d.m.'), []],
+                            ["\t".$eventStart->format('H:i').' Uhr', []],
+                            ["\t".$eventTitle, []],
                         ]
                     );
                 }
             }
         }
 
+        $cityName = $city->name;
+        $cityName = is_string($cityName) ? $cityName : '';
+
         return $this->sendToBrowser(
             FileNameService::make(
-                static::FILE_TITLE.' '.$city->name,
+                self::FILE_TITLE.' '.$cityName,
                 '.docx',
                 static::FILE_SIGNATURE,
                 Carbon::now())

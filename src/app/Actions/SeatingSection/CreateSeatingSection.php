@@ -37,6 +37,7 @@ class CreateSeatingSection extends AbstractCreateAction implements CreatesSeatin
     public function create(User $user, array $input): SeatingSection
     {
         Gate::forUser($user)->authorize('create', SeatingSection::class);
+        /** @var array{location_id: int|string, ...} $input */
         $input = Validator::make($input, SeatingSection::$validationRules)->validateWithBag('createSeatingSection');
 
         $this->location = Location::findOrFail((int) $input['location_id']);

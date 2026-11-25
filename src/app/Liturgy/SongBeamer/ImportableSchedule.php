@@ -165,11 +165,15 @@ class ImportableSchedule
      */
     public function addReadingItem(Item $item)
     {
+        $title = $item['title'] ?? '';
+        $title = is_string($title) ? $title : '';
+        $suffix = '';
+        if (isset($item->data['reference'])) {
+            $reference = $item->data['reference'];
+            $suffix = ': '.str_replace('–', '-', is_string($reference) ? $reference : '');
+        }
         $this->schedule->addItem([
-            'Caption' => utf8_decode(
-                $item['title']
-                .(isset($item->data['reference']) ? ': '.str_replace('–', '-', $item->data['reference']) : '')
-            ),
+            'Caption' => utf8_decode($title.$suffix),
             'Color' => '@@clGray',
             'Props' => [],
         ]);
@@ -210,9 +214,6 @@ class ImportableSchedule
         return $zipPath;
     }
 
-    /**
-     * @return Schedule
-     */
     public function getSchedule(): Schedule
     {
         return $this->schedule;
@@ -220,7 +221,6 @@ class ImportableSchedule
 
     /**
      * @param  Schedule  $schedule  Schedule to use.
-     * @return void
      */
     public function setSchedule(Schedule $schedule): void
     {
@@ -241,7 +241,6 @@ class ImportableSchedule
      * Set the files to be written to the ZIP archive
      *
      * @param  AbstractFile[]  $files  Files to write to the archive
-     * @return void
      */
     public function setFiles(array $files): void
     {
@@ -262,7 +261,6 @@ class ImportableSchedule
      * Set the paths of the files to be imported into the ZIP archive
      *
      * @param  string[]  $imports  Absolute paths of the imported files
-     * @return void
      */
     public function setImports(array $imports): void
     {

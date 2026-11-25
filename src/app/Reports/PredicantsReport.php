@@ -78,8 +78,10 @@ class PredicantsReport extends AbstractWordDocumentReport
     public function __construct()
     {
         parent::__construct();
-        $this->title = config('labels.predicant').'nenanforderung';
-        $this->description = 'Vorausgefülltes '.config('labels.predicant').'nenformular für das Dekanatamt';
+        /** @var string $predicantLabel */
+        $predicantLabel = config('labels.predicant');
+        $this->title = $predicantLabel.'nenanforderung';
+        $this->description = 'Vorausgefülltes '.$predicantLabel.'nenformular für das Dekanatamt';
     }
 
     /**
@@ -107,7 +109,7 @@ class PredicantsReport extends AbstractWordDocumentReport
                 'end' => 'required|string',
             ]
         );
-
+        /** @var array{cities: array<int, int>, start: string, end: string} $data */
         $start = $this->parseDateInput($data['start']);
         $end = $this->parseDateInput($data['end']);
 
@@ -133,8 +135,10 @@ class PredicantsReport extends AbstractWordDocumentReport
             ]
         );
 
+        /** @var string $predicantLabel */
+        $predicantLabel = config('labels.predicant');
         $section->addText(
-            'Anforderung von '.config('labels.predicant').'nen bzw. Pfarrer:innen im Ruhestand über das Dekanatamt',
+            'Anforderung von '.$predicantLabel.'nen bzw. Pfarrer:innen im Ruhestand über das Dekanatamt',
             [
                 'size' => 13,
                 'bold' => true,
@@ -150,8 +154,10 @@ class PredicantsReport extends AbstractWordDocumentReport
         for ($i = 1; $i <= 3; $i++) {
             $section->addText('', [], ['spaceAfter' => 0]);
         }
+        /** @var string $cityNames */
+        $cityNames = $cities->pluck('name')->join(' / ');
         $section->addText(
-            'Für '.$cities->pluck('name')->join(' / '),
+            'Für '.$cityNames,
             [],
             [
                 'borderSize' => 6,
@@ -212,16 +218,24 @@ class PredicantsReport extends AbstractWordDocumentReport
                 $textRun = $table->addCell((int) Converter::cmToTwip(3.25))->addTextRun();
                 $textRun->addText($service->trueDate()->format('d.m.Y'));
                 $textRun->addTextBreak();
-                $table->addCell((int) Converter::cmToTwip(5))->addText($service->locationTextWithCity);
+                /** @var string $locationText */
+                $locationText = $service->locationTextWithCity;
+                $table->addCell((int) Converter::cmToTwip(5))->addText($locationText);
                 $table->addCell((int) Converter::cmToTwip(3.25))->addText($service->timeText());
                 $table->addCell((int) Converter::cmToTwip(6))->addText($service->descriptionText());
                 $table->addCell((int) Converter::cmToTwip(7.25));
             }
         }
 
+        /** @var string $fileNameCityNames */
+        $fileNameCityNames = $cities->pluck('name')->join(' ');
+
+        /** @var string $fileTitle */
+        $fileTitle = static::FILE_TITLE;
+
         return $this->sendToBrowser(
             FileNameService::make(
-                static::FILE_TITLE.' '.$cities->pluck('name')->join(' '),
+                $fileTitle.' '.$fileNameCityNames,
                 'docx',
                 static::FILE_SIGNATURE,
                 [$start->format('d.m.Y'), $end->format('d.m.Y')])

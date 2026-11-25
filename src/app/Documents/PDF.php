@@ -55,7 +55,10 @@ class PDF extends Browsershot
     {
         parent::__construct($url);
         $this->noSandbox();
-        $this->setChromePath(config('services.browsershot.chrome_path'));
+        $chromePath = config('services.browsershot.chrome_path');
+        if (is_string($chromePath)) {
+            $this->setChromePath($chromePath);
+        }
     }
 
     /**
@@ -224,8 +227,10 @@ HTML;
         $fullCommand = $this->getFullCommand($command);
         $workingDirectory = base_path() ?: getcwd() ?: storage_path('app');
 
+        $windowsEnv = $this->isWindows() ? $this->getWindowsEnv() : null;
+        /** @var array<string, string|false>|null $windowsEnv */
         $process = is_array($fullCommand)
-            ? new Process(array_values(array_map('strval', $fullCommand)), $workingDirectory, $this->isWindows() ? $this->getWindowsEnv() : null)
+            ? new Process(array_values(array_map(static fn (mixed $part): string => is_scalar($part) ? (string) $part : '', $fullCommand)), $workingDirectory, $windowsEnv)
             : Process::fromShellCommandline($fullCommand, $workingDirectory);
 
         $process->setTimeout($this->timeout);
@@ -234,7 +239,8 @@ HTML;
         $process->run();
 
         $rawOutput = rtrim($process->getOutput());
-        $this->chromiumResult = new ChromiumResult(json_decode($rawOutput, true));
+        $decodedOutput = json_decode($rawOutput, true);
+        $this->chromiumResult = new ChromiumResult(is_array($decodedOutput) ? $decodedOutput : null);
 
         if ($process->isSuccessful()) {
             $result = $this->chromiumResult->getResult();
@@ -258,7 +264,8 @@ HTML;
         }
 
         if ($exitCode === 2) {
-            throw ElementNotFound::make($this->additionalOptions['selector']);
+            $selector = $this->additionalOptions['selector'] ?? null;
+            throw ElementNotFound::make(is_string($selector) ? $selector : '');
         }
 
         throw new ProcessFailedException($process);

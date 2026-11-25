@@ -93,7 +93,9 @@ class LiturgyBlockController extends Controller
     {
         Gate::authorize('update', $service);
         abort_unless((int) $block->service_id === (int) $service->id, 404);
-        foreach ($request->all() as $item) {
+        /** @var list<array{id: int|string, sortable: int}> $items */
+        $items = $request->all();
+        foreach ($items as $item) {
             $block->items()->whereKey($item['id'])->firstOrFail()->update(['sortable' => $item['sortable']]);
         }
 
@@ -107,12 +109,15 @@ class LiturgyBlockController extends Controller
      */
     protected function validateRequest(Request $request): array
     {
-        return $request->validate(
+        /** @var array<string, mixed> $validated */
+        $validated = $request->validate(
             [
                 'title' => 'required|string',
                 'instructions' => 'nullable|string',
                 'service_id' => 'int|exists:services,id',
             ]
         );
+
+        return $validated;
     }
 }

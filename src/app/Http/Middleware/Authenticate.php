@@ -75,7 +75,10 @@ class Authenticate extends Middleware
                 ->with('status', 'Dieses Benutzerkonto ist gesperrt oder nicht mehr aktiv.');
         }
 
-        return $next($request);
+        /** @var Response $response */
+        $response = $next($request);
+
+        return $response;
     }
 
     /**

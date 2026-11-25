@@ -94,9 +94,13 @@ class HomeScreenTabFactory
      */
     public static function getOne($tab, $tabIndex)
     {
-        $class = 'App\\HomeScreen\\Tabs\\'.ucfirst($tab['type'].'HomeScreenTab');
+        /** @var string $tabType */
+        $tabType = $tab['type'];
+        $class = 'App\\HomeScreen\\Tabs\\'.ucfirst($tabType.'HomeScreenTab');
         if (class_exists($class) && is_subclass_of($class, AbstractHomeScreenTab::class)) {
-            $tabObject = new $class($tab['config']);
+            /** @var array<string, mixed> $tabConfig */
+            $tabConfig = $tab['config'];
+            $tabObject = new $class($tabConfig);
             if (! $tabObject->isAvailable()) {
                 return null;
             }
@@ -118,7 +122,9 @@ class HomeScreenTabFactory
             return $result;
         }
         $result['config'] = $tab['config'];
-        $result['key'] = $result['type'].$tabIndex;
+        /** @var string $resultType */
+        $resultType = $result['type'];
+        $result['key'] = $resultType.$tabIndex;
         $result['index'] = $tabIndex;
 
         return $result;
@@ -136,10 +142,14 @@ class HomeScreenTabFactory
      */
     public static function getCount($tab, $tabIndex)
     {
-        $class = 'App\\HomeScreen\\Tabs\\'.ucfirst($tab['type'].'HomeScreenTab');
+        /** @var string $tabType */
+        $tabType = $tab['type'];
+        $class = 'App\\HomeScreen\\Tabs\\'.ucfirst($tabType.'HomeScreenTab');
         if (class_exists($class) && is_subclass_of($class, AbstractHomeScreenTab::class)) {
+            /** @var array<string, mixed> $tabConfig */
+            $tabConfig = $tab['config'];
             /** @var AbstractHomeScreenTab $tabObject */
-            $tabObject = new $class($tab['config']);
+            $tabObject = new $class($tabConfig);
             if (! $tabObject->isAvailable()) {
                 return null;
             }
@@ -197,9 +207,14 @@ class HomeScreenTabFactory
     {
         $titles = [];
         foreach ($tabsConfig as $tabIndex => $tab) {
-            $class = 'App\\HomeScreen\\Tabs\\'.ucfirst($tab['type'].'HomeScreenTab');
+            /** @var string $tabType */
+            $tabType = $tab['type'];
+            $class = 'App\\HomeScreen\\Tabs\\'.ucfirst($tabType.'HomeScreenTab');
             if (class_exists($class) && is_subclass_of($class, AbstractHomeScreenTab::class)) {
-                $tabObject = new $class($tab['config']);
+                /** @var array<string, mixed> $tabConfig */
+                $tabConfig = $tab['config'];
+                /** @var AbstractHomeScreenTab $tabObject */
+                $tabObject = new $class($tabConfig);
                 $titles[$tabIndex] = $tabObject->getTitle();
             } else {
                 throw new \Exception('Class not found: '.$class);

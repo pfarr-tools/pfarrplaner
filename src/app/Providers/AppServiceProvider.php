@@ -77,12 +77,17 @@ class AppServiceProvider extends ServiceProvider
         );
         RateLimiter::for('login-link', static fn (Request $request): Limit => Limit::perMinute(10)->by('login-link|'.$request->ip())
         );
-        RateLimiter::for('manual-login-link', static fn (Request $request): Limit => Limit::perMinute(6)
-            ->by('manual-login-link|'.($request->user()?->getAuthIdentifier() ?? $request->ip()))
-        );
+        RateLimiter::for('manual-login-link', static function (Request $request): Limit {
+            /** @var string|int|null $identifier */
+            $identifier = $request->user()?->getAuthIdentifier() ?? $request->ip();
 
-        App::setLocale(config('app.locale'));
-        Carbon::setLocale(config('app.locale'));
+            return Limit::perMinute(6)->by('manual-login-link|'.($identifier ?? ''));
+        });
+
+        /** @var string $locale */
+        $locale = config('app.locale');
+        App::setLocale($locale);
+        Carbon::setLocale($locale);
 
         Factory::guessFactoryNamesUsing([self::class, 'guessFactoryName']);
 
@@ -106,10 +111,20 @@ class AppServiceProvider extends ServiceProvider
         Blade::include('partials.form.radiogroup', 'radiogroup');
         Blade::include('partials.string.badges', 'badges');
 
-        Validator::extend('phone_number', fn ($a, $v) => (bool) preg_match('/^([0-9s(+][0-9\.-\/ ()]{7,})$/i', $v));
-        Validator::extend('zip', fn ($a, $v) => (bool) preg_match('/^([0]{1}[1-9]{1}|[1-9]{1}[0-9]{1})[0-9]{3}$/i', $v));
-        Validator::extend('hash', fn ($a, $v, $p) => Hash::check($v, $p[0]));
-        Validator::extend('not_hash', fn ($a, $v, $p) => ! Hash::check($v, $p[0]));
+        Validator::extend('phone_number', static fn ($a, $v): bool => is_string($v)
+            && (bool) preg_match('/^([0-9s(+][0-9\.-\/ ()]{7,})$/i', $v));
+        Validator::extend('zip', static fn ($a, $v): bool => is_string($v)
+            && (bool) preg_match('/^([0]{1}[1-9]{1}|[1-9]{1}[0-9]{1})[0-9]{3}$/i', $v));
+        Validator::extend('hash', static fn ($a, $v, $p): bool => is_string($v)
+            && is_array($p)
+            && isset($p[0])
+            && is_string($p[0])
+            && Hash::check($v, $p[0]));
+        Validator::extend('not_hash', static fn ($a, $v, $p): bool => ! (is_string($v)
+            && is_array($p)
+            && isset($p[0])
+            && is_string($p[0])
+            && Hash::check($v, $p[0])));
 
         SeatingValidators::register();
 
@@ -128,6 +143,7 @@ class AppServiceProvider extends ServiceProvider
             if (! is_array($except)) {
                 $except = (array) $except;
             }
+            /** @var array<int|string> $except */
 
             // Single Dimensional arrays
             if (! is_array($this->first()) && ! is_object($this->first())) {
@@ -136,6 +152,10 @@ class AppServiceProvider extends ServiceProvider
 
             // Multi Dimensional arrays
             $out = $this->map(function ($item) use ($except) {
+                if (! is_array($item)) {
+                    return $item;
+                }
+
                 return Arr::except($item, $except);
             });
 

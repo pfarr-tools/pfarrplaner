@@ -69,6 +69,7 @@ class UpdateLocation extends AbstractUpdateAction implements UpdatesLocations
         $city = $location->city;
         abort_unless($city instanceof City, 404);
         $this->city = $city;
+        /** @var array<string, mixed> $input Validierte Eingabedaten. */
         $input = Validator::make($input, Location::$validationRules)->validateWithBag('updateLocation');
         $location->update($input);
         UpdatedLocation::dispatch($user, $location);

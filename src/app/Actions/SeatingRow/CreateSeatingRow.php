@@ -40,6 +40,7 @@ class CreateSeatingRow extends AbstractCreateAction implements CreatesSeatingRow
     public function create(User $user, array $input): SeatingRow
     {
         Gate::forUser($user)->authorize('create', SeatingRow::class);
+        /** @var array{seating_section_id: int|string, ...} $input */
         $input = Validator::make($input, SeatingRow::$validationRules)->validateWithBag('createSeatingRow');
 
         $section = SeatingSection::findOrFail((int) $input['seating_section_id']);

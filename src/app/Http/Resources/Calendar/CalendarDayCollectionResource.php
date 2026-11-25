@@ -45,6 +45,9 @@ class CalendarDayCollectionResource extends ResourceCollection
     {
         $items = [];
         foreach ($this->collection ?? collect() as $item) {
+            if (! is_int($item) && ! is_string($item)) {
+                continue;
+            }
             $items[$item] = new CalendarDayResource($item);
         }
 

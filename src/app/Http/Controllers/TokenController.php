@@ -78,7 +78,8 @@ class TokenController extends Controller
         abort_unless($user instanceof User, 401);
         Gate::authorize('update', $user);
         $request->validate(['title' => 'required|string']);
-        $token = $user->createToken($request->get('title'));
+        $title = $request->get('title');
+        $token = $user->createToken(is_string($title) ? $title : '');
         $tokens = $user->tokens;
 
         return Inertia::render('tokens', compact('tokens', 'token'));

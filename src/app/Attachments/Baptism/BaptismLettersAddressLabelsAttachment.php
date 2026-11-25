@@ -93,16 +93,16 @@ class BaptismLettersAddressLabelsAttachment extends AbstractBaptismAttachment
      */
     public function download()
     {
+        $validated = request()->validate([
+            'size' => 'nullable|numeric',
+            'years' => 'nullable|int|min:1',
+            'skipLabels' => 'nullable|int',
+        ]);
         $config = array_merge([
             'size' => 3.7,
             'years' => 9,
             'skipLabels' => 0,
-        ],
-            request()->validate([
-                'size' => 'nullable|numeric',
-                'years' => 'nullable|int|min:1',
-                'skipLabels' => 'nullable|int',
-            ]));
+        ], is_array($validated) ? $validated : []);
 
         $doc = new DefaultAddressLabelSheetDocument([
             'label' => [
@@ -114,7 +114,7 @@ class BaptismLettersAddressLabelsAttachment extends AbstractBaptismAttachment
         $data = [];
         for ($i = 1; $i <= $config['years']; $i++) {
             $data[] = [
-                'name' => NameService::fromName($this->baptism->candidate_name)->format(NameService::FIRST_LAST),
+                'name' => NameService::fromName(is_string($this->baptism->candidate_name) ? $this->baptism->candidate_name : '')->format(NameService::FIRST_LAST),
                 'address' => $this->baptism->candidate_address,
                 'zip' => $this->baptism->candidate_zip,
                 'city' => $this->baptism->candidate_city,

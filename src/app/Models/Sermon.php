@@ -159,6 +159,7 @@ class Sermon extends Model
      */
     public function latestService(): ?string
     {
+        /** @var Collection<int, Carbon|string|null> $dates Termine der zugehörigen Gottesdienste. */
         $dates = $this->services->pluck('dateTime');
         $dates = $dates->reject(function ($item) {
             return (new Carbon($item)) > Carbon::now();

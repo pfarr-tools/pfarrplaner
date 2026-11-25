@@ -145,7 +145,11 @@ class StreamingTroubleshooterController extends Controller
         $youtubeUrl = $service->youtube_url;
         abort_unless(is_string($youtubeUrl), 422);
         $youtube = YoutubeIntegration::get($city)->getYoutube();
-        $youtube->liveBroadcasts->delete(YoutubeHelper::getCode($youtubeUrl));
+        $liveBroadcasts = $youtube->liveBroadcasts;
+        if (! is_object($liveBroadcasts) || ! method_exists($liveBroadcasts, 'delete')) {
+            abort(500);
+        }
+        $liveBroadcasts->delete(YoutubeHelper::getCode($youtubeUrl));
         $broadcast = Broadcast::create($service);
         $service->update(['youtube_url' => $broadcast->getSharerUrl()]);
 

@@ -51,6 +51,7 @@ class CreateServiceGroup extends AbstractCreateAction implements CreatesServiceG
     public function create(User $user, array $input): ServiceGroup
     {
         Gate::forUser($user)->authorize('create', ServiceGroup::class);
+        /** @var array<string, mixed> $input */
         $input = Validator::make($input, ServiceGroup::$validationRules)->validateWithBag('createServiceGroup');
         $serviceGroup = ServiceGroup::create($input);
         CreatedServiceGroup::dispatch($user, $serviceGroup);

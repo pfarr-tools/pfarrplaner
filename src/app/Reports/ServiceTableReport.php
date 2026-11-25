@@ -136,7 +136,7 @@ class ServiceTableReport extends AbstractExcelDocumentReport
                 'name_format' => 'required|int|in:1,2,3',
             ]
         );
-
+        /** @var array{year: int, cities: array<int, int>, locations?: array<int, int>|null, ministries?: array<int, string>|null, name_format: int} $data */
         $serviceList = Service::between(
             Carbon::createFromDate($data['year'], 1, 1),
             Carbon::createFromDate($data['year'], 12, 31)->setTime(23, 59, 59),
@@ -148,6 +148,8 @@ class ServiceTableReport extends AbstractExcelDocumentReport
             ->groupBy('key_date');
 
         $cities = City::whereIn('id', $data['cities'])->get();
+        /** @var string $cityNames */
+        $cityNames = $cities->pluck('name')->join(', ');
 
         $ministries = $data['ministries'] ?? [];
         $nameFormat = $data['name_format'] ?? User::NAME_FORMAT_DEFAULT;
@@ -245,14 +247,10 @@ class ServiceTableReport extends AbstractExcelDocumentReport
             ->setFooter(0);
         $sheet->getHeaderFooter()
             ->setOddHeader(
-                '&LEvangelische Kirchengemeinde'.(count($cities) > 1 ? 'n ' : ' ').$cities->pluck('name')->join(
-                    ', '
-                ).'&RPlan für Gottesdienste '.$data['year'].' - Blatt &P von &N'
+                '&LEvangelische Kirchengemeinde'.(count($cities) > 1 ? 'n ' : ' ').$cityNames.'&RPlan für Gottesdienste '.$data['year'].' - Blatt &P von &N'
             )
             ->setEvenHeader(
-                '&LEvangelische Kirchengemeinde'.(count($cities) > 1 ? 'n ' : ' ').$cities->pluck('name')->join(
-                    ', '
-                ).'&RPlan für Gottesdienste '.$data['year'].' - Blatt &P von &N'
+                '&LEvangelische Kirchengemeinde'.(count($cities) > 1 ? 'n ' : ' ').$cityNames.'&RPlan für Gottesdienste '.$data['year'].' - Blatt &P von &N'
             )
             ->setOddFooter('&CAusdruck vom &D, &T')
             ->setEvenFooter('&CAusdruck vom &D, &T');
@@ -380,6 +378,7 @@ class ServiceTableReport extends AbstractExcelDocumentReport
         $row = 3;
         foreach ($serviceList as $services) {
             foreach ($services as $service) {
+                /** @var array{Bezeichnung?: string, 'CSS-Farbe'?: string} $liturgy */
                 $liturgy = $service->liturgicalInfo;
 
                 $row += 2;
@@ -497,7 +496,7 @@ class ServiceTableReport extends AbstractExcelDocumentReport
 
         return $this->sendToBrowser(
             FileNameService::make(
-                static::FILE_TITLE.' '.$cities->pluck('name')->join(', '),
+                self::FILE_TITLE.' '.$cityNames,
                 'xlsx',
                 static::FILE_SIGNATURE,
                 $data['year'].'-01-01', false, null, 'Y')

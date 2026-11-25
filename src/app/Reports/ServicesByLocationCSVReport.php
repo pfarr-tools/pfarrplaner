@@ -76,17 +76,31 @@ class ServicesByLocationCSVReport extends AbstractCSVReport
             ]
         );
 
-        $start = Carbon::parse($data['start']);
-        $end = Carbon::parse($data['end']);
-        $location = Location::findOrFail((int) $data['location_id']);
+        if (! is_array($data)) {
+            abort(400, 'Ungültige Angaben für den Zeitraum oder den Ort.');
+        }
+
+        $start = $data['start'] ?? null;
+        $end = $data['end'] ?? null;
+        $locationId = $data['location_id'] ?? null;
+        if (! is_string($start) || ! is_string($end) || ! is_scalar($locationId)) {
+            abort(400, 'Ungültige Angaben für den Zeitraum oder den Ort.');
+        }
+
+        $start = Carbon::parse($start);
+        $end = Carbon::parse($end);
+        $location = Location::findOrFail((int) $locationId);
 
         $services = Service::between($start, $end)->where('location_id', $location->id)->ordered()->get();
 
         Carbon::setLocale('de');
 
+        $locationName = $location->name;
+        $locationName = is_scalar($locationName) ? (string) $locationName : '';
+
         return $this->csv(
             FileNameService::make(
-                static::FILE_TITLE.' '.$location->name,
+                self::FILE_TITLE.' '.$locationName,
                 null,
                 static::FILE_SIGNATURE,
                 [$start, $end]
@@ -94,12 +108,31 @@ class ServicesByLocationCSVReport extends AbstractCSVReport
             $services,
             [
                 'Datum' => function ($item, $key) {
-                    return $item->date->setTimezone('Europe/Berlin')->isoFormat('dddd, DD. MMMM');
+                    if (! $item instanceof Service) {
+                        return '';
+                    }
+                    $date = $item->date;
+                    if (! $date instanceof Carbon) {
+                        return '';
+                    }
+
+                    return $date->setTimezone('Europe/Berlin')->isoFormat('dddd, DD. MMMM');
                 },
                 'Uhrzeit' => function ($item, $key) {
-                    return $item->date->setTimezone('Europe/Berlin')->format('H:i').' Uhr';
+                    if (! $item instanceof Service) {
+                        return '';
+                    }
+                    $date = $item->date;
+                    if (! $date instanceof Carbon) {
+                        return '';
+                    }
+
+                    return $date->setTimezone('Europe/Berlin')->format('H:i').' Uhr';
                 },
                 'Titel' => function ($item, $key) {
+                    if (! $item instanceof Service) {
+                        return '';
+                    }
                     if ($item->titleText() == 'GD') {
                         return '';
                     }

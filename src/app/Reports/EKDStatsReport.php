@@ -95,7 +95,7 @@ class EKDStatsReport extends AbstractExcelDocumentReport
                 'year' => 'required|integer',
             ]
         );
-
+        /** @var array{year: int, cities: array<int, int>} $data */
         Carbon::setLocale('de');
 
         $serviceList = Service::query()->with([])->between(
@@ -121,9 +121,13 @@ class EKDStatsReport extends AbstractExcelDocumentReport
         $weekdays = [];
 
         foreach ($dates as $date) {
+            if (! is_string($date)) {
+                continue;
+            }
+            $liturgyInfo = LiturgyService::getLiturgyInfoByDate($date);
             if (Carbon::parse($date)->isSunday()) {
                 $sundays[] = $date;
-            } elseif (count(LiturgyService::getLiturgyInfoByDate($date))) {
+            } elseif (is_array($liturgyInfo) && count($liturgyInfo) > 0) {
                 $sundays[] = $date;
             } else {
                 $weekdays[] = $date;
@@ -153,7 +157,10 @@ class EKDStatsReport extends AbstractExcelDocumentReport
             ->whereHas('pastors')
             ->get()
             ->groupBy(function ($item) {
-                return (string) $item->locationTextWithCity;
+                /** @var Service $item */
+                $location = $item->locationTextWithCity;
+
+                return is_scalar($location) ? (string) $location : '';
             });
 
         $ctChristmasEve = Service::with([])->between(
@@ -262,9 +269,12 @@ class EKDStatsReport extends AbstractExcelDocumentReport
         $row += 2;
 
         // output
+        /** @var string $cityNames */
+        $cityNames = $cities->pluck('name')->join(', ');
+
         return $this->sendToBrowser(
             FileNameService::make(
-                static::FILE_TITLE.' '.$cities->pluck('name')->join(', '),
+                self::FILE_TITLE.' '.$cityNames,
                 'xlsx',
                 static::FILE_SIGNATURE,
                 $data['year'].'-01-01', false, null, 'Y')

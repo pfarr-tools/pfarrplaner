@@ -43,7 +43,7 @@ class CalwerPredigtenStudyHelper extends AbstractStudyHelper
     /**
      * Liest die Predigtlinks aller Ergebnisseiten der Calwer Predigten.
      *
-     * @param array<string, mixed> $data
+     * @param  array<string, mixed>  $data
      * @return array<string, array<string, string>>
      */
     public function read(array $data): array
@@ -103,12 +103,16 @@ class CalwerPredigtenStudyHelper extends AbstractStudyHelper
     /**
      * Ergänzt die Predigtlinks für das angeforderte Datum.
      *
-     * @param array<string, mixed> $data
+     * @param  array<string, mixed>  $data
      * @return array<string, mixed>
      */
     public function getLinks(array $data): array
     {
-        $data['links'] = array_merge($data['links'] ?? [], $this->records[$data['date']] ?? []);
+        /** @var array<string, string> $links Bereits vorhandene Links. */
+        $links = $data['links'] ?? [];
+        /** @var string $date Angefragtes Datum. */
+        $date = $data['date'];
+        $data['links'] = array_merge($links, $this->records[$date] ?? []);
 
         return $data;
     }

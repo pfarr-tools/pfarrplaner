@@ -147,7 +147,9 @@ class LiturgischerWegweiserStudyHelper extends AbstractStudyHelper
         if ($json === null) {
             return '';
         }
-        $list = json_decode($json, true)['content']['days'] ?? [];
+        /** @var array{content?: array{days?: array<int, array{date: string, title: string}>}} $decoded */
+        $decoded = json_decode($json, true);
+        $list = $decoded['content']['days'] ?? [];
         $lastInTrinityPeriod = '';
         foreach ($list as $item) {
             if (substr($item['date'], -4) == $year) {
@@ -165,11 +167,16 @@ class LiturgischerWegweiserStudyHelper extends AbstractStudyHelper
      */
     public function getLinks(array $data): array
     {
-        $title = $this->translateTitle($data['title']);
+        /** @var string $title */
+        $title = $data['title'];
+        $title = $this->translateTitle($title);
         if ($title == 'Vorletzter Sonntag d. Kj.') {
-            $title = $this->findSecondToLastSunday($data['date']);
+            /** @var string $date */
+            $date = $data['date'];
+            $title = $this->findSecondToLastSunday($date);
         }
-        $data['links'] = array_merge($data['links'] ?? [], $this->records[$title] ?? []);
+        $links = $data['links'] ?? [];
+        $data['links'] = array_merge(is_array($links) ? $links : [], $this->records[$title] ?? []);
 
         return $data;
     }

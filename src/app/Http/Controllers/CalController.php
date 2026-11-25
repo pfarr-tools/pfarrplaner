@@ -41,6 +41,7 @@ use App\Services\RedirectorService;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
@@ -119,8 +120,10 @@ class CalController extends Controller
             ->get()->pluck('year');
 
         $writableCities = $user->writableCities;
-        $cities = array_values($user->getSortedCities()->map(function ($city) {
-            $city->childIds = $city->is_org ? $city->children->pluck('id')->toArray() : [];
+        /** @var Collection<int, City> $sortedCities */
+        $sortedCities = $user->getSortedCities();
+        $cities = array_values($sortedCities->map(function (City $city) {
+            $city->setAttribute('childIds', $city->is_org ? $city->children->pluck('id')->toArray() : []);
 
             return $city;
         })->all());

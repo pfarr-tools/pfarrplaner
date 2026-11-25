@@ -59,10 +59,12 @@ class CommentPolicy
             return $owner;
         }
 
-        if (! $owner) {
+        if (! is_object($owner)) {
             return null;
         }
 
-        return $owner->service ?? null;
+        $service = $owner->service ?? null;
+
+        return $service instanceof Service ? $service : null;
     }
 }

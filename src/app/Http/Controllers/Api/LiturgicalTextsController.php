@@ -62,8 +62,6 @@ class LiturgicalTextsController extends Controller
 
     /**
      * Import text from Word document
-     *
-     * @return JsonResponse|null
      */
     public function importFromWord(Request $request): ?JsonResponse
     {

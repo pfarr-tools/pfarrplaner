@@ -162,6 +162,7 @@ class ServiceRequest extends FormRequest
                 $data['time'] = $data['time'] ?: '';
                 $data['cc_location'] = $data['cc_location'] ?: '';
             } elseif (isset($data['location_id'])) {
+                /** @var int|string $locationId */
                 $locationId = $data['location_id'] ?: 0;
                 if ($locationId) {
                     $location = Location::query()->whereKey($locationId)->first();
@@ -187,8 +188,12 @@ class ServiceRequest extends FormRequest
         $data['needs_reservations'] = $data['needs_reservations'] ?? 0;
         $data['registration_active'] = $data['registration_active'] ?? 0;
 
-        $data['exclude_places'] = strtoupper($data['exclude_places'] ?? '');
-        $data['reserved_places'] = strtoupper($data['reserved_places'] ?? '');
+        /** @var string $excludePlaces */
+        $excludePlaces = $data['exclude_places'] ?? '';
+        $data['exclude_places'] = strtoupper($excludePlaces);
+        /** @var string $reservedPlaces */
+        $reservedPlaces = $data['reserved_places'] ?? '';
+        $data['reserved_places'] = strtoupper($reservedPlaces);
 
         if (isset($data['registration_online_start'])) {
             $data['registration_online_start'] = $this->getDateTime($data['registration_online_start']);
@@ -198,11 +203,15 @@ class ServiceRequest extends FormRequest
         }
 
         if (isset($data['date'])) {
-            $data['time'] = Carbon::parse($data['date'])->setTimezone('Europe/Berlin')->format('H:i:s');
+            /** @var string $date */
+            $date = $data['date'];
+            $data['time'] = Carbon::parse($date)->setTimezone('Europe/Berlin')->format('H:i:s');
         }
 
         if (($data['event_class'] ?? null) == 'service') {
-            $data['end'] = Carbon::parse($data['date'])->addHour();
+            /** @var string $date */
+            $date = $data['date'];
+            $data['end'] = Carbon::parse($date)->addHour();
         }
 
         if (($data['location_id'] ?? null) === 0) {
@@ -217,6 +226,7 @@ class ServiceRequest extends FormRequest
      */
     protected function getDateTime(mixed $data): Carbon
     {
+        /** @var string|int|float|\DateTimeInterface|null $data */
         return Carbon::parse($data, 'Europe/Berlin')->setTimezone('UTC');
     }
 }

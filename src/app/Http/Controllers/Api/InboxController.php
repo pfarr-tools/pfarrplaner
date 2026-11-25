@@ -44,12 +44,12 @@ class InboxController extends Controller
     public function index(): JsonResponse
     {
         $inboxPath = config('inbox.path');
-        if (! $inboxPath) {
+        if (! is_string($inboxPath) || $inboxPath === '') {
             return response()->json(false);
         }
 
         $files = collect(glob(storage_path($inboxPath.'/*')) ?: [])->filter(function (string $item) {
-            return is_file($item) && in_array(pathinfo($item, PATHINFO_EXTENSION), static::ALLOWED_EXTENSIONS);
+            return is_file($item) && in_array(pathinfo($item, PATHINFO_EXTENSION), self::ALLOWED_EXTENSIONS);
         })->map(function ($item) {
             $extension = strtolower(pathinfo($item, PATHINFO_EXTENSION));
             $size = filesize($item);
@@ -74,14 +74,14 @@ class InboxController extends Controller
     public function download(string $filename): BinaryFileResponse
     {
         $inboxPath = config('inbox.path');
-        $directory = $inboxPath ? realpath(storage_path($inboxPath)) : false;
+        $directory = is_string($inboxPath) && $inboxPath !== '' ? realpath(storage_path($inboxPath)) : false;
         $basename = basename($filename);
         $extension = strtolower(pathinfo($basename, PATHINFO_EXTENSION));
         $path = $directory ? realpath($directory.'/'.$basename) : false;
 
         abort_unless(
             $directory && $path && str_starts_with($path, $directory.DIRECTORY_SEPARATOR)
-                && in_array($extension, static::ALLOWED_EXTENSIONS, true),
+                && in_array($extension, self::ALLOWED_EXTENSIONS, true),
             404
         );
 

@@ -40,6 +40,7 @@ use App\Services\LiturgyService;
 use App\Tools\StringTool;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\View as ViewFacade;
 use Illuminate\View\View;
@@ -164,7 +165,8 @@ class BulletinBLReport extends AbstractPDFDocumentReport
 
         $locations = Location::with('alternateLocation')->inCities($includeCities)->get();
         $user = $this->authenticatedUser();
-        $presets = explode(',', $user->getSetting('report.bulletinbl.locationpresets', '-1,-1,-1,-1'));
+        $presetsSetting = $user->getSetting('report.bulletinbl.locationpresets', '-1,-1,-1,-1');
+        $presets = explode(',', is_string($presetsSetting) ? $presetsSetting : '-1,-1,-1,-1');
 
         return $this->renderView('configure', compact('start', 'end', 'includeCities', 'locations', 'presets'));
     }
@@ -175,20 +177,26 @@ class BulletinBLReport extends AbstractPDFDocumentReport
     public function empty(Request $request)
     {
         $locationIds = $request->get('locations');
+        $locationIds = is_array($locationIds) ? $locationIds : [];
         $user = $this->authenticatedUser();
-        $user->setSetting('report.bulletinbl.locationpresets', implode(',', $locationIds));
+        $user->setSetting(
+            'report.bulletinbl.locationpresets',
+            implode(',', array_map(static fn (mixed $id): string => is_scalar($id) ? (string) $id : '', $locationIds))
+        );
         $locations = Location::whereIn('id', $locationIds)->get();
 
         $start = $request->get('start');
         $end = $request->get('end');
+        $start = is_string($start) ? $start : '';
+        $end = is_string($end) ? $end : '';
         $includeCities = $request->get('includeCities');
 
         $empty = [];
 
         $dates = Service::select(DB::raw('DISTINCT DATE(date) AS day'))
             ->between(
-                $this->requireParsedDate(Carbon::createFromFormat('d.m.Y H:i:s', $request->get('start').' 0:00:00')),
-                $this->requireParsedDate(Carbon::createFromFormat('d.m.Y H:i:s', $request->get('end').' 23:59:59'))
+                $this->requireParsedDate(Carbon::createFromFormat('d.m.Y H:i:s', $start.' 0:00:00')),
+                $this->requireParsedDate(Carbon::createFromFormat('d.m.Y H:i:s', $end.' 23:59:59'))
             )->displayable()
             ->whereDoesntHave('funerals')
             ->orderBy('day', 'asc')
@@ -196,6 +204,7 @@ class BulletinBLReport extends AbstractPDFDocumentReport
             ->pluck('day');
 
         foreach ($dates as $day) {
+            $day = is_string($day) ? $day : '';
             foreach ($locations as $location) {
                 $service = Service::where('location_id', $location->id)
                     ->displayable()
@@ -226,6 +235,9 @@ class BulletinBLReport extends AbstractPDFDocumentReport
 
         $empty = $empty;
         $dayList = $dates->reject(function ($item) use ($empty) {
+            if (! is_string($item)) {
+                return false;
+            }
             if (! isset($empty[$item])) {
                 return false;
             }
@@ -269,13 +281,24 @@ class BulletinBLReport extends AbstractPDFDocumentReport
                 'dayList' => 'required',
             ]
         );
+        if (! is_array($data)) {
+            $data = [];
+        }
 
         $start = $request->get('start');
         $end = $request->get('end');
+        $start = is_string($start) ? $start : '';
+        $end = is_string($end) ? $end : '';
         $empty = $request->get('empty');
 
-        $serviceList = Service::whereDate('date', 'in', $data['dayList'])
-            ->whereIn('location_id', $data['locations'])
+        $dayListInput = $data['dayList'];
+        $dayList = is_array($dayListInput) ? $dayListInput : [];
+        $locationsInput = $data['locations'];
+        $locationIds = is_array($locationsInput)
+            ? array_map(static fn (mixed $id): int => is_numeric($id) ? (int) $id : 0, $locationsInput)
+            : [];
+        $serviceList = Service::whereIn(DB::raw('DATE(date)'), $dayList)
+            ->whereIn('location_id', $locationIds)
             ->displayable()
             ->whereDoesntHave('funerals')
             ->whereDoesntHave('serviceGroups')
@@ -284,9 +307,8 @@ class BulletinBLReport extends AbstractPDFDocumentReport
             ->groupBy(['location_id', 'key_date']);
 
         $includeCities = $request->get('includeCities');
-        $dayIds = $days = $request->get('dayList');
+        $dayIds = $days = $dayList;
 
-        $locationIds = array_map(static fn (mixed $id): int => (int) $id, $data['locations']);
         $locationOrder = array_flip($locationIds);
         $locations = Location::whereIn('id', $locationIds)
             ->get()
@@ -308,8 +330,8 @@ class BulletinBLReport extends AbstractPDFDocumentReport
         $specialServices = [];
         foreach (ServiceGroup::all() as $group) {
             $svc = Service::between(
-                $this->requireParsedDate(Carbon::createFromFormat('d.m.Y', $data['start'])),
-                $this->requireParsedDate(Carbon::createFromFormat('d.m.Y', $data['end'])),
+                $this->requireParsedDate(Carbon::createFromFormat('d.m.Y', $start)),
+                $this->requireParsedDate(Carbon::createFromFormat('d.m.Y', $end)),
             )
                 ->inCities($data['includeCities'])
                 ->displayable()
@@ -340,7 +362,8 @@ class BulletinBLReport extends AbstractPDFDocumentReport
             $specialServices[$group]['options'] = compact('sameLocation', 'sameTime', 'location', 'time', 'group');
         }
 
-        $empty = $request->get('empty') ?: [];
+        $emptyInput = $request->get('empty');
+        $empty = is_array($emptyInput) ? $emptyInput : [];
 
         $this->idml = new IDML(base_path('assets/idml/ev3.idml'), 'ev3');
         $spreadCode = '';
@@ -398,7 +421,12 @@ class BulletinBLReport extends AbstractPDFDocumentReport
         $rowCtr = 0;
         foreach ($days as $day) {
             $rowCtr++;
+            $day = is_string($day) ? $day : '';
             $liturgy = LiturgyService::getLiturgyInfoByDate($day);
+            $liturgyName = '';
+            if (is_array($liturgy) && isset($liturgy['Bezeichnung']) && is_string($liturgy['Bezeichnung'])) {
+                $liturgyName = $liturgy['Bezeichnung'];
+            }
 
             if ($rowCtr % 2 == 0) {
                 // even rows: render rectangles
@@ -422,7 +450,7 @@ class BulletinBLReport extends AbstractPDFDocumentReport
                 $spreadCode,
                 $y,
                 0,
-                Carbon::parse($day)->format('d.m.Y').$this->idml->BR().($liturgy['Bezeichnung'] ?? '')
+                Carbon::parse($day)->format('d.m.Y').$this->idml->BR().$liturgyName
             );
 
             $col = 0;
@@ -430,36 +458,41 @@ class BulletinBLReport extends AbstractPDFDocumentReport
                 $col++;
                 $text = '';
                 $service = null;
-                if (isset($serviceList[$location->id][$day]) && count(
-                    $serviceList[$location->id][$day]
-                )) {
-                    $service = $serviceList[$location->id][$day]->first();
-                    if ($service) {
+                $dayServices = $serviceList[$location->id][$day] ?? null;
+                if ($dayServices instanceof Collection && $dayServices->count() > 0) {
+                    $candidate = $dayServices->first();
+                    if ($candidate instanceof Service) {
+                        $service = $candidate;
+                        $defaultTime = StringTool::timeString($location->default_time ?? '', true, '.');
                         $text = $service->participantsText('P', false, false, '|')
-                            .((is_object($service->location)) && (StringTool::timeString(
-                                $location->default_time ?? '',
-                                true,
-                                '.'
-                            ) != $service->timeText(true, '.')) ? ' '.StringTool::timeString(
-                                $location->default_time ?? '',
-                                true,
-                                '.'
-                            ) : '')
-                            .StringTool::timeString($location->default_time ?? '', true, '.')
+                            .((is_object($service->location)) && ($defaultTime != $service->timeText(true, '.')) ? ' '.$defaultTime : '')
+                            .$defaultTime
                             .$this->idml->BR()
                             .$service->description;
                     }
-                } elseif (isset($empty[$location->id][$day])) {
-                    $text = strtr($empty[$location->id][$day], ["\n" => $this->idml->BR(), "\r" => '']);
+                } else {
+                    $emptyForLocation = $empty[$location->id] ?? null;
+                    if (is_array($emptyForLocation) && isset($emptyForLocation[$day]) && is_string($emptyForLocation[$day])) {
+                        $text = strtr($emptyForLocation[$day], ["\n" => $this->idml->BR(), "\r" => '']);
+                    }
                 }
                 $this->storyFrame($stories, $storyId, $spreadCode, $y, $col, $text);
 
-                if (! is_null($service)) {
-                    $tags = $service->tags->pluck('code')->toArray();
+                if ($service instanceof Service) {
+                    $tags = [];
+                    $serviceTags = $service->tags;
+                    if ($serviceTags instanceof Collection) {
+                        foreach ($serviceTags->pluck('code')->toArray() as $code) {
+                            if (is_string($code)) {
+                                $tags[] = $code;
+                            }
+                        }
+                    }
                     if ($service->eucharist) {
                         $tags[] = 'abendmahl';
                     }
-                    if ($service->baptism || (count($service->baptisms) > 0)) {
+                    $baptisms = $service->baptisms;
+                    if ($service->baptism || (is_countable($baptisms) && count($baptisms) > 0)) {
                         $tags[] = 'taufe';
                     }
                     if ($service->cc) {
@@ -507,22 +540,18 @@ class BulletinBLReport extends AbstractPDFDocumentReport
     }
 
     /**
-     * @param  string  $view
-     * @return string
-     *
-     * @throws Throwable
-     */
-    /**
      * Render one story frame into the IDML document.
      *
-     * @param  mixed  $stories  Story identifiers collected so far.
-     * @param  mixed  $storyId  Identifier of the new story.
-     * @param  mixed  $spreadCode  Spread identifier.
+     * @param  list<string>  $stories  Story identifiers collected so far.
+     * @param  string  $storyId  Identifier of the new story, assigned by this method.
+     * @param  string  $spreadCode  Spread XML code, extended by this method.
      * @param  float  $y  Vertical coordinate.
      * @param  int  $col  Column index.
      * @param  string  $text  Story text.
      * @param  string  $view  View used to render the story.
-     * @return string
+     * @return string The assigned story identifier.
+     *
+     * @throws Throwable
      */
     protected function storyFrame(
         &$stories,
@@ -553,11 +582,12 @@ class BulletinBLReport extends AbstractPDFDocumentReport
     }
 
     /**
-     * @return string
-     */
-    /**
-     * @param  list<string>  $tags  Tag names.
-     * @return string
+     * Render the tag graphics for one service cell into the IDML spread.
+     *
+     * @param  int  $col  Column index.
+     * @param  int  $row  Row index.
+     * @param  list<string>  $tags  Tag names to render.
+     * @return string Generated IDML code.
      */
     protected function setTags(int $col, int $row, array $tags)
     {
@@ -580,7 +610,7 @@ class BulletinBLReport extends AbstractPDFDocumentReport
             $y = str_replace(',', '.', (string) ($coords[1] + (($row - 1) * 34.4685039370106)));
             $uid = $this->idml->getUID('tag_'.$tag);
             $tagView = 'reports.bulletinbl.idml.tags.'.$tag;
-            $code .= ViewFacade::file(ViewFacade::getFinder()->find($tagView), compact('x', 'y', 'uid'));
+            $code .= ViewFacade::file(ViewFacade::getFinder()->find($tagView), compact('x', 'y', 'uid'))->render();
 
             $offset += IDML::mmToPoint($this->tagWidth[$tag] + 1);
         }

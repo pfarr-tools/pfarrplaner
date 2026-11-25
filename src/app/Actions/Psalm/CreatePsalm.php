@@ -51,6 +51,7 @@ class CreatePsalm extends AbstractCreateAction implements CreatesPsalms
     public function create(User $user, array $input): Psalm
     {
         Gate::forUser($user)->authorize('create', Psalm::class);
+        /** @var array<string, mixed> $input Validierte Eingabedaten. */
         $input = Validator::make($input, Psalm::$validationRules)->validateWithBag('createPsalm');
         $psalm = Psalm::create($input);
         CreatedPsalm::dispatch($user, $psalm);

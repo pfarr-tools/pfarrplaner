@@ -54,6 +54,7 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
+use Inertia\Response;
 
 /**
  * Class AbsenceController
@@ -75,7 +76,7 @@ class AbsenceController extends Controller
      *
      * @param  int  $year  Year to display.
      * @param  int  $month  Month to display.
-     * @return \Inertia\Response|RedirectResponse
+     * @return Response|RedirectResponse
      */
     public function index(Request $request, $year = 0, $month = 0)
     {
@@ -108,7 +109,7 @@ class AbsenceController extends Controller
      * @param  int  $year  Year of the absence.
      * @param  int  $month  Month of the absence.
      * @param  int  $day  First day of the absence.
-     * @return \Inertia\Response|RedirectResponse
+     * @return Response|RedirectResponse
      */
     public function create(Request $request, $year, $month, User $user, $day = 1)
     {
@@ -154,7 +155,9 @@ class AbsenceController extends Controller
         $absence = Absence::create($request->validated());
         $user = $request->user();
         abort_unless($user instanceof User, 403);
-        $absence->setupReplacements($user, $request->get('replacements') ?: []);
+        /** @var array<int|string, mixed> $replacements */
+        $replacements = $request->get('replacements') ?: [];
+        $absence->setupReplacements($user, $replacements);
 
         event(new AbsenceUpdated($absence));
 
@@ -169,7 +172,10 @@ class AbsenceController extends Controller
         }
 
         if ($url = $request->get('redirectTo', false)) {
-            return Inertia::location($url);
+            /** @var string $redirectTo */
+            $redirectTo = $url;
+
+            return Inertia::location($redirectTo);
         }
 
         return redirect()->route('absence.edit', $absence->id);
@@ -253,7 +259,9 @@ class AbsenceController extends Controller
         }
 
         foreach ($days as $index => $day) {
-            $days[$index]['services'] = Service::atDate($days[$index]['date'])
+            /** @var Carbon $date */
+            $date = $days[$index]['date'];
+            $days[$index]['services'] = Service::atDate($date)
                 ->userParticipates($user)
                 ->count();
             $days[$index]['busy'] = ($days[$index]['services'] > 0);
@@ -359,13 +367,16 @@ class AbsenceController extends Controller
             return $value->copy()->setTimezone('Europe/Berlin')->startOfDay();
         }
 
-        return Carbon::parse($value)->setTimezone('Europe/Berlin')->startOfDay();
+        /** @var \DateTimeInterface|float|int|string|null $date */
+        $date = $value;
+
+        return Carbon::parse($date)->setTimezone('Europe/Berlin')->startOfDay();
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @return \Inertia\Response
+     * @return Response
      */
     public function edit(Request $request, Absence $absence)
     {
@@ -375,7 +386,7 @@ class AbsenceController extends Controller
     /**
      * Render the absence editor.
      *
-     * @return \Inertia\Response
+     * @return Response
      */
     protected function renderEditor(Absence $absence, Request $request)
     {
@@ -393,7 +404,9 @@ class AbsenceController extends Controller
 
         $year = $month = null;
         if ($request->has('startMonth')) {
-            [$month, $year] = explode('-', $request->get('startMonth'));
+            /** @var string $startMonth */
+            $startMonth = $request->get('startMonth');
+            [$month, $year] = explode('-', $startMonth);
         }
         if (! $year) {
             $year = date('Y');
@@ -445,14 +458,16 @@ class AbsenceController extends Controller
      * Update the specified resource in storage.
      *
      * @param  AbsenceRequest  $request  Validated request.
-     * @return JsonResponse|RedirectResponse|\Inertia\Response|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse|RedirectResponse|Response|\Symfony\Component\HttpFoundation\Response
      */
     public function update(AbsenceRequest $request, Absence $absence)
     {
         $absence->update($request->validated());
         $user = $request->user();
         abort_unless($user instanceof User, 403);
-        $absence->setupReplacements($user, $request->get('replacements') ?: []);
+        /** @var array<int|string, mixed> $replacements */
+        $replacements = $request->get('replacements') ?: [];
+        $absence->setupReplacements($user, $replacements);
 
         event(new AbsenceUpdated($absence));
 
@@ -460,7 +475,10 @@ class AbsenceController extends Controller
             return response()->json();
         }
         if ($url = $request->get('redirectTo', false)) {
-            return Inertia::location($url);
+            /** @var string $redirectTo */
+            $redirectTo = $url;
+
+            return Inertia::location($redirectTo);
         }
 
         return redirect()->route(

@@ -141,8 +141,13 @@ class Occurence extends Model
             return $this->event->liturgicalInfo;
         }
         $info = LiturgyService::getLiturgyInfoByDate($this->start);
+        if (! is_array($info)) {
+            return [];
+        }
+        /** @var array<string, mixed> $first */
+        $first = $info[0] ?? [];
 
-        return $info[0] ?? [];
+        return is_array($first) ? $first : [];
     }
 
     /**

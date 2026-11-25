@@ -498,7 +498,7 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
     }
 
     /**
-     * @return mixed
+     * @return \Illuminate\Database\Eloquent\Collection<int, User>
      */
     public function approvableUsers()
     {
@@ -602,6 +602,7 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
     {
         $needReload = false;
         $settings = Settings::all($this);
+        /** @var array<string, mixed> $defaults */
         $defaults = config('user-settings.defaults');
         foreach ($defaults as $key => $defaultSetting) {
             if (! isset($settings[$key])) {
@@ -629,6 +630,7 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
     public function forgetSetting($key)
     {
         if ($this->hasSetting($key)) {
+            /** @var UserSetting $setting */
             $setting = $this->getSetting($key, null, true);
             $setting->delete();
         }
@@ -659,7 +661,10 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
      */
     public function getSetting($key, $default = null, $returnObject = false)
     {
-        return Settings::get($this, $key, $default, $returnObject);
+        /** @var null $default */
+        $settingDefault = $default;
+
+        return Settings::get($this, $key, $settingDefault, $returnObject);
     }
 
     /**
@@ -710,6 +715,7 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
      */
     public function getHomeScreen()
     {
+        /** @var string $homeScreen */
         $homeScreen = $this->getSetting('homeScreen', 'route:calendar');
         if (substr($homeScreen, 0, 11) == 'homescreen:') {
             $homeScreenClass = 'App\\HomeScreens\\'.ucfirst(substr($homeScreen, 11)).'HomeScreen';
@@ -735,7 +741,9 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
     public function getSortedCities()
     {
         if ($this->hasSetting('sorted_cities')) {
-            $ids = explode(',', $this->getSetting('sorted_cities'));
+            /** @var string $sortedCities */
+            $sortedCities = $this->getSetting('sorted_cities');
+            $ids = explode(',', $sortedCities);
 
             return City::whereIn('id', $ids)->get()->sortBy(
                 function ($model) use ($ids) {
@@ -745,7 +753,9 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
         } else {
             // default if user preference not set:
             $cities = $this->visibleCities;
-            $this->setSetting('sorted_cities', implode(',', $cities->pluck('id')->toArray()));
+            /** @var array<int, string> $cityIds */
+            $cityIds = $cities->pluck('id')->toArray();
+            $this->setSetting('sorted_cities', implode(',', $cityIds));
 
             return $cities;
         }
@@ -834,9 +844,11 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
         }
 
         // always include the user
+        /** @var array<int|string> $ids */
         $ids = [$this->id];
 
         // (B) Staff (users with manage_absences flag set) may see all fellow staff in their home city
+        /** @var array<int|string> $newIds */
         $newIds = User::whereHas(
             'homeCities',
             function ($query) {
@@ -848,6 +860,7 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
 
         // (A) Pastors (role Pastor:in, Diakon:in) may also see all fellow pastors in their district (cities with view rights)
         if ($this->hasRole('Pfarrer:in') || $this->hasRole('Diakon:in')) {
+            /** @var array<int|string> $newIds */
             $newIds = User::where(
                 function ($query2) {
                     $query2->whereHas(
@@ -898,8 +911,10 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
         if (! $this->manage_absences) {
             return $returnAbsence ? null : false;
         }
-        if (! is_a($date, Carbon::class)) {
-            $date = new Carbon($date);
+        if (! $date instanceof Carbon) {
+            /** @var \DateTimeInterface|float|int|string|null $dateValue */
+            $dateValue = $date;
+            $date = new Carbon($dateValue);
         }
         $absences = Absence::with('user')
             ->where('user_id', $this->id)
@@ -944,8 +959,10 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
         if (! $this->manage_absences) {
             return $returnAbsence ? null : false;
         }
-        if (! is_a($date, Carbon::class)) {
-            $date = new Carbon($date);
+        if (! $date instanceof Carbon) {
+            /** @var \DateTimeInterface|float|int|string|null $dateValue */
+            $dateValue = $date;
+            $date = new Carbon($dateValue);
         }
         $absences = Absence::where('replacement', $this->id)
             ->where('from', '<=', $date)
@@ -1084,7 +1101,9 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
     public function setSubscriptionsFromArray($subscriptions)
     {
         foreach ($subscriptions as $city => $type) {
-            $this->setSubscription((int) $city, (int) $type);
+            /** @var int|string $type */
+            $typeId = $type;
+            $this->setSubscription((int) $city, (int) $typeId);
         }
     }
 
@@ -1123,9 +1142,11 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
      */
     public function syncRelatedUsers($relation, $relationString, $userIds)
     {
-        $this->$relation()->sync([]);
+        /** @var BelongsToMany<User, $this> $relationship */
+        $relationship = $this->$relation();
+        $relationship->sync([]);
         foreach ($userIds as $userId) {
-            $this->$relation()->attach([$userId => ['relation' => $relationString]]);
+            $relationship->attach([$userId => ['relation' => $relationString]]);
         }
     }
 
@@ -1175,8 +1196,11 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
         $result = $this->cities()->sync($permissions);
 
         // update the user's own sorting (remove cities which are not allowed)
-        $thisPref = explode(',', $this->getSetting('sorted_cities', ''));
+        /** @var string $sortedCities */
+        $sortedCities = $this->getSetting('sorted_cities', '');
+        $thisPref = explode(',', $sortedCities);
         if (! count($thisPref)) {
+            /** @var array<string> $thisPref */
             $thisPref = $result['attached'];
         } else {
             foreach ($thisPref as $key => $city) {
@@ -1185,6 +1209,7 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
                 }
             }
             // make added cities visible without having to edit user preference in profile:
+            /** @var array<string> $thisPref */
             $thisPref = array_merge($thisPref, $result['attached']);
         }
         $this->setSetting('sorted_cities', implode(',', $thisPref));

@@ -94,6 +94,7 @@ class MinistryRequestReport extends AbstractReport
      */
     public function services(Request $request)
     {
+        /** @var array<string, mixed> $data */
         $data = $request->validate([
             'start' => 'date',
             'end' => 'date',
@@ -104,15 +105,26 @@ class MinistryRequestReport extends AbstractReport
             'only_open' => 'sometimes|boolean',
         ]);
 
-        $services = Service::whereIn('city_id', $data['cities'])
-            ->between(Carbon::parse($data['start']), Carbon::parse($data['end']));
+        /** @var array<int, int> $cities */
+        $cities = $data['cities'];
+        /** @var string $startDate */
+        $startDate = $data['start'];
+        /** @var string $endDate */
+        $endDate = $data['end'];
+        /** @var string|null $ministry */
+        $ministry = $data['ministry'] ?? null;
+        /** @var array<int, int> $locations */
+        $locations = $data['locations'] ?? [];
 
-        if (($data['only_open'] ?? false) && ! empty($data['ministry'])) {
-            $services->havingOpenMinistries([$data['ministry']]);
+        $services = Service::whereIn('city_id', $cities)
+            ->between(Carbon::parse($startDate), Carbon::parse($endDate));
+
+        if (($data['only_open'] ?? false) && ! empty($ministry)) {
+            $services->havingOpenMinistries([$ministry]);
         }
 
-        if (count($data['locations'] ?? [])) {
-            $services->whereIn('location_id', ($data['locations'] ?? []));
+        if (count($locations)) {
+            $services->whereIn('location_id', $locations);
         }
 
         return response()->json($services->ordered()->get());
@@ -123,6 +135,7 @@ class MinistryRequestReport extends AbstractReport
      */
     public function recipients(Request $request)
     {
+        /** @var array<string, mixed> $data */
         $data = $request->validate([
             'ministry' => 'string',
             'cities' => 'required|array|min:1',
@@ -146,6 +159,7 @@ class MinistryRequestReport extends AbstractReport
      */
     public function render(Request $request)
     {
+        /** @var array<string, mixed> $data */
         $data = $request->validate(
             [
                 'ministry' => 'required',
@@ -159,18 +173,23 @@ class MinistryRequestReport extends AbstractReport
             ]
         );
 
-        foreach (($data['address'] ?? []) as $id => $address) {
+        /** @var array<int|string, string|null> $addresses */
+        $addresses = $data['address'] ?? [];
+        foreach ($addresses as $id => $address) {
             if (! $address) {
-                unset($data['address'][$id]);
+                unset($addresses[$id]);
             } else {
                 $user = User::findOrFail((int) $id)->update(['email' => $address]);
             }
         }
+        $data['address'] = $addresses;
 
-        $data['recipients'] = User::whereIn('id', $data['recipients'])->get();
+        /** @var array<int, int> $recipientIds */
+        $recipientIds = $data['recipients'];
+        $recipients = User::whereIn('id', $recipientIds)->get();
 
-        foreach ($data['recipients'] as $user) {
-            $address = $data['address'][$user->id] ?? $user->email;
+        foreach ($recipients as $user) {
+            $address = $addresses[$user->id] ?? $user->email;
             if (! filter_var($address, FILTER_VALIDATE_EMAIL)) {
                 throw ValidationException::withMessages([
                     'recipients' => 'Für '.$user->name.' ist keine gültige E-Mailadresse hinterlegt.',
@@ -178,16 +197,21 @@ class MinistryRequestReport extends AbstractReport
             }
         }
 
-        $data['services'] = Service::whereIn('id', $data['services'])
+        /** @var array<int, int> $serviceIds */
+        $serviceIds = $data['services'];
+        $services = Service::whereIn('id', $serviceIds)
             ->ordered()
             ->get();
 
-        $ministries = MinistryService::all();
+        /** @var string $ministry */
+        $ministry = $data['ministry'];
+        /** @var string|null $text */
+        $text = $data['text'] ?? null;
 
-        foreach ($data['recipients'] as $user) {
+        foreach ($recipients as $user) {
             $sender = $this->authenticatedUser();
-            Mail::to($data['address'][$user->id] ?? $user->email)->cc($sender)->queue(
-                new MinistryRequest($user, $sender, $data['ministry'], $data['services'], $data['text'])
+            Mail::to($addresses[$user->id] ?? $user->email)->cc($sender)->queue(
+                new MinistryRequest($user, $sender, $ministry, $services, $text)
             );
         }
 

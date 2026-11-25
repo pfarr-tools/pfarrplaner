@@ -88,9 +88,10 @@ class GenerateDatabaseKey extends Command
      */
     protected function generateRandomKey()
     {
-        return 'base64:'.base64_encode(
-            Encrypter::generateKey((string) config('database.cipher'))
-        );
+        /** @var string $cipher Konfiguriertes Verschlüsselungsverfahren. */
+        $cipher = config('database.cipher');
+
+        return 'base64:'.base64_encode(Encrypter::generateKey($cipher));
     }
 
     /**
@@ -101,7 +102,8 @@ class GenerateDatabaseKey extends Command
      */
     protected function setKeyInEnvironmentFile($key)
     {
-        $currentKey = (string) config('database.key');
+        /** @var string $currentKey Aktuell konfigurierter Datenbankschlüssel. */
+        $currentKey = config('database.key');
 
         if (strlen($currentKey) !== 0 && (! $this->confirmToProceed())) {
             return false;
@@ -162,7 +164,9 @@ class GenerateDatabaseKey extends Command
      */
     protected function keyReplacementPattern()
     {
-        $escaped = preg_quote('='.(string) config('database.key'), '/');
+        /** @var string $currentKey Aktuell konfigurierter Datenbankschlüssel. */
+        $currentKey = config('database.key');
+        $escaped = preg_quote('='.$currentKey, '/');
 
         return "/^DATABASE_KEY{$escaped}/m";
     }

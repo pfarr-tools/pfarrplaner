@@ -221,7 +221,9 @@ class PublicController extends Controller
             ->filter()
             ->map(fn ($serviceId) => (int) $serviceId);
         $selectedServiceIds = [];
-        foreach ($request->get('services', []) as $key => $service) {
+        /** @var array<array-key, mixed> $requestedServices */
+        $requestedServices = $request->get('services', []);
+        foreach ($requestedServices as $key => $service) {
             if ($service && $allowedServiceIds->contains((int) $key)) {
                 $selectedServiceIds[] = (int) $key;
             }
@@ -287,7 +289,7 @@ class PublicController extends Controller
     /**
      * @param  int|string  $id  Rite identifier.
      * @param  string  $type  Rite type.
-     * @return mixed
+     * @return Baptism|Funeral|Wedding|null
      */
     protected function getRite($type, $id)
     {
@@ -325,17 +327,18 @@ class PublicController extends Controller
                 abort(404);
             }
             $spouse = $request->get('spouse');
+            abort_unless(is_string($spouse) || is_int($spouse), 404);
             $method = 'spouse'.$spouse.'_needs_dimissorial';
-            if (! $rite->$method) {
+            if (! $rite->getAttribute($method)) {
                 abort(403);
             }
             $dimissorialReceived = (bool) $rite->{'spouse'.$spouse.'_dimissorial_received'};
         } else {
-            if (! $rite->needs_dimissorial) {
+            if (! $rite->getAttribute('needs_dimissorial')) {
                 abort(403);
             }
             $spouse = null;
-            $dimissorialReceived = (bool) $rite->dimissorial_received;
+            $dimissorialReceived = (bool) $rite->getAttribute('dimissorial_received');
         }
 
         $rite->load(['service']);
@@ -363,13 +366,14 @@ class PublicController extends Controller
                 abort(404);
             }
             $spouse = $request->get('spouse');
+            abort_unless(is_string($spouse) || is_int($spouse), 404);
             $method = 'spouse'.$spouse.'_needs_dimissorial';
-            if (! $rite->$method) {
+            if (! $rite->getAttribute($method)) {
                 abort(403);
             }
             $rite->update(['spouse'.$spouse.'_dimissorial_received' => Carbon::now()]);
         } else {
-            if (! $rite->needs_dimissorial) {
+            if (! $rite->getAttribute('needs_dimissorial')) {
                 abort(403);
             }
             $rite->update(['dimissorial_received' => Carbon::now()]);
@@ -384,6 +388,15 @@ class PublicController extends Controller
      */
     public function submitContactForm(Request $request)
     {
+        /**
+         * @var array{
+         *     name: string,
+         *     email: string,
+         *     subject: string,
+         *     message: string,
+         *     'g-recaptcha-response': string
+         * } $data
+         */
         $data = $request->validate([
             'name' => 'required|string',
             'email' => 'required|email',
@@ -399,7 +412,8 @@ class PublicController extends Controller
                 'response' => $data['g-recaptcha-response'],
             ],
         ]);
-        if (! json_decode($response->getBody(), true)['success']) {
+        $captchaResult = json_decode($response->getBody(), true);
+        if (! is_array($captchaResult) || ! ($captchaResult['success'] ?? false)) {
             abort(403);
         }
 
@@ -421,6 +435,7 @@ class PublicController extends Controller
 
         $packageContents = file_get_contents(base_path('package.json'));
         abort_unless(is_string($packageContents), 500);
+        /** @var array{version: string} $packageConfig */
         $packageConfig = json_decode($packageContents, true);
         $version = $packageConfig['version'];
 

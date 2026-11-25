@@ -143,8 +143,12 @@ class DasKirchenjahrStudyHelper extends AbstractStudyHelper
      */
     public function getLinks(array $data): array
     {
-        $title = $this->translateTitle($data['title']);
-        $data['links'] = array_merge($data['links'] ?? [], $this->records[$title] ?? []);
+        /** @var string $title Titel des angeforderten Tages. */
+        $title = $data['title'];
+        $title = $this->translateTitle($title);
+        /** @var array<string, string> $links Bereits vorhandene Links. */
+        $links = $data['links'] ?? [];
+        $data['links'] = array_merge($links, $this->records[$title] ?? []);
 
         return $data;
     }

@@ -46,6 +46,17 @@ class DefaultAddressLabelSheetDocument extends DefaultLabelSheetDocument
     public const FONT10 = ['name' => 'Arial', 'size' => 10];
 
     /**
+     * Convert a free-form configuration or address value into printable text.
+     *
+     * @param  mixed  $value  Value read from the document configuration or an address record.
+     * @return string Textual representation, or an empty string for non-scalar values.
+     */
+    private function asString(mixed $value): string
+    {
+        return is_scalar($value) ? (string) $value : '';
+    }
+
+    /**
      * @param  array<string, mixed>  $config  Document configuration.
      * @return void
      */
@@ -74,7 +85,9 @@ class DefaultAddressLabelSheetDocument extends DefaultLabelSheetDocument
         }
         if (isset($fromAddressData['address'])) {
             $fromParts->push($fromAddressData['address']);
-            if ($x = trim(($fromAddressData['zip'] ?? '').' '.($fromAddressData['city'] ?? ''))) {
+            $zip = $this->asString($fromAddressData['zip'] ?? '');
+            $city = $this->asString($fromAddressData['city'] ?? '');
+            if ($x = trim($zip.' '.$city)) {
                 $fromParts->push($x);
             }
         } else {
@@ -85,18 +98,22 @@ class DefaultAddressLabelSheetDocument extends DefaultLabelSheetDocument
             }
         }
 
-        $this->fromAddress = $fromParts->join(' · ');
+        $this->fromAddress = $this->asString($fromParts->join(' · '));
+
+        $labelConfig = $this->config['label'] ?? [];
+        $labelHeight = is_array($labelConfig) ? ($labelConfig['height'] ?? 3.7) : 3.7;
+        $skipLabels = $this->config['skipLabels'] ?? 0;
 
         $this->renderLabels(
             $addresses,
             3,
             Converter::cmToTwip(7),
-            Converter::cmToTwip($this->config['label']['height'] ?? 3.7),
+            Converter::cmToTwip(is_numeric($labelHeight) ? (float) $labelHeight : 3.7),
             [
 
             ],
             [$this, 'renderAddress'],
-            $this->config['skipLabels'] ?? 0,
+            is_numeric($skipLabels) ? (int) $skipLabels : 0,
         );
     }
 
@@ -127,7 +144,7 @@ class DefaultAddressLabelSheetDocument extends DefaultLabelSheetDocument
         }
 
         if (isset($address['info'])) {
-            $cell->addText($address['info'], static::FONT6, array_merge($pStyle, [
+            $cell->addText($this->asString($address['info']), static::FONT6, array_merge($pStyle, [
                 'align' => 'right',
                 'spaceBefore' => $this->fromAddress ? 0 : Converter::cmToTwip(0.7),
             ]));
@@ -136,10 +153,10 @@ class DefaultAddressLabelSheetDocument extends DefaultLabelSheetDocument
         $run = $cell->addTextRun(array_merge($pStyle, [
             'spaceBefore' => $this->fromAddress || isset($address['info']) ? 0 : Converter::cmToTwip(0.7),
         ]));
-        $run->addText($address['name'], static::FONT10);
+        $run->addText($this->asString($address['name']), static::FONT10);
         $run->addTextBreak();
-        $run->addText($address['address'], static::FONT10);
+        $run->addText($this->asString($address['address']), static::FONT10);
         $run->addTextBreak();
-        $run->addText(trim($address['zip'].' '.$address['city']), static::FONT10);
+        $run->addText(trim($this->asString($address['zip']).' '.$this->asString($address['city'])), static::FONT10);
     }
 }

@@ -100,8 +100,10 @@ class Item extends Model
      */
     public function getDataAttribute(): array
     {
-        $data = unserialize($this->attributes['serialized_data']) ?: [];
+        $serialized = $this->attributes['serialized_data'] ?? '';
+        $data = is_string($serialized) ? unserialize($serialized) : false;
 
+        /** @var array<string, mixed> $data */
         return is_array($data) ? $data : [];
     }
 
@@ -123,23 +125,29 @@ class Item extends Model
      */
     public function recipients(): array
     {
-        $list = (isset($this->data['responsible']) ? $this->data['responsible'] : []);
+        $list = $this->data['responsible'] ?? [];
         $p = [];
-        foreach ($list as $participant) {
+        foreach (is_array($list) ? $list : [] as $participant) {
             if (is_array($participant)) {
-                $type = $participant['type'];
-                $id = $participant['name'];
-            } else {
+                $type = $participant['type'] ?? null;
+                $id = $participant['name'] ?? null;
+            } elseif (is_string($participant)) {
                 if (Str::contains($participant, ':')) {
                     [$type, $id] = explode(':', $participant, 2);
                 } else {
                     $id = $participant;
                     $type = 'free';
                 }
+            } else {
+                continue;
             }
             if ((! $type) || (! $id)) {
                 continue;
             }
+            if (! is_string($id) && ! is_int($id)) {
+                continue;
+            }
+            $id = (string) $id;
             if ($type == 'ministry') {
                 $id = isset(self::replacement[$id]) ? self::replacement[$id] : $id;
                 /** @var Block&object{service: Service} $block */
@@ -189,15 +197,26 @@ class Item extends Model
             return;
         }
         $data = $this->data;
+        $reference = $this->data['reference'] ?? '';
+        if (! is_string($reference)) {
+            $reference = '';
+        }
         $bible = new BibleText;
-        $bibleText = $this->data['reference'] ? $bible->get(ReferenceParser::getInstance()->parse($this->data['reference'])) : [];
+        $bibleText = [];
+        if ($reference) {
+            /** @var array{parsed: array<int, array<string, mixed>>} $parsedReference */
+            $parsedReference = ReferenceParser::getInstance()->parse($reference);
+            $bibleText = $bible->get($parsedReference);
+        }
         $text = '';
         foreach ($bibleText as $textSection) {
-            foreach ($textSection['text'] as $verse) {
+            /** @var array<int, array{verse: string, text: string}> $verses */
+            $verses = $textSection['text'];
+            foreach ($verses as $verse) {
                 $text .= $verse['verse'].' '.$verse['text'].' ';
             }
         }
-        $data['text'] = trim($text) ? trim($text).' ('.$this->data['reference'].')' : '';
+        $data['text'] = trim($text) ? trim($text).' ('.$reference.')' : '';
         $this->data = $data;
     }
 

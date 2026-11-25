@@ -55,11 +55,18 @@ class ServiceUpdated extends AbstractServiceMailable
      */
     public function build()
     {
+        /** @var array<string, array{original: mixed, changed: mixed}> $changes */
+        $changes = $this->changed;
         $participants = [];
-        if (isset($this->changed['participants'])) {
+        if (isset($changes['participants'])) {
             foreach (['original', 'changed'] as $type) {
-                foreach ($this->changed['participants'][$type] ?? [] as $participant) {
-                    $category = $participant['pivot']['category'];
+                $participantsOfType = $changes['participants'][$type] ?? [];
+                foreach (is_array($participantsOfType) ? $participantsOfType : [] as $participant) {
+                    if (! is_array($participant)) {
+                        continue;
+                    }
+                    $pivot = $participant['pivot'] ?? null;
+                    $category = is_array($pivot) ? ($pivot['category'] ?? null) : null;
                     switch ($category) {
                         case 'P':
                             $category = config('labels.pastor');
@@ -74,6 +81,9 @@ class ServiceUpdated extends AbstractServiceMailable
                             $category = 'Andere Beteiligte';
                             break;
                     }
+                    if (! is_string($category)) {
+                        continue;
+                    }
                     $participants[$category][$type][] = $participant;
                 }
             }
@@ -85,7 +95,7 @@ class ServiceUpdated extends AbstractServiceMailable
             }
         }
 
-        $displayChanges = ServiceChangeFormatter::format($this->service, $this->changed);
+        $displayChanges = ServiceChangeFormatter::format($this->service, $changes);
 
         $ics = view(
             'ical/ical',

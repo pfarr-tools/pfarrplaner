@@ -53,13 +53,16 @@ abstract class AbstractBaptismAttachment extends AbstractAttachment
 
     public function getFileName()
     {
+        /** @var string|null $candidateName */
+        $candidateName = $this->baptism->candidate_name;
+
         return FileNameService::make(
             static::$fileTitle ?: static::$title,
             static::$extension,
             self::FILE_SIGNATURE,
             $this->baptism->service->date ?? now(),
             false,
-            $this->baptism->candidate_name
+            $candidateName
         );
     }
 }

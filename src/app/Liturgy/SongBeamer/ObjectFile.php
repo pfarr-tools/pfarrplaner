@@ -131,7 +131,6 @@ class ObjectFile extends AbstractFile
             .$this->line('end');
     }
 
-    /** @return string */
     public function getClass(): string
     {
         return $this->class;
@@ -145,7 +144,6 @@ class ObjectFile extends AbstractFile
         $this->class = $class;
     }
 
-    /** @return string */
     public function getType(): string
     {
         return $this->type;
