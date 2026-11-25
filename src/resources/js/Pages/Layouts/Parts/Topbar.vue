@@ -126,6 +126,18 @@
                             </span>
                         </inertia-link>
                     </li>
+                    <li>
+                        <inertia-link
+                            :href="route('tokens.index')"
+                            class="dropdown-item profile-menu-item"
+                        >
+                            <span class="profile-menu-item-icon mdi mdi-key-variant"></span>
+                            <span>
+                                <strong>API-Tokens</strong><br />
+                                <small>Persönliche und gemeindebezogene Zugangsschlüssel</small>
+                            </span>
+                        </inertia-link>
+                    </li>
                     <li><hr class="dropdown-divider" /></li>
                     <li>
                         <button
@@ -147,22 +159,44 @@
 </template>
 
 <script>
+/**
+ * Renders the top navigation bar including quick actions, help link, and user profile menu.
+ */
 export default {
     name: 'Topbar',
     computed: {
+        /**
+         * Return the current authenticated user's profile payload.
+         *
+         * @returns {Record<string, unknown>} Current user data.
+         */
         user() {
             return this.$page.props.currentUser.data
         },
+        /**
+         * Return any active admin impersonation switch-back metadata.
+         *
+         * @returns {Record<string, unknown>|null|undefined} Impersonation metadata.
+         */
         adminUserSwitchBack() {
             return this.$page.props.adminUserSwitchBack
         },
+        /**
+         * Resolve the current contextual manual page slug.
+         *
+         * @returns {string} Manual page path segment.
+         */
         helpPage() {
             return this.$page.props.helpPage ?? 'benutzerhandbuch'
         },
+        /**
+         * Build the full handbook URL for the current page's help button.
+         *
+         * @returns {string} External handbook URL.
+         */
         helpUrl() {
-            const baseUrl = (
-                this.$page.props.manualBaseUrl ?? 'https://handbuch.pfarrplaner.de'
-            ).replace(/\/+$/, '')
+            const rawBaseUrl = this.$page.props.manualBaseUrl ?? 'https://handbuch.pfarrplaner.de'
+            const baseUrl = rawBaseUrl.replace(/\/+$/, '')
             const helpPage = String(this.helpPage || '').replace(/^\/+|\/+$/g, '')
             const suffix = helpPage ? `/${helpPage}/` : ''
 

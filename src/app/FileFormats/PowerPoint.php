@@ -8,7 +8,7 @@
  * @copyright (c) Christoph Fischer, https://christoph-fischer.org
  * @license https://www.gnu.org/licenses/gpl-3.0.txt GPL 3.0 or later
  * @link https://github.com/pfarr-tools/pfarrplaner
- * @version git: $Id: c6cb84134ab5945a21a606292f843f6bdfcc105f $
+ * @version git: $Id$
  *
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).

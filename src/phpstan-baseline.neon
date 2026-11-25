@@ -5035,24 +5035,6 @@ parameters:
 			path: app/Http/Controllers/Extranet/SermonController.php
 
 		-
-			message: '#^Method App\\Http\\Controllers\\Extranet\\ServiceController\:\:lastWithSermon\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/Http/Controllers/Extranet/ServiceController.php
-
-		-
-			message: '#^Method App\\Http\\Controllers\\Extranet\\ServiceController\:\:next\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/Http/Controllers/Extranet/ServiceController.php
-
-		-
-			message: '#^Method App\\Http\\Controllers\\Extranet\\ServiceController\:\:past\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/Http/Controllers/Extranet/ServiceController.php
-
-		-
 			message: '#^Access to an undefined property App\\Models\\Leave\\Poolmaster\:\:\$pool\.$#'
 			identifier: property.notFound
 			count: 1
@@ -6185,24 +6167,6 @@ parameters:
 			identifier: missingType.parameter
 			count: 1
 			path: app/Http/Controllers/TestController.php
-
-		-
-			message: '#^Method App\\Http\\Controllers\\TokenController\:\:create\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/Http/Controllers/TokenController.php
-
-		-
-			message: '#^Method App\\Http\\Controllers\\TokenController\:\:destroy\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/Http/Controllers/TokenController.php
-
-		-
-			message: '#^Method App\\Http\\Controllers\\TokenController\:\:index\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/Http/Controllers/TokenController.php
 
 		-
 			message: '#^Access to an undefined property App\\Models\\People\\User\:\:\$duplicates\.$#'

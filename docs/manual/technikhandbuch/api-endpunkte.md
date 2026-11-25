@@ -112,3 +112,39 @@ Dieses Kapitel beschreibt die aktuell sichtbaren API-Routen aus `routes/api/*.ph
 
 - Öffentliche API-Routen dürfen nur mit ausdrücklicher fachlicher Begründung angelegt werden. Standard ist immer `auth:sanctum,api`.
 - Die Route-Definitionen allein beschreiben noch nicht alle Validierungsdetails. Für Payloads und Seiteneffekte sind die jeweiligen Controller und Requests maßgeblich.
+
+## Extranet-Schnittstellen (`/extranet`)
+
+Die Extranet-Routen aus `routes/extranet/*.php` liegen unter dem Präfix `/extranet` und verwenden die Middleware-Gruppe `extranet` (`auth:sanctum`, `EnforceExtranetTokenScope`, `RequireTwoFactorRecovery`, `RequireSecurityOnboarding`).
+
+### Persönliche Lese-Endpunkte
+
+Diese Endpunkte stehen Sitzungen und unbeschränkten persönlichen Tokens (`*`) zur Verfügung; gemeindebezogene Schlüssel (`extranet:city:{id}`) und Kalenderfeed-Tokens werden abgewiesen:
+
+| Methode | Pfad | Schutz | Zweck |
+|---|---|---|---|
+| `GET` | `/extranet/user/services/next` | `auth:sanctum` | kommende eigene Gottesdienste (`P`) |
+| `GET` | `/extranet/user/services/past` | `auth:sanctum` | vergangene eigene Gottesdienste (`P`) |
+| `GET` | `/extranet/user/services/lastWithSermon` | `auth:sanctum` | eigene Gottesdienste mit verknüpfter Predigt |
+| `GET` | `/extranet/user/sermons/latest` | `auth:sanctum` | neueste Predigten der angemeldeten Person |
+| `GET` | `/extranet/user/sermons/headers` | `auth:sanctum` | Predigt-Kopfdaten |
+| `GET` | `/extranet/sermon/{sermonId}` | `auth:sanctum` | Einzelansicht einer Predigt |
+
+### Gemeindebezogene Veranstaltungs- und Gottesdienstverwaltung
+
+Diese Endpunkte verwalten sowohl Gottesdienste (`event_class = "service"`) als auch allgemeine Veranstaltungen (`event_class = "event"`) inkl. Wiederholungsregeln (`rrule`) und generierter `Occurence`-Einträge. Sie akzeptieren sowohl gemeindebezogene Extranet-Tokens (`extranet:services` + `extranet:city:{id}`) als auch berechtigte Sanctum-Sitzungen/Voll-Tokens im Rahmen der Gemeinderechte:
+
+| Methode | Pfad | Schutz | Zweck |
+|---|---|---|---|
+| `GET` | `/extranet/services` | `auth:sanctum` | Gottesdienste und Veranstaltungen auflisten/filtern (`city_id`, `event_class=service\|event\|all`, `from`, `to`, `include_hidden`, `per_page`) |
+| `POST` | `/extranet/services` | `auth:sanctum` | Gottesdienst oder Veranstaltung anlegen (`201 Created`) |
+| `GET` | `/extranet/services/{service}` | `auth:sanctum` | Einzelnen Gottesdienst bzw. Veranstaltung inkl. `occurences` abrufen |
+| `PATCH` | `/extranet/services/{service}` | `auth:sanctum` | Partielle Aktualisierung ohne Überschreiben ausgelassener Flags |
+| `DELETE` | `/extranet/services/{service}` | `auth:sanctum` | Gottesdienst oder Veranstaltung in den Papierkorb verschieben (Soft-Delete) |
+| `POST` | `/extranet/services/{service}/assign` | `auth:sanctum` | Mitwirkende für Dienste (`ministry`, `users`, `exclusive`, `no-toggle`) zuordnen |
+
+#### Wichtige Payload- und Zeitregeln für `/extranet/services`
+
+- **Gemeindezuordnung (`city_id`):** Bei einem auf genau eine Kirchengemeinde beschränkten Token wird `city_id` beim Anlegen (`POST /extranet/services`) automatisch vorbelegt, sofern es im Request ausgelassen wird. Abweichende `city_id`-Werte oder fremde `location_id`-Werte werden mit `403` bzw. `422` abgewiesen.
+- **Zeitstempel & UTC:** Alle Zeitpunkte werden in der Datenbank in `UTC` gespeichert. Übergibt der Client ISO-8601-Werte mit Zeitzone (z. B. `2026-11-04T19:30:00+01:00` oder `…Z`), wird exakt nach `UTC` umgerechnet; reine Datums- oder Lokalzeitangaben ohne Offset (z. B. `2026-11-01` + optional `time: "10:00"`) werden als `Europe/Berlin` interpretiert und nach `UTC` konvertiert.
+- **Partielle Updates (`PATCH`):** Nicht mitgesendete boolesche Felder (`hidden`, `needs_reservations`, `registration_active`, `is_allday`) sowie Sitzplatzfelder bleiben unverändert erhalten.

@@ -23,6 +23,7 @@ return [
         'gd-organist-bearbeiten',
         'gd-pfarrer-bearbeiten',
         'gd-taufe-bearbeiten',
+        RoleService::PERMISSION_CREATE_CHURCH_API_TOKENS,
         'kirche-bearbeiten',
         'lieder-bearbeiten',
         'liederbuecher-bearbeiten',
@@ -80,5 +81,6 @@ return [
             'gd-taufe-bearbeiten', 'kirche-bearbeiten', 'urlaub-lesen', 'ort-bearbeiten',
         ],
         'Streaming-Bearbeiter:in' => ['ort-bearbeiten', 'gd-bearbeiten', 'gd-allgemein-bearbeiten'],
+        RoleService::ROLE_EXTRANET_API_MANAGER => [RoleService::PERMISSION_CREATE_CHURCH_API_TOKENS],
     ],
 ];

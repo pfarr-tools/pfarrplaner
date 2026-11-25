@@ -30,43 +30,139 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StorePersonalTokenRequest;
+use App\Models\People\User;
+use App\Models\Places\City;
+use App\Services\ExtranetTokenScope;
+use App\Services\RoleService;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
+use Inertia\Response;
+use Laravel\Sanctum\NewAccessToken;
 use Laravel\Sanctum\PersonalAccessToken;
 
+/**
+ * Manages personal and church-scoped Sanctum API tokens for the authenticated user.
+ */
 class TokenController extends Controller
 {
+    /**
+     * Require an authenticated web session for token management routes.
+     */
     public function __construct()
     {
         $this->middleware('auth');
     }
 
-    public function index()
+    /**
+     * Render the token overview page for the authenticated user.
+     *
+     * @return Response Inertia token management page.
+     */
+    public function index(): Response
     {
-        Gate::authorize('update', Auth::user());
-        $tokens = Auth::user()->tokens;
-        $token = null;
+        /** @var User $user */
+        $user = Auth::user();
+        Gate::authorize('update', $user);
 
-        return Inertia::render('tokens', compact('tokens', 'token'));
+        return $this->renderTokensPage($user, null);
     }
 
-    public function create(Request $request)
+    /**
+     * Issue a personal or church-scoped Sanctum token and display its plain-text secret once.
+     *
+     * @param  StorePersonalTokenRequest  $request  Validated token creation request.
+     * @return Response Inertia token management page including the newly issued token.
+     */
+    public function create(StorePersonalTokenRequest $request): Response
     {
-        Gate::authorize('update', Auth::user());
-        $request->validate(['title' => 'required|string']);
-        $token = Auth::user()->createToken($request->get('title'));
-        $tokens = Auth::user()->tokens;
+        /** @var User $user */
+        $user = $request->user();
+        $validated = $request->validated();
+        $title = (string) $validated['title'];
+        $cityId = isset($validated['city_id']) && $validated['city_id'] !== ''
+            ? (int) $validated['city_id']
+            : null;
 
-        return Inertia::render('tokens', compact('tokens', 'token'));
+        $abilities = $cityId !== null
+            ? ExtranetTokenScope::abilitiesForCity($cityId)
+            : ['*'];
+
+        $newToken = $user->createToken($title, $abilities);
+
+        return $this->renderTokensPage($user, $newToken);
     }
 
-    public function destroy(Request $request, PersonalAccessToken $token)
+    /**
+     * Revoke an existing Sanctum token owned by the authenticated user.
+     *
+     * @param  Request  $request  Authenticated deletion request.
+     * @param  PersonalAccessToken  $token  Token selected for revocation.
+     * @return RedirectResponse Redirect back to the token overview.
+     */
+    public function destroy(Request $request, PersonalAccessToken $token): RedirectResponse
     {
-        Gate::authorize('update', Auth::user());
-        Auth::user()->tokens()->where('id', $token->id)->delete();
+        /** @var User $user */
+        $user = Auth::user();
+        Gate::authorize('update', $user);
+        $user->tokens()->where('id', $token->id)->delete();
 
         return redirect()->route('tokens.index');
+    }
+
+    /**
+     * Build the Inertia response payload for the token management view.
+     *
+     * @param  User  $user  Current user whose tokens are displayed.
+     * @param  NewAccessToken|null  $token  Newly created token to display once, if any.
+     * @return Response Rendered Inertia response.
+     */
+    private function renderTokensPage(User $user, ?NewAccessToken $token): Response
+    {
+        $canCreateChurchTokens = $user->can(RoleService::PERMISSION_CREATE_CHURCH_API_TOKENS);
+        $writableCityIds = $canCreateChurchTokens
+            ? ExtranetTokenScope::directlyWritableCityIds($user)
+            : collect();
+
+        $churchTokenCities = $writableCityIds->isEmpty()
+            ? []
+            : City::query()
+                ->whereIn('id', $writableCityIds->all())
+                ->orderBy('name')
+                ->get(['id', 'name'])
+                ->map(static fn (City $city): array => [
+                    'id' => (int) $city->id,
+                    'name' => (string) $city->name,
+                ])
+                ->values()
+                ->all();
+
+        $rawTokens = $user->tokens()->orderByDesc('created_at')->get();
+        $referencedCityIds = $rawTokens
+            ->flatMap(static fn (PersonalAccessToken $item): array => ExtranetTokenScope::allowedCityIds($item) ?? [])
+            ->unique()
+            ->values();
+
+        $cityNamesById = $referencedCityIds->isEmpty()
+            ? collect()
+            : City::query()
+                ->whereIn('id', $referencedCityIds->all())
+                ->pluck('name', 'id')
+                ->mapWithKeys(static fn (mixed $name, mixed $id): array => [(int) $id => (string) $name]);
+
+        $tokens = $rawTokens
+            ->map(static fn (PersonalAccessToken $item): array => ExtranetTokenScope::describeToken($item, $cityNamesById))
+            ->values()
+            ->all();
+
+        return Inertia::render('tokens', [
+            'tokens' => $tokens,
+            'token' => $token,
+            'canCreateChurchTokens' => $canCreateChurchTokens,
+            'churchTokenCities' => $churchTokenCities,
+        ]);
     }
 }

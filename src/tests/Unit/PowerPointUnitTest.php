@@ -8,7 +8,7 @@
  * @copyright (c) Christoph Fischer, https://christoph-fischer.org
  * @license https://www.gnu.org/licenses/gpl-3.0.txt GPL 3.0 or later
  * @link https://github.com/pfarr-tools/pfarrplaner
- * @version git: $Id: 6800623ca2bcf994dd408e79878da4a623c45fa8 $
+ * @version git: $Id$
  */
 
 namespace Tests\Unit;

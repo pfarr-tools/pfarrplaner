@@ -31,6 +31,7 @@
 use App\Http\Middleware\Authenticate;
 use App\Http\Middleware\BlockDevHelperRoutes;
 use App\Http\Middleware\Cors;
+use App\Http\Middleware\EnforceExtranetTokenScope;
 use App\Http\Middleware\ForceDomain;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\RedirectIfAuthenticated;
@@ -98,6 +99,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'throttle:600,1',
             SubstituteBindings::class,
             'auth:sanctum',
+            EnforceExtranetTokenScope::class,
             RequireTwoFactorRecovery::class,
             RequireSecurityOnboarding::class,
         ]);

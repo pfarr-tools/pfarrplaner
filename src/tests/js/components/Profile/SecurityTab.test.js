@@ -35,6 +35,9 @@ describe('SecurityTab', () => {
         expect(wrapper.findAll('input[type="password"]')).toHaveLength(0)
         expect(content).not.toContain('passwort')
         expect(content).not.toContain('mindestens 8 zeichen')
+        expect(wrapper.find('[data-testid="manage-api-tokens"]').attributes('href')).toBe(
+            '/tokens.index',
+        )
     })
 
     it('starts TOTP setup without sending account-password data', async () => {

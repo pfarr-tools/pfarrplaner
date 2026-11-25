@@ -30,6 +30,9 @@
 
 namespace App\Services;
 
+/**
+ * Defines canonical role and permission names used across authorization checks.
+ */
 class RoleService
 {
     public const ROLE_SUPER_ADMIN = 'Super-Administrator:in';
@@ -39,4 +42,8 @@ class RoleService
     public const ROLE_PASTOR = 'Pfarrer:in';
 
     public const ROLE_PREDICANT = 'Prädikant:in';
+
+    public const ROLE_EXTRANET_API_MANAGER = 'Extranet-API-Berechtigte:r';
+
+    public const PERMISSION_CREATE_CHURCH_API_TOKENS = 'gemeinde-api-tokens-erstellen';
 }
