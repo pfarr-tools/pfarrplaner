@@ -18,5 +18,10 @@ use App\Models\Seating\SeatingRow;
 
 interface CreatesSeatingRows
 {
+    /**
+     * Legt eine Sitzreihe an.
+     *
+     * @param  array<string, mixed>  $input
+     */
     public function create(User $user, array $input): SeatingRow;
 }

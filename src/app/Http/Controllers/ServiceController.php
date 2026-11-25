@@ -41,6 +41,7 @@ use App\Models\Attachment;
 use App\Models\Calendar\Day;
 use App\Models\LiturgyInfo;
 use App\Models\Location;
+use App\Models\People\User;
 use App\Models\Places\City;
 use App\Models\Service;
 use App\Models\ServiceGroup;
@@ -49,18 +50,16 @@ use App\Services\GiroCodeService;
 use App\Services\RedirectorService;
 use App\Traits\HandlesAttachmentsTrait;
 use Carbon\Carbon;
-use Illuminate\Contracts\Foundation\Application;
-use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\View;
 use Inertia\Inertia;
 use Inertia\Response as InertiaResponse;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Class ServiceController
@@ -69,6 +68,9 @@ class ServiceController extends Controller
 {
     use HandlesAttachmentsTrait;
 
+    /**
+     * @return void
+     */
     public function __construct()
     {
         $this->middleware('auth')->except(['publicLiturgy']);
@@ -163,15 +165,27 @@ class ServiceController extends Controller
     }
 
     /** Show the dedicated advertising editor. */
+    /**
+     * @return mixed
+     */
     public function ads(Request $request, Service $service)
     {
         return $this->renderEditor($request, $service, 'serviceAdEditor');
     }
 
-    /** Build the shared service-editor data for the requested editor view. */
-    protected function renderEditor(Request $request, Service $service, string $view)
+    /**
+     * Build the shared service-editor data for the requested editor view.
+     *
+     * @param  Request  $request  Current request.
+     * @param  Service  $service  Service to edit.
+     * @param  string  $view  Editor view name.
+     * @return InertiaResponse Rendered editor response.
+     */
+    protected function renderEditor(Request $request, Service $service, string $view): InertiaResponse
     {
         Gate::authorize('update', $service);
+        $authUser = Auth::user();
+        abort_unless($authUser instanceof User, 403);
         $tab = $request->get('tab', 'home');
         $service->load(
             ['attachments', 'comments', 'bookings', 'liturgyBlocks', 'tags', 'serviceGroups', 'relatedCities', 'adConfigs']
@@ -206,9 +220,9 @@ class ServiceController extends Controller
             ]
         );
 
-        $availableCities = Auth::user()->cities;
+        $availableCities = $authUser->cities;
 
-        $locations = Location::inCities(Auth::user()->cities->pluck('id'))->get();
+        $locations = Location::inCities($authUser->cities->pluck('id'))->get();
         $liturgySheets = LiturgySheets::all();
 
         $liturgyInfo = LiturgyInfo::select(['id', 'date', 'title', 'litColor'])->orderBy('date')->get();
@@ -219,7 +233,9 @@ class ServiceController extends Controller
         $serviceGroups = ServiceGroup::all();
 
         $adsConfig = config('ads');
-        $adChannels = $service->city->getActiveAdChannels();
+        $city = $service->city;
+        abort_unless($city instanceof City, 404);
+        $adChannels = $city->getActiveAdChannels();
 
         return Inertia::render(
             $view,
@@ -242,7 +258,7 @@ class ServiceController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @return Response
+     * @return JsonResponse|RedirectResponse|InertiaResponse
      */
     public function update(ServiceRequest $request, Service $service)
     {
@@ -284,7 +300,7 @@ class ServiceController extends Controller
                 return redirect($route)->with('success', $success);
             } else {
                 if (RedirectorService::backRoute() == route('calendar')) {
-                    RedirectorService::setReturnRoute(route('calendar', ['date' => $service->date->format('Y-m')]));
+                    RedirectorService::setReturnRoute(route('calendar', ['date' => $service->date?->format('Y-m')]));
                 }
 
                 return RedirectorService::back();
@@ -297,12 +313,12 @@ class ServiceController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @return Response
+     * @return RedirectResponse
      */
     public function destroy(Service $service)
     {
         Gate::authorize('delete', $service);
-        $date = $service->date->format('Y-m');
+        $date = $service->date?->format('Y-m');
 
         // emit event so that integrations may react to impending delete
         event(new ServiceBeforeDelete($service));
@@ -314,17 +330,19 @@ class ServiceController extends Controller
     }
 
     /**
-     * @return Application|Factory|\Illuminate\View\View
+     * @param  string  $date  Date for the new service.
+     * @return mixed
      */
     public function add($date, City $city)
     {
         Gate::authorize('create', Service::class);
         $day = Day::find($date);
+        abort_unless($day instanceof Day, 404);
 
         $data = [
             'city_id' => $city->id,
             'day_id' => $day->id,
-            'location_id' => $city->locations->first()->id,
+            'location_id' => $city->locations->first()?->id,
         ];
 
         if ($city->konfiapp_default_type) {
@@ -342,10 +360,13 @@ class ServiceController extends Controller
      *
      * @param  $service  Service
      */
+    /**
+     * @return Response
+     */
     public function ical(Service $service)
     {
         $services = [$service];
-        $raw = View::make('ical.ical', ['services' => $services, 'token' => null]);
+        $raw = View::make('ical.ical', ['services' => $services, 'token' => null])->render();
 
         $raw = str_replace(
             "\r\n\r\n",
@@ -363,14 +384,21 @@ class ServiceController extends Controller
     /**
      * Return timestamp of last update
      */
+    /**
+     * @return mixed
+     */
     public function lastUpdate()
     {
-        $lastUpdated = Service::inCities(Auth::user()->cities->pluck('id'))
-            ->orderBy('updated_at', 'DESC')
+        $authUser = Auth::user();
+        abort_unless($authUser instanceof User, 403);
+
+        $lastUpdated = Service::inCities($authUser->cities->pluck('id'))
+            ->orderBy('updated_at', 'desc')
             ->first();
-        $lastCreated = Service::inCities(Auth::user()->cities->pluck('id'))
-            ->orderBy('created_at', 'DESC')
+        $lastCreated = Service::inCities($authUser->cities->pluck('id'))
+            ->orderBy('created_at', 'desc')
             ->first();
+        abort_unless($lastUpdated instanceof Service && $lastCreated instanceof Service, 404);
 
         if ($lastUpdated->updated_at > $lastCreated->created_at) {
             $service = $lastUpdated;
@@ -383,22 +411,22 @@ class ServiceController extends Controller
         $route = route(
             'calendar',
             [
-                'year' => $service->date->format('Y'),
-                'month' => $service->date->format('m'),
+                'year' => $service->date?->format('Y'),
+                'month' => $service->date?->format('m'),
                 'highlight' => $service->id,
                 'slave' => 1,
             ]
         );
 
         // tie in automatic month switching
-        $timestamp2 = Carbon::createFromTimestamp(Auth::user()->getSetting('display-timestamp', 0));
+        $timestamp2 = Carbon::createFromTimestamp($authUser->getSetting('display-timestamp', 0));
         if ($timestamp2 > $timestamp) {
             $timestamp = $timestamp2;
             $route = route(
                 'calendar',
                 [
-                    'year' => Auth::user()->getSetting('display-year', date('Y')),
-                    'month' => Auth::user()->getSetting('display-month', date('m')),
+                    'year' => $authUser->getSetting('display-year', date('Y')),
+                    'month' => $authUser->getSetting('display-month', date('m')),
                     'slave' => 1,
                 ]
             );
@@ -437,7 +465,8 @@ class ServiceController extends Controller
     }
 
     /**
-     * @return array|mixed|string[]
+     * @param  string  $key  Request key.
+     * @return array<mixed>|mixed
      */
     private function arrayFromRequest(Request $request, $key)
     {
@@ -454,7 +483,7 @@ class ServiceController extends Controller
 
     /**
      * @param  int  $service
-     * @return JsonResponse
+     * @return Response
      */
     public function data(Request $request, $service)
     {
@@ -517,42 +546,46 @@ class ServiceController extends Controller
     public function createQR(Request $request, Service $service)
     {
         Gate::authorize('update', $service);
-        if (! $service->city->konfiapp_apikey) {
+        $city = $service->city;
+        abort_unless($city instanceof City, 404);
+        if (! $city->konfiapp_apikey) {
             abort(404);
         }
 
-        $type = $request->validate(['type' => 'nullable|int'])['type'] ?? $service->city->konfiapp_default_type ?? null;
+        $type = $request->validate(['type' => 'nullable|int'])['type'] ?? $city->konfiapp_default_type ?? null;
         if (! $type) {
             abort(403);
         }
 
-        $konfiApp = new KonfiAppIntegration($service->city());
+        $konfiApp = new KonfiAppIntegration($city->konfiapp_apikey);
         $service->konfiapp_event_type = $type;
         $service->konfiapp_event_qr = $konfiApp->createQRCode($service);
         $service->save();
 
-        return redirect()->route('qr', $service->city->name);
+        return redirect()->route('qr', $city->name);
     }
 
     /**
      * Return a EPC code for donations
      *
-     * @return void
+     * @return RedirectResponse Redirect to the generated QR code.
      */
-    public function epc(Service $service)
+    public function epc(Service $service): RedirectResponse
     {
-        if (! $service->city->iban) {
+        $city = $service->city;
+        abort_unless($city instanceof City, 404);
+        if (! $city->iban) {
             abort(404);
         }
 
         $purpose = $service->offeringGoal() ?: 'Allgemeine Gemeindearbeit';
 
         return redirect()->route('qrcode', GiroCodeService::codeValue(
-            $service->city->official_name ?: 'Evang. Kirchengemeinde '.$service->city->name,
-            $service->city->iban,
+            $city->official_name ?: 'Evang. Kirchengemeinde '.$city->name,
+            $city->iban,
             null, // empty amount
             'Spende: '.$purpose,
-            $service->city->bic ?? null,
+            $city->bic ?? null,
         ));
     }
 

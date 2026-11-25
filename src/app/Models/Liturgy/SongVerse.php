@@ -32,11 +32,16 @@ namespace App\Models\Liturgy;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/** Song verse model. */
 class SongVerse extends Model
 {
     protected $fillable = ['song_id', 'number', 'text', 'refrain_before', 'refrain_after', 'notation'];
 
+    /**
+     * @return void
+     */
     protected static function boot()
     {
         parent::boot();
@@ -47,8 +52,11 @@ class SongVerse extends Model
         });
     }
 
-    public function song()
+    /**
+     * @return BelongsTo<Song, $this>
+     */
+    public function song(): BelongsTo
     {
-        $this->belongsTo(Song::class);
+        return $this->belongsTo(Song::class);
     }
 }

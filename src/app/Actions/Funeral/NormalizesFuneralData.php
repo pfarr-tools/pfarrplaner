@@ -21,6 +21,10 @@ use Illuminate\Validation\ValidationException;
 
 trait NormalizesFuneralData
 {
+    /**
+     * @param  array<string, mixed>  $input
+     * @return array<string, mixed>
+     */
     protected function prepareInputForValidation(array $input): array
     {
         foreach ([
@@ -90,6 +94,10 @@ trait NormalizesFuneralData
         }
     }
 
+    /**
+     * @param  array<string, mixed>  $input
+     * @return array<string, mixed>
+     */
     protected function normalizeValidatedInput(array $input): array
     {
         $input['wake'] = $this->parseDate($input['wake'] ?? null);
@@ -137,12 +145,17 @@ trait NormalizesFuneralData
             return $value;
         }
         if (preg_match('/^\d{2}\.\d{2}\.\d{4} \d{2}:\d{2}$/', (string) $value)) {
-            return Carbon::createFromFormat('d.m.Y H:i', $value, 'Europe/Berlin')->setTimezone('UTC');
+            $parsed = Carbon::createFromFormat('d.m.Y H:i', (string) $value, 'Europe/Berlin');
+
+            return ($parsed ?: Carbon::parse($value, 'Europe/Berlin'))->setTimezone('UTC');
         }
 
         return Carbon::parse($value, 'Europe/Berlin')->setTimezone('UTC');
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     protected function draftDefaults(Service $service): array
     {
         return array_merge((new Funeral)->fillDefaults(), [

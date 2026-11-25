@@ -31,21 +31,33 @@
 namespace App\HomeScreen\Tabs;
 
 use App\Models\People\User;
+use Illuminate\Auth\AuthenticationException;
+use Illuminate\Http\Resources\Json\JsonResource;
 use View;
 
-/**
- * Base implementation shared by configurable home screen tabs.
- */
 class AbstractHomeScreenTab
 {
+    /** @var string */
     protected $title = '';
 
+    /** @var string */
     protected $description = '';
 
+    /** @var array<string, mixed> */
     protected $config = [];
 
     /**
-     * Initialize the tab with its saved configuration.
+     * Return the authenticated user required to build this tab.
+     *
+     * @throws AuthenticationException When no user is authenticated.
+     */
+    protected function user(): User
+    {
+        return auth()->user() ?? throw new AuthenticationException;
+    }
+
+    /**
+     * @param  array<string, mixed>  $config  Tab configuration.
      */
     public function __construct($config = [])
     {
@@ -55,43 +67,28 @@ class AbstractHomeScreenTab
     }
 
     /**
-     * Check whether this tab is available to the given user or current user.
-     *
-     * @param  User|null  $user  User whose access should be checked
-     * @return bool Whether the tab is available
+     * Check if this tab is available to the current user
      */
     public function isAvailable(?User $user = null): bool
     {
         return true;
     }
 
-    /**
-     * Get the tab's display title.
-     */
     public function getTitle(): string
     {
         return $this->title;
     }
 
-    /**
-     * Set the tab's display title.
-     */
     public function setTitle(string $title): void
     {
         $this->title = $title;
     }
 
-    /**
-     * Get the tab's explanatory text.
-     */
     public function getDescription(): string
     {
         return $this->description;
     }
 
-    /**
-     * Set the tab's explanatory text.
-     */
     public function setDescription(string $description): void
     {
         $this->description = $description;
@@ -126,7 +123,9 @@ class AbstractHomeScreenTab
     }
 
     /**
-     * Apply default values to missing tab configuration entries.
+     * @param  array<string, mixed>  $config  Tab configuration.
+     * @param  array<string, mixed>  $defaults  Default values.
+     * @return void
      */
     protected function setDefaultConfig(array $config, array $defaults)
     {
@@ -150,7 +149,8 @@ class AbstractHomeScreenTab
     }
 
     /**
-     * Build the namespaced view name for this tab.
+     * @param  string  $viewName  View name.
+     * @return string
      */
     public function viewName($viewName)
     {
@@ -160,13 +160,19 @@ class AbstractHomeScreenTab
     /**
      * Render a specific view
      *
-     * @return string|Illuminate\Contracts\View\View Rendered view
+     * @return string|\Illuminate\Contracts\View\View Rendered view
+     */
+    /**
+     * @param  string  $viewName  View name.
+     * @param  array<string, mixed>  $data  View data.
+     * @return string|\Illuminate\Contracts\View\View
      */
     public function view($viewName, $data = [])
     {
         $viewName = $this->viewName($viewName);
         $data = array_merge($data, ['tab' => $this, 'config' => $this->config]);
         if (View::exists($viewName)) {
+            /** @var view-string $viewName */
             return View::make($viewName, $data);
         } else {
             if ($viewName == 'config') {
@@ -181,7 +187,11 @@ class AbstractHomeScreenTab
      * Render the tab header
      *
      * @param  array  $data
-     * @return string|Illuminate\Contracts\View\View
+     * @return string|\Illuminate\Contracts\View\View
+     */
+    /**
+     * @param  array<string, mixed>  $data  View data.
+     * @return string|\Illuminate\Contracts\View\View
      */
     public function getHeader($data = [])
     {
@@ -191,7 +201,11 @@ class AbstractHomeScreenTab
     /**
      * Render the tab content
      *
-     * @return string|Illuminate\Contracts\View\View
+     * @return string|\Illuminate\Contracts\View\View
+     */
+    /**
+     * @param  array<string, mixed>  $data  View data.
+     * @return string|\Illuminate\Contracts\View\View
      */
     public function getContent($data = [])
     {
@@ -210,7 +224,8 @@ class AbstractHomeScreenTab
     }
 
     /**
-     * Add common tab metadata to its serialized data.
+     * @param  array<string, mixed>  $data  Additional tab data.
+     * @return array<string, mixed>|JsonResource Tab data.
      */
     public function toArray($data = [])
     {

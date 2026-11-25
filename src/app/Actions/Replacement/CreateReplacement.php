@@ -46,6 +46,9 @@ class CreateReplacement extends AbstractCreateAction implements CreatesReplaceme
         return '';
     }
 
+    /**
+     * @param  array<string, mixed>  $input
+     */
     public function create(User $user, Absence $absence, array $input): Replacement
     {
         Gate::forUser($user)->authorize('create', [Replacement::class, $absence]);

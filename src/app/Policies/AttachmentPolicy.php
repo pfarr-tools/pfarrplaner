@@ -34,11 +34,18 @@ use App\Models\Attachment;
 use App\Models\People\User;
 use App\Models\Service;
 use Illuminate\Auth\Access\HandlesAuthorization;
+use Illuminate\Database\Eloquent\Model;
 
+/** Policy f\u00fcr Attachments. */
 class AttachmentPolicy
 {
     use HandlesAuthorization;
 
+    /**
+     * @param  User  $user  Benutzer.
+     *      * @param  Attachment  $attachment  Attachment.
+     *      * @return bool
+     */
     public function update(User $user, Attachment $attachment): bool
     {
         $attachable = $attachment->resolveAttachableIncludingTrashed();
@@ -55,13 +62,13 @@ class AttachmentPolicy
         if ($attachable instanceof Service) {
             $service = $attachable;
         } elseif (method_exists($attachable, 'service')) {
-            $service = $attachable->service;
+            $service = $attachable->getRelationValue('service');
             if (($service === null) && isset($attachable->service_id) && $attachable->service_id) {
                 $service = Service::withTrashed()->find($attachable->service_id);
             }
         }
 
-        if ($service && method_exists($service, 'trashed') && $service->trashed()) {
+        if ($service instanceof Model && method_exists($service, 'trashed') && $service->trashed()) {
             return false;
         }
 

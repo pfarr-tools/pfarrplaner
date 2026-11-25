@@ -52,6 +52,9 @@ class UpdatePoolmaster extends AbstractUpdateAction implements UpdatesPoolmaster
         return route('absences.index', $this->poolmaster ? ['year' => Carbon::parse($this->poolmaster->start)->year, 'month' => Carbon::parse($this->poolmaster->start)->month] : null);
     }
 
+    /**
+     * @param  array<string, mixed>  $input
+     */
     public function update(User $user, Poolmaster $poolmaster, array $input): Poolmaster
     {
         Gate::forUser($user)->authorize('update', $poolmaster);

@@ -69,11 +69,11 @@ class HandleInertiaRequests extends Middleware
      *
      * @see https://inertiajs.com/shared-data
      *
-     * @return array
+     * @return array<string, mixed>
      */
     public function share(Request $request)
     {
-        $packageConfig = json_decode(file_get_contents(base_path('package.json')), true);
+        $packageConfig = json_decode((string) file_get_contents(base_path('package.json')), true);
         $version = $packageConfig['version'];
 
         $data = array_merge(parent::share($request), [
@@ -104,15 +104,15 @@ class HandleInertiaRequests extends Middleware
             ],
         ]);
 
-        if (! Auth::guest()) {
+        if ($user = Auth::user()) {
             $data = array_merge($data, [
                 'currentUser' => fn () => $request->user()
                     ? new UserResource($request->user())
                     : null,
                 'sessionId' => fn () => $request->session()->getId(),
                 'menu' => fn () => MenuBuilder::sidebar(),
-                'settings' => fn () => Settings::all(Auth::user()),
-                'interstitials' => fn () => app(InterstitialService::class)->forUser(Auth::user()),
+                'settings' => fn () => Settings::all($user),
+                'interstitials' => fn () => app(InterstitialService::class)->forUser($user),
                 'adminUserSwitchBack' => Session::has('adminUserSwitchBack'),
                 'appName' => config('app.name'),
             ]);

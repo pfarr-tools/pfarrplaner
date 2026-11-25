@@ -45,6 +45,9 @@ class CreateSong extends AbstractCreateAction implements CreatesSongs
         return route('admin.songs.index');
     }
 
+    /**
+     * @param  array<string, mixed>  $input
+     */
     public function create(User $user, array $input): Song
     {
         Gate::forUser($user)->authorize('create', Song::class);

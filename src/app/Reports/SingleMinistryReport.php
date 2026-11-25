@@ -35,14 +35,15 @@ use App\Models\People\Participant;
 use App\Models\Service;
 use App\Services\FileNameService;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Worksheet\PageSetup;
 use PhpOffice\PhpWord\Shared\Converter;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 /**
  * Class PersonReport
@@ -77,7 +78,7 @@ class SingleMinistryReport extends AbstractPDFDocumentReport
      */
     public function setup()
     {
-        $cities = Auth::user()->cities;
+        $cities = $this->authenticatedUser()->cities;
         $locations = Location::inCities($cities->pluck('id'))->get();
         $ministries = $this->getAvailableMinistries();
 
@@ -125,7 +126,14 @@ class SingleMinistryReport extends AbstractPDFDocumentReport
         abort(404);
     }
 
-    public function renderDataToPDF($data, $services)
+    /**
+     * Erzeugt den PDF-Download für den ausgewählten Dienstplan.
+     *
+     * @param  array<string, mixed>  $data  Validierte Berichtsparameter.
+     * @param  Collection<int, Service>  $services  Dienste, die dargestellt werden sollen.
+     * @return mixed PDF-Download-Antwort.
+     */
+    public function renderDataToPDF(array $data, Collection $services)
     {
         return $this->sendToBrowser(
             FileNameService::make(
@@ -146,7 +154,14 @@ class SingleMinistryReport extends AbstractPDFDocumentReport
         );
     }
 
-    public function renderDataToXLSX($data, $services)
+    /**
+     * Erzeugt den XLSX-Download für den ausgewählten Dienstplan.
+     *
+     * @param  array<string, mixed>  $data  Validierte Berichtsparameter.
+     * @param  Collection<int, Service>  $services  Dienste, die dargestellt werden sollen.
+     * @return mixed XLSX-Download-Antwort.
+     */
+    public function renderDataToXLSX(array $data, Collection $services)
     {
         $spreadsheet = new Spreadsheet;
         $spreadsheet->getDefaultStyle()
@@ -180,7 +195,7 @@ class SingleMinistryReport extends AbstractPDFDocumentReport
         $row = 1;
         if ($data['includeHeader']) {
             // title row
-            $sheet->getRowDimension('1')->setRowHeight(21);
+            $sheet->getRowDimension(1)->setRowHeight(21);
             $sheet->setCellValue('A1', 'Dienstplan für '.implode(', ', $data['ministries']))
                 ->getStyle('A1')
                 ->getFont()->setBold(true)->setSize(16);
@@ -222,11 +237,11 @@ class SingleMinistryReport extends AbstractPDFDocumentReport
         $row++;
 
         foreach ($services as $service) {
-            $sheet->setCellValue('A'.$row, $service->date->format('d.m.Y'));
+            $sheet->setCellValue('A'.$row, $service->trueDate()->format('d.m.Y'));
             $sheet->setCellValue('B'.$row, $service->timeText());
             $c = 67;
             if (count($data['cities']) > 1) {
-                $sheet->setCellValue('C'.$row, $service->city->name);
+                $sheet->setCellValue('C'.$row, $service->city->name ?? '');
                 $c = 68;
             }
             $sheet->setCellValue(chr($c).$row, $service->locationText());
@@ -247,9 +262,14 @@ class SingleMinistryReport extends AbstractPDFDocumentReport
 
     }
 
-    protected function getAvailableMinistries()
+    /**
+     * Ermittelt die Dienste, die der aktuelle Benutzer bearbeiten darf.
+     *
+     * @return array<string, string> Dienste mit ihren Anzeigenamen.
+     */
+    protected function getAvailableMinistries(): array
     {
-        $tmpMinistries = Participant::all()
+        $tmpMinistries = Participant::query()
             ->pluck('category')
             ->unique();
 
@@ -257,27 +277,27 @@ class SingleMinistryReport extends AbstractPDFDocumentReport
         foreach ($tmpMinistries as $ministry) {
             switch ($ministry) {
                 case 'P':
-                    if (Auth::user()->can('gd-pfarrer-bearbeiten')) {
+                    if ($this->authenticatedUser()->can('gd-pfarrer-bearbeiten')) {
                         $ministries[$ministry] = config('labels.pastor');
                     }
                     break;
                 case 'O':
-                    if (Auth::user()->can('gd-organist-bearbeiten')) {
+                    if ($this->authenticatedUser()->can('gd-organist-bearbeiten')) {
                         $ministries[$ministry] = config('labels.organist');
                     }
                     break;
                 case 'M':
-                    if (Auth::user()->can('gd-mesner-bearbeiten')) {
+                    if ($this->authenticatedUser()->can('gd-mesner-bearbeiten')) {
                         $ministries[$ministry] = config('labels.sacristan');
                     }
                     break;
                 case 'A':
-                    if (Auth::user()->can('gd-allgemein-bearbeiten')) {
+                    if ($this->authenticatedUser()->can('gd-allgemein-bearbeiten')) {
                         $ministries[$ministry] = 'Weitere Beteiligte';
                     }
                     break;
                 default:
-                    if (Auth::user()->can('gd-allgemein-bearbeiten')) {
+                    if ($this->authenticatedUser()->can('gd-allgemein-bearbeiten')) {
                         $ministries[$ministry] = $ministry;
                     }
             }
@@ -286,7 +306,13 @@ class SingleMinistryReport extends AbstractPDFDocumentReport
         return $ministries;
     }
 
-    public function sendXlsxToBrowser($filename, $spreadsheet)
+    /**
+     * Sendet die Tabelle als XLSX-Download an den Browser.
+     *
+     * @param  string  $filename  Dateiname des Downloads.
+     * @param  Spreadsheet  $spreadsheet  Zu exportierende Tabelle.
+     */
+    public function sendXlsxToBrowser(string $filename, Spreadsheet $spreadsheet): BinaryFileResponse
     {
         $tempFile = tempnam(sys_get_temp_dir(), $filename);
         $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');

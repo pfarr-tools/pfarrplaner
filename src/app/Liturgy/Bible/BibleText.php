@@ -32,12 +32,18 @@ namespace App\Liturgy\Bible;
 
 class BibleText
 {
+    /** @var string */
     protected $version = '';
 
+    /** @var string[] */
     protected $text = [];
 
+    /** @var array<string, array<string, string>> */
     protected $renderedVerses = [];
 
+    /**
+     * @param  string  $version
+     */
     public function __construct($version = 'LUT17')
     {
         $this->version = $version;
@@ -48,9 +54,17 @@ class BibleText
         if (! file_exists($textFile)) {
             throw new \Exception('Bibeltextdatei für '.$version.' nicht gefunden.');
         }
-        $this->text = explode("\n", file_get_contents($textFile));
+        $contents = file_get_contents($textFile);
+        if ($contents === false) {
+            throw new \RuntimeException('Bibeltextdatei für '.$version.' konnte nicht gelesen werden.');
+        }
+        $this->text = explode("\n", $contents);
     }
 
+    /**
+     * @param  array{parsed: array<int, array<string, mixed>>}  $reference
+     * @return array<int, array<string, mixed>>
+     */
     public function get(array $reference): array
     {
         $result = [];
@@ -63,6 +77,10 @@ class BibleText
         return $result;
     }
 
+    /**
+     * @param  array<int, array<string, string>>  $reference
+     * @return array<string, array<string, string>>
+     */
     public function getSection(array $reference): array
     {
         $copy = false;
@@ -97,12 +115,15 @@ class BibleText
         return $output;
     }
 
+    /**
+     * @return array<string, string>|null
+     */
     protected function parse(string $line)
     {
         $tmp = explode(' ', $line);
         $book = $tmp[0];
         if (! isset($tmp[1])) {
-            return;
+            return null;
         }
         [$chapter, $verse] = explode(':', $tmp[1]);
         $slug = $book.' '.$chapter.':'.$verse;
@@ -120,6 +141,9 @@ class BibleText
         ];
     }
 
+    /**
+     * @param  array<string, string>  $reference
+     */
     protected function matches(string $line, array $reference): bool
     {
         $ref = $reference['book'].' '.$reference['chapter'].':'.$reference['verse'];

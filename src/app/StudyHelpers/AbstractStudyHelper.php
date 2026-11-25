@@ -37,21 +37,32 @@ use Illuminate\Support\Str;
 
 abstract class AbstractStudyHelper
 {
+    /** @var string */
     public $title = '';
 
-    /** @var Client|null */
-    protected $client = null;
+    /** @var Client */
+    protected $client;
 
     /** @var Command */
     protected $command = null;
 
+    /**
+     * @param  Command  $command  Console command used for output.
+     * @return void
+     */
     public function __construct(Command $command)
     {
         $this->client = new Client;
         $this->command = $command;
     }
 
-    protected function getContent($url)
+    /**
+     * Lädt den Inhalt der angegebenen URL.
+     *
+     * @param  string  $url  URL des abzurufenden Inhalts
+     * @return string Geladener Inhalt oder ein leerer String bei Fehlern
+     */
+    protected function getContent(string $url): string
     {
         try {
             $result = $this->client->get($url);
@@ -65,16 +76,28 @@ abstract class AbstractStudyHelper
         return $result->getBody()->getContents();
     }
 
-    public function getKey()
+    /**
+     * Gibt den Schlüssel dieses StudyHelpers zurück.
+     */
+    public function getKey(): string
     {
         return Str::replace('StudyHelper', '', Str::afterLast(static::class, '\\'));
     }
 
+    /**
+     * Ergänzt die Predigtlinks für alle gelesenen Daten.
+     *
+     * @param  array<array-key, mixed>  $data  Zu ergänzende Daten
+     * @return array<array-key, mixed> Ergänzte Daten
+     */
     public function assign(array $data): array
     {
         $studyData = $this->read($data);
         foreach ($studyData as $date => $record) {
             $date = Carbon::createFromFormat('d.m.Y', $date);
+            if ($date === null) {
+                continue;
+            }
             if (isset($data[$date->year]['Tage'][$date->format('Y-m-d')])) {
                 foreach ($data[$date->year]['Tage'][$date->format('Y-m-d')] as $key => $tmp) {
                     $data[$date->year]['Tage'][$date->format('Y-m-d')][$key]['Links'] = array_merge($data[$date->year]['Tage'][$date->format('Y-m-d')][$key]['Links'] ?? [], $record);
@@ -85,7 +108,19 @@ abstract class AbstractStudyHelper
         return $data;
     }
 
+    /**
+     * Liest die Predigtlinks aus der jeweiligen Quelle.
+     *
+     * @param  array<string, mixed>  $data  Anfrageparameter
+     * @return array<string, array<string, string>> Predigtlinks, gruppiert nach Datum
+     */
     abstract public function read(array $data): array;
 
+    /**
+     * Ergänzt die Predigtlinks für das angeforderte Datum.
+     *
+     * @param  array<string, mixed>  $data  Zu ergänzende Daten
+     * @return array<string, mixed> Ergänzte Daten
+     */
     abstract public function getLinks(array $data): array;
 }

@@ -39,11 +39,17 @@ use JsonSerializable;
  */
 trait TracksChangesTrait
 {
-    /** @var array Snapshot with original data */
+    /**
+     * Snapshot of the model state recorded before changes were made.
+     *
+     * @var array<string, mixed> Normalized values keyed by attribute path.
+     */
     public $dataBeforeChanges = [];
 
     /**
-     * @var array
+     * Collected differences between the recorded snapshot and the saved state.
+     *
+     * @var array<string, array{original: mixed, changed: mixed}> Old and new value keyed by attribute path.
      */
     public $changed = [];
 
@@ -172,7 +178,9 @@ trait TracksChangesTrait
     }
 
     /**
-     * Return all changed attributes and relations
+     * Return all changed attributes and relations as stable field paths.
+     *
+     * @return array<string, array{original: mixed, changed: mixed}> Old and new value keyed by attribute path.
      */
     public function diff(): array
     {

@@ -17,13 +17,18 @@ class ReferenceParser extends \Peregrinus\BibleReferenceParser\ReferenceParser
 {
     public static function getInstance(): ReferenceParser
     {
-        if (static::$instance === null) {
-            static::$instance = new self;
+        $instance = static::$instance;
+        if (! $instance instanceof self) {
+            $instance = new self;
+            static::$instance = $instance;
         }
 
-        return static::$instance;
+        return $instance;
     }
 
+    /**
+     * @return void
+     */
     public function __construct()
     {
         parent::__construct(

@@ -51,6 +51,8 @@ class CreatePool extends AbstractCreateAction implements CreatesPools
     }
 
     /**
+     * @param  array<string, mixed>  $input
+     *
      * @throws AuthorizationException
      * @throws ValidationException
      */

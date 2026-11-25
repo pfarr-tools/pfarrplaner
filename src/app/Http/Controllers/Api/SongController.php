@@ -36,6 +36,7 @@ use App\Models\Liturgy\Song;
 use App\Models\Liturgy\SongReference;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 
 /**
  * Handles CRUD requests for Song records.
@@ -59,6 +60,7 @@ class SongController extends AbstractApiCRUDController
      */
     public function index(Request $request)
     {
+        /** @var Collection<int, mixed> $listed */
         $listed = SongReference::orderBy('code')->orderBy('reference')->get();
         $songsWithoutSongBook = Song::whereDoesntHave('songbooks')->orderBy('title')->get();
         foreach ($songsWithoutSongBook as $song) {
@@ -173,6 +175,7 @@ class SongController extends AbstractApiCRUDController
     }
 
     /**
+     * @param  int|string|null  $modelId
      * @return JsonResponse
      */
     public function update(Request $request, $modelId)
@@ -187,7 +190,9 @@ class SongController extends AbstractApiCRUDController
 
         $id = $request->get('ref');
         if ($id < 1000000) {
-            $songReference = SongReference::where('song_id', $song->id)->where('songbook_id', $request->get('songbook')['id'])->first();
+            $songReference = SongReference::where('song_id', $song->id)
+                ->where('songbook_id', $request->get('songbook')['id'])
+                ->firstOrFail();
             $listEntry = [
                 'id' => $songReference->id,
                 'name' => ($songReference->songbook->code ?: $songReference->songbook->name).' '.$songReference->reference.' '.$song->title,
@@ -204,7 +209,7 @@ class SongController extends AbstractApiCRUDController
     }
 
     /**
-     * @return array
+     * @return array<string, mixed>
      */
     protected function validateRequest(Request $request)
     {
@@ -232,6 +237,13 @@ class SongController extends AbstractApiCRUDController
         );
     }
 
+    /**
+     * Music.
+     *
+     * @param  string|array<int, string>  $verses
+     * @param  int|null  $lineNumber
+     * @return mixed
+     */
     public function music(Song $song, $verses = '', $lineNumber = null)
     {
         return response()->file(ABCMusic::renderToFile($song, $verses, ABCMusic::make($song, $verses, $lineNumber)));

@@ -39,7 +39,7 @@ class DAVCalendarItem
 {
     public const AUTO_WARNING = '<p><small>Bitte beachte: Dies ist ein automatisch vom Pfarrplaner erzeugter Eintrag. Änderungen können jederzeit ohne Vorwarnungen vom Pfarrplaner überschrieben werden.</small></p>';
 
-    /** @var Model */
+    /** @var Model&object{created_at: Carbon, updated_at: Carbon, id: int|string} */
     protected $object;
 
     /** @var VCalendar */
@@ -48,9 +48,22 @@ class DAVCalendarItem
     /** @var string */
     protected $key = '';
 
-    /** @var array Config */
+    /** @var array<string, bool|string> Kalenderkonfiguration des Eintrags */
     protected $config = [];
 
+    /**
+     * Erzeugt einen Kalendereintrag aus einem Modell und den übergebenen Terminangaben.
+     *
+     * @param  Model  $object  Modell, aus dem der Eintrag erzeugt wird.
+     * @param  string  $title  Titel des Kalendereintrags.
+     * @param  Carbon  $start  Beginn des Termins.
+     * @param  Carbon  $end  Ende des Termins.
+     * @param  string  $location  Ort des Termins.
+     * @param  string  $body  Beschreibung des Termins.
+     * @param  string  $key  Optionaler Schlüssel zur Unterscheidung mehrerer Einträge.
+     * @param  array<string, bool|string>  $config  Schalter für Ganztagstermine und BUSY-Status.
+     * @param  string[]  $categories  Zusätzliche Kategorien des Kalendereintrags.
+     */
     public function __construct(
         Model $object,
         string $title,
@@ -62,6 +75,7 @@ class DAVCalendarItem
         array $config = [],
         array $categories = [],
     ) {
+        /** @var Model&object{created_at: Carbon, updated_at: Carbon, id: int|string} $object */
         $this->object = $object;
         $this->key = $key;
         $this->config = $config;
@@ -69,38 +83,47 @@ class DAVCalendarItem
         $categories = array_merge(['Pfarrplaner'], $categories);
 
         $this->vObject = new VCalendar;
+        /** @var mixed $vEvent */
         $vEvent = $this->vObject->create('VEVENT');
         $vEvent->UID = $this->objectId(true);
         if ($config['allDay'] ?? false) {
-            $vEvent->DTSTART = $start->format('Ymd');
-            $vEvent->DTSTART['VALUE'] = 'DATE';
-            $vEvent->DTEND = $end->format('Ymd');
-            $vEvent->DTEND['VALUE'] = 'DATE';
+            $dtStart = $this->vObject->createProperty('DTSTART', $start->format('Ymd'));
+            $dtStart['VALUE'] = 'DATE';
+            $vEvent->add($dtStart);
+            $dtEnd = $this->vObject->createProperty('DTEND', $end->format('Ymd'));
+            $dtEnd['VALUE'] = 'DATE';
+            $vEvent->add($dtEnd);
         } else {
             $vEvent->DTSTART = $start;
             $vEvent->DTEND = $end;
         }
-        $vEvent->DTSTAMP = $object->created_at;
-        $vEvent->CREATED = $object->created_at;
+        $vEvent->DTSTAMP = $this->object->created_at;
+        $vEvent->CREATED = $this->object->created_at;
         $vEvent->SUMMARY = $title;
         $vEvent->LOCATION = $location;
         $vEvent->DESCRIPTION = $body;
         $vEvent->TRANSP = ($config['busy'] ?? 'true') ? 'OPAQUE' : 'TRANSPARENT';
         $vEvent->{'X-MICROSOFT-CDO-BUSYSTATUS'} = $config['busyStatus'] ?? 'BUSY';
         $vEvent->CATEGORIES = implode(',', $categories);
-        $vEvent->SEQUENCE = ($object->created_at == $object->updated_at) ? 1 : $object->updated_at->timestamp;
+        $vEvent->SEQUENCE = ($this->object->created_at == $this->object->updated_at) ? 1 : $this->object->updated_at->timestamp;
         $this->vObject->add($vEvent);
     }
 
+    /**
+     * @return string|false
+     */
     protected function getDomain()
     {
-        return parse_url(url('/'), PHP_URL_HOST);
+        return parse_url(url('/'), PHP_URL_HOST) ?? false;
     }
 
     /**
      * Get a calendarItem via it's URI
      *
      * @throws \ErrorException
+     */
+    /**
+     * @param  string  $uri  Calendar item URI.
      */
     public static function fromUri($uri): ?DAVCalendarItem
     {
@@ -121,14 +144,15 @@ class DAVCalendarItem
         return $object->getCalendarItem($tmp[2] ?? '');
     }
 
-    /**
-     * @return mixed
-     */
     public function getVObject(): VCalendar
     {
         return $this->vObject;
     }
 
+    /**
+     * @param  bool  $withDomain  Whether the domain is appended.
+     * @return string
+     */
     protected function objectId($withDomain = false)
     {
         return Str::replace('\\', '-', get_class($this->object)).'--'.$this->object->id
@@ -136,6 +160,9 @@ class DAVCalendarItem
             .($withDomain ? '@'.$this->getDomain() : '');
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function toCalendarObject(): array
     {
         $calData = $this->getVObject()->serialize();

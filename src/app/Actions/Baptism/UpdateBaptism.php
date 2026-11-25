@@ -51,6 +51,9 @@ class UpdateBaptism extends AbstractUpdateAction implements UpdatesBaptisms
         return $this->redirectUrl ?: route('home');
     }
 
+    /**
+     * @param  array<string, mixed>  $input
+     */
     public function update(User $user, Baptism $baptism, array $input): Baptism
     {
         Gate::forUser($user)->authorize('update', $baptism);
@@ -73,6 +76,9 @@ class UpdateBaptism extends AbstractUpdateAction implements UpdatesBaptisms
         return $baptism;
     }
 
+    /**
+     * @param  Service  $service  Service to derive the slug from.\n     * @return string
+     */
     protected function getServiceSlug(Service $service): string
     {
         return $service->slug ?: $service->createSlug();

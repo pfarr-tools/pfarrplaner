@@ -37,7 +37,6 @@
 
 namespace App\Models;
 
-use App\Date;
 use App\Models\Leave\Absence;
 use App\Models\People\User;
 use Carbon\Carbon;
@@ -51,12 +50,14 @@ use Illuminate\Support\Facades\Cache;
 class Vacations
 {
     /**
-     * @param  $date  Date
-     * @return array
+     * Return the vacation replacements for a given day.
+     *
+     * @param  Carbon|string  $date  Day to check, either as Carbon instance or as a parseable string
+     * @return array<string, string> Replacement labels keyed by user identifier
      */
-    public static function getByDate($date)
+    public static function getByDate(Carbon|string $date): array
     {
-        if (! is_a($date, Carbon::class)) {
+        if (! $date instanceof Carbon) {
             $date = Carbon::parse($date);
         }
         $vacationers = [];
@@ -74,12 +75,18 @@ class Vacations
     }
 
     /**
+     * Load the vacation data from the cache or fetch it from the configured URL.
+     *
      * @return mixed
      */
     protected static function getVacationDataFromCache()
     {
         if (! Cache::has('vacationData')) {
-            $vacationData = json_decode(file_get_contents(env('VACATION_URL')), true);
+            $contents = file_get_contents((string) config('calendar.vacation_url'));
+            $vacationData = json_decode($contents ?: '', true);
+            if (! is_array($vacationData)) {
+                $vacationData = [];
+            }
             foreach ($vacationData as $key => $datum) {
                 $vacationData[$key]['start'] = Carbon::createFromTimeString($datum['start']);
                 $vacationData[$key]['end'] = Carbon::createFromTimeString($datum['end']);
@@ -93,17 +100,29 @@ class Vacations
     }
 
     /**
+     * Return the absences and replacements of a user within a period.
+     *
+     * @param  Carbon  $start  First day of the period
+     * @param  Carbon  $end  Last day of the period
+     * @param  User|null  $user  User whose absences are returned
      * @return mixed
      */
-    public static function getByPeriodAndUser($start, $end, ?User $user)
+    public static function getByPeriodAndUser(Carbon $start, Carbon $end, ?User $user)
     {
+        if ($user === null) {
+            return Absence::query()->whereRaw('1 = 0');
+        }
+
         return Absence::with('replacements')->byUserAndPeriod($user, $start, $end);
     }
 
     /**
+     * Find a user by the end of their name.
+     *
+     * @param  string  $lastName  Name suffix to search for
      * @return Builder|Model|object|null
      */
-    protected static function findUserByLastName($lastName)
+    protected static function findUserByLastName(string $lastName)
     {
         return User::with('cities')->where('name', 'like', '%'.$lastName)->first();
     }

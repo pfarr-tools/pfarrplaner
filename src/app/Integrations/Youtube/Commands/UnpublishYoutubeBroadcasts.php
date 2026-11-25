@@ -65,7 +65,12 @@ class UnpublishYoutubeBroadcasts extends Command
         parent::__construct();
     }
 
-    protected function output($s)
+    /**
+     * Write a message to the console output and the log.
+     *
+     * @param  string  $s  Message to write.
+     */
+    protected function output(string $s): void
     {
         $this->line($s);
         Log::info($s);
@@ -98,10 +103,10 @@ class UnpublishYoutubeBroadcasts extends Command
 
                 continue;
             }
-            $channelId = YoutubeHelper::getChannelId($city->youtube_channel_url);
+            $channelId = YoutubeHelper::getChannelId($city->youtube_channel_url ?? '');
 
             $this->output('Configured cut-off after '.$city->youtube_cutoff_days.' days');
-            $cutoffDate = Carbon::now()->subDays($city->youtube_cutoff_days);
+            $cutoffDate = Carbon::now()->subDays($city->youtube_cutoff_days ?? 0);
             $this->output('Cut-off date: '.$cutoffDate->format('Y-m-d H:i:s'));
 
             $services = Service::inCity($city)

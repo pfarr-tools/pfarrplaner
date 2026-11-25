@@ -33,6 +33,7 @@ namespace App\Http\Controllers;
 use App\Models\Calendar\Day;
 use App\Models\Leave\Absence;
 use App\Models\Location;
+use App\Models\People\User;
 use App\Models\Service;
 use App\Services\CalendarService;
 use Carbon\Carbon;
@@ -56,33 +57,38 @@ class CalendarController extends Controller
 
     public const NAME_FORMAT_FIRST_AND_LAST = 3;
 
+    /**
+     * @return void
+     */
     public function __construct()
     {
         $this->middleware('auth');
     }
 
     /**
-     * @param  int  $year
-     * @param  int  $month
+     * @param  int|string|null  $year  Year or a year-month combination such as "2026-11".
+     * @param  int|string|null  $month  Month to display.
      * @return bool|Application|Factory|RedirectResponse|View
      */
     public function month(Request $request, $year = null, $month = null)
     {
+        $user = Auth::user();
+        abort_unless($user instanceof User, 403);
+
         if (! is_null($year) && is_null($month)) {
-            [$year, $month] = explode('-', $year);
+            [$year, $month] = array_map('intval', explode('-', (string) $year));
         }
 
-        $month ??= Auth::user()->getSetting('display-month') ?: date('m');
-        $year ??= Auth::user()->getSetting('display-year') ?: date('Y');
+        $month ??= $user->getSetting('display-month') ?: date('m');
+        $year ??= $user->getSetting('display-year') ?: date('Y');
 
         $monthStart = Carbon::create($year, $month, 1);
-        $monthEnd = $monthStart->copy()->addMonth(1)->subSecond(1);
+        abort_unless($monthStart instanceof Carbon, 500);
+        $monthEnd = $monthStart->copy()->addMonth()->subSecond();
 
         if (! Session::has('showLimitedDays')) {
             Session::put('showLimitedDays', false);
         }
-
-        $user = Auth::user();
 
         // city sorting
         if ($request->has('sort')) {
@@ -92,7 +98,7 @@ class CalendarController extends Controller
         $unusedCities = $user->cities->whereNotIn('id', $sortedCities->pluck('id'));
 
         // filter days:
-        $days = Day::inMonth(Carbon::create($year, $month, 1))
+        $days = Day::inMonth($monthStart->copy())
             ->visibleForCities($cities)
             ->get();
 
@@ -100,8 +106,8 @@ class CalendarController extends Controller
             $days = CalendarService::initializeMonth($year, $month);
         }
 
-        $nextDay = Day::inMonth(Carbon::create($year, $month, 1))
-            ->whereBetween('date', [Carbon::now()->setTime(0, 0, 0), Carbon::create($year, $month, 1)->addMonth(1)->subSecond(1)])
+        $nextDay = Day::inMonth($monthStart->copy())
+            ->whereBetween('date', [Carbon::now()->setTime(0, 0, 0), $monthEnd])
             ->first() ?? new Day(['date' => now()]);
 
         // name_format parameter
@@ -116,7 +122,7 @@ class CalendarController extends Controller
             : 'YEAR(days.date)';
         $years = Day::select(DB::raw($yearExpression.' as year'))->orderBy('date')->get()->pluck('year')->unique()->sort();
         for ($i = 1; $i <= 12; $i++) {
-            $months[$i] = strftime('%B', mktime(0, 0, 0, $i, 1, date('Y')));
+            $months[$i] = strftime('%B', (int) mktime(0, 0, 0, $i, 1, (int) date('Y')));
         }
 
         // determine orientation and view name;
@@ -144,7 +150,7 @@ class CalendarController extends Controller
 
         // absences
         $absences = Absence::byPeriod($monthStart, $monthEnd)
-            ->visibleForUser(Auth::user())
+            ->visibleForUser($user)
             ->get();
 
         $slave = $request->get('slave', 0);
@@ -152,7 +158,6 @@ class CalendarController extends Controller
 
         // save current display settings for slave displays to follow
         if (! $slave) {
-            $user = Auth::user();
             $currentDisplayMonth = $user->getSetting('display-month', 999);
             $currentDisplayYear = $user->getSetting('display-year', 999);
             if (($month != $currentDisplayMonth) || ($year != $currentDisplayYear)) {
@@ -162,7 +167,7 @@ class CalendarController extends Controller
             }
         }
 
-        return view(
+        return $this->renderView(
             'calendar.month',
             compact(
                 'year',
@@ -187,12 +192,20 @@ class CalendarController extends Controller
     }
 
     /**
+     * Redirect if the requested year or month is missing or invalid.
+     *
+     * @param  string  $route  Route name used for the redirect.
+     * @param  int  $year  Requested year.
+     * @param  int  $month  Requested month.
      * @return bool|RedirectResponse
      */
     protected function redirectIfMissingParameters(Request $request, $route, $year, $month)
     {
-        $defaultMonth = Auth::user()->getSetting('display-month', date('m'));
-        $defaultYear = Auth::user()->getSetting('display-year', date('Y'));
+        $user = Auth::user();
+        abort_unless($user instanceof User, 403);
+
+        $defaultMonth = $user->getSetting('display-month', date('m'));
+        $defaultYear = $user->getSetting('display-year', date('Y'));
 
         $initialYear = $year;
         $initialMonth = $month;
@@ -222,6 +235,19 @@ class CalendarController extends Controller
         }
 
         return redirect()->route($route, $data);
+    }
+
+    /**
+     * Render a Blade view whose name is provided as a plain string.
+     *
+     * @param  string  $view  Name of the view to render.
+     * @param  array<string, mixed>  $data  Data passed to the view.
+     * @return View Rendered month view.
+     */
+    private function renderView(string $view, array $data): View
+    {
+        /** @var view-string $view */
+        return view($view, $data);
     }
 
     /**

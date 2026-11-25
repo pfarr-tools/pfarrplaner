@@ -34,6 +34,6 @@ use App\Models\Liturgy\Songbook;
 use App\Models\People\User;
 
 /**
- * @method Songbook create(User $user, array $input)
+ * @method Songbook create(User $user, array<string, mixed> $input)
  */
 interface CreatesSongbooks {}

@@ -34,6 +34,6 @@ use App\Models\People\User;
 use App\Models\Tag;
 
 /**
- * @method Tag update(User $user, Tag $tag, array $input)
+ * @method Tag update(User $user, Tag $tag, array<string, mixed> $input)
  */
 interface UpdatesTags {}

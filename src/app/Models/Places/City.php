@@ -109,7 +109,7 @@ class City extends AbstractModel
     public static $adminGroup = 'Orte';
 
     /**
-     * @var string[]
+     * @var list<string>
      */
     protected $fillable = [
         'name',
@@ -200,6 +200,8 @@ class City extends AbstractModel
 
     /**
      * Return pastors assigned to this city as home city.
+     *
+     * @return BelongsToMany<User, $this>
      */
     public function pastors()
     {
@@ -316,9 +318,9 @@ class City extends AbstractModel
     /**
      * @param  string[]  $ministries
      */
-    public function setDefaultMinistriesAttribute(array $ministries)
+    public function setDefaultMinistriesAttribute(array $ministries): void
     {
-        $this->attributes['default_ministries'] = implode('||', $ministries ?? []);
+        $this->attributes['default_ministries'] = implode('||', $ministries);
     }
 
     /**
@@ -334,7 +336,7 @@ class City extends AbstractModel
     /**
      * Updates the children relationship for the current model based on the provided input.
      *
-     * @param  array  $input  An associative array containing child IDs in the 'childIds' key.
+     * @param  array<string, mixed>  $input  An associative array containing child IDs in the 'childIds' key.
      * @return void
      */
     public function setChildrenFromInput(array $input)

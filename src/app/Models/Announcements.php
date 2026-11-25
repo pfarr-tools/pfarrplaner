@@ -74,12 +74,18 @@ class Announcements
     /** @var bool Use tabs \t in output? */
     protected bool $useTabs = false;
 
+    /** @var string */
     protected $eventListKeyFormat = 'dddd, D. MMMM';
 
+    /**
+     * @param  City|array<int, int|City>|int  $city  Cities included in the announcements.
+     * @param  bool  $excludeRegularWeekly  Whether weekly recurring services are excluded.
+     * @param  string  $eventListKeyFormat  Date format used as the event group key.
+     */
     public function __construct(Service $service, $city, $excludeRegularWeekly = false, $eventListKeyFormat = 'dddd, D. MMMM')
     {
         $this->service = $service;
-        if (is_a($city, City::class)) {
+        if ($city instanceof City) {
             $city = [$city->id];
         } elseif (! is_array($city)) {
             $city = [$city];
@@ -87,7 +93,9 @@ class Announcements
         $city = City::whereIn('id', $city)->get();
         $this->eventListKeyFormat = $eventListKeyFormat;
 
-        $lastWeek = Carbon::createFromTimeString($service->date->format('Y-m-d').' 0:00:00 last Sunday');
+        /** @var Carbon $serviceDate Service date provided by the datetime cast. */
+        $serviceDate = $service->date;
+        $lastWeek = Carbon::createFromTimeString($serviceDate->format('Y-m-d').' 0:00:00 last Sunday');
         $nextWeek = $lastWeek->copy()->addWeeks(2)->setTime(
             23,
             59,
@@ -95,7 +103,7 @@ class Announcements
         );
 
         $this->events = Occurence::with('event')
-            ->between($service->date->copy()->addHour(2), $nextWeek)
+            ->between($serviceDate->copy()->addHours(2), $nextWeek)
             ->whereHas('service', function ($query) use ($service, $city, $excludeRegularWeekly) {
                 $query->withoutGlobalScope(ServicesOnlyScope::class);
                 $query->where('id', '!=', $service->id);
@@ -120,11 +128,11 @@ class Announcements
             ->whereHas('service', function ($query) use ($service, $city) {
                 $query->inCities($city)->displayable($service->date);
             })
-            ->adRunningAt('bekanntgaben', $service->date)
+            ->adRunningAt('bekanntgaben', $serviceDate)
             ->orderBy('start')
             ->get();
 
-        $this->funerals = Funeral::where('announcement', $service->date->format('Y-m-d'))
+        $this->funerals = Funeral::where('announcement', $serviceDate->format('Y-m-d'))
             ->whereHas(
                 'service',
                 function ($query) use ($service, $city) {
@@ -137,50 +145,73 @@ class Announcements
         $this->weddings = Wedding::with('service')
             ->whereHas(
                 'service',
-                function ($query) use ($service, $nextWeek, $city) {
-                    $query->between($service->date, $nextWeek)
+                function ($query) use ($serviceDate, $nextWeek, $city) {
+                    $query->between($serviceDate, $nextWeek)
                         ->inCities($city)
-                        ->displayable($service->date)
+                        ->displayable($serviceDate)
                         ->ordered();
                 }
             )->get()
-            ->groupBy(function ($rite) use ($service) {
-                $day = ($rite->service->date->format('Ymd') == $service->date->format(
+            ->groupBy(function ($rite) use ($serviceDate) {
+                /** @var Service $riteService Service relation of the rite. */
+                $riteService = $rite->service;
+                /** @var Carbon $riteDate Service date provided by the datetime cast. */
+                $riteDate = $riteService->date;
+                $day = ($riteDate->format('Ymd') == $serviceDate->format(
                     'Ymd'
-                )) ? 'heute' : 'am '.$rite->service->date->isoFormat('dddd, DD. MMMM,');
+                )) ? 'heute' : 'am '.$riteDate->isoFormat('dddd, DD. MMMM,');
 
-                return 'Im Gottesdienst '.$day.' um '.$rite->service->timeText(
-                ).' in '.$rite->service->city->name;
+                return 'Im Gottesdienst '.$day.' um '.$riteService->timeText(
+                ).' in '.$riteService->city?->name;
             });
 
         $this->baptisms = Baptism::with('service')
             ->whereHas(
                 'service',
-                function ($query) use ($service, $nextWeek, $city) {
-                    $query->between($service->date, $nextWeek)
+                function ($query) use ($serviceDate, $nextWeek, $city) {
+                    $query->between($serviceDate, $nextWeek)
                         ->inCities($city)
-                        ->displayable($service->date)
+                        ->displayable($serviceDate)
                         ->ordered();
                 }
             )->get()
             ->reject(function ($rite) use ($service) {
-                return $rite->service->id == $service->id;
-            })
-            ->groupBy(function ($rite) use ($service) {
-                $day = ($rite->service->date->format('Ymd') == $service->date->format(
-                    'Ymd'
-                )) ? 'heute' : 'am '.$rite->service->date->isoFormat('dddd, DD. MMMM,');
+                /** @var Service $riteService Service relation of the rite. */
+                $riteService = $rite->service;
 
-                return 'Im Gottesdienst '.$day.' um '.$rite->service->timeText(
-                ).' in '.$rite->service->city->name;
+                return $riteService->id == $service->id;
+            })
+            ->groupBy(function ($rite) use ($serviceDate) {
+                /** @var Service $riteService Service relation of the rite. */
+                $riteService = $rite->service;
+                /** @var Carbon $riteDate Service date provided by the datetime cast. */
+                $riteDate = $riteService->date;
+                $day = ($riteDate->format('Ymd') == $serviceDate->format(
+                    'Ymd'
+                )) ? 'heute' : 'am '.$riteDate->isoFormat('dddd, DD. MMMM,');
+
+                return 'Im Gottesdienst '.$day.' um '.$riteService->timeText(
+                ).' in '.$riteService->city?->name;
             });
     }
 
-    protected static function defaultCallback(string $key, array $items)
+    /**
+     * @param  array<array-key, mixed>  $items  Paragraphs to join.
+     * @return string
+     */
+    protected static function defaultCallback(int|string $key, array $items)
     {
         return count($items) ? implode("\n", $items)."\n" : '';
     }
 
+    /**
+     * @param  mixed  $lastService  Last service description.
+     * @param  mixed  $offerings  Offering amount.
+     * @param  (callable(mixed, mixed): mixed)|null  $callback  Optional paragraph renderer.
+     * @param  string|null  $separator  Separator for a flattened result.
+     * @param  list<string>  $remove  Keys to omit.
+     * @return array<string, mixed>|string
+     */
     public function render($lastService = '', $offerings = '', $callback = null, $separator = null, array $remove = [])
     {
         $data = $this->renderArray($lastService, $offerings);
@@ -197,7 +228,10 @@ class Announcements
         })->join($separator) : $result;
     }
 
-    public function renderArray($lastService = '', $offerings = ''): array
+    /**
+     * @return array<string, list<string>>
+     */
+    public function renderArray(string $lastService = '', string $offerings = ''): array
     {
         return [
             'thanks' => $this->getThanksArray(),
@@ -214,6 +248,9 @@ class Announcements
         ];
     }
 
+    /**
+     * @return list<string>
+     */
     public function getRitesArray(): array
     {
         $paragraphs = array_merge($this->getBaptismsArray(), $this->getWeddingsArray(), $this->getFuneralsArray());
@@ -222,6 +259,9 @@ class Announcements
         return $paragraphs;
     }
 
+    /**
+     * @return list<string>
+     */
     public function getBaptismsArray(): array
     {
         if ($this->baptisms->count() == 0) {
@@ -244,6 +284,9 @@ class Announcements
         return $paragraphs;
     }
 
+    /**
+     * @return list<string>
+     */
     public function getFuneralsArray(): array
     {
         if ($this->funerals->count() == 0) {
@@ -259,9 +302,11 @@ class Announcements
                 } else {
                     $location = 'in '.$funeral->service->city->name;
                 }
+                /** @var string $buriedName Formatted name of the deceased. */
+                $buriedName = NameService::fromName($funeral->buried_name)->format(NameService::FIRST_LAST);
 
                 return 'Am '.$funeral->dod->isoFormat('D. MMMM').' ist '
-                    .NameService::fromName($funeral->buried_name)->format(NameService::FIRST_LAST)
+                    .$buriedName
                     .($funeral->buried_address ? ', '.$funeral->buried_address.',' : '')
                     .($funeral->age ? ' im Alter von '.$funeral->age.' Jahren' : '')
                     .' verstorben. Die '.$funeral->type
@@ -273,9 +318,15 @@ class Announcements
         $paragraphs[] = '';
         $paragraphs[] = static::DEFAULT_FUNERAL_VOTE;
 
-        return $paragraphs->toArray();
+        /** @var list<string> $result Funeral paragraphs including the closing vote. */
+        $result = $paragraphs->toArray();
+
+        return $result;
     }
 
+    /**
+     * @return list<string>
+     */
     public function getWeddingsArray(): array
     {
         if ($this->weddings->count() == 0) {
@@ -287,8 +338,12 @@ class Announcements
                 $day,
                 'werden',
                 $weddings->map(function ($wedding) {
-                    return NameService::fromName($wedding->spouse1_name)->format(NameService::FIRST_LAST)
-                        .' und '.NameService::fromName($wedding->spouse2_name)->format(NameService::FIRST_LAST);
+                    /** @var string $spouse1 Formatted name of the first spouse. */
+                    $spouse1 = NameService::fromName($wedding->spouse1_name)->format(NameService::FIRST_LAST);
+                    /** @var string $spouse2 Formatted name of the second spouse. */
+                    $spouse2 = NameService::fromName($wedding->spouse2_name)->format(NameService::FIRST_LAST);
+
+                    return $spouse1.' und '.$spouse2;
                 })->join('; ', 'und'),
                 'kirchlich getraut.',
             ]);
@@ -299,21 +354,33 @@ class Announcements
         return $paragraphs;
     }
 
+    /**
+     * @param  string  $separator  Paragraph separator.
+     */
     public function getRitesText($separator = ''): string
     {
         return implode($separator, $this->getRitesArray());
     }
 
+    /**
+     * @return list<string>
+     */
     public function getCustomAnnouncementsArray(): array
     {
         return [];
     }
 
+    /**
+     * @param  string  $separator  Paragraph separator.
+     */
     public function getCustomAnnouncementsText($separator = ''): string
     {
         return implode($separator, $this->getCustomAnnouncementsArray());
     }
 
+    /**
+     * @return list<string>
+     */
     public function getFinalSongArray(): array
     {
         $liturgy = collect();
@@ -333,14 +400,20 @@ class Announcements
             return [];
         }
 
-        return ['Wir singen:', $finalSong->getHelper()->getTitleText().(($item->data['verses'] ?? '') ? ', '.$item->data['verses'] : '')];
+        return ['Wir singen:', $finalSong->getHelper()->getTitleText().(($finalSong->data['verses'] ?? '') ? ', '.$finalSong->data['verses'] : '')];
     }
 
+    /**
+     * @param  string  $separator  Paragraph separator.
+     */
     public function getFinalSongText($separator = ''): string
     {
         return implode($separator, $this->getFinalSongArray());
     }
 
+    /**
+     * @return list<string>
+     */
     public function getEventsIntroArray()
     {
         if ($this->events->count() == 0) {
@@ -354,11 +427,17 @@ class Announcements
         ];
     }
 
+    /**
+     * @param  string  $separator  Paragraph separator.
+     */
     public function getEventsIntroText($separator = ''): string
     {
         return implode($separator, $this->getEventsIntroArray());
     }
 
+    /**
+     * @return list<string>
+     */
     public function getFeaturedEventsIntroArray()
     {
         if ($this->featuredEvents->count() == 0) {
@@ -372,11 +451,17 @@ class Announcements
         ];
     }
 
+    /**
+     * @param  string  $separator  Paragraph separator.
+     */
     public function getFeaturedEventsIntroText($separator = ''): string
     {
         return implode($separator, $this->getFeaturedEventsIntroArray());
     }
 
+    /**
+     * @return list<string>
+     */
     public function getThanksArray(): array
     {
         $music = $this->service->organists;
@@ -398,11 +483,17 @@ class Announcements
         ];
     }
 
+    /**
+     * @return string
+     */
     protected function tab()
     {
         return $this->useTabs ? "\t" : ' ';
     }
 
+    /**
+     * @return list<string>
+     */
     public function getEventsArray(): array
     {
         $paragraphs = [];
@@ -427,11 +518,17 @@ class Announcements
         return $paragraphs;
     }
 
+    /**
+     * @param  string  $separator  Paragraph separator.
+     */
     public function getEventsText($separator = ''): string
     {
         return implode($separator, $this->getEventsArray());
     }
 
+    /**
+     * @return list<string>
+     */
     public function getFeaturedEventsArray(): array
     {
         $paragraphs = [];
@@ -448,18 +545,24 @@ class Announcements
         return $paragraphs;
     }
 
+    /**
+     * @param  string  $separator  Paragraph separator.
+     */
     public function getFeaturedEventsText($separator = ''): string
     {
         return implode($separator, $this->getFeaturedEventsArray());
     }
 
+    /**
+     * @return list<string>
+     */
     public function getEventsExtroArray(): array
     {
         $sources = collect(['in den Aushängen']);
-        if ($this->service->city->homepage) {
+        if ($this->service->city?->homepage) {
             $sources->push('auf unserer Homepage');
         }
-        if ($this->service->city->communiapp_token) {
+        if ($this->service->city?->communiapp_token) {
             $sources->push('in unserer App');
         }
 
@@ -468,21 +571,30 @@ class Announcements
         ];
     }
 
+    /**
+     * @param  string  $separator  Paragraph separator.
+     */
     public function getEventsExtroText($separator = ''): string
     {
         return implode($separator, $this->getEventsExtroArray());
     }
 
+    /**
+     * @param  string  $separator  Separator.\n     * @return string
+     */
     public function getThanksText(string $separator = ''): string
     {
         return implode($separator, $this->getThanksArray());
     }
 
+    /**
+     * @return list<string>
+     */
     public function getLastOfferingsArray(string $lastService = '', string $offerings = ''): array
     {
         $paragraphs = [];
         if ($lastService) {
-            $lastService = is_object($lastService) ? $lastService : Carbon::parse($lastService);
+            $lastService = Carbon::parse($lastService);
             if ($offerings == "0,00\u{A0}€") {
                 $offerings = '';
             }
@@ -492,12 +604,18 @@ class Announcements
         return $paragraphs;
     }
 
+    /**
+     * @param  string  $separator  Paragraph separator.
+     */
     public function getLastOfferingsText($separator = ''): string
     {
         return implode($separator, $this->getLastOfferingsArray());
 
     }
 
+    /**
+     * @return list<string>
+     */
     public function getOfferingsArray(string $lastService = '', string $offerings = ''): array
     {
         $paragraphs = [];
@@ -517,11 +635,17 @@ class Announcements
         return $paragraphs;
     }
 
+    /**
+     * @param  string  $lastService  Last service.\n     * @param  string  $offerings  Offerings.\n     * @param  string  $separator  Separator.\n     * @return string
+     */
     public function getOfferingsText(string $lastService = '', string $offerings = '', string $separator = ''): string
     {
-        return implode($separator, $this->renderOfferingsArray($lastService, $offerings));
+        return implode($separator, $this->getOfferingsArray($lastService, $offerings));
     }
 
+    /**
+     * @return Service
+     */
     public function getService(): Service
     {
         return $this->service;
@@ -563,26 +687,41 @@ class Announcements
         return $this->weddings;
     }
 
+    /**
+     * @return City
+     */
     public function getCity(): City
     {
         return $this->city;
     }
 
+    /**
+     * @return bool
+     */
     public function isUseTabs(): bool
     {
         return $this->useTabs;
     }
 
+    /**
+     * @param  bool  $useTabs  Use tabs.\n     * @return void
+     */
     public function setUseTabs(bool $useTabs): void
     {
         $this->useTabs = $useTabs;
     }
 
+    /**
+     * @return string
+     */
     public function getEventListKeyFormat(): string
     {
         return $this->eventListKeyFormat;
     }
 
+    /**
+     * @param  string  $eventListKeyFormat  Key format.\n     * @return void
+     */
     public function setEventListKeyFormat(string $eventListKeyFormat): void
     {
         $this->eventListKeyFormat = $eventListKeyFormat;
@@ -596,7 +735,9 @@ class Announcements
     {
         $extra = collect();
         foreach ($events as $event) {
-            if (! $event->event->is_allday) {
+            /** @var Service $eventService Service relation of the occurrence. */
+            $eventService = $event->event;
+            if (! $eventService->is_allday) {
                 continue;
             }
             if ($event->start->setTimezone('Europe/Berlin')->format('Ymd') == $event->end->setTimezone('Europe/Berlin')->format('Ymd')) {
@@ -605,9 +746,10 @@ class Announcements
             $cursor = $event->start->copy()->addDay();
             while ($cursor < $event->end) {
                 $newEvent = clone $event;
-                $newEvent->setRelation('event', clone $event->event);
+                $eventClone = clone $eventService;
+                $eventClone->date = $cursor;
+                $newEvent->setRelation('event', $eventClone);
                 $newEvent->start = $cursor;
-                $newEvent->event->date = $cursor;
                 $extra->push($newEvent);
                 $cursor->addDay();
             }

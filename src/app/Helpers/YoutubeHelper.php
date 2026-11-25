@@ -38,18 +38,24 @@ use App\Models\Places\City;
 class YoutubeHelper
 {
     /**
-     * @return string
+     * Ermittelt die URL zum Live-Dashboard eines YouTube-Videos.
+     *
+     * @param  string  $url  YouTube-URL des Gottesdienstes
+     * @return string Dashboard-URL
      */
-    public static function getLiveDashboardUrl(City $city, $url)
+    public static function getLiveDashboardUrl(City $city, string $url)
     {
         return 'https://studio.youtube.com/video/'
             .self::getCode($url).'/livestreaming';
     }
 
     /**
-     * @return mixed|string
+     * Ermittelt die Kanal-ID aus einer YouTube-Kanal-URL.
+     *
+     * @param  string  $url  YouTube-Kanal-URL
+     * @return mixed|string Kanal-ID
      */
-    public static function getChannelId($url)
+    public static function getChannelId(string $url)
     {
         if (substr($url, -1) == '/') {
             $url = substr($url, 0, -1);
@@ -61,9 +67,12 @@ class YoutubeHelper
     }
 
     /**
-     * @return mixed|string
+     * Ermittelt den Videocode aus einer YouTube-URL.
+     *
+     * @param  string  $url  YouTube-URL
+     * @return mixed|string Videocode
      */
-    public static function getCode($url)
+    public static function getCode(string $url)
     {
         $code = '';
         if (strpos($url, 'youtu.be') !== false) {

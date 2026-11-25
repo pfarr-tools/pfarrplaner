@@ -39,6 +39,7 @@ namespace App\CalendarLinks;
 
 use App\Models\Leave\Absence;
 use App\Models\People\User;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -70,6 +71,10 @@ class AbsencesCalendarLink extends AbstractCalendarLink
         return route('ical.link', ['key' => $this->getKey()]);
     }
 
+    /**
+     * @param  Request  $request  Incoming request.
+     * @return void
+     */
     public function setDataFromRequest(Request $request)
     {
         if (Auth::user() !== null) {
@@ -78,7 +83,9 @@ class AbsencesCalendarLink extends AbstractCalendarLink
     }
 
     /**
-     * @return array
+     * Return the absences visible to the given user.
+     *
+     * @return Collection<int, Absence>
      */
     public function getRenderData(Request $request, User $user)
     {

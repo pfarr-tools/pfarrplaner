@@ -33,9 +33,10 @@ namespace App\Http\Controllers;
 use App\Contracts\Comment\CreatesComments;
 use App\Contracts\Comment\DeletesComments;
 use App\Models\Comment;
+use App\Models\People\User;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 
 /**
  * Class CommentController
@@ -50,13 +51,15 @@ class CommentController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @return Response
+     * @return JsonResponse
      */
     public function store(Request $request)
     {
+        $user = $request->user();
+        abort_unless($user instanceof User, 401);
         try {
             $creator = app(CreatesComments::class);
-            $comment = $creator->create($request->user(), $request->all());
+            $comment = $creator->create($user, $request->all());
 
             return response()->json($comment);
         } catch (AuthorizationException $exception) {
@@ -67,12 +70,14 @@ class CommentController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @return Response
+     * @return string
      */
     public function destroy(int $modelId)
     {
+        $user = request()->user();
+        abort_unless($user instanceof User, 401);
         $comment = Comment::findOrFail($modelId);
-        app(DeletesComments::class)->delete(request()->user(), $comment);
+        app(DeletesComments::class)->delete($user, $comment);
 
         return '<div class="alert alert-success alert-dismissible alertCommentDeleted"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>Der Kommentar wurde gelöscht.</div>';
     }

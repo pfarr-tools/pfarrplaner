@@ -36,5 +36,5 @@ abstract class AbstractPatch
 {
     public function __construct() {}
 
-    public function patch(Request $request) {}
+    public function patch(Request $request): void {}
 }

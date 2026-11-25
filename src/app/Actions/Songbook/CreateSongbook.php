@@ -45,6 +45,11 @@ class CreateSongbook extends AbstractCreateAction implements CreatesSongbooks
         return route('admin.songbooks.index');
     }
 
+    /**
+     * Create a new songbook
+     *
+     * @param  array<string, mixed>  $input
+     */
     public function create(User $user, array $input): Songbook
     {
         Gate::forUser($user)->authorize('create', Songbook::class);

@@ -18,5 +18,10 @@ use App\Models\Rites\Wedding;
 
 interface CreatesWeddings
 {
+    /**
+     * Legt eine Hochzeit an.
+     *
+     * @param  array<string, mixed>  $input
+     */
     public function create(User $user, array $input): Wedding;
 }

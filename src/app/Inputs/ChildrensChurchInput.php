@@ -53,7 +53,7 @@ class ChildrensChurchInput extends AbstractInput
 
     public function canEdit(): bool
     {
-        return Auth::user()->can('gd-kinderkirche-bearbeiten');
+        return Auth::user()?->can('gd-kinderkirche-bearbeiten') ?? false;
     }
 
     /**
@@ -61,7 +61,9 @@ class ChildrensChurchInput extends AbstractInput
      */
     public function setup(Request $request)
     {
-        $cities = Auth::user()->cities;
+        $user = Auth::user();
+        abort_unless($user !== null, 403);
+        $cities = $user->cities;
         $locations = Location::inCities($cities->pluck('id'))->get();
 
         return Inertia::render('Inputs/ChildrensChurch/Setup', compact('cities', 'locations'));
@@ -83,11 +85,15 @@ class ChildrensChurchInput extends AbstractInput
 
         $locations = Location::inCities($setup['cities'])->get();
 
+        $from = Carbon::createFromFormat('d.m.Y', $setup['from']);
+        $to = Carbon::createFromFormat('d.m.Y', $setup['to']);
+        abort_unless($from !== null && $to !== null, 422);
+
         $query = Service::with(['city'])
             ->select('services.slug')
             ->between(
-                Carbon::createFromFormat('d.m.Y', $setup['from']),
-                Carbon::createFromFormat('d.m.Y', $setup['to'])
+                $from,
+                $to
             )
             ->inCities($setup['cities'])
             ->ordered();
@@ -96,7 +102,7 @@ class ChildrensChurchInput extends AbstractInput
             $query->whereIn('services.location_id', $setup['locations']);
         }
 
-        $serviceSlugs = $query->get()->pluck('slug');
+        $serviceSlugs = $query->pluck('slug');
 
         return Inertia::render('Inputs/ChildrensChurch/Form', compact('serviceSlugs'));
     }
@@ -114,7 +120,7 @@ class ChildrensChurchInput extends AbstractInput
             'cc_lesson' => 'nullable|string',
             'cc_staff' => 'nullable|string',
         ]);
-        $service = Service::find($data['id']);
+        $service = Service::query()->whereKey($data['id'])->first();
         if (! $service) {
             abort(404);
         }

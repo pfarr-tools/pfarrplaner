@@ -43,7 +43,7 @@ class Tag extends AbstractModel
     use HasFactory;
 
     /**
-     * @var string[]
+     * @var list<string>
      */
     protected $fillable = ['code', 'name'];
 

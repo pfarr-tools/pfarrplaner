@@ -37,6 +37,6 @@ class UpdateService
      */
     public function currentCommit(): ?string
     {
-        return shell_exec('git rev-parse HEAD');
+        return shell_exec('git rev-parse HEAD') ?: null;
     }
 }

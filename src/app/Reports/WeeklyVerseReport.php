@@ -84,7 +84,7 @@ class WeeklyVerseReport extends AbstractCSVReport
             if (count($dayData)) {
                 $records[$currentDate->format('Y-m-d')] = $dayData;
             }
-            $currentDate->addDay(1);
+            $currentDate->addDay();
         } while ($currentDate <= $end);
 
         $bible = new BibleText;
@@ -117,7 +117,7 @@ class WeeklyVerseReport extends AbstractCSVReport
                     return $item['Wochenspruch']['Text'];
                 },
                 'Bibelstelle' => function ($item, $key) {
-                    return ReferenceParser::getInstance()->beautify($item['Wochenspruch']['Bibelstelle'], []);
+                    return ReferenceParser::getInstance()->beautify($item['Wochenspruch']['Bibelstelle']);
                 },
             ]);
 

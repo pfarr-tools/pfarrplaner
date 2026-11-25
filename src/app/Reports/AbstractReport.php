@@ -30,10 +30,13 @@
 
 namespace App\Reports;
 
-use Illuminate\Contracts\Foundation\Application;
-use Illuminate\Contracts\View\Factory;
+use App\Models\People\User;
+use Carbon\Carbon;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\View as ViewFacade;
 use Illuminate\View\View;
+use InvalidArgumentException;
 
 /**
  * Class AbstractReport
@@ -64,6 +67,38 @@ class AbstractReport
     protected $inertia = false;
 
     /**
+     * Return the user who is running this report.
+     *
+     * @throws AuthenticationException When the report is requested without an authenticated user.
+     */
+    protected function authenticatedUser(): User
+    {
+        $user = auth()->user();
+        if (! $user instanceof User) {
+            throw new AuthenticationException;
+        }
+
+        return $user;
+    }
+
+    /**
+     * Ensure a date parsed from validated report input is usable.
+     *
+     * @param  Carbon|false|null  $date  Result from Carbon::createFromFormat().
+     * @return Carbon Parsed date.
+     *
+     * @throws InvalidArgumentException When the input cannot be parsed.
+     */
+    protected function requireParsedDate(Carbon|false|null $date): Carbon
+    {
+        if (! $date instanceof Carbon) {
+            throw new InvalidArgumentException('Das eingegebene Datum konnte nicht verarbeitet werden.');
+        }
+
+        return $date;
+    }
+
+    /**
      * Returns true if the report is active for the current user
      */
     public function isActive(): bool
@@ -80,11 +115,14 @@ class AbstractReport
     }
 
     /**
+     * @param  string  $view  View name suffix.
      * @return string
      */
-    public function getViewName($view)
+    public function getViewName(string $view)
     {
-        return 'reports.'.strtolower($this->getKey().'.'.strtolower($view));
+        $viewName = sprintf('reports.%s.%s', strtolower($this->getKey()), strtolower($view));
+
+        return $viewName;
     }
 
     /**
@@ -112,14 +150,14 @@ class AbstractReport
     }
 
     /**
-     * @param  array  $data
-     * @return Application|Factory|View
+     * @param  array<string, mixed>  $data  Variables passed to the render view.
+     * @return \Illuminate\Contracts\View\View
      */
-    public function renderSetupView($data = [])
+    public function renderSetupView(array $data = [])
     {
         $data = array_merge(['report' => $this->getKey()], $data);
 
-        return view($this->getSetupViewName(), $data);
+        return ViewFacade::file(ViewFacade::getFinder()->find($this->getSetupViewName()), $data);
     }
 
     /**
@@ -131,7 +169,7 @@ class AbstractReport
     }
 
     /**
-     * @return Application|Factory|View
+     * @return \Illuminate\Contracts\View\View
      */
     public function setup()
     {
@@ -139,14 +177,15 @@ class AbstractReport
     }
 
     /**
-     * @param  array  $data
-     * @return Application|Factory|View
+     * @param  string  $view  View name suffix.
+     * @param  array<string, mixed>  $data  Variables passed to the render view.
+     * @return \Illuminate\Contracts\View\View
      */
-    public function renderView($view, $data = [])
+    public function renderView(string $view, array $data = [])
     {
         $data = array_merge(['report' => $this->getKey()], $data);
 
-        return view($this->getViewName($view), $data);
+        return ViewFacade::file(ViewFacade::getFinder()->find($this->getViewName($view)), $data);
     }
 
     public function isInertia(): bool
@@ -154,6 +193,9 @@ class AbstractReport
         return $this->inertia;
     }
 
+    /**
+     * @param  bool  $inertia  Whether the report uses Inertia.\n     * @return void
+     */
     public function setInertia(bool $inertia): void
     {
         $this->inertia = $inertia;

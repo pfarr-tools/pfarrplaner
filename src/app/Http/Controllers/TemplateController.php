@@ -32,25 +32,41 @@ namespace App\Http\Controllers;
 
 use App\Models\Service;
 use Carbon\Carbon;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Inertia\Response;
 
+/** Controller for reusable service templates. */
 class TemplateController extends Controller
 {
+    /**
+     * @return void
+     */
     public function __construct()
     {
         $this->middleware('auth');
         $this->authorizeResource(Service::class, 'template');
     }
 
-    public function index()
+    /**
+     * Render the list of available service templates.
+     *
+     * @return Response Inertia response with all templates ordered by title.
+     */
+    public function index(): Response
     {
         $templates = Service::orderBy('title')->isTemplate()->get();
 
         return Inertia::render('Liturgy/Template/Index', compact('templates'));
     }
 
-    public function create()
+    /**
+     * Create a new template and open it in the liturgy editor.
+     *
+     * @return RedirectResponse Redirect to the liturgy editor for the new template.
+     */
+    public function create(): RedirectResponse
     {
         $template = Service::create([
             'date' => Carbon::parse('1978-03-05 0:00:00'),
@@ -64,7 +80,13 @@ class TemplateController extends Controller
         return redirect()->route('liturgy.editor', $template->slug);
     }
 
-    public function store(Request $request)
+    /**
+     * Store a template from the validated request and open it in the editor.
+     *
+     * @param  Request  $request  Request containing the template data.
+     * @return RedirectResponse Redirect to the liturgy editor for the new template.
+     */
+    public function store(Request $request): RedirectResponse
     {
         $template = Service::create($this->validateRequest($request));
         $template->update(['slug' => $template->createSlug()]);
@@ -72,14 +94,27 @@ class TemplateController extends Controller
         return redirect()->route('liturgy.editor', $template->slug);
     }
 
-    public function update(Request $request, Service $template)
+    /**
+     * Update an existing template from the validated request.
+     *
+     * @param  Request  $request  Request containing the updated template data.
+     * @param  Service  $template  Template to update.
+     * @return RedirectResponse Redirect to the template list.
+     */
+    public function update(Request $request, Service $template): RedirectResponse
     {
         $template->update($this->validateRequest($request));
 
         return redirect()->route('template.index');
     }
 
-    public function saveAsTemplate(Service $service)
+    /**
+     * Copy a service including its liturgy blocks into a new template.
+     *
+     * @param  Service  $service  Service to save as a template.
+     * @return RedirectResponse Redirect to the liturgy editor for the new template.
+     */
+    public function saveAsTemplate(Service $service): RedirectResponse
     {
         $this->authorize('create', Service::class);
         $template = Service::create([
@@ -111,7 +146,13 @@ class TemplateController extends Controller
         return redirect()->route('liturgy.editor', $template->slug);
     }
 
-    public function duplicate(Service $template)
+    /**
+     * Duplicate a template including its liturgy blocks.
+     *
+     * @param  Service  $template  Template to duplicate.
+     * @return RedirectResponse Redirect to the liturgy editor for the copy.
+     */
+    public function duplicate(Service $template): RedirectResponse
     {
         $this->authorize('create', Service::class);
         $newTemplate = Service::create([
@@ -144,13 +185,25 @@ class TemplateController extends Controller
         return redirect()->route('liturgy.editor', $newTemplate->slug);
     }
 
-    public function delete(Service $template)
+    /**
+     * Delete a template.
+     *
+     * @param  Service  $template  Template to delete.
+     * @return RedirectResponse Redirect to the template list with a success message.
+     */
+    public function delete(Service $template): RedirectResponse
     {
         $template->delete();
 
         return redirect()->route('template.index')->with('success', 'Die Vorlage wurde gelöscht.');
     }
 
+    /**
+     * Validate the template form input and assign the template reference date.
+     *
+     * @param  Request  $request  Request containing the template form data.
+     * @return array<string, mixed> Validated template data including the reference date.
+     */
     protected function validateRequest(Request $request): array
     {
         $data = $request->validate(

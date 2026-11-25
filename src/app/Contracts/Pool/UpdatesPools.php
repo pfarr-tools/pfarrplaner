@@ -34,6 +34,6 @@ use App\Models\Leave\Pool;
 use App\Models\People\User;
 
 /**
- * @method Pool update(User $user, Pool $pool, array $input)
+ * @method Pool update(User $user, Pool $pool, array<string, mixed> $input)
  */
 interface UpdatesPools {}

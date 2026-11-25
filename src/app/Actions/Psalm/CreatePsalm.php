@@ -45,6 +45,9 @@ class CreatePsalm extends AbstractCreateAction implements CreatesPsalms
         return route('admin.psalms.index');
     }
 
+    /**
+     * @param  array<string, mixed>  $input
+     */
     public function create(User $user, array $input): Psalm
     {
         Gate::forUser($user)->authorize('create', Psalm::class);

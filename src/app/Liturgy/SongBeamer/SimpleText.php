@@ -30,20 +30,39 @@
 
 namespace App\Liturgy\SongBeamer;
 
+/**
+ * Represents a simple text slide as a SongBeamer SNG file.
+ */
 class SimpleText extends AbstractSngFile
 {
+    /** @var string Slide title used as the file name and optional header */
     protected $title;
 
+    /** @var string Slide text rendered into the SNG file */
     protected $text;
 
+    /** @var array<string, string|int> Additional schedule item options */
     protected $scheduleOptions = [];
 
+    /** @var array<string, string|int> Additional song profile options */
     protected $profileOptions = [];
 
+    /** @var array<string, string|int> Additional SNG header options */
     protected $headerOptions = [];
 
+    /** @var bool Whether the title is rendered as an SNG header */
     protected $showTitle = true;
 
+    /**
+     * Create a simple text slide.
+     *
+     * @param  string  $title  Slide title
+     * @param  string  $text  Slide text
+     * @param  array<string, string|int>  $scheduleOptions  Additional schedule item options
+     * @param  array<string, string|int>  $profileOptions  Additional song profile options
+     * @param  array<string, string|int>  $headerOptions  Additional SNG header options
+     * @param  bool  $showTitle  Whether the title is rendered as an SNG header
+     */
     public function __construct(string $title, string $text, array $scheduleOptions = [], array $profileOptions = [], array $headerOptions = [], $showTitle = true)
     {
         parent::__construct($title);
@@ -55,7 +74,9 @@ class SimpleText extends AbstractSngFile
     }
 
     /**
-     * {@inheritDoc}
+     * Render the simple text slide as SNG file text.
+     *
+     * @return string Rendered SNG file text
      */
     public function toText()
     {
@@ -79,10 +100,13 @@ class SimpleText extends AbstractSngFile
     }
 
     /**
-     * {@inheritDoc}
+     * Get the schedule item data with the additional options merged in.
+     *
+     * @return array<string, mixed> Schedule item data
      */
     public function toScheduleItem(): array
     {
+        /** @var array<string, mixed> $scheduleItem */
         $scheduleItem = parent::toScheduleItem();
         if (count($this->scheduleOptions)) {
             $scheduleItem = array_merge($this->scheduleOptions, $scheduleItem);
@@ -92,10 +116,13 @@ class SimpleText extends AbstractSngFile
     }
 
     /**
-     * {@inheritDoc}
+     * Get the song profile data with the additional options merged in.
+     *
+     * @return array<string, mixed> Song profile data
      */
     public function toProfile(): array
     {
+        /** @var array<string, mixed> $profile */
         $profile = parent::toProfile();
         if (count($this->profileOptions)) {
             $profile = array_merge($this->profileOptions, $profile);

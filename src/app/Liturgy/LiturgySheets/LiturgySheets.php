@@ -32,10 +32,13 @@ namespace App\Liturgy\LiturgySheets;
 
 class LiturgySheets
 {
-    public static function all()
+    /**
+     * @return array<string, array<string, mixed>> Sheet configuration indexed by title.
+     */
+    public static function all(): array
     {
         $sheets = [];
-        foreach (glob(app_path('Liturgy/LiturgySheets/*LiturgySheet.php')) as $file) {
+        foreach (glob(app_path('Liturgy/LiturgySheets/*LiturgySheet.php')) ?: [] as $file) {
             if (substr(pathinfo($file, PATHINFO_FILENAME), 0, 8) != 'Abstract') {
                 $class = 'App\\Liturgy\\LiturgySheets\\'.pathinfo($file, PATHINFO_FILENAME);
                 /** @var AbstractLiturgySheet $object */

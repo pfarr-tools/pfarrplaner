@@ -32,15 +32,18 @@ namespace App\Http\Controllers;
 
 use App\Facades\Settings;
 use App\HomeScreen\Tabs\HomeScreenTabFactory;
+use App\Models\People\User;
 use App\Services\RedirectorService;
 use Carbon\Carbon;
-use Illuminate\Contracts\Support\Renderable;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
+use Inertia\Response;
 
 /**
  * Class HomeController
@@ -60,9 +63,11 @@ class HomeController extends Controller
     /**
      * Show the application dashboard.
      *
-     * @return Renderable
+     * @param  Request  $request  Current request.
+     * @param  string  $activeTab  Tab selected in the route or request.
+     * @return RedirectResponse|Response Redirect to login/home screen or the rendered dashboard.
      */
-    public function index(Request $request, $activeTab = '')
+    public function index(Request $request, string $activeTab = ''): RedirectResponse|Response
     {
         if (! Auth::user()) {
             return redirect()->route('login');
@@ -103,13 +108,21 @@ class HomeController extends Controller
         );
     }
 
-    /** Display application metadata and the current changelog. */
-    public function about()
+    /**
+     * Display application metadata and the current changelog.
+     *
+     * @return Response Inertia response with version, changelog and runtime information.
+     */
+    public function about(): Response
     {
         // get version
-        $packageConfig = json_decode(file_get_contents(base_path('package.json')), true);
+        $packageContents = file_get_contents(base_path('package.json'));
+        abort_unless(is_string($packageContents), 500);
+        $packageConfig = json_decode($packageContents, true);
         $version = $packageConfig['version'];
-        $date = (new Carbon(filemtime(base_path('package.json'))))->setTimeZone('Europe/Berlin');
+        $modifiedAt = filemtime(base_path('package.json'));
+        abort_unless($modifiedAt !== false, 500);
+        $date = (new Carbon($modifiedAt))->setTimeZone('Europe/Berlin');
         $changelog = file_get_contents(base_path('CHANGELOG.md'));
         $env = App::environment();
         $phpVersion = phpversion();
@@ -186,10 +199,16 @@ class HomeController extends Controller
         }
     }
 
-    /** Return one configured home-screen tab as JSON. */
-    public function tab($tabIndex)
+    /**
+     * Return one configured home-screen tab as JSON.
+     *
+     * @param  int|string  $tabIndex  Index of the configured tab.
+     * @return JsonResponse JSON response containing the tab data.
+     */
+    public function tab(int|string $tabIndex): JsonResponse
     {
         $user = Auth::user();
+        abort_unless($user instanceof User, 401);
         $config = $user->getSetting('homeScreenTabsConfig') ?? [];
         $tab = HomeScreenTabFactory::getOne($config['tabs'][$tabIndex], $tabIndex);
 

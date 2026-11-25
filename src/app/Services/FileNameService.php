@@ -36,17 +36,29 @@ use Illuminate\Support\Str;
 
 class FileNameService
 {
+    /**
+     * Erzeugt einen datei- und ordnerfreundlichen Namen aus Titel, Datum, Rufzeichen und Person.
+     *
+     * @param  string  $title  Titel des Dokuments
+     * @param  string|null  $extension  Dateiendung mit oder ohne führenden Punkt
+     * @param  mixed  $callSign  Kürzel, das dem Namen vorangestellt wird
+     * @param  array<Carbon|string>|Carbon|string|null  $dates  Ein oder mehrere Datumswerte
+     * @param  bool  $withTime  Uhrzeit im Datumsformat berücksichtigen
+     * @param  User|string|null  $person  Person oder Name, der dem Namen vorangestellt wird
+     * @param  string|null  $forceDateFormat  Erzwingt ein bestimmtes Datumsformat
+     */
     public static function make($title, $extension = '', $callSign = '', $dates = null, $withTime = false, $person = null, $forceDateFormat = null): string
     {
         if ((! empty($extension)) && (substr($extension, 0, 1) != '.')) {
             $extension = '.'.$extension;
         }
+        $date = null;
         if ($dates) {
             if (! is_array($dates)) {
                 $dates = [$dates];
             }
             foreach ($dates as $index => $date) {
-                if (! is_a($date, Carbon::class)) {
+                if (! $date instanceof Carbon) {
                     $date = Carbon::parse($date);
                 }
                 $dateFormat = $forceDateFormat ?? ($withTime ? 'Ymd-Hi' : 'Ymd');
@@ -56,7 +68,7 @@ class FileNameService
         }
 
         if ($person) {
-            $name = (is_a($person, User::class) ? NameService::fromUser($person) : NameService::fromName($person))->format(NameService::LAST_COMMA_FIRST).' ';
+            $name = ($person instanceof User ? NameService::fromUser($person) : NameService::fromName($person))->format(NameService::LAST_COMMA_FIRST).' ';
         } else {
             $name = '';
         }

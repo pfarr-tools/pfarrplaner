@@ -51,7 +51,7 @@ class VersionInfo
      */
     public static function version()
     {
-        $data = json_decode(file_get_contents(base_path('composer.json')), true);
+        $data = json_decode((string) file_get_contents(base_path('composer.json')), true);
 
         return $data['version'];
     }
@@ -218,7 +218,7 @@ class VersionInfo
                     'date' => Carbon::createFromFormat('d.m.Y', '07.09.2019'),
                     'text' => 'Im <a href="'.route(
                         'user.profile'
-                    ).'">Benutzerprofil</a> (<span class="fa fa-user"></span> '.Auth::user()->fullName(
+                    ).'">Benutzerprofil</a> (<span class="fa fa-user"></span> '.Auth::user()?->fullName(
                         false
                     ).' > Mein Profil) kann jetzt eingestellt werden, welche Kirchengemeinden im Kalender in welcher Reihenfolge angezeigt werden sollen. Außerdem kann dort eine neue, (experimentelle) vertikale Tabellendarstellung ausgewählt werden, die die Tage in Zeilen und die Kirchengemeinden in Spalten anordnet.',
                 ],
@@ -249,7 +249,7 @@ class VersionInfo
                         'user.profile'
                     ).'">'
                     .'<span class="fa fa-user"></span>&nbsp;'
-                    .Auth::user()->fullName().' > Mein Profil</a> an- und abbestellt werden.',
+                    .Auth::user()?->fullName().' > Mein Profil</a> an- und abbestellt werden.',
                 ],
                 [
                     'date' => Carbon::createFromFormat('d.m.Y', '14.05.2019'),

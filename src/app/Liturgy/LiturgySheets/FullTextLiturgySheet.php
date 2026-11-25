@@ -33,19 +33,25 @@ namespace App\Liturgy\LiturgySheets;
 use App\Documents\Word\DefaultA5WordDocument;
 use App\Documents\Word\DefaultWordDocument;
 use App\Integrations\KonfiApp\KonfiAppIntegration;
+use App\Liturgy\ItemHelpers\FreetextItemHelper;
 use App\Liturgy\ItemHelpers\PsalmItemHelper;
 use App\Liturgy\ItemHelpers\ReadingItemHelper;
 use App\Liturgy\ItemHelpers\SongItemHelper;
 use App\Liturgy\Replacement\Replacement;
 use App\Models\Liturgy\Item;
+use App\Models\People\User;
+use App\Models\Places\City;
 use App\Models\Service;
 use Illuminate\Support\Facades\Auth;
 use PhpOffice\PhpWord\Element\Footer;
+use PhpOffice\PhpWord\Element\Section;
 use PhpOffice\PhpWord\Element\TextRun;
+use PhpOffice\PhpWord\PhpWord;
 use PhpOffice\PhpWord\Shared\Converter;
 use PhpOffice\PhpWord\Shared\Html;
 use PhpOffice\PhpWord\Style\Tab;
 
+/** Liturgy sheet rendering the complete liturgy text. */
 class FullTextLiturgySheet extends AbstractLiturgySheet
 {
     protected $title = 'Volltext';
@@ -71,11 +77,17 @@ class FullTextLiturgySheet extends AbstractLiturgySheet
         'pageNumbers' => 1,
     ];
 
+    /**
+     * @return void
+     */
     public function __construct()
     {
         parent::__construct();
     }
 
+    /**
+     * @return mixed
+     */
     public function render(Service $service)
     {
         $this->service = $service;
@@ -86,7 +98,7 @@ class FullTextLiturgySheet extends AbstractLiturgySheet
                     'titles' => [
                         2 => [
                             'tabs' => [
-                                new Tab('right', Converter::cmToTwip(12)),
+                                new Tab('right', (int) Converter::cmToTwip(12)),
                             ],
                         ],
                     ],
@@ -98,9 +110,14 @@ class FullTextLiturgySheet extends AbstractLiturgySheet
 
         // page numbers
         if ($this->config['pageNumbers']) {
-            $doc->getPhpWord()->getSettings()->setEvenAndOddHeaders(true);
-            $footer = $doc->getSection()->addFooter();
-            $footer->addPreserveText(
+            /** @var PhpWord $phpWord */
+            $phpWord = $doc->getPhpWord();
+            $phpWord?->getSettings()->setEvenAndOddHeaders(true);
+            /** @var Section $section */
+            $section = $doc->getSection();
+
+            $footer = $section->addFooter();
+            $footer?->addPreserveText(
                 '{PAGE}',
                 [
                     'size' => 8,
@@ -110,8 +127,8 @@ class FullTextLiturgySheet extends AbstractLiturgySheet
                     'align' => 'right',
                 ]
             );
-            $footer = $doc->getSection()->addFooter(Footer::EVEN);
-            $footer->addPreserveText(
+            $footer = $section->addFooter(Footer::EVEN);
+            $footer?->addPreserveText(
                 '{PAGE}',
                 [
                     'size' => 8,
@@ -121,6 +138,7 @@ class FullTextLiturgySheet extends AbstractLiturgySheet
                     'align' => 'left',
                 ]
             );
+
         }
 
         // heading
@@ -145,10 +163,16 @@ class FullTextLiturgySheet extends AbstractLiturgySheet
             }
         }
 
-        if ($this->config['includeQR'] && (! empty($this->service->konfiapp_event_qr))) {
-            $doc->getSection()->addPageBreak();
-            $doc->getSection()->addTitle('QR-Code für die KonfiApp', 1);
-            $types = KonfiAppIntegration::get($service->city)->listEventTypes();
+        $city = $service->city;
+        if ($this->config['includeQR'] && (! empty($this->service->konfiapp_event_qr)) && $city !== null) {
+            /** @var Section $section */
+            $section = $doc->getSection();
+
+            $section->addPageBreak();
+            $section->addTitle('QR-Code für die KonfiApp', 1);
+
+            /** @var City $city */
+            $types = KonfiAppIntegration::get($city)->listEventTypes();
             $text = '';
             foreach ($types as $type) {
                 if ($type->id == $service->konfiapp_event_type) {
@@ -160,8 +184,8 @@ class FullTextLiturgySheet extends AbstractLiturgySheet
             }
             $doc->renderNormalText(
                 'Gültig nur am '.$service->dateTime->isoFormat('dddd, DD. MMMM YYYY')
-                .' von '.$service->date->setTimezone('Europe/Berlin')->format('H:i')
-                .' bis '.$service->date->setTimezone('Europe/Berlin')->copy()->addHours(3)->format('H:i').' Uhr.'
+                .' von '.($service->date?->setTimezone('Europe/Berlin')?->format('H:i') ?? '')
+                .' bis '.($service->date?->setTimezone('Europe/Berlin')?->copy()?->addHours(3)?->format('H:i') ?? '').' Uhr.'
             );
             $doc->getSection()->addImage(
                 route('qrcode', $this->service->konfiapp_event_qr),
@@ -172,15 +196,31 @@ class FullTextLiturgySheet extends AbstractLiturgySheet
         return $doc->sendToBrowser($this->getFileName($service));
     }
 
-    protected function setProperties(DefaultWordDocument $doc)
+    /**
+     * Set the metadata of the generated Word document.
+     *
+     * @param  DefaultWordDocument  $doc  Document whose properties are set.
+     */
+    protected function setProperties(DefaultWordDocument $doc): void
     {
-        $properties = $doc->getPhpWord()->getDocInfo();
-        $properties->setCreator(Auth::user()->fullName());
-        $properties->setCompany(Auth::user()->office ?? '');
-        $properties->setTitle($this->service->date->setTimeZone('Europe/Berlin')->format('Ymd-Hi').' '.$this->getFileTitle());
+        /** @var PhpWord $phpWord */
+        $phpWord = $doc->getPhpWord();
+        $properties = $phpWord->getDocInfo();
+        if ($properties === null) {
+            return;
+        }
+        $user = Auth::user();
+        /** @var User|null $user */
+        $userName = $user?->fullName() ?? '';
+        $properties->setCreator($userName);
+        $properties->setCompany($user->office ?? '');
+        $properties->setTitle(
+            ($this->service->date?->setTimeZone('Europe/Berlin')?->format('Ymd-Hi') ?? '')
+            .' '.$this->getFileTitle()
+        );
         $properties->setDescription($this->getFileTitle().' ('.$this->title.')');
         $properties->setCategory('Gottesdienste');
-        $properties->setLastModifiedBy(Auth::user()->fullName());
+        $properties->setLastModifiedBy($userName);
         $properties->setSubject('Komplette Liturgie');
     }
 
@@ -195,15 +235,29 @@ class FullTextLiturgySheet extends AbstractLiturgySheet
         ).($this->service->sermon ? ' - '.$this->service->sermon->title : '');
     }
 
-    protected function renderFreetextItem(DefaultWordDocument $doc, Item $item)
+    /**
+     * Render the free text of a liturgy item into the document.
+     *
+     * @param  DefaultWordDocument  $doc  Document receiving the free text.
+     * @param  Item  $item  Liturgy item whose free text should be rendered.
+     */
+    protected function renderFreetextItem(DefaultWordDocument $doc, Item $item): void
     {
         if (! $item->data['description']) {
             return;
         }
-        $doc->renderNormalText(Replacement::replaceAll($item->getHelper()->getText(), $this->service));
+        /** @var FreetextItemHelper $helper */
+        $helper = $item->getHelper();
+        $doc->renderNormalText(Replacement::replaceAll($helper->getText(), $this->service));
     }
 
-    protected function renderSermonItem(DefaultWordDocument $doc, Item $item)
+    /**
+     * Render the sermon text of a liturgy item into the document.
+     *
+     * @param  DefaultWordDocument  $doc  Document receiving the sermon text.
+     * @param  Item  $item  Liturgy item identifying the sermon to render.
+     */
+    protected function renderSermonItem(DefaultWordDocument $doc, Item $item): void
     {
         if ($this->service->sermon === null) {
             $doc->renderNormalText('Für diesen Gottesdienst wurde noch keine Predigt angelegt.', ['italic' => true]);
@@ -222,6 +276,8 @@ class FullTextLiturgySheet extends AbstractLiturgySheet
             if (! $body) {
                 return;
             }
+            $section = $doc->getSection();
+            /** @var Section $section */
             $nodes = [];
             /** @var \DOMNode $node */
             foreach ($body->childNodes as $node) {
@@ -233,17 +289,24 @@ class FullTextLiturgySheet extends AbstractLiturgySheet
                         $doc->renderText($paragraph, $doc::BLOCKQUOTE, ['size' => 10]);
                     }
                 } else {
+                    $html = (string) $dom->saveHTML($node);
                     Html::addHtml(
-                        $doc->getSection(),
-                        '<body>'.str_replace('<br>', '<br />', $dom->saveHTML($node)).'</body>'
+                        $section,
+                        '<body>'.str_replace('<br>', '<br />', $html).'</body>'
                     );
                 }
-                $nodes[] = $node->nodeName.' -> '.$node->nodeValue;
             }
+
         }
     }
 
-    protected function renderPsalmItem(DefaultWordDocument $doc, Item $item)
+    /**
+     * Render the Psalm text of a liturgy item into the document.
+     *
+     * @param  DefaultWordDocument  $doc  Document receiving the Psalm content.
+     * @param  Item  $item  Liturgy item whose Psalm data should be rendered.
+     */
+    protected function renderPsalmItem(DefaultWordDocument $doc, Item $item): void
     {
         if (! isset($item->data['psalm'])) {
             return;
@@ -257,7 +320,13 @@ class FullTextLiturgySheet extends AbstractLiturgySheet
         $doc->renderNormalText($item->data['psalm']['text']);
     }
 
-    protected function renderSongItem(DefaultWordDocument $doc, Item $item)
+    /**
+     * Render the song text of a liturgy item into the document.
+     *
+     * @param  DefaultWordDocument  $doc  Document receiving the song text.
+     * @param  Item  $item  Liturgy item whose song data should be rendered.
+     */
+    protected function renderSongItem(DefaultWordDocument $doc, Item $item): void
     {
         if (! isset($item->data['song'])) {
             return;
@@ -287,7 +356,13 @@ class FullTextLiturgySheet extends AbstractLiturgySheet
         }
     }
 
-    protected function renderReadingItem(DefaultWordDocument $doc, Item $item)
+    /**
+     * Render the Bible reading of a liturgy item into the document.
+     *
+     * @param  DefaultWordDocument  $doc  Document receiving the reading.
+     * @param  Item  $item  Liturgy item whose reading should be rendered.
+     */
+    protected function renderReadingItem(DefaultWordDocument $doc, Item $item): void
     {
         if (! $item->data['reference']) {
             return;

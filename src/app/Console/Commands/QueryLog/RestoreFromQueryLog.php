@@ -88,7 +88,7 @@ class RestoreFromQueryLog extends Command
             foreach ($queries as $query) {
                 $ctr++;
                 $this->line('Restoring archived query #'.$ctr.' from '.$query['time']->format('Y-m-d H:i:s'));
-                DB::query($query['query']);
+                DB::statement($query['query']);
             }
             $this->info('Restored '.count($queries).' queries. DB is now up-to-date as of '.QueryLogService::date()->format('Y-m-d H:i:s').'.');
             QueryLogService::clear();

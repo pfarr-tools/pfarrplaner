@@ -42,10 +42,9 @@ use Carbon\Carbon;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 use Inertia\Inertia;
-use Inertia\Render;
+use Inertia\Response;
 
 /**
  * Class EmbedStreamingReport
@@ -75,17 +74,17 @@ class EmbedStreamingReport extends AbstractEmbedReport
     protected $inertia = true;
 
     /**
-     * @return Render
+     * @return Response
      */
     public function setup()
     {
-        $cities = Auth::user()->cities;
+        $cities = $this->authenticatedUser()->cities;
 
         return Inertia::render('Report/EmbedStreaming/Setup', compact('cities'));
     }
 
     /**
-     * @return Application|Factory|View|string
+     * @return Application|Factory|View|Response|string
      */
     public function render(Request $request)
     {

@@ -18,5 +18,8 @@ use App\Models\Rites\Funeral;
 
 interface UpdatesFunerals
 {
+    /**
+     * @param array<string, mixed> $input
+     */
     public function update(User $user, Funeral $funeral, array $input): Funeral;
 }

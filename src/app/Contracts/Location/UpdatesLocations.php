@@ -34,6 +34,6 @@ use App\Models\Location;
 use App\Models\People\User;
 
 /**
- * @method Location update(User $user, Location $location, array $input)
+ * @method Location update(User $user, Location $location, array<string, mixed> $input)
  */
 interface UpdatesLocations {}

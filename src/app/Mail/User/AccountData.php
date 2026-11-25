@@ -30,12 +30,14 @@
 
 namespace App\Mail\User;
 
+use App\Models\People\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 
+/** Mailable containing a user account data export. */
 class AccountData extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
@@ -49,9 +51,11 @@ class AccountData extends Mailable implements ShouldQueue
     /**
      * Create a new message instance.
      *
+     * @param  User  $user  Empfänger der Zugangsdaten.
+     * @param  User  $author  Benutzer, der den Zugang eingerichtet hat.
      * @return void
      */
-    public function __construct($user, $author)
+    public function __construct(User $user, User $author)
     {
         $this->user = $user;
         $this->author = $author;

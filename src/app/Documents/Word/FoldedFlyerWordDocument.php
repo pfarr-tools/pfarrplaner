@@ -51,6 +51,10 @@ class FoldedFlyerWordDocument extends DefaultWordDocument
         );
     }
 
+    /**
+     * @param  string  $style  Font style name.
+     * @return array<string, mixed>|null
+     */
     public function getFontStyle($style)
     {
         switch ($style) {
@@ -86,5 +90,7 @@ class FoldedFlyerWordDocument extends DefaultWordDocument
                     'italic' => false,
                 ];
         }
+
+        return null;
     }
 }

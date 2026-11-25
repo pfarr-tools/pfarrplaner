@@ -32,9 +32,11 @@ namespace App\FileFormats;
 
 use DOMDocument;
 use DOMElement;
+use DOMNode;
 use DOMXPath;
 use RuntimeException;
 
+/** ODP document format writer. */
 class ODP extends AbstractZIPBasedFileFormat
 {
     /**
@@ -43,66 +45,18 @@ class ODP extends AbstractZIPBasedFileFormat
      * This is necessary to fix a bug in the current version of PHPPresentation, where slide names are
      * not written to the presentation file.
      *
+     * @param  array<array-key, string>  $slideNames  Slide names keyed by slide index
      * @return void
      */
     public function applySlideNameFix(array $slideNames)
     {
         return;
-        $this->zip->open($this->documentFilePath);
-
-        $this->patchXMLFile('content.xml', function (DOMDocument $doc) use ($slideNames) {
-            $xp = new DOMXPath($doc);
-
-            // Register ODF namespaces
-            $xp->registerNamespace('office', 'urn:oasis:names:tc:opendocument:xmlns:office:1.0');
-            $xp->registerNamespace('draw', 'urn:oasis:names:tc:opendocument:xmlns:drawing:1.0');
-
-            // Robust: unabhängig von Prefixen im Dokument
-            $pages = $xp->query("//*[local-name()='presentation']/*[local-name()='page']");
-            $p7 = $pages->item(7);
-            $p7->setAttributeNS(
-                'urn:oasis:names:tc:opendocument:xmlns:drawing:1.0',
-                'draw:name',
-                'foo-bar-baz'
-            );
-
-            // Fallback, falls die Struktur anders ist
-            if (! $pages || $pages->length === 0) {
-                $pages = $xp->query(
-                    "//*[local-name()='page' and namespace-uri()='urn:oasis:names:tc:opendocument:xmlns:drawing:1.0']"
-                );
-            }
-
-            if (! $pages->count()) {
-                return;
-            }
-
-            $count = $pages->count();
-
-            foreach ($slideNames as $slideIndex => $name) {
-                $slideIndex = (int) $slideIndex;
-                if ($slideIndex < 0 || $slideIndex >= $count) {
-                    continue;
-                }
-
-                $page = $pages->item($slideIndex);
-                if (! $page) {
-                    continue;
-                }
-
-                // set draw:name in correct namespace
-                $page->setAttributeNS(
-                    'urn:oasis:names:tc:opendocument:xmlns:drawing:1.0',
-                    'draw:name',
-                    (string) $name
-                );
-            }
-
-            return $doc;
-        });
-        $this->zip->close();
     }
 
+    /**
+     * @param  string  $basPath  Basic macro path.
+     * @return void
+     */
     public function injectBasicMacroFromBas(
         string $basPath
     ): void {
@@ -116,15 +70,24 @@ class ODP extends AbstractZIPBasedFileFormat
         }
         // Convert to valid UTF-8 (ODF expects UTF-8)
         $enc = mb_detect_encoding($basicCode, ['UTF-8', 'Windows-1252', 'ISO-8859-1'], true) ?: 'Windows-1252';
-        $basicCode = mb_convert_encoding($basicCode, 'UTF-8', $enc);
+        $converted = mb_convert_encoding($basicCode, 'UTF-8', $enc);
+        if ($converted === false) {
+            throw new RuntimeException("BAS file conversion failed: {$basPath}");
+        }
         // Remove any remaining invalid sequences (belt + suspenders)
-        $basicCode = iconv('UTF-8', 'UTF-8//IGNORE', $basicCode);
-        $basicCode = preg_replace('/^\xEF\xBB\xBF/', '', $basicCode);
+        $converted = iconv('UTF-8', 'UTF-8//IGNORE', $converted);
+        if ($converted === false) {
+            throw new RuntimeException("BAS file conversion failed: {$basPath}");
+        }
+        $basicCode = preg_replace('/^\xEF\xBB\xBF/', '', $converted) ?? $converted;
         if (! mb_check_encoding($basicCode, 'UTF-8')) {
             throw new RuntimeException('LoopListener.xml not valid UTF-8');
         }
 
         $moduleName = pathinfo($basPath, PATHINFO_FILENAME);
+        if ($moduleName === '') {
+            throw new RuntimeException("BAS file has no filename: {$basPath}");
+        }
         $libraryName = 'Pfarrplaner';
 
         $this->zip->open($this->documentFilePath);
@@ -155,6 +118,9 @@ class ODP extends AbstractZIPBasedFileFormat
             'vnd.sun.star.script:Pfarrplaner.LoopListener.StartWatchdog?language=Basic&location=document');
     }
 
+    /**
+     * @param  string  $moduleName  Module name.\n     * @param  string  $basicCode  Basic source code.\n     * @return string
+     */
     private function buildXba(string $moduleName, string $basicCode): string
     {
         // Normalize line endings (LO is tolerant, but consistent is nice)
@@ -185,9 +151,17 @@ class ODP extends AbstractZIPBasedFileFormat
         // Inhalt als Text (wie in echten .xba; kein CDATA nötig)
         $module->appendChild($doc->createTextNode("\n".$basicCode."\n"));
 
-        return $doc->saveXML();
+        $xml = $doc->saveXML();
+        if ($xml === false) {
+            throw new RuntimeException('Failed to generate Basic module XML');
+        }
+
+        return $xml;
     }
 
+    /**
+     * @param  list<string>  $moduleNames  Names of the Basic modules to register
+     */
     private function buildScriptXlb(string $libraryName, array $moduleNames): string
     {
         $doc = new DOMDocument('1.0', 'UTF-8');
@@ -217,10 +191,16 @@ class ODP extends AbstractZIPBasedFileFormat
             $lib->appendChild($el);
         }
 
-        return $doc->saveXML();
+        $xml = $doc->saveXML();
+        if ($xml === false) {
+            throw new RuntimeException('Failed to generate Basic library XML');
+        }
+
+        return $xml;
     }
 
     /**
+     * @param  list<string>  $libraryNames  Names of the Basic libraries to register
      * @throws \DOMException
      */
     private function buildScriptLc(array $libraryNames): string
@@ -254,7 +234,53 @@ class ODP extends AbstractZIPBasedFileFormat
             $root->appendChild($entry);
         }
 
-        return $doc->saveXML();
+        $xml = $doc->saveXML();
+        if ($xml === false) {
+            throw new RuntimeException('Failed to generate Basic library container XML');
+        }
+
+        return $xml;
+    }
+
+    /**
+     * Evaluate an XPath expression and return the matching DOM nodes.
+     *
+     * A failed query yields no nodes; namespace nodes are skipped because they
+     * are not DOMNode instances and cannot be used with the DOM APIs below.
+     *
+     * @param  DOMXPath  $xpath  XPath evaluator bound to the document
+     * @param  string  $expression  XPath expression to evaluate
+     * @param  DOMNode|null  $contextNode  Context node for relative expressions
+     * @return list<DOMNode> Matching DOM nodes in document order
+     */
+    private function queryNodes(DOMXPath $xpath, string $expression, ?DOMNode $contextNode = null): array
+    {
+        $result = $xpath->query($expression, $contextNode);
+        if ($result === false) {
+            return [];
+        }
+
+        $nodes = [];
+        foreach ($result as $node) {
+            if ($node instanceof DOMNode) {
+                $nodes[] = $node;
+            }
+        }
+
+        return $nodes;
+    }
+
+    /**
+     * Evaluate an XPath expression and return its first matching DOM node.
+     *
+     * @param  DOMXPath  $xpath  XPath evaluator bound to the document
+     * @param  string  $expression  XPath expression to evaluate
+     * @param  DOMNode|null  $contextNode  Context node for relative expressions
+     * @return DOMNode|null First matching DOM node, or null if there is none
+     */
+    private function queryFirstNode(DOMXPath $xpath, string $expression, ?DOMNode $contextNode = null): ?DOMNode
+    {
+        return $this->queryNodes($xpath, $expression, $contextNode)[0] ?? null;
     }
 
     /**
@@ -275,8 +301,10 @@ class ODP extends AbstractZIPBasedFileFormat
 
             // Collect existing full-path entries
             $existing = [];
-            foreach ($xp->query('//manifest:file-entry') as $node) {
-                /** @var DOMElement $node */
+            foreach ($this->queryNodes($xp, '//manifest:file-entry') as $node) {
+                if (! $node instanceof DOMElement) {
+                    continue;
+                }
                 $fullPath = $node->getAttributeNS(
                     'urn:oasis:names:tc:opendocument:xmlns:manifest:1.0',
                     'full-path'
@@ -311,6 +339,11 @@ class ODP extends AbstractZIPBasedFileFormat
         });
     }
 
+    /**
+     * @param  string  $odfEventName  ODF event name.
+     * @param  string  $macroUrl  Macro URL.
+     * @return void
+     */
     public function registerContentXmlEvent(string $odfEventName, string $macroUrl): void
     {
         $this->zip->open($this->documentFilePath);
@@ -332,13 +365,16 @@ class ODP extends AbstractZIPBasedFileFormat
             }
 
             // <office:scripts> (direct child of root)
-            $scripts = $xp->query('/office:document-content/office:scripts')->item(0);
-            if (! $scripts) {
+            $scripts = $this->queryFirstNode($xp, '/office:document-content/office:scripts');
+            if (! $scripts instanceof DOMNode) {
                 $scripts = $doc->createElementNS($OFFICE_NS, 'office:scripts');
+                if (! $scripts instanceof DOMNode) {
+                    throw new RuntimeException('content.xml: could not create office:scripts');
+                }
 
                 // Insert scripts early (before office:body if possible)
-                $body = $xp->query('/office:document-content/office:body')->item(0);
-                if ($body) {
+                $body = $this->queryFirstNode($xp, '/office:document-content/office:body');
+                if ($body instanceof DOMNode) {
                     $root->insertBefore($scripts, $body);
                 } else {
                     $root->appendChild($scripts);
@@ -346,20 +382,24 @@ class ODP extends AbstractZIPBasedFileFormat
             }
 
             // <office:event-listeners>
-            $listeners = $xp->query('./office:event-listeners', $scripts)->item(0);
-            if (! $listeners) {
+            $listeners = $this->queryFirstNode($xp, './office:event-listeners', $scripts);
+            if (! $listeners instanceof DOMNode) {
                 $listeners = $doc->createElementNS($OFFICE_NS, 'office:event-listeners');
+                if (! $listeners instanceof DOMNode) {
+                    throw new RuntimeException('content.xml: could not create office:event-listeners');
+                }
                 $scripts->appendChild($listeners);
             }
 
             // Find existing listener for this event name
             $query = './script:event-listener[@script:event-name="'.htmlspecialchars($odfEventName, ENT_QUOTES | ENT_XML1).'"]';
-            $existing = $xp->query($query, $listeners)->item(0);
+            $listener = $this->queryFirstNode($xp, $query, $listeners);
 
-            if ($existing) {
-                $listener = $existing;
-            } else {
+            if (! $listener instanceof DOMElement) {
                 $listener = $doc->createElementNS($SCRIPT_NS, 'script:event-listener');
+                if (! $listener instanceof DOMElement) {
+                    throw new RuntimeException('content.xml: invalid script event listener');
+                }
                 $listeners->appendChild($listener);
             }
 
@@ -391,8 +431,10 @@ class ODP extends AbstractZIPBasedFileFormat
             $xpath->registerNamespace('style', $styleNamespace);
             $xpath->registerNamespace('svg', $svgNamespace);
 
-            foreach ($xpath->query('//draw:frame[@svg:y]') as $frame) {
-                /** @var DOMElement $frame */
+            foreach ($this->queryNodes($xpath, '//draw:frame[@svg:y]') as $frame) {
+                if (! $frame instanceof DOMElement) {
+                    continue;
+                }
                 $y = (float) str_replace('cm', '', $frame->getAttributeNS($svgNamespace, 'y'));
                 if (abs($y - 10.61) > 0.01) {
                     continue;
@@ -403,12 +445,12 @@ class ODP extends AbstractZIPBasedFileFormat
                     continue;
                 }
 
-                $style = $xpath->query('//style:style[@style:name='.json_encode($styleName).']')->item(0);
+                $style = $this->queryFirstNode($xpath, '//style:style[@style:name='.json_encode($styleName).']');
                 if (! $style instanceof DOMElement) {
                     continue;
                 }
 
-                $graphicProperties = $xpath->query('./style:graphic-properties', $style)->item(0);
+                $graphicProperties = $this->queryFirstNode($xpath, './style:graphic-properties', $style);
                 if (! $graphicProperties instanceof DOMElement) {
                     continue;
                 }
@@ -431,7 +473,7 @@ class ODP extends AbstractZIPBasedFileFormat
             $xpath = new DOMXPath($doc);
             $xpath->registerNamespace('office', 'urn:oasis:names:tc:opendocument:xmlns:office:1.0');
 
-            foreach ($xpath->query('/office:document-content/office:body//text()') as $textNode) {
+            foreach ($this->queryNodes($xpath, '/office:document-content/office:body//text()') as $textNode) {
                 $decodedText = html_entity_decode($textNode->textContent, ENT_QUOTES | ENT_HTML5, 'UTF-8');
                 if ($decodedText !== $textNode->textContent) {
                     $textNode->nodeValue = $decodedText;

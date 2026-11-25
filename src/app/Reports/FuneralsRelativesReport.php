@@ -38,9 +38,9 @@ use Carbon\Carbon;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 use Inertia\Inertia;
+use Inertia\Response;
 use PhpOffice\PhpSpreadsheet\Exception;
 
 /**
@@ -70,12 +70,12 @@ class FuneralsRelativesReport extends AbstractExcelDocumentReport
     protected $inertia = true;
 
     /**
-     * @return Application|Factory|View
+     * @return Application|Factory|View|Response
      */
     public function setup()
     {
-        $cities = Auth::user()->cities;
-        $start = LiturgyService::getPropriumDateByCode(now()->year, '1ADV')->subDays(6);
+        $cities = $this->authenticatedUser()->cities;
+        $start = (LiturgyService::getPropriumDateByCode(now()->year, '1ADV') ?? now())->subDays(6);
 
         return Inertia::render('Report/FuneralsRelatives/Setup', compact('start', 'cities'));
     }
@@ -95,7 +95,7 @@ class FuneralsRelativesReport extends AbstractExcelDocumentReport
         );
 
         $start = Carbon::parse($data['start'], 'Europe/Berlin')->setTime(0, 0, 0);
-        $city = City::find($request->get('city'));
+        $city = City::findOrFail((int) $data['city']);
 
         $funerals = Funeral::with('service')
             ->whereHas(
@@ -145,15 +145,19 @@ class FuneralsRelativesReport extends AbstractExcelDocumentReport
 
         $row = 1;
         foreach ($funerals as $funeral) {
+            $service = $funeral->service;
+            if ($service === null) {
+                continue;
+            }
             $row++;
-            $sheet->setCellValue("A{$row}", $funeral->service->date->format('d.m.Y'));
+            $sheet->setCellValue("A{$row}", $service->trueDate()->format('d.m.Y'));
             $sheet->setCellValue("B{$row}", $funeral->buried_name);
             $sheet->setCellValue("C{$row}", $funeral->buried_address);
             $sheet->setCellValue("D{$row}", $funeral->buried_zip);
             $sheet->setCellValue("E{$row}", $funeral->buried_city);
             $sheet->setCellValue("F{$row}", $funeral->text);
-            $sheet->setCellValue("G{$row}", $funeral->service->participantsText('P'));
-            $sheet->setCellValue("H{$row}", $funeral->service->locationText());
+            $sheet->setCellValue("G{$row}", $service->participantsText('P'));
+            $sheet->setCellValue("H{$row}", $service->locationText());
             $sheet->setCellValue("I{$row}", $funeral->relative_name);
             $sheet->setCellValue("J{$row}", $funeral->relative_address);
             $sheet->setCellValue("K{$row}", $funeral->relative_zip);

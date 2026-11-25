@@ -67,7 +67,7 @@ class Location extends AbstractModel
     ];
 
     /**
-     * @var string[]
+     * @var list<string>
      */
     protected $fillable = [
         'name',

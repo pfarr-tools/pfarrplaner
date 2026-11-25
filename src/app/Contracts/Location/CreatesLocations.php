@@ -34,6 +34,6 @@ use App\Models\Location;
 use App\Models\People\User;
 
 /**
- * @method Location create(User $user, array $input)
+ * @method Location create(User $user, array<string, mixed> $input)
  */
 interface CreatesLocations {}

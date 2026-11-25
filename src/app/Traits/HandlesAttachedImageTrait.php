@@ -30,6 +30,7 @@
 
 namespace App\Traits;
 
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
@@ -37,26 +38,37 @@ use Illuminate\Support\Str;
 
 trait HandlesAttachedImageTrait
 {
+    /**
+     * Store an uploaded image and point the model field at it.
+     *
+     * @param  int|string  $model  Identifier of the model to update.
+     * @param  string|null  $field  Model field receiving the image path.
+     * @return JsonResponse|null
+     */
     public function attachImage(Request $request, $model, $field = null)
     {
         $modelClass = $this->model ?? $this->modelClass ?? null;
-        abort_unless($modelClass, 500);
+        abort_unless((bool) $modelClass, 500);
         $modelObject = $modelClass::findOrFail($model);
         Gate::authorize('update', $modelObject);
-        $imageField = $field ?? $modelObject->getImageField();
+        $imageField = $field ?? (is_object($modelObject) && method_exists($modelObject, 'getImageField') ? $modelObject->getImageField() : null);
+        if ($imageField === null) {
+            return null;
+        }
+
         if ($request->hasFile('attachments')) {
             $files = $request->file('attachments');
             foreach ($files as $file) {
                 $fullPath = $file->store('attachments');
                 $modelObject->update([$imageField => $fullPath]);
-                $path = basename($fullPath);
+                $path = basename((string) $fullPath);
 
                 return response()->json(['url' => route('image', compact('path')), 'image' => $fullPath,
                     'model' => $modelObject, 'id' => $model, 'field' => $imageField]);
             }
         } elseif ($request->has('uploadFromUrl')) {
             $fullPath = 'attachments/'.Str::random(32).'.'.pathinfo($request->get('uploadFromUrl'), PATHINFO_EXTENSION);
-            Storage::put($fullPath, file_get_contents($request->get('uploadFromUrl')));
+            Storage::put($fullPath, (string) file_get_contents($request->get('uploadFromUrl')));
             $modelObject->update([$imageField => $fullPath]);
             $path = basename($fullPath);
 
@@ -64,16 +76,24 @@ trait HandlesAttachedImageTrait
                 'model' => $modelObject, 'id' => $model, 'field' => $imageField]);
         }
 
+        return null;
     }
 
+    /**
+     * Remove the image referenced by a model field.
+     *
+     * @param  int|string  $model  Identifier of the model to update.
+     * @param  string|null  $field  Model field holding the image path.
+     * @return JsonResponse
+     */
     public function detachImage(Request $request, $model, $field = null)
     {
         $modelClass = $this->model ?? $this->modelClass ?? null;
-        abort_unless($modelClass, 500);
+        abort_unless((bool) $modelClass, 500);
         $modelObject = $modelClass::findOrFail($model);
         Gate::authorize('update', $modelObject);
-        $imageField = $field ?? $modelObject->getImageField();
-        if ($modelObject->$imageField) {
+        $imageField = $field ?? (is_object($modelObject) && method_exists($modelObject, 'getImageField') ? $modelObject->getImageField() : null);
+        if ($imageField !== null && $modelObject->$imageField) {
             Storage::delete($modelObject->$imageField);
             $modelObject->update([$imageField => '']);
         }

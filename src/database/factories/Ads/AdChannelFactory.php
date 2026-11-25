@@ -26,7 +26,7 @@ class AdChannelFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => $name = fake()->words(2, true),
+            'name' => $name = fake()->sentence(2),
             'slug' => Str::slug($name),
             'city_id' => City::factory(),
         ];

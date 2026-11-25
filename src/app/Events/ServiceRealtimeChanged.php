@@ -35,7 +35,7 @@ class ServiceRealtimeChanged implements ShouldBroadcast, ShouldDispatchAfterComm
     /** Previous local calendar date. */
     public ?string $oldDate;
 
-    /** City identifiers receiving the invalidation. */
+    /** @var array<int, int> City identifiers receiving the invalidation. */
     private array $channelCityIds;
 
     /**

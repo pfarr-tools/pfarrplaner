@@ -36,8 +36,13 @@ class ZVStudyHelper extends AbstractStudyHelper
 {
     public $title = 'Zentrum Verkündigung, Predigtvorschläge';
 
+    /** @var array<string, array<string, string>> */
     protected $records = [];
 
+    /**
+     * @param  array<string, mixed>  $data  Study helper input data.
+     *                                      * @return array<string, array<string, string>>
+     */
     public function read(array $data): array
     {
         if ('' == ($content = $this->getContent('https://www.zentrum-verkuendigung.de/service/predigten/aktuell/'))) {
@@ -48,7 +53,7 @@ class ZVStudyHelper extends AbstractStudyHelper
 
         $lastMatch = null;
 
-        foreach ($matches[1] as $index => $li) {
+        foreach ($matches[1] ?? [] as $index => $li) {
             if (Str::substr($li, 0, 2) == '<a') {
                 if (preg_match('/href="(.*?)">(.*?)<\/a> \| (\d\d\.\d\d\.\d\d\d\d) \| (.*)/', $li, $parts)) {
                     if (! isset($this->records[$parts[3]])) {
@@ -61,7 +66,10 @@ class ZVStudyHelper extends AbstractStudyHelper
                     ];
                 } else {
                     preg_match('/href="(.*?)">(.*?)</', $li, $newParts);
-                    if (Str::substr($newParts[1], 0, 2) == '/f') {
+                    if (
+                        isset($newParts[1], $newParts[2], $lastMatch['date'], $lastMatch['title'])
+                        && Str::substr($newParts[1], 0, 2) == '/f'
+                    ) {
                         if (! isset($this->records[$lastMatch['date']])) {
                             $this->records[$lastMatch['date']] = [];
                         }
@@ -89,6 +97,10 @@ class ZVStudyHelper extends AbstractStudyHelper
         return $this->records;
     }
 
+    /**
+     * @param  array<string, mixed>  $data  Input data.
+     *                                      * @return array<string, string>
+     */
     public function getLinks(array $data): array
     {
         $data['links'] = array_merge($data['links'] ?? [], $this->records[$data['date']] ?? []);

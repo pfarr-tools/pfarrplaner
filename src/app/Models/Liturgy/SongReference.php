@@ -33,7 +33,14 @@ namespace App\Models\Liturgy;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * Referenz eines Liedes in einem Liederbuch.
+ *
+ * @property-read Song $song Das referenzierte Lied.
+ * @property-read Songbook $songbook Das Liederbuch der Referenz.
+ */
 class SongReference extends Model
 {
     /** @use HasFactory<Factory<static>> */
@@ -47,23 +54,38 @@ class SongReference extends Model
 
     protected $appends = ['altEG'];
 
-    public function song()
+    /**
+     * Gibt das referenzierte Lied zurück.
+     *
+     * @return BelongsTo<Song, $this>
+     */
+    public function song(): BelongsTo
     {
         return $this->belongsTo(Song::class, 'song_id', 'id', 'songs');
     }
 
-    public function songbook()
+    /**
+     * Gibt das Liederbuch der Referenz zurück.
+     *
+     * @return BelongsTo<Songbook, $this>
+     */
+    public function songbook(): BelongsTo
     {
         return $this->belongsTo(Songbook::class, 'songbook_id', 'id', 'songbooks');
     }
 
-    public function getAltEGAttribute()
+    /**
+     * Gibt die alternative EG-Nummer des Liedes zurück.
+     *
+     * @return string
+     */
+    public function getAltEGAttribute(): string
     {
         if ($this->songbook->code == 'EG') {
             return '';
         }
         if ($this->song->alt_eg) {
-            return $this->song->alt_eg;
+            return (string) $this->song->alt_eg;
         }
         foreach ($this->song->songbooks as $songbook) {
             if ($songbook->code == 'EG') {

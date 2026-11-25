@@ -36,7 +36,6 @@ use PhpOffice\PhpWord\Shared\ZipArchive;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use SimpleXMLElement;
-use SplFileInfo;
 
 /**
  * Class IDML
@@ -44,7 +43,7 @@ use SplFileInfo;
 class IDML
 {
     /**
-     * @var false|string
+     * @var string
      */
     protected $tempFolder = '';
 
@@ -55,6 +54,9 @@ class IDML
 
     /**
      * IDML constructor.
+     *
+     * @param  string  $fileName  Path to the IDML archive.
+     * @param  string  $prefix  Prefix for generated identifiers.
      *
      * @throws Exception
      */
@@ -70,7 +72,11 @@ class IDML
     }
 
     /**
-     * @return false|string
+     * Legt einen temporären Ordner für das IDML-Paket an.
+     *
+     * @return string Pfad des temporären Ordners.
+     *
+     * @throws \RuntimeException Wenn der temporäre Ordner nicht angelegt werden kann.
      */
     protected function tempdir()
     {
@@ -82,12 +88,15 @@ class IDML
             unlink($tempfile);
         }
         mkdir($tempfile);
-        if (is_dir($tempfile)) {
-            return $tempfile;
+        if (! is_dir($tempfile)) {
+            throw new \RuntimeException('Temporärer IDML-Ordner konnte nicht angelegt werden.');
         }
+
+        return (string) $tempfile;
     }
 
     /**
+     * @param  float  $mm  Millimeters.
      * @return float
      */
     public static function mmToPoint($mm)
@@ -96,6 +105,7 @@ class IDML
     }
 
     /**
+     * @param  float  $pt  Points.
      * @return float
      */
     public static function pointToMm($pt)
@@ -103,10 +113,16 @@ class IDML
         return $pt / 2.845275590551;
     }
 
+    /**
+     * @return never
+     */
     public function build()
     {
         // Get real path for our folder
         $rootPath = realpath($this->tempFolder);
+        if ($rootPath === false) {
+            throw new \RuntimeException('Temporärer IDML-Ordner konnte nicht aufgelöst werden.');
+        }
         $tempFile = tempnam(sys_get_temp_dir(), 'IDML_build_');
 
         // Initialize archive object
@@ -114,7 +130,6 @@ class IDML
         $zip->open($tempFile, ZipArchive::CREATE | ZipArchive::OVERWRITE);
 
         // Create recursive directory iterator
-        /** @var SplFileInfo[] $files */
         $files = new RecursiveIteratorIterator(
             new RecursiveDirectoryIterator($rootPath),
             RecursiveIteratorIterator::LEAVES_ONLY
@@ -143,22 +158,22 @@ class IDML
             'application/vnd.adobe.indesign-idml-package',
             'build-ev3_'.now()->format('YmdHis').'.idml'
         );
-        unlink($tempFile);
-        exit;
     }
 
     /**
      * Force the browser to download a file
      *
-     * @param  string  $mimeType
-     * @param  string  $fileName
+     * @param  string  $file  File to send.
+     * @param  string  $mimeType  Content type of the download.
+     * @param  string  $fileName  Download file name.
+     * @return never
      */
     public function forceDownload($file, $mimeType = 'application/vnd.adobe.indesign-idml-package', $fileName = '')
     {
         if ($fileName == '') {
             $fileName = pathinfo($file, PATHINFO_BASENAME);
         }
-        header('Content-Type: application/vnd.adobe.indesign-idml-package');
+        header('Content-Type: '.$mimeType);
         header('Content-Transfer-Encoding: Binary');
         header('Content-disposition: attachment; filename="'.$fileName.'"');
         if (! file_exists($file) && file_exists($this->tempPath($file))) {
@@ -171,6 +186,7 @@ class IDML
     /**
      * Get the full path from a relative path in the temp folder
      *
+     * @param  string  $file  Relative path.
      * @return string
      */
     public function tempPath($file)
@@ -179,13 +195,18 @@ class IDML
     }
 
     /**
-     * @return SimpleXMLElement
+     * @param  string  $file  Relative path.
+     * @return SimpleXMLElement|false
      */
     public function getXML($file)
     {
         return simplexml_load_file($this->tempPath($file));
     }
 
+    /**
+     * @param  string  $file  Relative path.
+     * @return void
+     */
     public function setXML($file, SimpleXMLElement $xml)
     {
         $this->renderToFile($file, $xml->__toString());
@@ -196,6 +217,7 @@ class IDML
      *
      * @param  string  $filePath  a relative path in the temp folder
      * @param  string  $code  contents
+     * @return void
      */
     public function renderToFile($filePath, $code)
     {
@@ -204,17 +226,21 @@ class IDML
 
     /**
      * Remove a file from the temp directory
+     *
+     * @param  string  $filePath  Relative path in the temp folder.
+     * @return void
      */
     public function removeFile($filePath)
     {
         if (file_exists($this->tempPath($filePath))) {
-            unlink($file);
+            unlink($this->tempPath($filePath));
         }
     }
 
     /**
      * Get a unique identifier
      *
+     * @param  string  $type  Identifier type.
      * @return string
      */
     public function getUID($type = '')
@@ -233,13 +259,12 @@ class IDML
     /**
      * Delete a folder from the disk
      *
+     * @param  string  $dirname  Directory to remove.
      * @return bool
      */
     protected function deleteFolder($dirname)
     {
-        if (is_dir($dirname)) {
-            $dir_handle = opendir($dirname);
-        }
+        $dir_handle = is_dir($dirname) ? opendir($dirname) : false;
         if (! $dir_handle) {
             return false;
         }

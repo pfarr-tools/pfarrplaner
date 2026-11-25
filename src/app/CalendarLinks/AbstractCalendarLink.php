@@ -60,7 +60,7 @@ class AbstractCalendarLink
     protected $description = '';
 
     /**
-     * @var array
+     * @var array<string, mixed>
      */
     protected $data = [];
 
@@ -72,8 +72,12 @@ class AbstractCalendarLink
     /** @var User */
     protected $user = null;
 
+    /** @var string[] */
     protected $needs = [];
 
+    /**
+     * @return void
+     */
     public function __construct()
     {
         $this->data['key'] = $this->getKey();
@@ -110,11 +114,17 @@ class AbstractCalendarLink
         return route('ical.setup', ['key' => $this->getKey(), 'includeHidden' => request()->get('includeHidden', 0)]);
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getData(): array
     {
         return $this->data;
     }
 
+    /**
+     * @param  array<string, mixed>  $data
+     */
     public function setData(array $data): void
     {
         $this->data = $data;
@@ -128,11 +138,14 @@ class AbstractCalendarLink
         $data = $this->setupData();
         $data['calendarLink'] = $this;
 
-        return view($this->getSetupViewName(), $data);
+        /** @var view-string $viewName */
+        $viewName = $this->getSetupViewName();
+
+        return view($viewName, $data);
     }
 
     /**
-     * @return array
+     * @return array<string, mixed>
      */
     public function setupData()
     {
@@ -155,19 +168,20 @@ class AbstractCalendarLink
         return route('ical.export', $this->data);
     }
 
-    public function wrap($s)
+    /**
+     * @param  string  $s  Text to wrap.
+     */
+    public function wrap(string $s): string
     {
         return implode("\n ", str_split($s, 32));
     }
 
     /**
      * Convert line endings to CR+LF and remove empty lines
-     *
-     * @return array|string|string[]
      */
-    protected function normalizeLineEndings($s)
+    protected function normalizeLineEndings(string $s): string
     {
-        $s = preg_replace("/(^[\r\n]*|[\r\n]+)[\s\t]*[\r\n]+/", "\n", $s);
+        $s = (string) preg_replace("/(^[\r\n]*|[\r\n]+)[\s\t]*[\r\n]+/", "\n", $s);
         $s = str_replace("\n", "\r\n", $s);
 
         return $s;
@@ -182,13 +196,25 @@ class AbstractCalendarLink
         $this->setUser($user);
         $data = $this->getRenderData($request, $user);
         $calendarLink = $this;
-        $raw = View::make('ical.export.'.$this->viewName, compact('calendarLink', 'data'));
+        /** @var view-string $view */
+        $view = sprintf('%s', 'ical.export.'.$this->viewName);
+        $raw = View::make($view, compact('calendarLink', 'data'))->render();
 
         return $this->normalizeLineEndings($raw);
     }
 
+    /**
+     * @return void
+     */
+    /**
+     * @param  Request  $request  Current request.
+     * @return void
+     */
     public function setDataFromRequest(Request $request) {}
 
+    /**
+     * @param  User  $user  Authenticated user.
+     */
     public function setUser(User $user): void
     {
         $this->user = $user;
@@ -207,7 +233,7 @@ class AbstractCalendarLink
     /**
      * Convert into array for vue
      *
-     * @return string[]
+     * @return array<string, mixed>
      */
     public function toArray()
     {
@@ -219,6 +245,9 @@ class AbstractCalendarLink
         ];
     }
 
+    /**
+     * @return string
+     */
     public function filename()
     {
         return implode('-', [$this->data['user']->id, $this->getKey()]).'.ics';

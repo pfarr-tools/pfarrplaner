@@ -30,16 +30,38 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Places\City;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Collection;
 
+/**
+ * Serialize a user for API responses.
+ *
+ * @property int $id
+ * @property string|null $image
+ * @property string $email
+ * @property string $first_name
+ * @property string $last_name
+ * @property Collection<int, City> $cities
+ * @property mixed $sortedCities
+ * @property Collection<int, City> $writableCities
+ * @property bool $isOfficialUser
+ * @property bool $isLocalAdmin
+ * @property bool $isAdmin
+ * @property bool $isSuperAdmin
+ * @property bool $isPastor
+ *
+ * @method string fullName(bool $withTitle = false)
+ * @method \Illuminate\Support\Collection<int, \App\Models\Places\City> getSortedCities()
+ */
 class UserResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
      *
      * @param  Request  $request
-     * @return array
+     * @return array<string, mixed>
      */
     public function toArray($request)
     {

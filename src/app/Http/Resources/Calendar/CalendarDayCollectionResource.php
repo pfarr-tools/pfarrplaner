@@ -44,7 +44,7 @@ class CalendarDayCollectionResource extends ResourceCollection
     public function toArray(Request $request)
     {
         $items = [];
-        foreach ($this->collection as $item) {
+        foreach ($this->collection ?? collect() as $item) {
             $items[$item] = new CalendarDayResource($item);
         }
 

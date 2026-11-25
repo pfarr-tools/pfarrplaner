@@ -43,7 +43,6 @@ use App\Services\LiturgyService;
 use App\Services\NameService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -76,6 +75,7 @@ class BillBoardReport extends AbstractWordDocumentReport
 
     public const FILE_TITLE = 'Kirchliche Nachrichten';
 
+    /** @var bool */
     protected $useDefaultDocument = true;
 
     /**
@@ -103,7 +103,7 @@ class BillBoardReport extends AbstractWordDocumentReport
      */
     public function setup()
     {
-        $cities = Auth::user()->cities;
+        $cities = $this->authenticatedUser()->cities;
 
         $parishes = [];
         foreach ($cities as $city) {
@@ -134,7 +134,7 @@ class BillBoardReport extends AbstractWordDocumentReport
 
         $presets = $data;
         unset($presets['start']);
-        Auth::user()->setSetting('reports_billboard_presets', $presets);
+        $this->authenticatedUser()->setSetting('reports_billboard_presets', $presets);
 
         $start = Carbon::parse($data['start'], 'UTC')->setTimeZone('Europe/Berlin')->startOfDay();
         $end = $start->copy()->addDays(7)->endOfDay();
@@ -159,10 +159,10 @@ class BillBoardReport extends AbstractWordDocumentReport
         $this->section = $this->wordDocument->addSection(
             [
                 'orientation' => 'portrait',
-                'marginTop' => Converter::cmToTwip(2),
-                'marginBottom' => Converter::cmToTwip(2),
-                'marginLeft' => Converter::cmToTwip(2),
-                'marginRight' => Converter::cmToTwip(2),
+                'marginTop' => (int) Converter::cmToTwip(2),
+                'marginBottom' => (int) Converter::cmToTwip(2),
+                'marginLeft' => (int) Converter::cmToTwip(2),
+                'marginRight' => (int) Converter::cmToTwip(2),
             ]
         );
 
@@ -171,7 +171,7 @@ class BillBoardReport extends AbstractWordDocumentReport
             [
                 'spaceAfter' => 0,
                 'tabs' => [
-                    new Tab('right', Converter::cmToTwip(13.5)),
+                    new Tab('right', (int) Converter::cmToTwip(13.5)),
                 ],
             ]
         );
@@ -180,12 +180,12 @@ class BillBoardReport extends AbstractWordDocumentReport
             static::INDENT,
             [
                 'indentation' => [
-                    'left' => Converter::cmToTwip(3),
-                    'hanging' => Converter::cmToTwip(3),
+                    'left' => (int) Converter::cmToTwip(3),
+                    'hanging' => (int) Converter::cmToTwip(3),
                 ],
                 'tabs' => [
-                    new Tab('left', Converter::cmToTwip(3)),
-                    new Tab('right', Converter::cmToTwip(18)),
+                    new Tab('left', (int) Converter::cmToTwip(3)),
+                    new Tab('right', (int) Converter::cmToTwip(18)),
                 ],
                 'spaceAfter' => 0,
             ]
@@ -203,7 +203,7 @@ class BillBoardReport extends AbstractWordDocumentReport
             static::HEADING2,
             [
                 'indentation' => [
-                    'left' => Converter::cmToTwip(7.5),
+                    'left' => (int) Converter::cmToTwip(7.5),
                 ],
                 'spaceAfter' => 0,
             ]
@@ -256,6 +256,13 @@ class BillBoardReport extends AbstractWordDocumentReport
         }
     }
 
+    /**
+     * @param  string  $text  Paragraph text.
+     * @param  mixed  $textFormat  Text style.
+     * @param  string|null  $image  Image path.
+     * @param  array<string, mixed>  $imageOptions  Image style options.
+     * @return void
+     */
     protected function renderParagraphWithImage($text, $textFormat, $image, $imageOptions = [])
     {
         $run = $this->section->addTextRun(static::DEFAULT);
@@ -265,6 +272,11 @@ class BillBoardReport extends AbstractWordDocumentReport
         }
     }
 
+    /**
+     * @param  mixed  $cities  Cities to render.
+     * @param  mixed  $parishes  Parishes by city.
+     * @return void
+     */
     protected function renderInfoHeader($cities, $parishes)
     {
         $rendered = [];
@@ -286,7 +298,7 @@ class BillBoardReport extends AbstractWordDocumentReport
                         return NameService::fromUser($item)->format(NameService::TITLE_FIRST_LAST);
                     })->join(', ', ' und ');
                     $this->renderParagraphWithImage($pastors, static::BOLD, $city->logo, [
-                        'width' => Converter::cmToPoint(3.5),
+                        'width' => (int) Converter::cmToPoint(3.5),
                         'positioning' => 'relative',
                         'wrappingStyle' => 'tight',
                     ]);
@@ -316,6 +328,11 @@ class BillBoardReport extends AbstractWordDocumentReport
 
     }
 
+    /**
+     * @param  mixed  $events  Events to render.
+     * @param  mixed  $cities  Cities to render.
+     * @return void
+     */
     protected function renderEvents($events, $cities)
     {
         if (! count($events)) {
@@ -367,6 +384,10 @@ class BillBoardReport extends AbstractWordDocumentReport
         }
     }
 
+    /**
+     * @param  mixed  $absences  Absences to render.
+     * @return void
+     */
     protected function renderAbsences($absences)
     {
         if (! count($absences)) {
@@ -379,6 +400,11 @@ class BillBoardReport extends AbstractWordDocumentReport
     }
 
     /**
+     * @return string
+     */
+    /**
+     * @param  mixed  $people  People to list.
+     * @param  string  $and  Conjunction.
      * @return string
      */
     protected function getNameListLine($people, $and = ', ')

@@ -40,7 +40,7 @@ use Illuminate\Support\Facades\Gate;
 class AbsenceRequest extends FormRequest
 {
     /** @var Absence absence */
-    protected $absence = null;
+    protected ?Absence $absence = null;
 
     /**
      * Determine if the user is authorized to make this request.
@@ -49,26 +49,31 @@ class AbsenceRequest extends FormRequest
      */
     public function authorize()
     {
-        $routeName = $this->route() ? $this->route()->getName() : null;
+        $routeName = $this->route()?->getName();
         $absence = $this->resolveAbsence();
 
         if ($absence === null) {
             return false;
         }
 
-        if ($routeName === 'absence.store') {
-            return Gate::forUser($this->user())->check('create', [Absence::class, $absence]);
+        $actor = $this->user();
+        if (! $actor instanceof User) {
+            return false;
         }
 
-        return $this->user()->can('update', $absence);
+        if ($routeName === 'absence.store') {
+            return Gate::forUser($actor)->check('create', [Absence::class, $absence]);
+        }
+
+        return $actor->can('update', $absence);
     }
 
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array
+     * @return array<string, mixed>
      */
-    public function rules()
+    public function rules(): array
     {
         $rules = [
             'from' => ['required', $this->dateValueRule()],
@@ -79,7 +84,7 @@ class AbsenceRequest extends FormRequest
             'sick_days' => 'nullable|bool',
             'internal_notes' => 'nullable|string',
         ];
-        if ($this->route()->getName() == 'absence.store') {
+        if ($this->route()?->getName() == 'absence.store') {
             $rules['user_id'] = 'required|exists:users,id';
         }
 
@@ -89,7 +94,12 @@ class AbsenceRequest extends FormRequest
         }
 
         // self-administrator?
-        if ($this->user()->can('selfAdminister', $this->absence)) {
+        $actor = $this->user();
+        if (! $actor instanceof User) {
+            return $rules;
+        }
+
+        if ($actor->can('selfAdminister', $this->absence)) {
             $rules['workflow_status'] = 'nullable|int|in:'.implode(
                 ',',
                 [
@@ -99,8 +109,13 @@ class AbsenceRequest extends FormRequest
             );
             $rules['approved_at'] = 'nullable|date_format:d.m.Y';
         } else {
-            $mayCheck = $this->absence->user->vacationAdmins->pluck('id')->contains($this->user()->id);
-            $mayApprove = $this->absence->user->vacationApprovers->pluck('id')->contains($this->user()->id);
+            $absenceUser = $this->absence->user;
+            if ($absenceUser === null) {
+                return $rules;
+            }
+
+            $mayCheck = $absenceUser->vacationAdmins->pluck('id')->contains($actor->id);
+            $mayApprove = $absenceUser->vacationApprovers->pluck('id')->contains($actor->id);
             if ($mayCheck) {
                 $rules['workflow_status'] = 'nullable|int|in:'.implode(
                     ',',
@@ -129,11 +144,16 @@ class AbsenceRequest extends FormRequest
     /**
      * Get the validated data
      *
-     * @return array|void
+     * @param  string|null  $key  Optional validated value key.
+     * @param  mixed  $default  Fallback value kept for FormRequest compatibility.
+     * @return array<string, mixed>
      */
-    public function validated($key = null, $default = null)
+    public function validated($key = null, $default = null): array
     {
         $data = parent::validated();
+
+        $absence = $this->resolveAbsence();
+        $actor = $this->user();
 
         $data['from'] = $this->normalizePlannerDate($data['from']);
         $data['to'] = $this->normalizePlannerDate($data['to'], true);
@@ -146,19 +166,20 @@ class AbsenceRequest extends FormRequest
         }
 
         // check if admin/approver id needs to be set
-        if (isset($data['workflow_status']) && ($this->absence->workflow_status != $data['workflow_status'])) {
+        if ($absence !== null && $actor instanceof User
+            && isset($data['workflow_status']) && ($absence->workflow_status != $data['workflow_status'])) {
             if ($data['workflow_status'] == Absence::STATUS_NEW) {
                 $data['admin_id'] = null;
                 $data['approver_id_id'] = null;
                 $data['checked_at'] = null;
                 $data['approved_at'] = null;
             }
-            if ($data['workflow_status'] >= Absence::STATUS_CHECKED && ($this->absence->admin_id === null)) {
-                $data['admin_id'] = $this->user()->id;
+            if ($data['workflow_status'] >= Absence::STATUS_CHECKED && ($absence->admin_id === null)) {
+                $data['admin_id'] = $actor->id;
                 $data['checked_at'] = Carbon::now();
             }
-            if ($data['workflow_status'] == Absence::STATUS_APPROVED && ($this->absence->approver_id === null)) {
-                $data['approver_id'] = $this->user()->id;
+            if ($data['workflow_status'] == Absence::STATUS_APPROVED && ($absence->approver_id === null)) {
+                $data['approver_id'] = $actor->id;
                 $data['approved_at'] = Carbon::now();
             }
         }
@@ -176,16 +197,16 @@ class AbsenceRequest extends FormRequest
         }
 
         if ($this->has('id')) {
-            $this->absence = Absence::find($this->get('id'));
+            $this->absence = Absence::query()->whereKey($this->get('id'))->first();
 
             return $this->absence;
         }
 
-        if (($this->route() ? $this->route()->getName() : null) !== 'absence.store') {
+        if ($this->route()?->getName() !== 'absence.store') {
             return null;
         }
 
-        $user = User::find($this->get('user_id'));
+        $user = User::query()->whereKey($this->get('user_id'))->first();
         if ($user === null) {
             return null;
         }
@@ -272,6 +293,9 @@ class AbsenceRequest extends FormRequest
         return $this->absence;
     }
 
+    /**
+     * @param  Absence|null  $absence  Absence instance.\n     * @return void
+     */
     public function setAbsence(?Absence $absence): void
     {
         $this->absence = $absence;

@@ -33,11 +33,14 @@ namespace App\Http\Controllers;
 use App\Liturgy\Music\ABCMusic;
 use App\Models\Liturgy\Psalm;
 use App\Models\Liturgy\Song;
+use App\Models\Liturgy\SongVerse;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
+use Inertia\Response;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 /**
  * Handles CRUD requests for Song records.
@@ -91,6 +94,7 @@ class SongController extends AbstractCRUDController
     /**
      * Create a separate song from a songbook reference on an existing one
      *
+     * @param  int|string  $reference  Songbook ID to split off.
      * @return RedirectResponse
      *
      * @throws AuthorizationException
@@ -142,12 +146,24 @@ class SongController extends AbstractCRUDController
         return redirect()->route('admin.song.edit', $newSong->id);
     }
 
-    public function musicEditor(Song $song)
+    /**
+     * Render the music editor page for a song.
+     *
+     * @return Response Music editor page.
+     */
+    public function musicEditor(Song $song): Response
     {
         return Inertia::render('Liturgy/Songs/MusicEditor', compact('song'));
     }
 
-    public function music(Song $song, $verses = '', $lineNumber = null)
+    /**
+     * Render the ABC notation of a song as an image file.
+     *
+     * @param  string|array<int, string>  $verses  Verse selection.
+     * @param  int|null  $lineNumber  Single line to render, or null for all lines.
+     * @return BinaryFileResponse Rendered notation image.
+     */
+    public function music(Song $song, $verses = '', $lineNumber = null): BinaryFileResponse
     {
         return response()->file(ABCMusic::renderToFile($song, $verses, ABCMusic::make($song, $verses, $lineNumber)));
     }

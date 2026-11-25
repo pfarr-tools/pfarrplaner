@@ -30,7 +30,7 @@
 
 Route::name('extranet.')->group(
     function () {
-        foreach (glob(base_path('routes/extranet/*.php')) as $file) {
+        foreach (glob(base_path('routes/extranet/*.php')) ?: [] as $file) {
             Route::group([], $file);
         }
     }

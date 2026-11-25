@@ -36,7 +36,6 @@ use App\Services\FileNameService;
 use Carbon\Carbon;
 use DateTimeZone;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
 use PhpOffice\PhpWord\Shared\Converter;
@@ -74,7 +73,8 @@ class QuarterlyEventsReport extends AbstractWordDocumentReport
      */
     public function setup()
     {
-        $locations = Location::inCities(Auth::user()->cities->pluck('id'))->get();
+        $user = $this->authenticatedUser();
+        $locations = Location::inCities($user->cities->pluck('id'))->get();
 
         return Inertia::render('Report/QuarterlyEvents/Setup', compact('locations'));
     }
@@ -94,10 +94,12 @@ class QuarterlyEventsReport extends AbstractWordDocumentReport
             ]
         );
 
-        $location = Location::findOrFail($data['location']);
+        $location = Location::findOrFail((int) $data['location']);
         $title = $data['title'] ?: 'Quartalsprogramm für '.$location->name;
         $quarter = Carbon::createFromFormat('Y-m-d', $data['quarter']);
+        abort_unless($quarter instanceof Carbon, 400);
 
+        $user = $this->authenticatedUser();
         $serviceList = Service::between($quarter, $quarter->copy()->endOfQuarter())
             ->displayable($quarter)
             ->where('location_id', $location->id)
@@ -110,10 +112,10 @@ class QuarterlyEventsReport extends AbstractWordDocumentReport
         $section = $this->wordDocument->addSection(
             [
                 'orientation' => Section::ORIENTATION_PORTRAIT,
-                'marginTop' => Converter::cmToTwip('1.59'),
-                'marginBottom' => Converter::cmToTwip('2'),
-                'marginLeft' => Converter::cmToTwip('2'),
-                'marginRight' => Converter::cmToTwip('2.5'),
+                'marginTop' => Converter::cmToTwip(1.59),
+                'marginBottom' => Converter::cmToTwip(2),
+                'marginLeft' => Converter::cmToTwip(2),
+                'marginRight' => Converter::cmToTwip(2.5),
             ]
         );
 
@@ -125,12 +127,13 @@ class QuarterlyEventsReport extends AbstractWordDocumentReport
             ]
         );
         $sectionStyle = $section->getStyle();
+        abort_unless($sectionStyle instanceof Section, 500);
 
         $section->addText('Für das '.$quarter->quarter.'. Quartal '.$quarter->year, ['size' => 18]);
 
         if (isset($data['notes1'])) {
             $section->addText(str_replace("\n", '<w:br />', $data['notes1']));
-            $section->addText();
+            $section->addText('');
         }
 
         $this->wordDocument->addTableStyle(
@@ -141,7 +144,7 @@ class QuarterlyEventsReport extends AbstractWordDocumentReport
                 ) - $sectionStyle->getMarginRight(),
                 'borderSize' => 6,
                 'borderColor' => '000000',
-                'cellMargin' => Converter::cmToTwip('0.2'),
+                'cellMargin' => Converter::cmToTwip(0.2),
             ],
             []
         );
@@ -166,7 +169,7 @@ class QuarterlyEventsReport extends AbstractWordDocumentReport
         foreach ($serviceList as $dayList) {
             foreach ($dayList as $service) {
                 $table->addRow();
-                $table->addCell()->addText($service->date->isoFormat('dd, DD. MMMM'));
+                $table->addCell()->addText($service->trueDate()?->isoFormat('dd, DD. MMMM') ?? '');
                 $table->addCell()->addText($service->timeText());
                 if ($request->get('includePastor')) {
                     $table->addCell()->addText($service->participantsText('P'));
@@ -184,21 +187,21 @@ class QuarterlyEventsReport extends AbstractWordDocumentReport
         }
 
         if (isset($data['notes2'])) {
-            $section->addText();
+            $section->addText('');
             $section->addText(str_replace("\n", '<w:br />', $data['notes2']));
         }
 
         if ($request->get('includeContact')) {
-            if ($x = Auth::user()->office) {
+            if ($x = $user->office) {
                 $data[] = $x;
             }
-            $data[] = Auth::user()->fullName();
-            if ($x = Auth::user()->phone) {
+            $data[] = $user->fullName();
+            if ($x = $user->phone) {
                 $data[] = 'Tel. '.$x;
             }
-            $data[] = Auth::user()->email;
+            $data[] = $user->email;
 
-            $section->addText();
+            $section->addText('');
             $run = $section->addTextRun();
             $run->addText('Weitere Informationen:', ['underline' => Font::UNDERLINE_SINGLE]);
             $run->addText('<w:br />');
@@ -210,9 +213,9 @@ class QuarterlyEventsReport extends AbstractWordDocumentReport
             ['size' => 7]
         );
 
-        Auth::user()->setSetting('quarterly_events_report_title', $request->get('title', ''));
-        Auth::user()->setSetting('quarterly_events_report_notes1', $request->get('notes1', ''));
-        Auth::user()->setSetting('quarterly_events_report_notes2', $request->get('notes2', ''));
+        $user->setSetting('quarterly_events_report_title', $request->get('title', ''));
+        $user->setSetting('quarterly_events_report_notes1', $request->get('notes1', ''));
+        $user->setSetting('quarterly_events_report_notes2', $request->get('notes2', ''));
 
         return $this->sendToBrowser(
             FileNameService::make(

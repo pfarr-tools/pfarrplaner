@@ -48,6 +48,8 @@ class UpdateCity extends AbstractUpdateAction implements UpdatesCities
     }
 
     /**
+     * @param  array<string, mixed>  $input
+     *
      * @throws AuthorizationException
      * @throws ValidationException
      */

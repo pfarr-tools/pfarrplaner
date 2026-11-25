@@ -38,6 +38,9 @@ use Illuminate\Support\Facades\Storage;
 class FileHelper
 {
     /**
+     * Format a byte count as a human-readable string
+     *
+     * @param  int|float  $bytes  Byte count to format.
      * @return string
      */
     public static function bytesToHuman($bytes)
@@ -52,6 +55,9 @@ class FileHelper
     }
 
     /**
+     * Get the FontAwesome icon class for a file
+     *
+     * @param  string  $path  Path to the file.
      * @return string
      */
     public static function icon($path)
@@ -70,13 +76,13 @@ class FileHelper
     public static function normalizeFilename($str = '')
     {
         $str = strip_tags($str);
-        $str = preg_replace('/[\r\n\t ]+/', ' ', $str);
-        $str = preg_replace('/[\"\*\/\:\<\>\?\'\|]+/', ' ', $str);
+        $str = preg_replace('/[\r\n\t ]+/', ' ', $str) ?? '';
+        $str = preg_replace('/[\"\*\/\:\<\>\?\'\|]+/', ' ', $str) ?? '';
         $str = strtr($str, ['Ä' => 'Ae', 'ä' => 'ae', 'Ö' => 'Oe', 'ö' => 'oe', 'Ü' => 'Ue', 'ü' => 'ue', 'ß' => 'ss']);
 
         $str = html_entity_decode($str, ENT_QUOTES, 'utf-8');
         $str = htmlentities($str, ENT_QUOTES, 'utf-8');
-        $str = preg_replace('/(&)([a-z])([a-z]+;)/i', '$2', $str);
+        $str = preg_replace('/(&)([a-z])([a-z]+;)/i', '$2', $str) ?? '';
         $str = str_replace(' ', '_____', $str);
         $str = rawurlencode($str);
         $str = str_replace('%', '-', $str);

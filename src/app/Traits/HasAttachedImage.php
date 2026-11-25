@@ -32,7 +32,12 @@ namespace App\Traits;
 
 trait HasAttachedImage
 {
-    public function getImageField()
+    /**
+     * Gibt den Namen des Bildfeldes des Modells zurück.
+     *
+     * @return string Name des Bildfeldes, bei fehlender Definition „image“
+     */
+    public function getImageField(): string
     {
         return $this->imageField ?: 'image';
     }

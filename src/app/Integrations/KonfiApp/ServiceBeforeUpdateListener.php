@@ -45,14 +45,15 @@ class ServiceBeforeUpdateListener
         if (! isset($event->data['konfiapp_event_type'])) {
             return;
         }
-        if (! $this->isIntegrationActive($event->service->city)) {
+        $city = $event->service->city;
+        if ($city === null || ! $this->isIntegrationActive($city)) {
             return;
         }
         if (isset($event->data['date'])) {
             $event->service->date = $event->data['date'];
         }
 
-        $this->resolveIntegration($event->service->city)->handleServiceUpdate(
+        $this->resolveIntegration($city)->handleServiceUpdate(
             $event->service,
             $event->data['konfiapp_event_type'] ?? ''
         );

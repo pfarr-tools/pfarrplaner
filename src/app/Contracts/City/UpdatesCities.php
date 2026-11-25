@@ -34,6 +34,6 @@ use App\Models\People\User;
 use App\Models\Places\City;
 
 /**
- * @method bool update(User $user, City $city, array $input)
+ * @method bool update(User $user, City $city, array<string, mixed> $input)
  */
 interface UpdatesCities {}

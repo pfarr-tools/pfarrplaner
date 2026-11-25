@@ -54,7 +54,7 @@ class AbstractServiceMailable extends Mailable implements ShouldQueue
     /** @var Service */
     protected $service;
 
-    /** @var array */
+    /** @var array<string, mixed> */
     protected $data = [];
 
     /** @var User */
@@ -72,12 +72,19 @@ class AbstractServiceMailable extends Mailable implements ShouldQueue
     protected $changed = [];
 
     /**
-     * AbstractServiceMailable constructor.
+     * Übernimmt Empfänger und Änderungsdaten eines Gottesdienstes in die Nachricht.
+     *
+     * @param  User  $user  Empfänger der Benachrichtigung.
+     * @param  Service  $service  Gottesdienst, auf den sich die Benachrichtigung bezieht.
+     * @param  User  $originatingUser  Benutzer, der die Änderung ausgelöst hat.
+     * @param  array<string, mixed>  $data  Zusätzliche Daten für die Nachricht.
      */
     public function __construct(User $user, Service $service, User $originatingUser, array $data)
     {
         $this->user = $user;
         $this->service = $service;
+        // Das Change-Tracking-Trait ergänzt den Service zur Laufzeit um dynamische Audit-Properties.
+        /** @var Service&object{originalObject: Service, changedFields: array<string, mixed>} $service */
         $this->original = $service->originalObject;
         $this->changed = $service->changedFields;
         $this->data = $data;

@@ -30,6 +30,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\People\User;
 use App\Models\Rites\Baptism;
 use Carbon\Carbon;
 use Illuminate\Foundation\Http\FormRequest;
@@ -46,13 +47,15 @@ class StoreBaptismRequest extends FormRequest
      */
     public function authorize()
     {
-        return $this->user()->can('update', Baptism::class);
+        $actor = $this->user();
+
+        return $actor instanceof User && $actor->can('update', Baptism::class);
     }
 
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array
+     * @return array<string, string>
      */
     public function rules()
     {
@@ -66,9 +69,9 @@ class StoreBaptismRequest extends FormRequest
             'candidate_city' => 'nullable|string',
             'candidate_phone' => 'nullable|phone_number',
             'pronoun_set' => 'nullable|string',
-            'city_id' => 'required|integer|exists:cities,id|in:'.$this->user()->writableCities->pluck('id')->implode(
+            'city_id' => 'required|integer|exists:cities,id|in:'.($this->user() instanceof User ? $this->user()->writableCities->pluck('id')->implode(
                 ','
-            ),
+            ) : ''),
             'first_contact_on' => 'nullable|date_format:d.m.Y',
             'first_contact_with' => 'nullable|string',
             'appointment' => 'nullable|date_format:d.m.Y H:i',

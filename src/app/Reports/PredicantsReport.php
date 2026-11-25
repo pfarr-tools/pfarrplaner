@@ -36,7 +36,6 @@ use App\Models\Service;
 use App\Services\FileNameService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
 use PhpOffice\PhpWord\Exception\Exception;
@@ -68,8 +67,14 @@ class PredicantsReport extends AbstractWordDocumentReport
      */
     public $description = 'Vorausgefülltes Prädikant:innenformular für das Dekanatamt';
 
+    /**
+     * @var bool
+     */
     protected $inertia = true;
 
+    /**
+     * @return void
+     */
     public function __construct()
     {
         parent::__construct();
@@ -82,8 +87,8 @@ class PredicantsReport extends AbstractWordDocumentReport
      */
     public function setup()
     {
-        $maxDate = Day::orderBy('date', 'DESC')->limit(1)->get()->first();
-        $cities = Auth::user()->cities;
+        $maxDate = Day::orderBy('date', 'desc')->first();
+        $cities = $this->authenticatedUser()->cities;
 
         return Inertia::render('Report/Predicants/Setup', compact('cities'));
     }
@@ -121,10 +126,10 @@ class PredicantsReport extends AbstractWordDocumentReport
         $section = $this->wordDocument->addSection(
             [
                 'orientation' => Section::ORIENTATION_LANDSCAPE,
-                'marginTop' => Converter::cmToTwip('1.59'),
-                'marginBottom' => Converter::cmToTwip('2'),
-                'marginLeft' => Converter::cmToTwip('2'),
-                'marginRight' => Converter::cmToTwip('2.5'),
+                'marginTop' => Converter::cmToTwip(1.59),
+                'marginBottom' => Converter::cmToTwip(2),
+                'marginLeft' => Converter::cmToTwip(2),
+                'marginRight' => Converter::cmToTwip(2.5),
             ]
         );
 
@@ -170,26 +175,26 @@ class PredicantsReport extends AbstractWordDocumentReport
 
         $table = $section->addTable('table');
         $table->addRow();
-        $textRun = $table->addCell(Converter::cmToTwip(3.25))->addTextRun();
+        $textRun = $table->addCell((int) Converter::cmToTwip(3.25))->addTextRun();
         $textRun->addText('Datum', ['bold' => true]);
         $textRun->addTextBreak();
 
-        $textRun = $table->addCell(Converter::cmToTwip(5))->addTextRun();
+        $textRun = $table->addCell((int) Converter::cmToTwip(5))->addTextRun();
         $textRun->addText('Kirche /', ['bold' => true]);
         $textRun->addTextBreak();
         $textRun->addText('Gemeindezentrum', ['bold' => true]);
 
-        $textRun = $table->addCell(Converter::cmToTwip(3.75))->addTextRun();
+        $textRun = $table->addCell((int) Converter::cmToTwip(3.75))->addTextRun();
         $textRun->addText('Beginn des', ['bold' => true]);
         $textRun->addTextBreak();
         $textRun->addText('Gottesdienstes', ['bold' => true]);
 
-        $textRun = $table->addCell(Converter::cmToTwip(6))->addTextRun();
+        $textRun = $table->addCell((int) Converter::cmToTwip(6))->addTextRun();
         $textRun->addText('Abendmahl / Taufe /', ['bold' => true]);
         $textRun->addTextBreak();
         $textRun->addText('Bemerkungen', ['bold' => true]);
 
-        $textRun = $table->addCell(Converter::cmToTwip(7.25))->addTextRun();
+        $textRun = $table->addCell((int) Converter::cmToTwip(7.25))->addTextRun();
         $textRun->addText(
             'Rückmeldung Dekanatamt',
             [
@@ -204,13 +209,13 @@ class PredicantsReport extends AbstractWordDocumentReport
         foreach ($serviceList as $services) {
             foreach ($services as $service) {
                 $table->addRow();
-                $textRun = $table->addCell(Converter::cmToTwip(3.25))->addTextRun();
-                $textRun->addText($service->date->format('d.m.Y'));
+                $textRun = $table->addCell((int) Converter::cmToTwip(3.25))->addTextRun();
+                $textRun->addText($service->trueDate()->format('d.m.Y'));
                 $textRun->addTextBreak();
-                $table->addCell(Converter::cmToTwip(5))->addText($service->locationTextWithCity);
-                $table->addCell(Converter::cmToTwip(3.25))->addText($service->timeText());
-                $table->addCell(Converter::cmToTwip(6))->addText($service->descriptionText());
-                $table->addCell(Converter::cmToTwip(7.25));
+                $table->addCell((int) Converter::cmToTwip(5))->addText($service->locationTextWithCity);
+                $table->addCell((int) Converter::cmToTwip(3.25))->addText($service->timeText());
+                $table->addCell((int) Converter::cmToTwip(6))->addText($service->descriptionText());
+                $table->addCell((int) Converter::cmToTwip(7.25));
             }
         }
 
@@ -223,10 +228,13 @@ class PredicantsReport extends AbstractWordDocumentReport
         );
     }
 
+    /**
+     * @param  string  $date  Date input.
+     */
     protected function parseDateInput(string $date): Carbon
     {
         if (str_contains($date, '.')) {
-            return Carbon::createFromFormat('d.m.Y', $date, 'Europe/Berlin');
+            return $this->requireParsedDate(Carbon::createFromFormat('d.m.Y', $date, 'Europe/Berlin'));
         }
 
         return Carbon::parse($date, 'Europe/Berlin');

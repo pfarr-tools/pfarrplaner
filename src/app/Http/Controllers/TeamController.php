@@ -52,14 +52,16 @@ class TeamController extends AbstractCRUDController
      */
     protected function getModelsForIndex(): Collection
     {
-        $writableCityIds = Auth::user()->writableCities->pluck('id');
+        $user = Auth::user();
+        abort_unless($user instanceof User, 401);
+        $writableCityIds = $user->writableCities->pluck('id');
 
         return Team::with(Team::$relationsForIndex)
-            ->inCities(Auth::user()->cities->pluck('id'))
+            ->inCities($user->cities->pluck('id'))
             ->orderBy('name')
             ->get()
             ->map(function ($item) use ($writableCityIds) {
-                $item->writable = $writableCityIds->contains($item->city_id);
+                $item->setAttribute('writable', $writableCityIds->contains($item->city_id));
 
                 return $item;
             });
@@ -70,9 +72,12 @@ class TeamController extends AbstractCRUDController
      */
     protected function getResourcesForEditor(Request $request, $model = null): array
     {
+        $user = Auth::user();
+        abort_unless($user instanceof User, 401);
+
         return [
-            'cities' => Auth::user()->writableCities,
-            'users' => User::visibleFor(Auth::user())->get(),
+            'cities' => $user->writableCities,
+            'users' => User::visibleFor($user)->get(),
         ];
     }
 
@@ -81,11 +86,13 @@ class TeamController extends AbstractCRUDController
      */
     protected function preFillNewModel(Request $request): array
     {
-        $counter = Team::inCities(Auth::user()->cities->pluck('id'))->count() + 1;
+        $user = Auth::user();
+        abort_unless($user instanceof User, 401);
+        $counter = Team::inCities($user->cities->pluck('id'))->count() + 1;
 
         return [
             'name' => 'Neues Team #'.$counter,
-            'city_id' => Auth::user()->cities->pluck('id')->first(),
+            'city_id' => $user->cities->pluck('id')->first(),
         ];
     }
 

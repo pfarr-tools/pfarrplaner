@@ -35,6 +35,7 @@ use App\Models\People\User;
 use App\Models\Places\City;
 use Database\Factories\Leave\PoolFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Str;
 
 class Pool extends AbstractModel
@@ -70,16 +71,25 @@ class Pool extends AbstractModel
 
     public static $relationsForEditor = ['cities', 'users'];
 
+    /**
+     * @return BelongsToMany<User, $this>
+     */
     public function users()
     {
         return $this->belongsToMany(User::class);
     }
 
+    /**
+     * @return BelongsToMany<City, $this>
+     */
     public function cities()
     {
         return $this->belongsToMany(City::class);
     }
 
+    /**
+     * @return BelongsToMany<User, $this>
+     */
     public function poolmasters()
     {
         return $this->belongsToMany(User::class, 'poolmasters', 'pool_id', 'user_id');
@@ -90,6 +100,7 @@ class Pool extends AbstractModel
      */
     public static function getEmptyModel(): self
     {
+        /** @var self $model */
         $model = parent::getEmptyModel();
         $model->setRelation('cities', collect());
         $model->setRelation('users', collect());
@@ -97,6 +108,9 @@ class Pool extends AbstractModel
         return $model;
     }
 
+    /**
+     * @return void
+     */
     protected static function boot()
     {
         parent::boot();

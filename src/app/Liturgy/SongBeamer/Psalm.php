@@ -47,7 +47,7 @@ class Psalm extends AbstractSngFile
     public function __construct(Item $item)
     {
         $this->item = $item;
-        $this->helper = $item->getHelper();
+        $this->helper = new PsalmItemHelper($item);
         parent::__construct($this->helper->getTitleText());
     }
 

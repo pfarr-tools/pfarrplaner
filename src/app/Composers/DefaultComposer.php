@@ -31,10 +31,18 @@
 namespace App\Composers;
 
 use App\Services\PackageService;
+use Illuminate\Contracts\View\View;
 
+/** Default composer adding common view variables. */
 class DefaultComposer
 {
-    public function compose($view)
+    /**
+     * Share package information with the composed view.
+     *
+     * @param  View  $view  View instance being composed.
+     * @return void
+     */
+    public function compose(View $view)
     {
         $view->with('package', PackageService::info());
     }

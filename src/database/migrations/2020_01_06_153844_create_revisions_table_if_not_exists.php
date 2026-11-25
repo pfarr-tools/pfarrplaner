@@ -36,7 +36,12 @@ use Illuminate\Support\Facades\Schema;
  */
 class CreateRevisionsTableIfNotExists extends Migration
 {
-    public function up()
+    /**
+     * Legt die Tabelle revisions an, sofern sie noch nicht existiert.
+     *
+     * @return void
+     */
+    public function up(): void
     {
         if (! Schema::hasTable('revisions')) {
             Schema::create(

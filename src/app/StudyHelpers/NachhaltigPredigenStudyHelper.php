@@ -36,8 +36,13 @@ class NachhaltigPredigenStudyHelper extends AbstractStudyHelper
 {
     public $title = 'Nachhaltig predigen';
 
+    /** @var array<string, array<string, string>> */
     protected $records = [];
 
+    /**
+     * @param  array<string, mixed>  $data  Study helper input data.
+     *      * @return array<string, array<string, string>>
+     */
     public function read(array $data): array
     {
         if ('' == ($content = $this->getContent('http://www.nachhaltig-predigen.de/index.php/predigtanregungen/2023-24'))) {
@@ -60,6 +65,10 @@ class NachhaltigPredigenStudyHelper extends AbstractStudyHelper
         return $this->records;
     }
 
+    /**
+     * @param  array<string, mixed>  $data  Input data.
+     *      * @return array<string, string>
+     */
     public function getLinks(array $data): array
     {
         $data['links'] = array_merge($data['links'] ?? [], $this->records[$data['date']] ?? []);

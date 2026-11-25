@@ -48,7 +48,7 @@ class EventServiceProvider extends ServiceProvider
     /**
      * The event listener mappings for the application.
      *
-     * @var array
+     * @var array<string, array<int, string>>
      */
     protected $listen = [
         Registered::class => [
@@ -70,6 +70,11 @@ class EventServiceProvider extends ServiceProvider
         ],
     ];
 
+    /**
+     * The subscriber classes to register.
+     *
+     * @var array<int, string>
+     */
     protected $subscribe = [
     ];
 
@@ -93,7 +98,7 @@ class EventServiceProvider extends ServiceProvider
     /**
      * Get the listener directories that should be used to discover events.
      *
-     * @return array
+     * @return array<int, string>
      */
     protected function discoverEventsWithin()
     {

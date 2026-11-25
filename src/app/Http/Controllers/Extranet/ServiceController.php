@@ -31,15 +31,24 @@
 namespace App\Http\Controllers\Extranet;
 
 use App\Http\Controllers\Controller;
+use App\Models\People\User;
 use App\Models\Service;
 use Carbon\Carbon;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 
+/** Controller for public service pages. */
 class ServiceController extends Controller
 {
-    public function next()
+    /**
+     * Return upcoming services the authenticated user participates in.
+     *
+     * @return JsonResponse Upcoming services and the authenticated user.
+     */
+    public function next(): JsonResponse
     {
         $user = Auth::user();
+        abort_unless($user instanceof User, 401);
         $services = Service::startingFrom(Carbon::now())
             ->userParticipates($user, 'P')
             ->notHidden()
@@ -49,9 +58,15 @@ class ServiceController extends Controller
         return response()->json(compact('user', 'services'));
     }
 
-    public function past()
+    /**
+     * Return past services the authenticated user participates in.
+     *
+     * @return JsonResponse Past services and the authenticated user.
+     */
+    public function past(): JsonResponse
     {
         $user = Auth::user();
+        abort_unless($user instanceof User, 401);
         $services = Service::endingAt(Carbon::now())
             ->userParticipates($user, 'P')
             ->orderedDesc()
@@ -60,9 +75,15 @@ class ServiceController extends Controller
         return response()->json(compact('user', 'services'));
     }
 
-    public function lastWithSermon()
+    /**
+     * Return the latest sermon-related services for the authenticated user.
+     *
+     * @return JsonResponse Services grouped by sermon, the user and the query.
+     */
+    public function lastWithSermon(): JsonResponse
     {
         $user = Auth::user();
+        abort_unless($user instanceof User, 401);
         $query = Service::orderedDesc()
             ->whereHas('participants', function ($query) use ($user) {
                 $query->where('user_id', $user->id);

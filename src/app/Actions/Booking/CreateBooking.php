@@ -50,9 +50,12 @@ class CreateBooking extends AbstractCreateAction implements CreatesBookings
         return route('service.edit', ['service' => $this->service->slug, 'tab' => 'registrations']);
     }
 
+    /**
+     * @param  array<string, mixed>  $input
+     */
     public function create(User $user, array $input): Booking
     {
-        $this->service = Service::findOrFail($input['service_id']);
+        $this->service = Service::findOrFail((int) $input['service_id']);
         Gate::forUser($user)->authorize('create', [Booking::class, $this->service]);
         $input = $this->validateAndNormalize($input);
         $input['code'] = $input['code'] ?? Booking::createCode();
@@ -66,6 +69,10 @@ class CreateBooking extends AbstractCreateAction implements CreatesBookings
         return $booking;
     }
 
+    /**
+     * @param  array<string, mixed>  $input
+     * @return array<string, mixed>
+     */
     protected function validateAndNormalize(array $input): array
     {
         $rules = Booking::$validationRules;

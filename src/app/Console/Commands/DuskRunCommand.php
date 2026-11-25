@@ -193,6 +193,8 @@ class DuskRunCommand extends Command
 
     /**
      * Run the PHPUnit child process and emit heartbeats during quiet compact runs.
+     *
+     * @param  string[]  $options
      */
     protected function runPhpUnitProcess(Process $process, array $options): int
     {
@@ -234,6 +236,8 @@ class DuskRunCommand extends Command
 
     /**
      * Print the active Dusk runtime configuration before the suite starts.
+     *
+     * @param  string[]  $options
      */
     protected function reportRunConfiguration(array $options): void
     {
@@ -323,7 +327,7 @@ class DuskRunCommand extends Command
     /**
      * Get the PHP binary to execute.
      *
-     * @return array
+     * @return string[]
      */
     protected function binary()
     {
@@ -343,8 +347,8 @@ class DuskRunCommand extends Command
     /**
      * Get the array of arguments for running PHPUnit.
      *
-     * @param  array  $options
-     * @return array
+     * @param  string[]  $options
+     * @return string[]
      */
     protected function phpunitArguments($options)
     {
@@ -373,11 +377,15 @@ class DuskRunCommand extends Command
         }
 
         if (version_compare(Version::id(), '10.0', '>=')) {
-            if ($this->option('ansi')) {
+            // Since Symfony Console 8, --ansi is a negatable option: passing
+            // --no-ansi makes option('ansi') return false instead of true.
+            $ansi = $this->option('ansi');
+
+            if ($ansi === true) {
                 $options[] = '--colors=always';
             }
 
-            if ($this->option('no-ansi')) {
+            if ($ansi === false) {
                 $options[] = '--colors=never';
             }
         }
@@ -388,7 +396,7 @@ class DuskRunCommand extends Command
     /**
      * Get the PHP binary environment variables.
      *
-     * @return array|null
+     * @return array<string, mixed>
      */
     protected function env()
     {
@@ -416,6 +424,7 @@ class DuskRunCommand extends Command
     /**
      * Determine if Collision's printer should be used.
      *
+     * @param  string[]  $options
      * @return bool
      */
     protected function shouldUseCollisionPrinter(array $options = [])
@@ -766,7 +775,7 @@ class DuskRunCommand extends Command
     {
         if (! file_exists($file = base_path('phpunit.dusk.xml')) &&
             ! file_exists(base_path('phpunit.dusk.xml.dist'))) {
-            copy(realpath(__DIR__.'/../../../vendor/laravel/dusk/stubs/phpunit.xml'), $file);
+            copy((string) realpath(__DIR__.'/../../../vendor/laravel/dusk/stubs/phpunit.xml'), $file);
 
             return;
         }

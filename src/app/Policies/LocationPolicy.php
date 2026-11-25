@@ -89,10 +89,11 @@ class LocationPolicy
      */
     public function update(User $user, Location $location)
     {
-        if ($user->hasRole('Administrator:in') && $location->city->administeredBy($user)) {
+        $city = $location->city;
+        if ($user->hasRole('Administrator:in') && $city?->administeredBy($user)) {
             return true;
         }
-        if ($user->can('kirche-bearbeiten') && $user->writableCities->contains($location->city)) {
+        if ($user->can('kirche-bearbeiten') && $city !== null && $user->writableCities->contains($city)) {
             return true;
         }
 
@@ -106,10 +107,11 @@ class LocationPolicy
      */
     public function delete(User $user, Location $location)
     {
-        if ($user->hasRole('Administrator:in') && $location->city->administeredBy($user)) {
+        $city = $location->city;
+        if ($user->hasRole('Administrator:in') && $city?->administeredBy($user)) {
             return true;
         }
-        if ($user->can('kirche-bearbeiten') && $user->writableCities->contains($location->city)) {
+        if ($user->can('kirche-bearbeiten') && $city !== null && $user->writableCities->contains($city)) {
             return true;
         }
 
@@ -123,10 +125,11 @@ class LocationPolicy
      */
     public function restore(User $user, Location $location)
     {
-        if ($user->hasRole('Administrator:in') && $location->city->administeredBy($user)) {
+        $city = $location->city;
+        if ($user->hasRole('Administrator:in') && $city?->administeredBy($user)) {
             return true;
         }
-        if ($user->can('kirche-bearbeiten') && $user->writableCities->contains($location->city)) {
+        if ($user->can('kirche-bearbeiten') && $city !== null && $user->writableCities->contains($city)) {
             return true;
         }
 
@@ -140,10 +143,11 @@ class LocationPolicy
      */
     public function forceDelete(User $user, Location $location)
     {
-        if ($user->hasRole('Administrator:in') && $location->city->administeredBy($user)) {
+        $city = $location->city;
+        if ($user->hasRole('Administrator:in') && $city?->administeredBy($user)) {
             return true;
         }
-        if ($user->can('kirche-bearbeiten') && $user->writableCities->contains($location->city)) {
+        if ($user->can('kirche-bearbeiten') && $city !== null && $user->writableCities->contains($city)) {
             return true;
         }
 

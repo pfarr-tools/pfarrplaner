@@ -88,7 +88,7 @@ class BookingController extends AbstractCRUDController
         Gate::authorize('create', [Booking::class, $service]);
         $service->setAppends([]);
         $booking = Booking::getEmptyModel();
-        $booking->service_id = $service->id;
+        $booking->setAttribute('service_id', $service->id);
 
         return Inertia::render('Service/Registrations/BookingEditor', compact('service', 'booking'));
     }
@@ -102,6 +102,11 @@ class BookingController extends AbstractCRUDController
     {
         $result = $service->getSeatFinder()->finalList();
         $viewName = $service->getSeatFinder()->viewName;
+        $view = match ($viewName) {
+            'rowBased' => 'bookings.pdf.list.rowBased',
+            'maxBased' => 'bookings.pdf.list.maxBased',
+            default => abort(404),
+        };
 
         $participants = [];
         foreach ($service->participants as $participant) {
@@ -111,7 +116,7 @@ class BookingController extends AbstractCRUDController
         $participants = array_unique($participants);
         sort($participants);
 
-        return PDF::fromView('bookings.pdf.list.'.$viewName,
+        return PDF::fromView($view,
             array_merge($result, compact('service', 'participants')))
             ->download(FileNameService::make('Sitzplan', 'pdf', '50.0', $service->date, true));
     }

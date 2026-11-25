@@ -18,5 +18,10 @@ use App\Models\Seating\SeatingSection;
 
 interface UpdatesSeatingSections
 {
+    /**
+     * Aktualisiert einen Sitzbereich.
+     *
+     * @param  array<string, mixed>  $input
+     */
     public function update(User $user, SeatingSection $seatingSection, array $input): SeatingSection;
 }

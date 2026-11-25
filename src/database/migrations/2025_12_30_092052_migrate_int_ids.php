@@ -12,7 +12,8 @@ use Illuminate\Support\Str;
  */
 return new class extends Migration
 {
-    protected $concernsTables = [
+    /** @var list<string> Tables whose legacy integer id columns are migrated. */
+    protected array $concernsTables = [
         'absence_user',
         'absences',
         'approvals',
@@ -79,6 +80,9 @@ return new class extends Migration
         }
     }
 
+    /**
+     * @param  string  $table  Table name.\n     * @param  string  $column  Column name.\n     * @return bool
+     */
     public function isColumnNullable(string $table, string $column): bool
     {
         $database = DB::getDatabaseName();
@@ -90,7 +94,14 @@ return new class extends Migration
             ->value('IS_NULLABLE') === 'YES';
     }
 
-    protected function migrateIdFieldWithAllConstraints(string $tableName, string $targetType)
+    /**
+     * Migrate an id column together with all foreign keys referencing it.
+     *
+     * @param  string  $tableName  Name of the table whose id column is migrated.
+     * @param  string  $targetType  Blueprint column method for the target type.
+     * @return void
+     */
+    protected function migrateIdFieldWithAllConstraints(string $tableName, string $targetType): void
     {
         $constraints = $this->foreignKeyColumnsReferencingTableId($tableName);
         // yields fk_table,fk_column,CONSTRAINT_NAME,DELETE_RULE,UPDATE_RULE
@@ -138,6 +149,12 @@ return new class extends Migration
         }
     }
 
+    /**
+     * Fetch the foreign key columns referencing the id column of a table.
+     *
+     * @param  string  $table  Name of the referenced table.
+     * @return array<int, \stdClass> Rows with fk_table, fk_column, DELETE_RULE, UPDATE_RULE and CONSTRAINT_NAME.
+     */
     public function foreignKeyColumnsReferencingTableId(string $table): array
     {
         $database = DB::getDatabaseName();
@@ -160,6 +177,9 @@ return new class extends Migration
             ->toArray();
     }
 
+    /**
+     * @param  string  $tableName  Table name.\n     * @param  string  $targetType  Target column type.\n     * @return void
+     */
     public function migrateUnconstrainedIdFields(string $tableName, string $targetType): void
     {
         $idFieldName = Str::singular($tableName).'_id';
@@ -185,7 +205,10 @@ return new class extends Migration
     }
 
     /**
-     * Find very old foreign key columns without constraints
+     * Find very old foreign key columns without constraints.
+     *
+     * @param  string  $columnName  Name of the foreign key column to look for.
+     * @return array<string, string> Map of table name to foreign key column name.
      */
     public function findUnconstrainedForeignKeyColumns(string $columnName): array
     {

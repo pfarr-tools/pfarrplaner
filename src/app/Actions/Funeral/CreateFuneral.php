@@ -30,9 +30,14 @@ class CreateFuneral extends AbstractCreateAction implements CreatesFunerals
         return '';
     }
 
+    /**
+     * Create a new Funeral
+     *
+     * @param  array<string, mixed>  $input
+     */
     public function create(User $user, array $input): Funeral
     {
-        $service = Service::findOrFail($input['service_id'] ?? $input['service'] ?? null);
+        $service = Service::findOrFail((int) ($input['service_id'] ?? $input['service'] ?? 0));
 
         Gate::forUser($user)->authorize('create', [Funeral::class, $service]);
 

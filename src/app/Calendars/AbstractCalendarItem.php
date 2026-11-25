@@ -32,6 +32,10 @@ namespace App\Calendars;
 
 use Carbon\Carbon;
 
+/**
+ * @method void update(array<string, mixed> $record)
+ * @method void delete()
+ */
 class AbstractCalendarItem
 {
     public const STATUS_FREE = 0;
@@ -46,6 +50,7 @@ class AbstractCalendarItem
 
     public const NO_DATA = 5;
 
+    /** @var mixed ID */
     protected $ID;
 
     /** @var Carbon Start date */
@@ -69,12 +74,19 @@ class AbstractCalendarItem
     /** @var int LegacyFreeBusyStatus */
     protected $freeBusy = self::STATUS_BUSY;
 
+    /** @var bool Is all day event */
     protected $isAllDayEvent = false;
 
+    /** @var mixed Calendar */
     protected $calendar = null;
 
+    /** @var string[] Date fields */
     protected $dates = ['startDate', 'endDate'];
 
+    /**
+     * @param  array<string, mixed>  $data
+     * @param  mixed  $calendar
+     */
     public function __construct(array $data = [], $calendar = null)
     {
         if ($calendar !== null) {
@@ -83,7 +95,10 @@ class AbstractCalendarItem
         $this->setPropertiesFromArray($data);
     }
 
-    protected function setPropertiesFromArray(array $data)
+    /**
+     * @param  array<string, mixed>  $data
+     */
+    protected function setPropertiesFromArray(array $data): void
     {
         foreach ($data as $key => $val) {
             if (in_array($key, $this->dates)) {
@@ -100,58 +115,88 @@ class AbstractCalendarItem
         }
     }
 
+    /**
+     * Getstartdate.
+     */
     public function getStartDate(): Carbon
     {
         return $this->startDate;
     }
 
+    /**
+     * Setstartdate.
+     */
     public function setStartDate(Carbon $startDate): void
     {
         $this->startDate = $startDate;
     }
 
+    /**
+     * Getenddate.
+     */
     public function getEndDate(): Carbon
     {
         return $this->endDate;
     }
 
+    /**
+     * Setenddate.
+     */
     public function setEndDate(Carbon $endDate): void
     {
         $this->endDate = $endDate;
     }
 
+    /**
+     * Gettitle.
+     */
     public function getTitle(): string
     {
         return $this->title;
     }
 
+    /**
+     * Settitle.
+     */
     public function setTitle(string $title): void
     {
         $this->title = $title;
     }
 
+    /**
+     * Getdescription.
+     */
     public function getDescription(): string
     {
         return $this->description;
     }
 
+    /**
+     * Setdescription.
+     */
     public function setDescription(string $description): void
     {
         $this->description = $description;
     }
 
+    /**
+     * Getlocation.
+     */
     public function getLocation(): string
     {
         return $this->location;
     }
 
+    /**
+     * Setlocation.
+     */
     public function setLocation(string $location): void
     {
         $this->location = $location;
     }
 
     /**
-     * @return string
+     * @return string[]
      */
     public function getCategories(): array
     {
@@ -166,28 +211,40 @@ class AbstractCalendarItem
         $this->categories = (array) $categories;
     }
 
+    /**
+     * Isisalldayevent.
+     */
     public function isIsAllDayEvent(): bool
     {
         return $this->isAllDayEvent;
     }
 
+    /**
+     * Setisalldayevent.
+     */
     public function setIsAllDayEvent(bool $isAllDayEvent): void
     {
         $this->isAllDayEvent = $isAllDayEvent;
     }
 
+    /**
+     * Getfreebusy.
+     */
     public function getFreeBusy(): int
     {
         return $this->freeBusy;
     }
 
+    /**
+     * Setfreebusy.
+     */
     public function setFreeBusy(int $freeBusy): void
     {
         $this->freeBusy = $freeBusy;
     }
 
     /**
-     * @return null
+     * @return mixed
      */
     public function getCalendar()
     {
@@ -195,7 +252,7 @@ class AbstractCalendarItem
     }
 
     /**
-     * @param  null  $calendar
+     * @param  mixed  $calendar
      */
     public function setCalendar($calendar): void
     {
@@ -218,6 +275,9 @@ class AbstractCalendarItem
         $this->ID = $ID;
     }
 
+    /**
+     * @param  string  $field
+     */
     public function isDateField($field): bool
     {
         return in_array($field, $this->dates);

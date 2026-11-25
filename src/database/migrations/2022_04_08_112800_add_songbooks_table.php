@@ -82,7 +82,7 @@ return new class extends Migration
         Schema::drop('song_songbook');
     }
 
-    protected function migrateSongbooks()
+    protected function migrateSongbooks(): void
     {
         $songbooks = [];
         foreach (Song::all() as $song) {
@@ -137,7 +137,7 @@ return new class extends Migration
         Song::whereIn('id', $delete)->delete();
     }
 
-    protected function migrateLiturgyItems()
+    protected function migrateLiturgyItems(): void
     {
         /** @var Item $item */
         foreach (Item::where('data_type', 'song')->get() as $item) {
@@ -146,7 +146,7 @@ return new class extends Migration
                 $reference = SongReference::where('code', $data['song']['songbook_abbreviation'])
                     ->where('reference', $data['song']['reference'])->first();
                 if ($reference) {
-                    $data['song'] = json_decode(json_encode($reference), true);
+                    $data['song'] = json_decode((string) json_encode($reference), true);
                     $item->update(['serialized_data' => serialize($data)]);
                 } else {
                     if (trim($data['song']['songbook_abbreviation'].$data['song']['reference'])) {

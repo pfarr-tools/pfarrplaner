@@ -56,6 +56,7 @@ class UpdateParish extends AbstractUpdateAction implements UpdatesParishes
     /**
      * Update a parish
      *
+     * @param  array<string, mixed>  $input
      * @return Parish
      *
      * @throws AuthorizationException
@@ -65,7 +66,9 @@ class UpdateParish extends AbstractUpdateAction implements UpdatesParishes
     {
         Gate::forUser($user)->authorize('update', $parish);
         $input = Validator::make($input, Parish::$validationRules)->validateWithBag('updateParish');
-        $this->city = $parish->owningCity;
+        $city = $parish->owningCity;
+        abort_unless($city instanceof City, 404);
+        $this->city = $city;
         $parish->update($input);
         UpdatedParish::dispatch($user, $parish);
 

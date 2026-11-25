@@ -48,27 +48,52 @@ class TeamPolicy
         //
     }
 
-    public function index(User $user)
+    /**
+     * Determine whether the user can view the team index.
+     *
+     * @return bool
+     */
+    public function index(User $user): bool
     {
         return count($user->writableCities) > 0;
     }
 
-    public function viewAny(User $user)
+    /**
+     * Determine whether the user can view any teams.
+     *
+     * @return bool
+     */
+    public function viewAny(User $user): bool
     {
         return $this->index($user);
     }
 
-    public function create(User $user)
+    /**
+     * Determine whether the user can create teams.
+     *
+     * @return bool
+     */
+    public function create(User $user): bool
     {
         return count($user->writableCities) > 0;
     }
 
-    public function update(User $user, Team $team)
+    /**
+     * Determine whether the user can update the team.
+     *
+     * @return bool
+     */
+    public function update(User $user, Team $team): bool
     {
         return $user->writableCities->pluck('id')->contains($team->city_id);
     }
 
-    public function delete(User $user, Team $team)
+    /**
+     * Determine whether the user can delete the team.
+     *
+     * @return bool
+     */
+    public function delete(User $user, Team $team): bool
     {
         return $user->writableCities->pluck('id')->contains($team->city_id);
     }

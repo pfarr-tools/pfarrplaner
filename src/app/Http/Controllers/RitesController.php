@@ -30,9 +30,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\People\User;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
+use Inertia\Response;
 
+/** API controller for rites. */
 class RitesController extends Controller
 {
     /**
@@ -43,9 +46,11 @@ class RitesController extends Controller
         $this->middleware('auth');
     }
 
-    public function index()
+    public function index(): Response
     {
-        $config = Auth::user()->getSetting('homeScreenConfig', []);
+        $user = Auth::user();
+        abort_unless($user instanceof User, 401);
+        $config = $user->getSetting('homeScreenConfig', []);
 
         return Inertia::render('Rites/Index', compact('config'));
     }

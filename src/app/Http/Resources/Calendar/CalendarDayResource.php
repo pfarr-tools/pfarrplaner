@@ -31,6 +31,7 @@
 namespace App\Http\Resources\Calendar;
 
 use App\Models\Leave\Absence;
+use App\Models\People\User;
 use App\Services\LiturgyService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -53,12 +54,16 @@ class CalendarDayResource extends JsonResource
         // use raw query to avoid any relationships
         $services = DB::select('SELECT id, slug, date, city_id FROM services WHERE date(`date`) = ? AND event_class=\'service\' ORDER BY date', [$this->resource]);
 
-        $absences = Absence::setEagerLoads([])->with('user', function ($query) {
+        $actor = Auth::user();
+        $absenceQuery = Absence::setEagerLoads([])->with('user', function ($query) {
             $query->setEagerLoads([])->with([]);
-        })->byPeriod($date, $date->copy()->endOfDay())
-            ->visibleForUser(Auth::user())
-            ->showInCalendar()
-            ->get();
+        })->byPeriod($date, $date->copy()->endOfDay());
+        if ($actor instanceof User) {
+            $absenceQuery->visibleForUser($actor);
+        } else {
+            $absenceQuery->whereRaw('1 = 0');
+        }
+        $absences = $absenceQuery->showInCalendar()->get();
 
         return [
             'date' => $this->resource,

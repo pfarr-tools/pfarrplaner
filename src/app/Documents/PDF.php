@@ -105,7 +105,12 @@ HTML;
      */
     protected static function getEmbeddedFontDataUri(string $path): string
     {
-        return 'data:font/ttf;base64,'.base64_encode(file_get_contents($path));
+        $font = file_get_contents($path);
+        if ($font === false) {
+            throw new \RuntimeException('PDF-Schriftdatei konnte nicht gelesen werden: '.$path);
+        }
+
+        return 'data:font/ttf;base64,'.base64_encode($font);
     }
 
     /**
@@ -159,13 +164,18 @@ HTML;
     }
 
     /**
-     * @param  string  $viewName
-     * @param  array  $data
-     * @return static
+     * Render a view as a configured PDF document.
+     *
+     * @param  string  $viewName  Name of the view to render.
+     * @param  array<array-key, mixed>  $data  Variables passed to the view.
+     * @param  string  $header  Optional HTML header template.
+     * @param  string  $footer  Optional HTML footer template.
+     * @return static Configured PDF renderer.
      */
-    public static function fromView($viewName, $data, $header = '', $footer = '')
+    public static function fromView(string $viewName, array $data, string $header = '', string $footer = ''): static
     {
-        $html = View::make($viewName, $data)->render();
+        $viewPath = View::getFinder()->find($viewName);
+        $html = View::file($viewPath, $data)->render();
         $html = static::applyDefaultPdfTitle($html, $viewName);
         $html = static::applyDefaultPdfStyles($html);
 
@@ -186,9 +196,13 @@ HTML;
     }
 
     /**
+     * Send the rendered PDF to the client as a file download.
+     *
+     * @param  string  $filename  Name used for the downloaded file.
+     *
      * @throws CouldNotTakeBrowsershot
      */
-    public function download($filename): BinaryFileResponse
+    public function download(string $filename): BinaryFileResponse
     {
         $tempFile = storage_path('app/tmp/'.$filename);
         File::ensureDirectoryExists(dirname($tempFile));
@@ -201,14 +215,17 @@ HTML;
     /**
      * Start Browsershot with a guaranteed working directory even if the runtime
      * environment does not provide a valid current directory.
+     *
+     * @param  array<array-key, mixed>  $command  Chromium command created by Browsershot.
+     * @return string Result reported by Chromium.
      */
     protected function callBrowser(array $command): string
     {
         $fullCommand = $this->getFullCommand($command);
         $workingDirectory = base_path() ?: getcwd() ?: storage_path('app');
 
-        $process = $this->isWindows()
-            ? new Process($fullCommand, $workingDirectory, $this->getWindowsEnv())
+        $process = is_array($fullCommand)
+            ? new Process(array_values(array_map('strval', $fullCommand)), $workingDirectory, $this->isWindows() ? $this->getWindowsEnv() : null)
             : Process::fromShellCommandline($fullCommand, $workingDirectory);
 
         $process->setTimeout($this->timeout);
@@ -220,7 +237,7 @@ HTML;
         $this->chromiumResult = new ChromiumResult(json_decode($rawOutput, true));
 
         if ($process->isSuccessful()) {
-            $result = $this->chromiumResult?->getResult();
+            $result = $this->chromiumResult->getResult();
 
             $this->cleanupTemporaryOptionsFile();
 
@@ -237,7 +254,7 @@ HTML;
         }
 
         if ($exitCode === 3) {
-            throw UnsuccessfulResponse::make($this->url, $errorOutput ?? '');
+            throw UnsuccessfulResponse::make($this->url, $errorOutput);
         }
 
         if ($exitCode === 2) {

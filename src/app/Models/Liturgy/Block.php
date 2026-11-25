@@ -37,12 +37,16 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Block extends Model
 {
-    protected $with = 'items';
+    /** @var list<string> */
+    protected $with = ['items'];
 
     protected $table = 'liturgy_blocks';
 
     protected $fillable = ['title', 'instructions', 'service_id', 'sortable'];
 
+    /**
+     * @return void
+     */
     protected static function boot()
     {
         parent::boot();
@@ -53,6 +57,9 @@ class Block extends Model
         });
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\Service, $this>
+     */
     public function service()
     {
         return $this->belongsTo(Service::class);

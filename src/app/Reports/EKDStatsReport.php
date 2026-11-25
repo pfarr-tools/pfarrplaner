@@ -30,13 +30,14 @@
 
 namespace App\Reports;
 
+use App\Models\People\User;
 use App\Models\Places\City;
 use App\Models\Service;
 use App\Services\FileNameService;
 use App\Services\LiturgyService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -75,14 +76,9 @@ class EKDStatsReport extends AbstractExcelDocumentReport
      */
     public function setup()
     {
-        $cities = Auth::user()->cities;
+        $cities = $this->authenticatedUser()->cities;
 
         return Inertia::render('Report/EKDStats/Setup', compact('cities'));
-    }
-
-    private function cellAddress($col, $row)
-    {
-        return $col.$row;
     }
 
     /**
@@ -161,7 +157,7 @@ class EKDStatsReport extends AbstractExcelDocumentReport
             });
 
         $ctChristmasEve = Service::with([])->between(
-            Carbon::createFromDate($data['year'], 12, 24, 0, 0, 0),
+            $this->requireParsedDate(Carbon::create($data['year'], 12, 24, 0, 0, 0)),
             Carbon::createFromDate($data['year'], 12, 24)->setTime(23, 59, 59),
         )->whereDoesntHave('funerals')
             ->whereDoesntHave('weddings')
@@ -241,7 +237,7 @@ class EKDStatsReport extends AbstractExcelDocumentReport
             /** @var Service $service */
             foreach ($services as $service) {
                 $sheet->getStyle('C'.$row)->getFont()->setSize(8);
-                $sheet->setCellValue('C'.$row, $service->date->setTimezone('Europe/Berlin')->format('d.m.Y H:i'));
+                $sheet->setCellValue('C'.$row, $service->trueDate()->setTimezone('Europe/Berlin')->format('d.m.Y H:i'));
                 $sheet->getStyle('D'.$row)->getFont()->setSize(8);
                 $sheet->setCellValue('D'.$row, $service->titleText(false));
                 $row++;
@@ -276,9 +272,13 @@ class EKDStatsReport extends AbstractExcelDocumentReport
     }
 
     /**
-     * @return string
+     * Formatiert eine Liste von Personen als kommaseparierten Text.
+     *
+     * @param  Collection<int, User>  $people  Zu formatierende Personen
+     * @param  int  $format  Namensformat, einer der User::NAME_FORMAT_*-Werte
+     * @return string Namen der Personen, kommasepariert
      */
-    protected function peopleListFormatted($people, $format)
+    protected function peopleListFormatted(Collection $people, int $format): string
     {
         $recs = [];
         foreach ($people as $person) {

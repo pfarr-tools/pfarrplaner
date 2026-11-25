@@ -36,7 +36,8 @@ use PhpOffice\PhpWord\Shared\Converter;
 
 class DefaultAddressLabelSheetDocument extends DefaultLabelSheetDocument
 {
-    protected $fromAddress = '';
+    /** @var string Formatted sender address shown on each label. */
+    protected string $fromAddress = '';
 
     public const FONT6 = ['name' => 'Arial', 'size' => 6];
 
@@ -44,6 +45,10 @@ class DefaultAddressLabelSheetDocument extends DefaultLabelSheetDocument
 
     public const FONT10 = ['name' => 'Arial', 'size' => 10];
 
+    /**
+     * @param  array<string, mixed>  $config  Document configuration.
+     * @return void
+     */
     public function __construct($config = [])
     {
         if (! isset($config['label'])) {
@@ -52,21 +57,28 @@ class DefaultAddressLabelSheetDocument extends DefaultLabelSheetDocument
         parent::__construct($config);
     }
 
-    public function renderAddresses($addresses, $fromAddress)
+    /**
+     * Render the address records as labels on the sheet.
+     *
+     * @param  iterable<array<string, mixed>>  $addresses  Address records to render.
+     * @param  array<string, mixed>|string  $fromAddress  Sender address override or an empty string to use the current user's data.
+     */
+    public function renderAddresses(iterable $addresses, array|string $fromAddress): void
     {
 
         $user = Auth::user();
+        $fromAddressData = is_array($fromAddress) ? $fromAddress : [];
         $fromParts = collect();
-        if ($x = $fromAddress['office'] ?? $user->office) {
+        if ($x = $fromAddressData['office'] ?? $user?->office) {
             $fromParts->push($x);
         }
-        if (isset($fromAddress['address'])) {
-            $fromParts->push($fromAddress['address']);
-            if ($x = trim(($fromAddress['zip'] ?? '').' '.($fromAddress['city'] ?? ''))) {
+        if (isset($fromAddressData['address'])) {
+            $fromParts->push($fromAddressData['address']);
+            if ($x = trim(($fromAddressData['zip'] ?? '').' '.($fromAddressData['city'] ?? ''))) {
                 $fromParts->push($x);
             }
         } else {
-            if ($user->address) {
+            if ($user?->address) {
                 foreach (explode("\n", $user->address) as $x) {
                     $fromParts->push(trim($x));
                 }
@@ -88,7 +100,14 @@ class DefaultAddressLabelSheetDocument extends DefaultLabelSheetDocument
         );
     }
 
-    public function renderAddress(Cell $cell, $address, $index)
+    /**
+     * Render a single address into one label cell.
+     *
+     * @param  Cell  $cell  Table cell receiving the address.
+     * @param  array<string, mixed>  $address  Address record with name, address, zip and city.
+     * @param  int  $index  Zero-based index of the label.
+     */
+    public function renderAddress(Cell $cell, array $address, int $index): void
     {
 
         $pStyle = [

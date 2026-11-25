@@ -32,7 +32,10 @@ namespace App\Liturgy\ItemHelpers;
 
 class PsalmItemHelper extends AbstractItemHelper
 {
-    public function getCodeText()
+    /**
+     * Gibt den Psalmcode mit Referenz und gegebenenfalls alternativer EG-Nummer zurück.
+     */
+    public function getCodeText(): string
     {
         if (! isset($this->item->data['psalm'])) {
             return '';
@@ -44,7 +47,10 @@ class PsalmItemHelper extends AbstractItemHelper
         return $codeText;
     }
 
-    public function getTitleText()
+    /**
+     * Gibt den Titel des Psalms zurück.
+     */
+    public function getTitleText(): string
     {
         if (! isset($this->item->data['psalm'])) {
             return '';
@@ -53,7 +59,12 @@ class PsalmItemHelper extends AbstractItemHelper
         return $this->item->data['psalm']['name'] ?? '';
     }
 
-    public function getVerses()
+    /**
+     * Gibt die Verse des Psalms als Gruppen von Zeilen zurück.
+     *
+     * @return list<list<string>> Durch Einrückung gruppierte Psalmzeilen
+     */
+    public function getVerses(): array
     {
         if (! isset($this->item->data['psalm'])) {
             return [];
@@ -78,7 +89,12 @@ class PsalmItemHelper extends AbstractItemHelper
         return $verses;
     }
 
-    public function getFinalVerses($number = 2)
+    /**
+     * Gibt die letzten Verse des Psalms als Text zurück.
+     *
+     * @param  int  $number  Anzahl der abschließenden Verse
+     */
+    public function getFinalVerses(int $number = 2): string
     {
         $verses = $this->getVerses();
         $stop = min($number, count($verses));

@@ -45,6 +45,9 @@ class UpdateReplacement extends AbstractUpdateAction implements UpdatesReplaceme
         return '';
     }
 
+    /**
+     * @param  array<string, mixed>  $input
+     */
     public function update(User $user, Replacement $replacement, array $input): Replacement
     {
         Gate::forUser($user)->authorize('update', $replacement);

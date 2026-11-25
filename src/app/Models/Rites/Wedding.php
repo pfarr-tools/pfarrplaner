@@ -122,9 +122,7 @@ class Wedding extends AbstractModel implements HasDAVCalendarItems
 
     public static $relationsForEditor = ['attachments', 'service.pastors'];
 
-    /**
-     * @var string[]
-     */
+    /** @var list<string> */
     protected $fillable = [
         'service_id',
         'spouse1_name',
@@ -171,9 +169,7 @@ class Wedding extends AbstractModel implements HasDAVCalendarItems
         'processed',
     ];
 
-    /**
-     * @var string[]
-     */
+    /** @var array<string, string> */
     protected $casts = [
         'spouse1_name' => EncryptedAttribute::class,
         'spouse1_birth_name' => EncryptedAttribute::class,
@@ -216,6 +212,9 @@ class Wedding extends AbstractModel implements HasDAVCalendarItems
         };
     }
 
+    /**
+     * @return array<string, int|string>
+     */
     public function fillDefaults(): array
     {
         return [
@@ -259,17 +258,22 @@ class Wedding extends AbstractModel implements HasDAVCalendarItems
     /**
      * Generate a record for sync'ing to external calendars
      *
-     * @return array[]|null
+     * @param  array<string, mixed>  $config  Event options.
+     * @return array<string, array<string, mixed>>|null
      */
-    public function getAdditionalEvents($config = [])
+    public function getAdditionalEvents(array $config = [])
     {
         if (! $this->appointment) {
             return null;
         }
+        $service = $this->service;
+        if ($service === null) {
+            return null;
+        }
         $records = [];
 
-        $description = '<p>Trauung am '.$this->service->date->format('d.m.Y').' um '.$this->service->timeText(
-        ).' ('.$this->service->locationText().')</p>'
+        $description = '<p>Trauung am '.$service->trueDate()->format('d.m.Y').' um '.$service->timeText(
+        ).' ('.$service->locationText().')</p>'
             .'<p><a href="'.route('weddings.edit', $this->id).'">Trauung im Pfarrplaner öffnen</a></p>'
             .'<p>Kontakt:<br />'
             .trim(' - '.$this->spouse1_name.': '.$this->spouse1_phone.' '.$this->spouse1_email).'<br />'
@@ -277,20 +281,18 @@ class Wedding extends AbstractModel implements HasDAVCalendarItems
             .'</p>'
             .AbstractSyncEngine::AUTO_WARNING;
 
-        if ($this->appointment) {
-            $records['wedding_prep_'.$this->id] = [
-                'startDate' => $this->appointment->copy(),
-                'endDate' => $this->appointment->copy()->addHour(1),
-                'title' => 'Traugespräch '.$this->spouse1_name.' / '.$this->spouse2_name,
-                'description' => $description,
-                'location' => '',
-                'categories' => ['Pfarrplaner', 'Traugespräch', 'Amtskalender: Amtshandlungen'],
-            ];
-        }
+        $records['wedding_prep_'.$this->id] = [
+            'startDate' => $this->appointment->copy(),
+            'endDate' => $this->appointment->copy()->addHour(),
+            'title' => 'Traugespräch '.$this->spouse1_name.' / '.$this->spouse2_name,
+            'description' => $description,
+            'location' => '',
+            'categories' => ['Pfarrplaner', 'Traugespräch', 'Amtskalender: Amtshandlungen'],
+        ];
         if ($config['include_rite_anniversaries'] ?? false) {
             $records['wedding_anniversary_'.$this->id] = [
-                'startDate' => $this->service->date->copy()->addYears(1),
-                'endDate' => $this->service->date->copy()->addYears(1),
+                'startDate' => $service->trueDate()->copy()->addYears(1),
+                'endDate' => $service->trueDate()->copy()->addYears(1),
                 'title' => '1. Jahrestag der Trauung von '.$this->spouse1_name.' / '.$this->spouse2_name,
                 'description' => $description,
                 'location' => '',
@@ -303,12 +305,12 @@ class Wedding extends AbstractModel implements HasDAVCalendarItems
         return $records;
     }
 
-    public function getSpouse1DimissorialUrlAttribute()
+    public function getSpouse1DimissorialUrlAttribute(): string
     {
         return URL::signedRoute('dimissorial.show', ['type' => 'trauung', 'id' => $this->id, 'spouse' => 1]);
     }
 
-    public function getSpouse2DimissorialUrlAttribute()
+    public function getSpouse2DimissorialUrlAttribute(): string
     {
         return URL::signedRoute('dimissorial.show', ['type' => 'trauung', 'id' => $this->id, 'spouse' => 2]);
     }
@@ -338,8 +340,12 @@ class Wedding extends AbstractModel implements HasDAVCalendarItems
      */
     public function getCalendarItem(string $itemType): DAVCalendarItem
     {
-        $description = 'Trauung am '.$this->service->date->format('d.m.Y').' um '.$this->service->timeText(
-        ).' ('.$this->service->locationText().")\n\n"
+        $service = $this->service;
+        if ($service === null) {
+            throw new \InvalidArgumentException('Trauung ohne Gottesdienst kann keinen Kalendereintrag erzeugen.');
+        }
+        $description = 'Trauung am '.$service->trueDate()->format('d.m.Y').' um '.$service->timeText(
+        ).' ('.$service->locationText().")\n\n"
             .'Trauung im Pfarrplaner öffnen: '
             .route('weddings.edit', $this->id)
             ."\n\nKontakt:\n"
@@ -349,31 +355,34 @@ class Wedding extends AbstractModel implements HasDAVCalendarItems
 
         switch ($itemType) {
             case 'prep':
+                $appointment = $this->appointment;
+                if ($appointment === null) {
+                    throw new \InvalidArgumentException('Traugespräch-Termin fehlt.');
+                }
+
                 return new DAVCalendarItem(
                     $this,
                     'Traugespräch '.$this->spouse1_name.' / '.$this->spouse2_name,
-                    $this->appointment->copy(),
-                    $this->appointment->copy()->addHour(1),
+                    $appointment->copy(),
+                    $appointment->copy()->addHour(),
                     $this->appointment_address ?? '',
                     $description,
                     'prep',
                     ['busyStatus' => 'BUSY'],
                     ['Traugespräch', 'Amtskalender: Amtshandlungen']
                 );
-                break;
             case 'anniv':
                 return new DAVCalendarItem(
                     $this,
                     '1. Jahrestag der Trauung von '.$this->spouse1_name.' / '.$this->spouse2_name,
-                    $this->service->date->copy()->addYears(1),
-                    $this->service->date->copy()->addYears(1)->addDays(1)->startOfDay(),
+                    $service->trueDate()->copy()->addYears(1),
+                    $service->trueDate()->copy()->addYears(1)->addDays(1)->startOfDay(),
                     '',
                     $description,
                     'anniv',
                     ['allDay' => true, 'busy' => false, 'busyStatus' => 'FREE'],
                     ['Jahrestag Trauung']
                 );
-                break;
         }
 
         throw new \InvalidArgumentException("Unknown wedding calendar item type: {$itemType}");

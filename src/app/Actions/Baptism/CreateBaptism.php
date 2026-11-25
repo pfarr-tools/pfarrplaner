@@ -47,12 +47,15 @@ class CreateBaptism extends AbstractCreateAction implements CreatesBaptisms
         return '';
     }
 
+    /**
+     * @param  array<string, mixed>  $input
+     */
     public function create(User $user, array $input): Baptism
     {
         Gate::forUser($user)->authorize('create', Baptism::class);
 
         $serviceId = $input['service_id'] ?? $input['service'] ?? null;
-        $service = $serviceId ? Service::find($serviceId) : null;
+        $service = $serviceId ? Service::find((int) $serviceId) : null;
         $baptism = Baptism::create($this->draftDefaults($user, $service));
 
         CreatedBaptism::dispatch($user, $baptism);

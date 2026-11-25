@@ -39,6 +39,10 @@ use Illuminate\Validation\ValidationException;
 
 trait NormalizesBaptismData
 {
+    /**
+     * @param  array<string, mixed>  $input
+     * @return array<string, mixed>
+     */
     protected function prepareInputForValidation(array $input): array
     {
         if (isset($input['service']) && ! isset($input['service_id'])) {
@@ -46,7 +50,7 @@ trait NormalizesBaptismData
         }
 
         if (! isset($input['city_id']) && ! empty($input['service_id'])) {
-            $service = Service::find($input['service_id']);
+            $service = Service::find((int) $input['service_id']);
             if ($service) {
                 $input['city_id'] = $service->city_id;
             }
@@ -116,6 +120,10 @@ trait NormalizesBaptismData
         }
     }
 
+    /**
+     * @param  array<string, mixed>  $input
+     * @return array<string, mixed>
+     */
     protected function normalizeValidatedInput(array $input): array
     {
         $input['dob'] = $this->parseDate($input['dob'] ?? null);
@@ -157,12 +165,17 @@ trait NormalizesBaptismData
             return $value;
         }
         if (preg_match('/^\d{2}\.\d{2}\.\d{4} \d{2}:\d{2}$/', (string) $value)) {
-            return Carbon::createFromFormat('d.m.Y H:i', $value, 'Europe/Berlin')->setTimezone('UTC');
+            $parsed = Carbon::createFromFormat('d.m.Y H:i', (string) $value, 'Europe/Berlin');
+
+            return ($parsed ?: Carbon::parse($value, 'Europe/Berlin'))->setTimezone('UTC');
         }
 
         return Carbon::parse($value, 'Europe/Berlin')->setTimezone('UTC');
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     protected function draftDefaults(User $user, ?Service $service): array
     {
         $draftCityId = $service?->city_id ?: $user->writableCities->first()?->id ?: City::query()->value('id');

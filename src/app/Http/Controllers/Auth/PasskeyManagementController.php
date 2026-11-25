@@ -41,7 +41,7 @@ class PasskeyManagementController extends Controller
     {
         $user = $this->authenticatedUser($request);
         $options = $generate($user);
-        $issuedAt = now()->timestamp;
+        $issuedAt = (int) now()->timestamp;
         $request->session()->put('passkey.registration_options', WebAuthn::toJson($options));
         $request->session()->put('passkey.registration.challenge', [
             'purpose' => 'registration',

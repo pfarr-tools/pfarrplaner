@@ -31,7 +31,7 @@ class GenerateOpenApiSpec extends Command
 
         $openapi = (new Generator)->generate([app_path('Http/Controllers/Api')]);
 
-        file_put_contents($output, $openapi->toJson(JSON_PRETTY_PRINT));
+        file_put_contents($output, $openapi?->toJson(JSON_PRETTY_PRINT) ?? '{}');
 
         $this->info("OpenAPI spec written to {$output}");
 

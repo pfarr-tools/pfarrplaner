@@ -36,13 +36,15 @@ use Illuminate\Support\Facades\App;
 class PackageService
 {
     /**
-     * Get general app info
+     * Liefert allgemeine Informationen zur Anwendung.
+     *
+     * @return array<string, mixed> Paketdaten, Build-Datum und Version als Zeichenketten
      */
     public static function info(): array
     {
         $package = [
-            'info' => json_decode(file_get_contents(base_path('package.json')), true),
-            'date' => (new Carbon(filemtime(base_path('package.json'))))->setTimeZone(
+            'info' => json_decode(file_get_contents(base_path('package.json')) ?: '', true),
+            'date' => (new Carbon((int) filemtime(base_path('package.json'))))->setTimeZone(
                 'Europe/Berlin'
             ),
             'env' => App::environment(),

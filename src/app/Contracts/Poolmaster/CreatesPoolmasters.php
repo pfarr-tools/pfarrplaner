@@ -34,6 +34,6 @@ use App\Models\Leave\Poolmaster;
 use App\Models\People\User;
 
 /**
- * @method Poolmaster create (User $user, array $input)
+ * @method Poolmaster create (User $user, array<string, mixed> $input)
  */
 interface CreatesPoolmasters {}

@@ -80,7 +80,7 @@ class ServiceUpdated extends AbstractServiceMailable
         }
         $tmpParticipants = $participants;
         foreach ($tmpParticipants as $category => $p) {
-            if (print_r($p['original'] ?? [], 1) == print_r($p['changed'] ?? [], 1)) {
+            if (print_r($p['original'] ?? [], true) == print_r($p['changed'] ?? [], true)) {
                 unset($participants[$category]);
             }
         }
@@ -91,7 +91,7 @@ class ServiceUpdated extends AbstractServiceMailable
             'ical/ical',
             ['services' => [$this->service], 'token' => null, 'action' => null, 'key' => null]
         )->render();
-        $icsTitle = 'GD '.$this->service->date->format('Ymd').' '.$this->service->timeText(
+        $icsTitle = 'GD '.(string) $this->service->date?->format('Ymd').' '.$this->service->timeText(
             false
         ).' '.$this->service->locationText().'.ics';
 

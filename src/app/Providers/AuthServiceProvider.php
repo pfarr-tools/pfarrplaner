@@ -40,6 +40,7 @@ use App\Models\Liturgy\Psalm;
 use App\Models\Liturgy\Song;
 use App\Models\Liturgy\Songbook;
 use App\Models\Location;
+use App\Models\Parish;
 use App\Models\People\Team;
 use App\Models\People\User;
 use App\Models\Places\City;
@@ -92,7 +93,7 @@ class AuthServiceProvider extends ServiceProvider
     /**
      * The policy mappings for the application.
      *
-     * @var array
+     * @var array<class-string, class-string>
      */
     protected $policies = [
         User::class => UserPolicy::class,

@@ -106,7 +106,7 @@ class ServicePolicy
             return true;
         }
 
-        if ($user->isCurrentlyPoolmasterForCity($service->city)) {
+        if ($service->city !== null && $user->isCurrentlyPoolmasterForCity($service->city)) {
             return true;
         }
 
@@ -135,9 +135,13 @@ class ServicePolicy
     }
 
     /**
-     * @return mixed
+     * Determine whether the user may write services for the service's city.
+     *
+     * @param  User  $user  User requesting access.
+     * @param  Service  $service  Service whose city is checked.
+     * @return bool Whether access is granted.
      */
-    protected function hasCityPermission($user, $service)
+    protected function hasCityPermission(User $user, Service $service): bool
     {
         return $user->writableCities->pluck('id')->contains($service->city_id);
     }

@@ -44,7 +44,7 @@ return new class extends Migration
         foreach ($items as $item) {
             $data = $item->data;
             if (str_contains($data['description'], "\n")) {
-                $data['description'] = '<p>'.str_replace("\n", '<br>', str_replace("\r\n", '</p><p>', $data['description'])).'</p>';
+                $data['description'] = '<p>'.str_replace("\n", '<br>', str_replace("\r\n", '</p><p>', (string) $data['description'])).'</p>';
                 $item->data = $data;
                 $item->save();
             }

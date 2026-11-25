@@ -65,9 +65,10 @@ class InputController extends Controller
     }
 
     /**
+     * @param  string  $input  Input key.
      * @return Application|Factory|View
      */
-    public function setup(Request $request, $input)
+    public function setup(Request $request, string $input)
     {
         $input = $this->getInputClass($input);
 

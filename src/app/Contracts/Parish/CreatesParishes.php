@@ -34,6 +34,6 @@ use App\Models\Parish;
 use App\Models\People\User;
 
 /**
- * @method Parish create(User $user, array $input)
+ * @method Parish create(User $user, array<string, mixed> $input)
  */
 interface CreatesParishes {}

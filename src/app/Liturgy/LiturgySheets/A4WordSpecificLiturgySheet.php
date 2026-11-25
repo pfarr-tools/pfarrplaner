@@ -31,6 +31,7 @@
 namespace App\Liturgy\LiturgySheets;
 
 use App\Documents\Word\DefaultWordDocument;
+use App\Liturgy\ItemHelpers\FreetextItemHelper;
 use App\Liturgy\ItemHelpers\PsalmItemHelper;
 use App\Liturgy\ItemHelpers\ReadingItemHelper;
 use App\Liturgy\ItemHelpers\SongItemHelper;
@@ -44,6 +45,7 @@ use PhpOffice\PhpWord\Shared\Converter;
 use PhpOffice\PhpWord\Shared\Html;
 use PhpOffice\PhpWord\SimpleType\JcTable;
 
+/** A4 liturgy sheet with service order and texts. */
 class A4WordSpecificLiturgySheet extends AbstractLiturgySheet
 {
     protected $title = 'Ablaufplan und Texte (DIN A4)';
@@ -59,6 +61,7 @@ class A4WordSpecificLiturgySheet extends AbstractLiturgySheet
 
     protected $configurationComponent = 'A4WordSpecificLiturgySheetConfiguration';
 
+    /** @var string */
     protected $currentRecipient = '';
 
     protected $defaultConfig = [
@@ -71,6 +74,9 @@ class A4WordSpecificLiturgySheet extends AbstractLiturgySheet
         'recipients' => [],
     ];
 
+    /**
+     * @return void
+     */
     public function __construct()
     {
         parent::__construct();
@@ -183,7 +189,7 @@ class A4WordSpecificLiturgySheet extends AbstractLiturgySheet
         $run = new TextRun($doc->getConfig()['styles']['paragraphs']['titles'][1]);
         $run->addText($this->service->titleText(false), $doc->getConfig()['styles']['fonts']['titles'][1]);
         $run->addTextBreak();
-        $run->addText($this->service->date->setTimeZone('Europe/Berlin')->isoFormat('DD.MM.YYYY, HH:mm').' Uhr'.', '
+        $run->addText($this->service->trueDate()->setTimeZone('Europe/Berlin')->isoFormat('DD.MM.YYYY, HH:mm').' Uhr'.', '
                       .$this->service->locationText(), $doc->getConfig()['styles']['fonts']['titles'][1]);
         $doc->getSection()->addTitle($run, 0);
 
@@ -199,6 +205,9 @@ class A4WordSpecificLiturgySheet extends AbstractLiturgySheet
             $doc->getSection()->addTitle($block->title, 1);
 
             $table = $doc->getSection()->addTable('Ablauf');
+            if ($table === null) {
+                continue;
+            }
             foreach ($block->items as $item) {
                 if (method_exists($this, ($method = 'render'.ucfirst($item->data_type.'ItemRow')))) {
                     $table->addRow();
@@ -209,15 +218,24 @@ class A4WordSpecificLiturgySheet extends AbstractLiturgySheet
 
     }
 
-    protected function setProperties(DefaultWordDocument $doc)
+    /**
+     * Set the metadata of the generated Word document.
+     *
+     * @param  DefaultWordDocument  $doc  Document whose properties are set.
+     */
+    protected function setProperties(DefaultWordDocument $doc): void
     {
         $properties = $doc->getPhpWord()->getDocInfo();
-        $properties->setCreator(Auth::user()->fullName());
-        $properties->setCompany(Auth::user()->office ?? '');
+        if ($properties === null) {
+            return;
+        }
+        $user = Auth::user();
+        $properties->setCreator($user?->fullName() ?? '');
+        $properties->setCompany($user->office ?? '');
         $properties->setTitle($this->getFileTitle());
         $properties->setDescription($this->getFileTitle().' ('.$this->title.')');
         $properties->setCategory('Gottesdienste');
-        $properties->setLastModifiedBy(Auth::user()->fullName());
+        $properties->setLastModifiedBy($user?->fullName() ?? '');
         $properties->setSubject('Ablauf und Texte');
     }
 
@@ -241,8 +259,8 @@ class A4WordSpecificLiturgySheet extends AbstractLiturgySheet
      */
     protected function renderRow(Table $table, Item $item, $text)
     {
-        $table->addCell(Converter::cmToTwip(4.3))->addText($item->title, ['bold' => true]);
-        $table->addCell(Converter::cmToTwip(8.5))->addText($text);
+        $table->addCell((int) Converter::cmToTwip(4.3))->addText($item->title, ['bold' => true]);
+        $table->addCell((int) Converter::cmToTwip(8.5))->addText($text);
         $this->renderRecipients($table, $item);
 
     }
@@ -256,7 +274,7 @@ class A4WordSpecificLiturgySheet extends AbstractLiturgySheet
      */
     protected function renderRecipients(Table $table, Item $item)
     {
-        $cell = $table->addCell(Converter::cmToTwip(4.3));
+        $cell = $table->addCell((int) Converter::cmToTwip(4.3));
         $run = $cell->addTextRun();
         $first = true;
         foreach ($item->recipients() as $recipient) {
@@ -280,7 +298,9 @@ class A4WordSpecificLiturgySheet extends AbstractLiturgySheet
     {
         $text = '';
         if ($item->data['description']) {
-            $text = Replacement::replaceAll($item->getHelper()->getText(), $this->service);
+            /** @var FreetextItemHelper $helper */
+            $helper = $item->getHelper();
+            $text = Replacement::replaceAll($helper->getText(), $this->service);
             $text = (strpos($text, "\n") !== false) ? explode("\n", $text)[0] : substr($text, 0, 80).'...';
         }
         $this->renderRow($table, $item, $text);
@@ -296,7 +316,8 @@ class A4WordSpecificLiturgySheet extends AbstractLiturgySheet
      */
     protected function renderSermonItemRow(DefaultWordDocument $doc, Table $table, Item $item)
     {
-        $this->renderRow($table, $item, $this->service->sermon_id ? $this->service->sermon->title : '');
+        $sermon = $this->service->sermon;
+        $this->renderRow($table, $item, $sermon->title ?? '');
     }
 
     /**
@@ -357,7 +378,9 @@ class A4WordSpecificLiturgySheet extends AbstractLiturgySheet
         if (! $item->data['description']) {
             return;
         }
-        $doc->renderNormalText(Replacement::replaceAll($item->getHelper()->getText(), $this->service));
+        /** @var FreetextItemHelper $helper */
+        $helper = $item->getHelper();
+        $doc->renderNormalText(Replacement::replaceAll($helper->getText(), $this->service));
     }
 
     /**
@@ -395,7 +418,11 @@ class A4WordSpecificLiturgySheet extends AbstractLiturgySheet
                         $doc->renderText($paragraph, $doc::BLOCKQUOTE, ['size' => 10]);
                     }
                 } else {
-                    Html::addHtml($doc->getSection(), '<body>'.str_replace('<br>', '<br />', $dom->saveHTML($node)).'</body>');
+                    $section = $doc->getSection();
+                    $html = $dom->saveHTML($node);
+                    if (is_string($html)) {
+                        Html::addHtml($section, '<body>'.str_replace('<br>', '<br />', $html).'</body>');
+                    }
                 }
                 $nodes[] = $node->nodeName.' -> '.$node->nodeValue;
             }

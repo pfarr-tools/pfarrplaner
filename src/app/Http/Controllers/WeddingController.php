@@ -105,17 +105,20 @@ class WeddingController extends AbstractCRUDController
     public function wizard(Request $request)
     {
         Gate::authorize('create', Wedding::class);
-        $cities = Auth::user()->writableCities;
-        $locations = Location::inCities($cities->pluck('id'))->get();
-        $people = User::visibleFor(Auth::user())->get();
         $user = Auth::user();
+        abort_unless($user instanceof User, 401);
+        $cities = $user->writableCities;
+        $locations = Location::inCities($cities->pluck('id'))->get();
+        $people = User::visibleFor($user)->get();
 
         return Inertia::render('Rites/WeddingWizard', compact('cities', 'locations', 'people', 'user'));
     }
 
-    public function wizardSave(Request $request)
+    public function wizardSave(Request $request): RedirectResponse
     {
         Gate::authorize('create', Wedding::class);
+        $user = Auth::user();
+        abort_unless($user instanceof User, 401);
         $data = $request->validate(
             [
                 'date' => 'required|date_format:d.m.Y H:i',
@@ -130,10 +133,12 @@ class WeddingController extends AbstractCRUDController
         if (is_numeric($data['location'])) {
             $request->validate(['location' => 'exists:locations,id']);
         }
-        $data['date'] = Carbon::createFromFormat('d.m.Y H:i', $data['date'], 'Europe/Berlin')->setTimezone('UTC');
+        $date = Carbon::createFromFormat('d.m.Y H:i', $data['date'], 'Europe/Berlin');
+        abort_unless($date !== null, 422);
+        $data['date'] = $date->setTimezone('UTC');
 
-        $city = City::find($data['city']);
-        abort_unless(Auth::user()->writableCities->pluck('id')->contains($city?->id), 403);
+        $city = City::query()->whereKey($data['city'])->firstOrFail();
+        abort_unless($user->writableCities->pluck('id')->contains($city->id), 403);
 
         $location = $specialLocation = null;
         if ((! is_numeric($data['location'])) || (Location::find($data['location']) === null)) {
@@ -143,7 +148,7 @@ class WeddingController extends AbstractCRUDController
             $ccLocation = $request->get('cc_location') ?: '';
         } else {
             if ($data['location']) {
-                $location = Location::find($data['location']);
+                $location = Location::query()->whereKey($data['location'])->firstOrFail();
                 $time = $data['date']->format('H:i');
                 $ccLocation = $request->get('cc_location') ?: ($request->get(
                     'cc'
@@ -179,8 +184,8 @@ class WeddingController extends AbstractCRUDController
         );
         $service->update(['slug' => $service->createSlug()]);
         if (! is_array($data['pastor'])) {
-            if (Auth::user()->hasRole('Pfarrer:in')) {
-                $service->pastors()->sync([Auth::user()->id => ['category' => 'P']]);
+            if ($user->hasRole('Pfarrer:in')) {
+                $service->pastors()->sync([$user->id => ['category' => 'P']]);
             }
         } else {
             $sync = [];

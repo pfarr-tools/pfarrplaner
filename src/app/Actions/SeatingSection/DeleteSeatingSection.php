@@ -34,7 +34,9 @@ class DeleteSeatingSection extends AbstractDeleteAction implements DeletesSeatin
     {
         Gate::forUser($user)->authorize('delete', $seatingSection);
 
-        $this->location = $seatingSection->location;
+        $location = $seatingSection->location;
+        abort_unless($location instanceof Location, 404);
+        $this->location = $location;
         $result = (bool) $seatingSection->delete();
 
         if ($result) {

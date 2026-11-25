@@ -42,7 +42,6 @@ use Carbon\Carbon;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -79,13 +78,13 @@ class EmbedEventsTableReport extends AbstractEmbedReport
      */
     public function setup()
     {
-        $cities = Auth::user()->cities;
+        $cities = $this->authenticatedUser()->cities;
 
         return Inertia::render('Report/EmbedEventsTable/Setup', compact('cities'));
     }
 
     /**
-     * @return Application|Factory|View|string
+     * @return Application|Factory|View|Response|string
      */
     public function render(Request $request)
     {
@@ -113,7 +112,7 @@ class EmbedEventsTableReport extends AbstractEmbedReport
     }
 
     /**
-     * @return Application|Factory|View
+     * @return \Illuminate\Contracts\View\View
      */
     public function embed(Request $request)
     {

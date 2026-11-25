@@ -34,16 +34,22 @@ use App\Http\Resources\HomeScreen\NextServicesTabResource;
 use App\Models\Service;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\Auth;
 
+/** Home screen tab showing the next services. */
 class NextServicesHomeScreenTab extends AbstractHomeScreenTab
 {
     protected $title = 'Nächste Gottesdienste';
 
     protected $description = 'Zeigt die nächsten Gottesdienste an';
 
+    /**
+     * @var Builder<Service>
+     */
     protected $query = null;
 
+    /**
+     * @param  array<string, mixed>  $config  Tab configuration.\n     * @return void
+     */
     public function __construct($config = [])
     {
         // preset default config
@@ -61,11 +67,17 @@ class NextServicesHomeScreenTab extends AbstractHomeScreenTab
         return parent::getTitle();
     }
 
+    /**
+     * @return int
+     */
     public function getCount()
     {
         return $this->query->count();
     }
 
+    /**
+     * @param  array<string, mixed>  $data  View data.\n     * @return mixed
+     */
     public function getContent($data = [])
     {
         $data['services'] = $this->query->get();
@@ -73,6 +85,9 @@ class NextServicesHomeScreenTab extends AbstractHomeScreenTab
         return parent::getContent($data);
     }
 
+    /**
+     * @param  array<string, mixed>  $data  Additional data.\n     * @return array<string, mixed>
+     */
     public function toArray($data = [])
     {
         $data['services'] = $this->query->get();
@@ -89,7 +104,7 @@ class NextServicesHomeScreenTab extends AbstractHomeScreenTab
     public function buildQuery()
     {
         $start = Carbon::now()->setTime(0, 0, 0);
-        $end = Carbon::now()->addMonth(2);
+        $end = Carbon::now()->addMonths(2);
 
         $query =
             Service::with(['baptisms', 'weddings', 'funerals', 'location'])
@@ -99,11 +114,11 @@ class NextServicesHomeScreenTab extends AbstractHomeScreenTab
             $query->whereHas(
                 'participants',
                 function ($query) {
-                    $query->where('user_id', Auth::user()->id);
+                    $query->where('user_id', $this->user()->id);
                 }
             );
         } else {
-            $query->inCities(Auth::user()->cities->pluck('id'));
+            $query->inCities($this->user()->cities->pluck('id'));
         }
 
         return $query;

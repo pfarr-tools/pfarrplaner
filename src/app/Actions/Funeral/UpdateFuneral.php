@@ -34,6 +34,11 @@ class UpdateFuneral extends AbstractUpdateAction implements UpdatesFunerals
         return $this->redirectUrl ?: route('home');
     }
 
+    /**
+     * Aktualisiert die Beerdigung und die zugehörigen Dienste.
+     *
+     * @param  array<string, mixed>  $input
+     */
     public function update(User $user, Funeral $funeral, array $input): Funeral
     {
         Gate::forUser($user)->authorize('update', $funeral);
@@ -61,6 +66,9 @@ class UpdateFuneral extends AbstractUpdateAction implements UpdatesFunerals
         return $funeral;
     }
 
+    /**
+     * @param  Service  $service  Service to derive the slug from.\n     * @return string
+     */
     protected function getServiceSlug(Service $service): string
     {
         return $service->slug ?: $service->createSlug();

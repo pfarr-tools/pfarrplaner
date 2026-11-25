@@ -41,12 +41,13 @@ use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 use Inertia\Inertia;
+use Inertia\Response;
 
+/** Report listing ministry requests. */
 class MinistryRequestReport extends AbstractReport
 {
     /**
@@ -72,14 +73,14 @@ class MinistryRequestReport extends AbstractReport
     protected $inertia = true;
 
     /**
-     * @return Application|Factory|View
+     * @return Application|Factory|View|Response
      */
     public function setup()
     {
-        $cities = Auth::user()->writableCities;
-        $locations = Location::inCities(Auth::user()->writableCities->pluck('id'))->get();
+        $cities = $this->authenticatedUser()->writableCities;
+        $locations = Location::inCities($this->authenticatedUser()->writableCities->pluck('id'))->get();
         $ministries = MinistryService::all(true);
-        $users = User::visibleFor(Auth::user())->get();
+        $users = User::visibleFor($this->authenticatedUser())->get();
 
         $teams = Team::with('users')->inCities($cities->pluck('id'))->get()->groupBy('city_id');
 
@@ -117,6 +118,9 @@ class MinistryRequestReport extends AbstractReport
         return response()->json($services->ordered()->get());
     }
 
+    /**
+     * @return JsonResponse
+     */
     public function recipients(Request $request)
     {
         $data = $request->validate([
@@ -131,11 +135,15 @@ class MinistryRequestReport extends AbstractReport
                 $query->where('service_user.category', $data['ministry']);
                 $query->whereIn('city_id', $data['cities']);
             }
-        )->get()->pluck('id')->unique();
+        )->pluck('id')->unique();
 
         return response()->json($users);
     }
 
+    /**
+     * @param  Request  $request  Current request.
+     * @return mixed
+     */
     public function render(Request $request)
     {
         $data = $request->validate(
@@ -155,7 +163,7 @@ class MinistryRequestReport extends AbstractReport
             if (! $address) {
                 unset($data['address'][$id]);
             } else {
-                $user = User::find($id)->update(['email' => $address]);
+                $user = User::findOrFail((int) $id)->update(['email' => $address]);
             }
         }
 
@@ -177,7 +185,7 @@ class MinistryRequestReport extends AbstractReport
         $ministries = MinistryService::all();
 
         foreach ($data['recipients'] as $user) {
-            $sender = Auth::user();
+            $sender = $this->authenticatedUser();
             Mail::to($data['address'][$user->id] ?? $user->email)->cc($sender)->queue(
                 new MinistryRequest($user, $sender, $data['ministry'], $data['services'], $data['text'])
             );

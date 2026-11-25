@@ -101,7 +101,9 @@ class LiturgyItemController extends Controller
     }
 
     /**
-     * Validate the request
+     * Validate the request.
+     *
+     * @return array<string, mixed>
      */
     protected function validateRequest(Request $request): array
     {

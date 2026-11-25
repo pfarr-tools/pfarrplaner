@@ -115,7 +115,7 @@ class Booking extends AbstractModel
     }
 
     /**
-     * @return BelongsTo
+     * @return string
      */
     public function getLabelAttribute(): string
     {
@@ -154,6 +154,6 @@ class Booking extends AbstractModel
 
     public static function createCode(): string
     {
-        return str_pad(dechex(rand(0x100000, 0xFFFFFF)), 6, 0, STR_PAD_LEFT);
+        return str_pad(dechex(rand(0x100000, 0xFFFFFF)), 6, '0', STR_PAD_LEFT);
     }
 }

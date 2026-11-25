@@ -63,7 +63,7 @@ class Attachment extends AbstractModel
     ];
 
     /**
-     * @var string[]
+     * @var list<string>
      */
     protected $fillable = ['title', 'file', 'attachable_id', 'attachable_type', 'cut'];
 
@@ -116,7 +116,7 @@ class Attachment extends AbstractModel
             return '';
         }
 
-        return Storage::mimeType($this->file);
+        return Storage::mimeType($this->file) ?: '';
     }
 
     /**

@@ -43,11 +43,15 @@ class SeatingRowPolicy
 
     public function update(User $user, SeatingRow $seatingRow): bool
     {
-        return $user->can('update', $seatingRow->seatingSection->location);
+        $location = $seatingRow->seatingSection?->location;
+
+        return $location !== null && $user->can('update', $location);
     }
 
     public function delete(User $user, SeatingRow $seatingRow): bool
     {
-        return $user->can('delete', $seatingRow->seatingSection->location);
+        $location = $seatingRow->seatingSection?->location;
+
+        return $location !== null && $user->can('delete', $location);
     }
 }

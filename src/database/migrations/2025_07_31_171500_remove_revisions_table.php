@@ -36,7 +36,12 @@ use Illuminate\Support\Facades\Schema;
  */
 class RemoveRevisionsTable extends Migration
 {
-    public function up()
+    /**
+     * Entfernt die Tabelle revisions.
+     *
+     * @return void
+     */
+    public function up(): void
     {
         Schema::drop('revisions');
     }

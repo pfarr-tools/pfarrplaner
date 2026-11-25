@@ -45,7 +45,12 @@ class PrincipalBackend implements BackendInterface
      */
     public const PRINCIPAL_PREFIX = 'principals/';
 
-    public function getPrincipals()
+    /**
+     * List all principals that have calendar connections.
+     *
+     * @return list<array{uri: string, ...}> Principals in Sabre's principal backend format.
+     */
+    public function getPrincipals(): array
     {
         $principals = [];
         foreach (User::whereHas('calendarConnections')->get() as $user) {
@@ -60,7 +65,13 @@ class PrincipalBackend implements BackendInterface
         return $principals;
     }
 
-    public function getPrincipalsByPrefix($prefixPath)
+    /**
+     * List principals whose URI starts with the given prefix.
+     *
+     * @param  string  $prefixPath  Principal URI prefix to filter for.
+     * @return array<int, array{uri: string, ...}> Matching principals in Sabre's principal backend format.
+     */
+    public function getPrincipalsByPrefix($prefixPath): array
     {
         $prefixPath = Str::finish($prefixPath, '/');
 
@@ -69,7 +80,13 @@ class PrincipalBackend implements BackendInterface
         });
     }
 
-    public function getPrincipalByPath($path)
+    /**
+     * Return the principal with the given URI.
+     *
+     * @param  string  $path  Full principal URI to look up.
+     * @return array{uri: string, ...}|array{} The principal, or an empty array if none matches.
+     */
+    public function getPrincipalByPath($path): array
     {
         foreach ($this->getPrincipalsByPrefix(static::PRINCIPAL_PREFIX) as $principal) {
             if ($principal['uri'] === $path) {
@@ -80,12 +97,26 @@ class PrincipalBackend implements BackendInterface
         return [];
     }
 
-    public function updatePrincipal($path, PropPatch $propPatch)
+    /**
+     * Handle property updates, which are not supported for external principals.
+     *
+     * @param  string  $path  Full principal URI to update.
+     * @param  PropPatch  $propPatch  Requested property mutations.
+     */
+    public function updatePrincipal($path, PropPatch $propPatch): void
     {
         // not implemented
     }
 
-    public function searchPrincipals($prefixPath, array $searchProperties, $test = 'allof')
+    /**
+     * Search principals by WebDAV property values.
+     *
+     * @param  string  $prefixPath  Principal URI prefix to search in.
+     * @param  array<string, mixed>  $searchProperties  Property names mapped to expected values.
+     * @param  string  $test  Combination mode: 'allof' or 'anyof'.
+     * @return list<string> URIs of the matching principals.
+     */
+    public function searchPrincipals($prefixPath, array $searchProperties, $test = 'allof'): array
     {
         $result = [];
         $principals = $this->getPrincipalsByPrefix($prefixPath);
@@ -111,6 +142,11 @@ class PrincipalBackend implements BackendInterface
         return $result;
     }
 
+    /**
+     * @param  string  $uri  Principal URI.
+     * @param  string  $principalPrefix  Prefix to search in.
+     * @return string|null
+     */
     public function findByUri($uri, $principalPrefix)
     {
         $principalPrefix = Str::finish($principalPrefix, '/');
@@ -124,7 +160,13 @@ class PrincipalBackend implements BackendInterface
         return null;
     }
 
-    public function getGroupMemberSet($principal)
+    /**
+     * Return the group members of a principal, which is the principal itself.
+     *
+     * @param  string  $principal  Full principal URI to look up.
+     * @return list<string> URIs of the group members.
+     */
+    public function getGroupMemberSet($principal): array
     {
         $principal = $this->getPrincipalByPath($principal);
         if (! $principal) {
@@ -136,12 +178,24 @@ class PrincipalBackend implements BackendInterface
         ];
     }
 
-    public function getGroupMembership($principal)
+    /**
+     * Return the groups a principal belongs to, which is the principal itself.
+     *
+     * @param  string  $principal  Full principal URI to look up.
+     * @return list<string> URIs of the groups.
+     */
+    public function getGroupMembership($principal): array
     {
         return $this->getGroupMemberSet($principal);
     }
 
-    public function setGroupMemberSet($principal, array $members)
+    /**
+     * Handle group member updates, which are not supported for external principals.
+     *
+     * @param  string  $principal  Full principal URI to update.
+     * @param  list<string>  $members  URIs of the requested group members.
+     */
+    public function setGroupMemberSet($principal, array $members): void
     {
         // not implemented
     }

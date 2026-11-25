@@ -18,8 +18,13 @@ class EmailLoginLinkController extends Controller
 {
     private const GENERIC_STATUS = 'Wenn die Adresse zu einem Konto gehört, das sich anmelden kann, senden wir einen Anmeldelink. Bitte prüfen Sie Ihr Postfach.';
 
-    /** Send a generic passwordless sign-in response for known and unknown addresses. */
-    public function request(Request $request)
+    /**
+     * Send a generic passwordless sign-in response for known and unknown addresses.
+     *
+     * @param  Request  $request  Current login-link request.
+     * @return RedirectResponse Redirect to the login page with a generic status message.
+     */
+    public function request(Request $request): RedirectResponse
     {
         $validated = $request->validate(['email' => ['required', 'string', 'email', 'max:254']]);
         $email = mb_strtolower(trim($validated['email']));
@@ -33,8 +38,14 @@ class EmailLoginLinkController extends Controller
         return redirect()->route('login')->with('status', self::GENERIC_STATUS);
     }
 
-    /** Validate a nonce without consuming it, then redirect away from its URL. */
-    public function open(Request $request, string $token)
+    /**
+     * Validate a nonce without consuming it, then redirect away from its URL.
+     *
+     * @param  Request  $request  Current login-link request.
+     * @param  string  $token  One-time nonce from the email link.
+     * @return RedirectResponse Redirect to the login page or the confirmation form.
+     */
+    public function open(Request $request, string $token): RedirectResponse
     {
         $link = strlen($token) === 64
             ? DB::table('passwordless_login_links')->where('token_hash', hash('sha256', $token))
@@ -88,7 +99,7 @@ class EmailLoginLinkController extends Controller
                 return ['state' => 'invalid'];
             }
 
-            $user = User::query()->lockForUpdate()->find($link->user_id);
+            $user = User::query()->lockForUpdate()->whereKey($link->user_id)->first();
             if (! $user || ! $user->isOfficialUser || $user->isLocked) {
                 DB::table('passwordless_login_links')->where('id', $link->id)->update([
                     'consumed_at' => now(),

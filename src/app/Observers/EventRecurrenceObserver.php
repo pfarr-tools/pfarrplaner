@@ -73,11 +73,16 @@ class EventRecurrenceObserver
         Occurence::where('service_id', $service->id)->delete();
         //        }
 
+        $date = $service->date;
+        if (! $date) {
+            return;
+        }
+
         // create default occurence
         Occurence::create([
             'service_id' => $service->id,
             'start' => $service->date,
-            'end' => $service->date->copy()->addMinutes($service->duration),
+            'end' => $date->copy()->addMinutes($service->duration),
         ]);
 
         //        if (($service->rrule) && ($service->getOriginal('rrule') != $service->rrule)) {
@@ -89,8 +94,8 @@ class EventRecurrenceObserver
             }
             $rrule->setTimezone('Europe/Berlin');
             // Dates need to be converted to DateTime, since RRule has problems dealing with Carbon 3 objects
-            $rrule->setStartDate($service->date->copy()->setTimezone('Europe/Berlin')->toDateTime());
-            $rrule->setEndDate($service->date->copy()->setTimezone('Europe/Berlin')->addMinutes($service->duration)->toDateTime());
+            $rrule->setStartDate($date->copy()->setTimezone('Europe/Berlin')->toDateTime());
+            $rrule->setEndDate($date->copy()->setTimezone('Europe/Berlin')->addMinutes($service->duration)->toDateTime());
 
             // sanity check: no more than 5 years, no more than 5000 occurrences
             if ((! $rrule->getCount()) && (! $rrule->getUntil())) {

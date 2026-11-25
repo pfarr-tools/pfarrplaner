@@ -34,9 +34,11 @@ use App\Models\People\User;
 use App\Models\Places\City;
 use App\Models\Service;
 use GuzzleHttp\Client;
+use Illuminate\Support\Env;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Log;
 
+/** Registry f\u00fcr Installationen. */
 class InstanceRegistryService
 {
     /**
@@ -49,7 +51,7 @@ class InstanceRegistryService
      */
     public static function ping($debug = false)
     {
-        if (env('NO_PING')) {
+        if (Env::get('NO_PING')) {
             return;
         }
 

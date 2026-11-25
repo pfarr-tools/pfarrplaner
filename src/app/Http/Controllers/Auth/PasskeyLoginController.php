@@ -26,7 +26,7 @@ class PasskeyLoginController extends Controller
     public function options(Request $request, GenerateVerificationOptions $generate): JsonResponse
     {
         $options = $generate();
-        $issuedAt = now()->timestamp;
+        $issuedAt = (int) now()->timestamp;
         $request->session()->put('passkey.verification_options', WebAuthn::toJson($options));
         $request->session()->put('passkey.login.challenge', [
             'purpose' => 'login',

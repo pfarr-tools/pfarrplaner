@@ -38,7 +38,6 @@ use App\Services\FileNameService;
 use App\Services\NameService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
 use PhpOffice\PhpSpreadsheet\Exception;
@@ -70,8 +69,8 @@ class ServicesByWTCCategoryReport extends AbstractExcelDocumentReport
      */
     public function setup()
     {
-        $cities = Auth::user()->cities;
-        $people = User::visibleFor(Auth::user())->get();
+        $cities = $this->authenticatedUser()->cities;
+        $people = User::visibleFor($this->authenticatedUser())->get();
 
         return Inertia::render('Report/ServicesByWTCCategory/Setup', compact('cities', 'people'));
     }
@@ -92,41 +91,46 @@ class ServicesByWTCCategoryReport extends AbstractExcelDocumentReport
             ]
         );
 
-        $data['start'] = Carbon::createFromFormat('d.m.Y', $data['start'], 'Europe/Berlin')->setTime(0, 0, 0);
-        $data['end'] = Carbon::createFromFormat('d.m.Y', $data['end'], 'Europe/Berlin')->setTime(23, 59, 59);
+        $data['start'] = $this->requireParsedDate(Carbon::createFromFormat('d.m.Y', $data['start'], 'Europe/Berlin'))->setTime(0, 0, 0);
+        $data['end'] = $this->requireParsedDate(Carbon::createFromFormat('d.m.Y', $data['end'], 'Europe/Berlin'))->setTime(23, 59, 59);
 
         $cities = City::whereIn('id', $data['cities'])->get();
 
         $records = [];
         foreach ($data['people'] as $userId) {
-            $user = User::find($userId);
-            if ($user) {
-                $record = ['user' => $user];
+            $user = User::findOrFail((int) $userId);
+            $record = ['user' => $user, 'categories' => []];
 
-                // get all the user's services for a year
-                $serviceIds = Service::select('services.id')
-                    ->startingFrom($data['start'])
-                    ->endingAt($data['end'])
-                    ->inCities($data['cities'])
-                    ->userParticipates($user)
-                    ->get()->pluck('id');
+            // get all the user's services for a year
+            $serviceIds = Service::select('services.id')
+                ->startingFrom($data['start'])
+                ->endingAt($data['end'])
+                ->inCities($data['cities'])
+                ->userParticipates($user)
+                ->pluck('id');
 
-                $ptcCategories = Participant::where('user_id', $user->id)
-                    ->whereIn('service_id', $serviceIds)
-                    ->get()
-                    ->pluck('category')
-                    ->unique();
+            $ptcCategories = Participant::where('user_id', $user->id)
+                ->whereIn('service_id', $serviceIds)
+                ->pluck('category')
+                ->unique();
 
-                foreach ($ptcCategories as $ptcCategory) {
-                    foreach (['HG', 'WG', null] as $wtcCategory) {
-                        $record['categories'][$ptcCategory][($wtcCategory ?? 'ohne')] = Service::whereIn('services.id', $serviceIds)
-                            ->userParticipates($user, $ptcCategory)
-                            ->where('wtc_category', $wtcCategory)
-                            ->count();
-                    }
-                }
-                $records[] = $record;
+            foreach ($ptcCategories as $ptcCategory) {
+                $record['categories'][$ptcCategory] = [
+                    'HG' => Service::whereIn('services.id', $serviceIds)
+                        ->userParticipates($user, $ptcCategory)
+                        ->where('wtc_category', 'HG')
+                        ->count(),
+                    'WG' => Service::whereIn('services.id', $serviceIds)
+                        ->userParticipates($user, $ptcCategory)
+                        ->where('wtc_category', 'WG')
+                        ->count(),
+                    'ohne' => Service::whereIn('services.id', $serviceIds)
+                        ->userParticipates($user, $ptcCategory)
+                        ->whereNull('wtc_category')
+                        ->count(),
+                ];
             }
+            $records[] = $record;
         }
 
         Settings::setLocale('de');

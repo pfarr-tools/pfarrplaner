@@ -97,7 +97,7 @@ class ImageHelper
     /**
      * Get the width of an image
      *
-     * @param  $image  Path to image
+     * @param  string  $image  Path to image.
      * @return int Width
      */
     public static function getWidth($image)
@@ -113,7 +113,7 @@ class ImageHelper
     /**
      * Get the height of an image
      *
-     * @param  $image  Path to image
+     * @param  string  $image  Path to image.
      * @return int Height
      */
     public static function getHeight($image)
@@ -129,8 +129,8 @@ class ImageHelper
     /**
      * Get the proportional width of an image calculated from new height
      *
-     * @param  $image  Path to image
-     * @param  $newHeight  New height
+     * @param  string  $image  Path to image.
+     * @param  int|float  $newHeight  New height.
      * @return int New width
      */
     public static function getProportionalWidth($image, $newHeight)
@@ -143,15 +143,14 @@ class ImageHelper
             return 0;
         }
 
-        /** @var array $dimensions */
-        return floor(($dimensions[0] / $dimensions[1]) * $newHeight);
+        return (int) floor(($dimensions[0] / $dimensions[1]) * $newHeight);
     }
 
     /**
      * Get the proportional height of an image calculated from new width
      *
-     * @param  $image  Path to image
-     * @param  $newWidth  New width
+     * @param  string  $image  Path to image.
+     * @param  int|float  $newWidth  New width.
      * @return int New height
      */
     public static function getProportionalHeight($image, $newWidth)
@@ -164,15 +163,14 @@ class ImageHelper
             return 0;
         }
 
-        /** @var array $dimensions */
-        return floor(($dimensions[1] / $dimensions[0]) * $newWidth);
+        return (int) floor(($dimensions[1] / $dimensions[0]) * $newWidth);
     }
 
     /**
      * Get the IPTC data embedded in an image
      *
-     * @param  $image  Path to image
-     * @return array IPTC data
+     * @param  string  $image  Path to image.
+     * @return array<string, mixed> IPTC data
      */
     public static function IPTC($image)
     {
@@ -184,14 +182,14 @@ class ImageHelper
             return [];
         }
 
-        return iptcparse($meta['APP13']);
+        return iptcparse($meta['APP13']) ?: [];
     }
 
     /**
      * Get an embedded license string from IPTC data
      *
-     * @param  $image  Path to image
-     * @param  false  $withUrl  True, if a license URL should be included
+     * @param  string  $image  Path to image.
+     * @param  bool  $withUrl  True, if a license URL should be included
      * @return string License string
      */
     public static function getEmbeddedLicenseString($image, $withUrl = false)

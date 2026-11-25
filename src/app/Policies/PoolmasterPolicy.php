@@ -40,16 +40,21 @@ class PoolmasterPolicy
             return true;
         }
 
+        $poolmasterUser = $poolmaster->user;
+        if (! $poolmasterUser) {
+            return false;
+        }
+
         if ($user->hasPermissionTo('fremden-urlaub-bearbeiten')) {
-            $cityIds = $poolmaster->user->homeCities->pluck('id');
+            $cityIds = $poolmasterUser->homeCities->pluck('id');
             foreach ($user->writableCities as $city) {
-                if ($cityIds->contains($city->id) && (! $poolmaster->user->hasRole('Pfarrer:in'))) {
+                if ($cityIds->contains($city->id) && (! $poolmasterUser->hasRole('Pfarrer:in'))) {
                     return true;
                 }
             }
         }
 
-        if ($poolmaster->user->vacationAdmins->pluck('id')->contains($user->id)) {
+        if ($poolmasterUser->vacationAdmins->pluck('id')->contains($user->id)) {
             return true;
         }
 

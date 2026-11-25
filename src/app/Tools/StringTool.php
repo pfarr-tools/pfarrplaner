@@ -45,8 +45,11 @@ use Carbon\Carbon;
 class StringTool
 {
     /**
-     * @param  bool  $clockText
-     * @param  string  $separator
+     * Formatiert eine Uhrzeit im Format H:i als Text.
+     *
+     * @param  string  $s  Uhrzeit im Format H:i
+     * @param  bool  $clockText  " Uhr" anhängen
+     * @param  string  $separator  Trennzeichen zwischen Stunden und Minuten
      * @return string
      */
     public static function timeString($s, $clockText = true, $separator = ':')
@@ -54,6 +57,11 @@ class StringTool
         return Carbon::createFromTimeString($s)->isoFormat('HH'.$separator.'mm').($clockText ? ' Uhr' : '');
     }
 
+    /**
+     * @param  Carbon  $from  Start.
+     * @param  Carbon  $to  End.
+     * @return string
+     */
     public static function durationText(Carbon $from, Carbon $to): string
     {
         if ($from == $to) {
@@ -63,12 +71,15 @@ class StringTool
         } else {
             return $from->format('d.m.Y').' - '.$to->format('d.m.Y');
         }
-
-        return '';
     }
 
     /**
-     * @param  string  $zeroString
+     * Wählt abhängig von der Anzahl die Singular-, Plural- oder Null-Form.
+     *
+     * @param  int  $count  Anzahl, die die Wortform bestimmt
+     * @param  string  $singular  Singularform
+     * @param  string  $plural  Pluralform
+     * @param  string  $zeroString  Form für den Wert 0
      * @return string
      */
     public static function pluralString($count, $singular, $plural, $zeroString = '')
@@ -81,24 +92,31 @@ class StringTool
     }
 
     /**
+     * Kürzt einen Text am Wortende und kennzeichnet das Kürzen mit "...".
+     *
+     * @param  string  $s  Zu kürzender Text
+     * @param  int  $maxLength  Maximale Textlänge
      * @return string
      */
     public static function trimToLen($s, $maxLength)
     {
         if (strlen($s) > $maxLength) {
             $offset = ($maxLength - 3) - strlen($s);
-            $s = substr($s, 0, strrpos($s, ' ', $offset)).'...';
+            $s = substr($s, 0, strrpos($s, ' ', $offset) ?: 0).'...';
         }
 
         return $s;
     }
 
     /**
-     * @param  bool  $uhr
-     * @param  string  $separator
-     * @param  bool  $skipMinutes
-     * @param  bool  $nbsp
-     * @param  bool  $leadingZero
+     * Formatiert einen Zeitwert als Uhrzeittext.
+     *
+     * @param  mixed  $time  Unix-Zeitstempel, numerischer Zeitwert oder parsare Zeitangabe
+     * @param  bool  $uhr  " Uhr" anhängen
+     * @param  string  $separator  Trennzeichen zwischen Stunden und Minuten
+     * @param  bool  $skipMinutes  Minuten bei vollen Stunden ausblenden
+     * @param  bool  $nbsp  Geschütztes Leerzeichen vor "Uhr" verwenden
+     * @param  bool  $leadingZero  Stunde mit führender Null ausgeben
      * @return string
      */
     public static function timeText(
@@ -114,15 +132,18 @@ class StringTool
         }
         $format = ($leadingZero ? '%H' : '%k').$separator.'%M';
         if ($skipMinutes) {
-            if ((int) strftime('%M', $time) == 0) {
+            if ((int) strftime('%M', (int) $time) == 0) {
                 $format = '%H';
             }
         }
 
-        return trim(strftime($format, $time).($uhr ? ($nbsp ? '&nbsp;' : ' ').'Uhr' : ''));
+        return trim(strftime($format, (int) $time).($uhr ? ($nbsp ? '&nbsp;' : ' ').'Uhr' : ''));
     }
 
     /**
+     * Rückt die Zeilen eines Textes entsprechend ihrer HTML-Tiefe ein.
+     *
+     * @param  string  $text  Zu formatierender Text
      * @return string
      */
     public static function indent($text)
@@ -142,6 +163,10 @@ class StringTool
         return implode("\n", $lines);
     }
 
+    /**
+     * @param  string  $s  Input text.
+     * @return string
+     */
     public static function sanitizeXMLString(string $s): string
     {
         return htmlspecialchars($s, ENT_XML1 | ENT_COMPAT, 'UTF-8');

@@ -62,15 +62,22 @@ class AllServicesCalendarLink extends AbstractCalendarLink
     protected $needs = ['cities', 'includeHidden'];
 
     /**
-     * @return array
+     * Prepare the setup data for the all-services calendar.
+     *
+     * @return array<string, mixed> Cities available to the authenticated user.
      */
     public function setupData()
     {
-        $cities = Auth::user()->cities;
+        $user = Auth::user();
+        $cities = $user === null ? [] : $user->cities;
 
         return compact('cities');
     }
 
+    /**
+     * @param  Request  $request  Incoming request.
+     * @return void
+     */
     public function setDataFromRequest(Request $request)
     {
         $this->data['cities'] = implode('-', $request->get('includeCities') ?: []);

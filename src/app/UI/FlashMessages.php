@@ -53,7 +53,9 @@ class FlashMessages
     }
 
     /**
-     * @return array
+     * Gibt alle aus der Session stammenden Flash-Nachrichten zurück.
+     *
+     * @return array<int, array{text: mixed, class: string}> Nachrichten mit Text und Klasse
      */
     public static function all()
     {

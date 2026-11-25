@@ -47,6 +47,9 @@ class UpdateTeam extends AbstractUpdateAction implements UpdatesTeams
         return route('admin.teams.index');
     }
 
+    /**
+     * @param  array<string, mixed>  $input
+     */
     public function update(User $user, Team $team, array $input): Team
     {
         Gate::forUser($user)->authorize('update', $team);

@@ -38,13 +38,14 @@ use App\Models\People\Participant;
 class MinistryService
 {
     /**
-     * Get all available ministries
+     * Get all available ministries.
      *
      * @param  bool  $includeBasicMinistries  Include P/O/M/A ?
+     * @return array<string, string> Ministry labels keyed by their identifier.
      */
     public static function all(bool $includeBasicMinistries = false): array
     {
-        $ministries = Participant::all()
+        $ministries = Participant::query()
             ->pluck('category')
             ->unique()
             ->reject(function ($item) {
@@ -61,7 +62,13 @@ class MinistryService
         return $m;
     }
 
-    public static function title($title): string
+    /**
+     * Resolve the display label for a ministry identifier.
+     *
+     * @param  string  $title  Ministry identifier or custom ministry name.
+     * @return string Display label for the given ministry.
+     */
+    public static function title(string $title): string
     {
         if ($title == 'P') {
             return config('labels.pastor');
@@ -79,15 +86,25 @@ class MinistryService
         return $title;
     }
 
+    /**
+     * Get the labels for the four basic P/O/M/A ministries.
+     *
+     * @return array<string, string> Ministry labels keyed by their identifier.
+     */
     public static function POMA(): array
     {
         return ['P' => config('labels.pastor'), 'O' => config('labels.organist'), 'M' => config('labels.sacristan'), 'A' => 'Weitere Beteiligte'];
     }
 
+    /**
+     * Get all ministries as id/name pairs for selection widgets.
+     *
+     * @return array<int, array{id: string, name: string}> Ministry id/name pairs.
+     */
     public static function selectList(): array
     {
         $ministries = [];
-        foreach (Participant::all()->pluck('category')->unique() as $ministry) {
+        foreach (Participant::query()->pluck('category')->unique() as $ministry) {
             $ministries[] = [
                 'id' => $ministry,
                 'name' => self::POMA()[$ministry] ?? $ministry,

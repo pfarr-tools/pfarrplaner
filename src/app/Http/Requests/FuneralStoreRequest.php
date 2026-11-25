@@ -49,9 +49,13 @@ class FuneralStoreRequest extends FormRequest
     }
 
     /**
-     * @return array
+     * Return validated data with defaults set and dates parsed.
+     *
+     * @param  string|null  $key  Optional validated value key.
+     * @param  mixed  $default  Fallback value kept for FormRequest compatibility.
+     * @return array<string, mixed>
      */
-    public function validated($key = null, $default = null)
+    public function validated($key = null, $default = null): array
     {
         $data = parent::validated();
         foreach (
@@ -128,9 +132,9 @@ class FuneralStoreRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array
+     * @return array<string, mixed>
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             'service_id' => 'required|int|exists:services,id',

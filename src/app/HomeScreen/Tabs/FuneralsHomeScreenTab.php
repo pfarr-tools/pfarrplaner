@@ -33,14 +33,22 @@ namespace App\HomeScreen\Tabs;
 use App\Models\Rites\Funeral;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\Auth;
 
+/** Home screen tab or API controller. */
 class FuneralsHomeScreenTab extends AbstractHomeScreenTab
 {
     protected $title = 'Beerdigungen';
 
     protected $description = 'Zeigt die anstehenden Beerdigungen';
 
+    /** @var Builder<Funeral> */
+    protected $query;
+
+    /**
+     *   construct.
+     *
+     * @return mixed
+     */
     public function __construct($config = [])
     {
         $this->setDefaultConfig($config, ['mine' => 0, 'newestFirst' => 0, 'excludeProcessed' => 0]);
@@ -48,6 +56,9 @@ class FuneralsHomeScreenTab extends AbstractHomeScreenTab
         $this->query = $this->buildQuery();
     }
 
+    /**
+     * Gettitle.
+     */
     public function getTitle(): string
     {
         if ($this->config['mine']) {
@@ -57,11 +68,21 @@ class FuneralsHomeScreenTab extends AbstractHomeScreenTab
         return parent::getTitle();
     }
 
+    /**
+     * Getcount.
+     *
+     * @return mixed
+     */
     public function getCount()
     {
         return $this->query->count();
     }
 
+    /**
+     * Getcontent.
+     *
+     * @return mixed
+     */
     public function getContent($data = [])
     {
         $data['funerals'] = $this->query->get();
@@ -69,6 +90,11 @@ class FuneralsHomeScreenTab extends AbstractHomeScreenTab
         return parent::getContent($data);
     }
 
+    /**
+     * Toarray.
+     *
+     * @return mixed
+     */
     public function toArray($data = [])
     {
         $data['funerals'] = $this->query->get();
@@ -85,9 +111,9 @@ class FuneralsHomeScreenTab extends AbstractHomeScreenTab
     public function buildQuery()
     {
         $start = Carbon::now()->setTime(0, 0, 0);
-        $end = Carbon::now()->addMonth(2);
+        $end = Carbon::now()->addMonth();
 
-        $order = $this->config['newestFirst'] ? 'DESC' : 'ASC';
+        $order = $this->config['newestFirst'] ? 'desc' : 'asc';
 
         $query = Funeral::with(['service'])
             ->select('funerals.*')
@@ -105,11 +131,11 @@ class FuneralsHomeScreenTab extends AbstractHomeScreenTab
                     $service->whereHas(
                         'participants',
                         function ($query) {
-                            $query->where('user_id', Auth::user()->id);
+                            $query->where('user_id', $this->user()->id);
                         }
                     );
                 } else {
-                    $service->inCities(Auth::user()->writableCities->pluck('id'));
+                    $service->inCities($this->user()->writableCities->pluck('id'));
                 }
             })->orderBy('services.date', $order);
 

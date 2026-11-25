@@ -17,7 +17,7 @@ return new class extends Migration
         // event_class is introduced by a later migration than this data fix.
         foreach (Service::withoutGlobalScope(ServicesOnlyScope::class)
             ->whereNotNull('alt_liturgy_date')->whereNull('liturgy_info_id')->get() as $service) {
-            $x = LiturgyService::getLiturgyInfoByDate($service->alt_liturgy_date);
+            $x = LiturgyService::getLiturgyInfoByDate((string) ($service->alt_liturgy_date ?? $service->date));
             if (count($x)) {
                 $service->update(['liturgy_info_id' => $x->first()->id]);
             }

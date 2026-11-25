@@ -43,10 +43,17 @@ class BekanntgabenReplacer extends AbstractReplacer
     protected function getReplacementText(): string
     {
         $service = $this->service;
-        $lastWeek = Carbon::createFromTimeString($service->date->format('Y-m-d').' 0:00:00 last Sunday');
-        $nextWeek = Carbon::createFromTimeString($service->date->format('Y-m-d').' 0:00:00 next Sunday');
+        if ($service === null) {
+            return '';
+        }
+        $city = $service->city;
+        if ($city === null) {
+            return '';
+        }
+        $lastWeek = Carbon::createFromTimeString($service->trueDate()->format('Y-m-d').' 0:00:00 last Sunday');
+        $nextWeek = Carbon::createFromTimeString($service->trueDate()->format('Y-m-d').' 0:00:00 next Sunday');
         $lastServices = Service::select('*')
-            ->endingAt($service->date->copy()->subSecond(1))
+            ->endingAt($service->trueDate()->copy()->subSecond())
             ->where('offering_amount', '!=', '')
             ->orderedDesc()
             ->limit(10)
@@ -56,7 +63,7 @@ class BekanntgabenReplacer extends AbstractReplacer
         $offeringAmount = 0;
         foreach ($lastServices as $lastService) {
             if ($lastServiceDate === null) {
-                $lastServiceDate = $lastService->date;
+                $lastServiceDate = $lastService->trueDate();
             }
             if ($lastServiceDate != $lastService->date) {
                 continue;
@@ -71,10 +78,10 @@ class BekanntgabenReplacer extends AbstractReplacer
             ->displayable()
             ->whereHas(
                 'day',
-                function ($query) use ($service, $nextWeek) {
-                    $query->where('date', '>=', $service->date);
+                function ($query) use ($service, $nextWeek, $city) {
+                    $query->where('date', '>=', $service->trueDate());
                     $query->where('date', '<=', $nextWeek);
-                    $query->where('city_id', $service->city->id);
+                    $query->where('city_id', $city->id);
                     $query->where('id', '!=', $service->id);
                 }
             )
@@ -82,18 +89,18 @@ class BekanntgabenReplacer extends AbstractReplacer
 
         $events = [];
 
-        $calendar = new EventCalendarImport($service->city->public_events_calendar_url);
-        $events = $calendar->mix($events, $service->date, $nextWeek, true);
+        $calendar = new EventCalendarImport($city->public_events_calendar_url ?? '');
+        $events = $calendar->mix($events, $service->trueDate(), $nextWeek, true);
 
-        $events = Service::mix($events, $services, $service->date, $nextWeek);
+        $events = Service::mix($events, $services, $service->trueDate(), $nextWeek);
 
-        $op = new OPEventsImport($service->city);
-        $events = $op->mix($events, $service->date, $nextWeek);
+        $op = new OPEventsImport($city);
+        $events = $op->mix($events, $service->trueDate(), $nextWeek);
 
         $fmt = new \NumberFormatter('de_DE', \NumberFormatter::CURRENCY);
 
         $text = 'Herzlichen Dank für das Opfer der Gottesdienste vom '
-            .$lastServiceDate->format('d.m.Y').' in Höhe von '
+            .$lastServiceDate?->format('d.m.Y').' in Höhe von '
             .$fmt->formatCurrency($offeringAmount, 'EUR').'.'
             .PHP_EOL.PHP_EOL;
 
@@ -108,7 +115,7 @@ class BekanntgabenReplacer extends AbstractReplacer
                 $done = false;
 
                 if (is_array($event)) {
-                    if ($service->date->format('Ymd') == $eventStart->format('Ymd')) {
+                    if ($service->trueDate()->format('Ymd') == $eventStart->format('Ymd')) {
                         if ($event['allDay']) {
                             $text .= $this->renderParagraph($event['title']);
                             $done = true;
@@ -124,8 +131,8 @@ class BekanntgabenReplacer extends AbstractReplacer
                         }
 
                         $text .= $this->renderParagraph(
-                            ($service->date->format('Ymd') == $eventStart->format('Ymd')) ?
-                                'Heute' : strftime($dateFormat, $eventStart->getTimestamp())
+                            ($service->trueDate()->format('Ymd') == $eventStart->format('Ymd')) ?
+                                'Heute' : (string) strftime($dateFormat, $eventStart->getTimestamp())
                         );
                     }
 
@@ -144,7 +151,7 @@ class BekanntgabenReplacer extends AbstractReplacer
                         $description = $event->descriptionText();
                         $description = $description ? ' mit '.$description : '';
                         // take care of ampersands
-                        $description = preg_replace('/&(?![A-Za-z0-9#]{1,7};)/', '&amp;', $description);
+                        $description = (string) preg_replace('/&(?![A-Za-z0-9#]{1,7};)/', '&amp;', $description);
                         $text .= $this->renderParagraph(
                             $event->timeText(true, '.')."\t".trim(
                                 ($event->title ?: 'Gottesdienst').$description.' ('.$event->locationText().')'
@@ -153,16 +160,15 @@ class BekanntgabenReplacer extends AbstractReplacer
 
                         // add children's church
                         if ($event->cc) {
-                            $text .= $this->renderParagraph(
-                                Carbon::createFromFormat(
-                                    'Y-m-d H:i',
-                                    $event->date->format(
-                                        'Y-m-d'
-                                    ).' '.($event->cc_alt_time ?? $event->time)
-                                )->isoFormat(
-                                    'HH.mm \U\h\r'
-                                )."\t".'Kinderkirche'.' ('.($event->cc_location ?? $event->locationText()).')'
+                            $childChurchStart = Carbon::createFromFormat(
+                                'Y-m-d H:i',
+                                $event->trueDate()->format('Y-m-d').' '.($event->cc_alt_time ?? $event->time)
                             );
+                            if ($childChurchStart !== null) {
+                                $text .= $this->renderParagraph(
+                                    $childChurchStart->isoFormat('HH.mm \U\h\r')."\t".'Kinderkirche'.' ('.($event->cc_location ?? $event->locationText()).')'
+                                );
+                            }
                         }
                     }
 

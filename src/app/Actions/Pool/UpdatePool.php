@@ -48,6 +48,9 @@ class UpdatePool extends AbstractUpdateAction implements UpdatesPools
         return route('admin.pools.index');
     }
 
+    /**
+     * @param  array<string, mixed>  $input
+     */
     public function update(User $user, Pool $pool, array $input): Pool
     {
         Gate::forUser($user)->authorize('update', $pool);

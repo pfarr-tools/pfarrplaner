@@ -20,7 +20,11 @@ class RecoverTwoFactorRequest extends FormRequest
             && $actor->can('recoverTwoFactor', $target);
     }
 
-    /** Return a current TOTP code and a constrained support reference. */
+    /**
+     * Return a current TOTP code and a constrained support reference.
+     *
+     * @return array<string, array<int, string>>
+     */
     public function rules(): array
     {
         return [

@@ -43,18 +43,23 @@ class TermineReplacer extends AbstractReplacer
     protected function getReplacementText(): string
     {
         $service = $this->service;
-        $lastWeek = Carbon::createFromTimeString($service->date->format('Y-m-d').' 0:00:00 last Sunday');
-        $nextWeek = Carbon::createFromTimeString($service->date->format('Y-m-d').' 0:00:00 next Sunday');
+        $serviceDate = $service->trueDate();
+        $city = $service->city;
+        if ($city === null) {
+            return '';
+        }
+        $lastWeek = Carbon::parse($serviceDate->format('Y-m-d').' last Sunday');
+        $nextWeek = Carbon::parse($serviceDate->format('Y-m-d').' next Sunday');
 
         $services = Service::with(['day', 'location'])
             ->displayable()
             ->whereDoesntHave('funerals')
             ->whereHas(
                 'day',
-                function ($query) use ($service, $nextWeek) {
-                    $query->where('date', '>=', $service->date);
+                function ($query) use ($service, $serviceDate, $city, $nextWeek) {
+                    $query->where('date', '>=', $serviceDate);
                     $query->where('date', '<=', $nextWeek);
-                    $query->where('city_id', $service->city->id);
+                    $query->where('city_id', $city->id);
                     $query->where('id', '!=', $service->id);
                 }
             )
@@ -62,13 +67,13 @@ class TermineReplacer extends AbstractReplacer
 
         $events = [];
 
-        $calendar = new EventCalendarImport($service->city->public_events_calendar_url);
-        $events = $calendar->mix($events, $service->date, $nextWeek, true);
+        $calendar = new EventCalendarImport($city->public_events_calendar_url);
+        $events = $calendar->mix($events, $serviceDate, $nextWeek, true);
 
-        $events = Service::mix($events, $services, $service->date, $nextWeek);
+        $events = Service::mix($events, $services, $serviceDate, $nextWeek);
 
-        $op = new OPEventsImport($service->city);
-        $events = $op->mix($events, $service->date, $nextWeek);
+        $op = new OPEventsImport($city);
+        $events = $op->mix($events, $serviceDate, $nextWeek);
 
         $text = '';
 
@@ -76,12 +81,12 @@ class TermineReplacer extends AbstractReplacer
         $lastDay = $nextWeek->format('Ymd');
         foreach ($events as $eventsArray) {
             foreach ($eventsArray as $event) {
-                $eventStart = is_array($event) ? $event['start'] : $event->date;
+                $eventStart = is_array($event) ? $event['start'] : $event->trueDate();
                 $dateFormat = $ctr ? '%A, %d. %B' : '%A, %d. %B %Y';
                 $done = false;
 
                 if (is_array($event)) {
-                    if ($service->date->format('Ymd') == $eventStart->format('Ymd')) {
+                    if ($serviceDate->format('Ymd') == $eventStart->format('Ymd')) {
                         if ($event['allDay']) {
                             $text .= $this->renderParagraph($event['title']);
                             $done = true;
@@ -97,8 +102,8 @@ class TermineReplacer extends AbstractReplacer
                         }
 
                         $text .= $this->renderParagraph(
-                            ($service->date->format('Ymd') == $eventStart->format('Ymd')) ?
-                                'Heute' : strftime($dateFormat, $eventStart->getTimestamp())
+                            ($serviceDate->format('Ymd') == $eventStart->format('Ymd')) ?
+                                'Heute' : (string) strftime($dateFormat, $eventStart->getTimestamp())
                         );
                     }
 
@@ -117,7 +122,7 @@ class TermineReplacer extends AbstractReplacer
                         $description = $event->descriptionText();
                         $description = $description ? ' mit '.$description : '';
                         // take care of ampersands
-                        $description = preg_replace('/&(?![A-Za-z0-9#]{1,7};)/', '&amp;', $description);
+                        $description = (string) preg_replace('/&(?![A-Za-z0-9#]{1,7};)/', '&amp;', $description);
                         $text .= $this->renderParagraph(
                             $event->timeText(true, '.')."\t".trim(
                                 ($event->title ?: 'Gottesdienst').$description.' ('.$event->locationText().')'
@@ -126,16 +131,15 @@ class TermineReplacer extends AbstractReplacer
 
                         // add children's church
                         if ($event->cc) {
-                            $text .= $this->renderParagraph(
-                                Carbon::createFromFormat(
-                                    'Y-m-d H:i',
-                                    $event->date->format(
-                                        'Y-m-d'
-                                    ).' '.($event->cc_alt_time ?? $event->time)
-                                )->isoFormat(
-                                    'HH.mm \U\h\r'
-                                )."\t".'Kinderkirche'.' ('.($event->cc_location ?? $event->locationText()).')'
+                            $childChurchStart = Carbon::createFromFormat(
+                                'Y-m-d H:i',
+                                $event->trueDate()->format('Y-m-d').' '.($event->cc_alt_time ?? $event->time)
                             );
+                            if ($childChurchStart !== null) {
+                                $text .= $this->renderParagraph(
+                                    $childChurchStart->isoFormat('HH.mm \U\h\r')."\t".'Kinderkirche'.' ('.($event->cc_location ?? $event->locationText()).')'
+                                );
+                            }
                         }
                     }
 

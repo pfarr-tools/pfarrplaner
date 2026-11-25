@@ -45,6 +45,9 @@ class UpdateAdConfig extends AbstractUpdateAction implements UpdatesAdConfigs
         return '';
     }
 
+    /**
+     * @param  array<string, mixed>  $input
+     */
     public function update(User $user, AdConfig $adConfig, array $input): AdConfig
     {
         Gate::forUser($user)->authorize('update', $adConfig);

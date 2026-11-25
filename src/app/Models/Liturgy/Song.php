@@ -121,8 +121,8 @@ class Song extends AbstractModel
     {
         /** @var Song $model */
         $model = parent::getEmptyModel();
-        $model->verses = new Collection;
-        $model->songbooks = new Collection;
+        $model->setRelation('verses', new Collection);
+        $model->setRelation('songbooks', new Collection);
 
         return $model;
     }
@@ -165,6 +165,9 @@ class Song extends AbstractModel
         return $this->belongsToMany(Songbook::class)->withPivot(['id', 'reference', 'code', 'color']);
     }
 
+    /**
+     * @param array<string, mixed> $data
+     */
     public function syncVersesFromRequest(array $data): void
     {
         $this->verses()->delete();
@@ -174,6 +177,9 @@ class Song extends AbstractModel
         }
     }
 
+    /**
+     * @param array<string, mixed> $data
+     */
     public function syncSongbooksFromRequest(array $data): void
     {
         if (! isset($data['songbooks'])) {

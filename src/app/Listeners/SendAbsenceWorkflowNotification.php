@@ -31,7 +31,6 @@
 namespace App\Listeners;
 
 use App\Events\AbsenceUpdated;
-use App\Events\OrderShipped;
 use App\Mail\Absence\AbsenceApproved;
 use App\Mail\Absence\AbsenceChecked;
 use App\Mail\Absence\AbsenceRequested;
@@ -57,14 +56,20 @@ class SendAbsenceWorkflowNotification
     /**
      * Handle the event.
      *
-     * @param  OrderShipped  $event
      * @return void
      */
     public function handle(AbsenceUpdated $event)
     {
         Log::debug('SendAbsenceWorkflowNotification::handle()');
+        $user = $event->absence->user;
+        if ($user === null) {
+            Log::debug('SendAbsenceWorkflowNotification abgebrochen, weil kein Benutzer zugeordnet ist.');
+
+            return;
+        }
+
         // do nothing, if no workflow is defined
-        if ((! $event->absence->user->vacationAdmins->count()) && ! $event->absence->user->vacationApprovers->count()) {
+        if ((! $user->vacationAdmins->count()) && ! $user->vacationApprovers->count()) {
             Log::debug('SendAbsenceWorkflowNotification abgebrochen, weil kein Workflow definiert ist.');
 
             return;
@@ -72,25 +77,26 @@ class SendAbsenceWorkflowNotification
 
         // check workflow status and send appropriate notifications
         $message = null;
+        $recipients = collect();
         switch ($event->absence->workflow_status) {
             case Absence::STATUS_NEW:
-                $recipients = $event->absence->user->vacationAdmins->reject(function ($user) {
+                $recipients = $user->vacationAdmins->reject(function ($user) {
                     // filter out users without email address
                     return empty($user->email);
                 });
                 $message = new AbsenceRequested($event->absence);
                 break;
             case Absence::STATUS_CHECKED:
-                $recipients = $event->absence->user->vacationApprovers->reject(function ($user) {
+                $recipients = $user->vacationApprovers->reject(function ($user) {
                     // filter out users without email address
                     return empty($user->email);
                 });
                 $message = new AbsenceChecked($event->absence);
                 break;
             case Absence::STATUS_APPROVED:
-                $recipients = collect([$event->absence->user])
-                    ->merge($event->absence->user->vacationAdmins)
-                    ->merge($event->absence->user->vacationApprovers)
+                $recipients = collect([$user])
+                    ->merge($user->vacationAdmins)
+                    ->merge($user->vacationApprovers)
                     ->reject(function ($user) {
                         // filter out users without email address
                         return empty($user->email);

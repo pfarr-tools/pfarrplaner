@@ -45,6 +45,12 @@ class UpdateSong extends AbstractUpdateAction implements UpdatesSongs
         return route('admin.songs.index');
     }
 
+    /**
+     * Aktualisiert ein Lied und synchronisiert dessen Verse und Liederbücher.
+     *
+     * @param  array<string, mixed>  $input
+     * @return Song
+     */
     public function update(User $user, Song $song, array $input): Song
     {
         Gate::forUser($user)->authorize('update', $song);

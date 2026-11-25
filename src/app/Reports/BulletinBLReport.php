@@ -33,16 +33,15 @@ namespace App\Reports;
 use App\FileFormats\IDML;
 use App\Models\Calendar\Day;
 use App\Models\Location;
+use App\Models\People\User;
 use App\Models\Service;
 use App\Models\ServiceGroup;
 use App\Services\LiturgyService;
 use App\Tools\StringTool;
 use Carbon\Carbon;
-use Illuminate\Contracts\Foundation\Application;
-use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\View as ViewFacade;
 use Illuminate\View\View;
 use PhpOffice\PhpWord\Exception\Exception;
 use Throwable;
@@ -78,7 +77,7 @@ class BulletinBLReport extends AbstractPDFDocumentReport
     public $formats = ['Balingen'];
 
     /**
-     * @var float[]
+     * @var array<int, list<float>>
      */
     protected $cols = [
         [21.6102362202077, -489.32677165354335, 7948.082677164984, -350.9017990755136, 7978.082677164984],
@@ -89,7 +88,7 @@ class BulletinBLReport extends AbstractPDFDocumentReport
     ];
 
     /**
-     * @var array
+     * @var array<string, float>
      */
     protected $tagWidth = [
         'abendmahl' => 2.399,
@@ -104,7 +103,7 @@ class BulletinBLReport extends AbstractPDFDocumentReport
     ];
 
     /**
-     * @var float[]
+     * @var array<string, array{float, float}>
      */
     protected $tagBaseCoords = [
         'abendmahl' => [-488.45233093682400, -596.13678866970800],
@@ -126,22 +125,28 @@ class BulletinBLReport extends AbstractPDFDocumentReport
      */
     public function isActive(): bool
     {
-        return Auth::user()->writableCities->pluck('name')->contains('Balingen');
+        $user = auth()->user();
+        if (! $user instanceof User) {
+            return false;
+        }
+
+        return $user->writableCities->pluck('name')->contains('Balingen');
     }
 
     /**
-     * @return Application|Factory|View
+     * @return \Illuminate\Contracts\View\View
      */
     public function setup()
     {
-        $maxDate = Day::orderBy('date', 'DESC')->limit(1)->get()->first();
-        $cities = Auth::user()->cities;
+        $maxDate = Day::orderBy('date', 'desc')->limit(1)->first();
+        $user = $this->authenticatedUser();
+        $cities = $user->cities;
 
         return $this->renderView('setup', ['maxDate' => $maxDate, 'cities' => $cities, 'formats' => $this->formats]);
     }
 
     /**
-     * @return Application|Factory|View
+     * @return \Illuminate\Contracts\View\View
      */
     public function configure(Request $request)
     {
@@ -158,15 +163,20 @@ class BulletinBLReport extends AbstractPDFDocumentReport
         $end = $request->get('end');
 
         $locations = Location::with('alternateLocation')->inCities($includeCities)->get();
-        $presets = explode(',', Auth::user()->getSetting('report.bulletinbl.locationpresets', '-1,-1,-1,-1'));
+        $user = $this->authenticatedUser();
+        $presets = explode(',', $user->getSetting('report.bulletinbl.locationpresets', '-1,-1,-1,-1'));
 
         return $this->renderView('configure', compact('start', 'end', 'includeCities', 'locations', 'presets'));
     }
 
+    /**
+     * @return mixed
+     */
     public function empty(Request $request)
     {
         $locationIds = $request->get('locations');
-        Auth::user()->setSetting('report.bulletinbl.locationpresets', implode(',', $locationIds));
+        $user = $this->authenticatedUser();
+        $user->setSetting('report.bulletinbl.locationpresets', implode(',', $locationIds));
         $locations = Location::whereIn('id', $locationIds)->get();
 
         $start = $request->get('start');
@@ -177,11 +187,11 @@ class BulletinBLReport extends AbstractPDFDocumentReport
 
         $dates = Service::select(DB::raw('DISTINCT DATE(date) AS day'))
             ->between(
-                Carbon::createFromFormat('d.m.Y H:i:s', $request->get('start').' 0:00:00'),
-                Carbon::createFromFormat('d.m.Y H:i:s', $request->get('end').' 23:59:59')
+                $this->requireParsedDate(Carbon::createFromFormat('d.m.Y H:i:s', $request->get('start').' 0:00:00')),
+                $this->requireParsedDate(Carbon::createFromFormat('d.m.Y H:i:s', $request->get('end').' 23:59:59'))
             )->displayable()
             ->whereDoesntHave('funerals')
-            ->orderBy('day', 'ASC')
+            ->orderBy('day', 'asc')
             ->get()
             ->pluck('day');
 
@@ -200,7 +210,8 @@ class BulletinBLReport extends AbstractPDFDocumentReport
                             ->whereDate('date', $day)
                             ->get();
                         if (count($service)) {
-                            $replacement = 'Gottesdienst '.$service->first()->timeText(
+                            $serviceInstance = $service->firstOrFail();
+                            $replacement = 'Gottesdienst '.$serviceInstance->timeText(
                                 true,
                                 '.',
                                 true
@@ -253,7 +264,8 @@ class BulletinBLReport extends AbstractPDFDocumentReport
                 'includeCities' => 'required',
                 'start' => 'required|date|date_format:d.m.Y',
                 'end' => 'required|date|date_format:d.m.Y',
-                'locations' => 'required',
+                'locations' => 'required|array',
+                'locations.*' => 'required|integer|exists:locations,id',
                 'dayList' => 'required',
             ]
         );
@@ -262,7 +274,7 @@ class BulletinBLReport extends AbstractPDFDocumentReport
         $end = $request->get('end');
         $empty = $request->get('empty');
 
-        $serviceList = Service::whereRaw('DATE(date) IN (\''.implode("','", $data['dayList'])."'".')')
+        $serviceList = Service::whereDate('date', 'in', $data['dayList'])
             ->whereIn('location_id', $data['locations'])
             ->displayable()
             ->whereDoesntHave('funerals')
@@ -274,10 +286,12 @@ class BulletinBLReport extends AbstractPDFDocumentReport
         $includeCities = $request->get('includeCities');
         $dayIds = $days = $request->get('dayList');
 
-        $locationIds = $request->get('locations');
+        $locationIds = array_map(static fn (mixed $id): int => (int) $id, $data['locations']);
+        $locationOrder = array_flip($locationIds);
         $locations = Location::whereIn('id', $locationIds)
-            ->orderByRaw('FIELD (id, '.implode(', ', $locationIds).') ASC')
-            ->get();
+            ->get()
+            ->sortBy(static fn (Location $location): int => $locationOrder[$location->id] ?? PHP_INT_MAX)
+            ->values();
 
         $specialDays = Day::with('cities')
             ->whereHas(
@@ -286,16 +300,16 @@ class BulletinBLReport extends AbstractPDFDocumentReport
                     $query->whereIn('city_id', $includeCities);
                 }
             )
-            ->where('date', '>=', Carbon::createFromFormat('d.m.Y H:i:s', $start.' 0:00:00'))
-            ->where('date', '<=', Carbon::createFromFormat('d.m.Y H:i:s', $end.' 23:59:59'))
-            ->orderBy('date', 'ASC')
+            ->where('date', '>=', $this->requireParsedDate(Carbon::createFromFormat('d.m.Y H:i:s', $start.' 0:00:00')))
+            ->where('date', '<=', $this->requireParsedDate(Carbon::createFromFormat('d.m.Y H:i:s', $end.' 23:59:59')))
+            ->orderBy('date', 'asc')
             ->get();
 
         $specialServices = [];
         foreach (ServiceGroup::all() as $group) {
             $svc = Service::between(
-                Carbon::createFromFormat('d.m.Y', $data['start']),
-                Carbon::createFromFormat('d.m.Y', $data['end']),
+                $this->requireParsedDate(Carbon::createFromFormat('d.m.Y', $data['start'])),
+                $this->requireParsedDate(Carbon::createFromFormat('d.m.Y', $data['end'])),
             )
                 ->inCities($data['includeCities'])
                 ->displayable()
@@ -304,14 +318,14 @@ class BulletinBLReport extends AbstractPDFDocumentReport
                 ->ordered()
                 ->get();
             if (count($svc)) {
-                $specialServices2[$group->name]['services'] = $svc;
+                $specialServices[$group->name]['services'] = $svc;
             }
         }
 
         // check for same times as locations
         foreach ($specialServices as $group => $data) {
             $services = $data['services'];
-            $firstService = array_first($services);
+            $firstService = $services->firstOrFail();
             $time = $firstService->timeText(true, '.', true);
             $sameTime = true;
             $location = $firstService->locationText();
@@ -365,8 +379,8 @@ class BulletinBLReport extends AbstractPDFDocumentReport
                 $text = 'Besondere Gottesdienste';
             } else {
                 $location = $locationsTemp->splice(0, 1)->first();
-                $text = $location->name;
-                if ($location->default_time) {
+                $text = $location->name ?? '';
+                if ($location?->default_time) {
                     $text .= (strlen($text) < 28) ? $this->idml->BR() : ' - ';
                     $text .= StringTool::timeString($location->default_time, true, '.');
                 }
@@ -420,18 +434,21 @@ class BulletinBLReport extends AbstractPDFDocumentReport
                     $serviceList[$location->id][$day]
                 )) {
                     $service = $serviceList[$location->id][$day]->first();
-                    $text = $service->participantsText('P', false, false, '|')
-                        .((is_object($service->location)) && (StringTool::timeString(
-                            $location->default_time,
-                            true,
-                            '.'
-                        ) != $service->timeText(true, '.')) ? ' '.StringTool::timeString(
-                            $location->default_time,
-                            true,
-                            '.'
-                        ) : '')
-                        .$this->idml->BR()
-                        .$service->description;
+                    if ($service) {
+                        $text = $service->participantsText('P', false, false, '|')
+                            .((is_object($service->location)) && (StringTool::timeString(
+                                $location->default_time ?? '',
+                                true,
+                                '.'
+                            ) != $service->timeText(true, '.')) ? ' '.StringTool::timeString(
+                                $location->default_time ?? '',
+                                true,
+                                '.'
+                            ) : '')
+                            .StringTool::timeString($location->default_time ?? '', true, '.')
+                            .$this->idml->BR()
+                            .$service->description;
+                    }
                 } elseif (isset($empty[$location->id][$day])) {
                     $text = strtr($empty[$location->id][$day], ["\n" => $this->idml->BR(), "\r" => '']);
                 }
@@ -495,6 +512,18 @@ class BulletinBLReport extends AbstractPDFDocumentReport
      *
      * @throws Throwable
      */
+    /**
+     * Render one story frame into the IDML document.
+     *
+     * @param  mixed  $stories  Story identifiers collected so far.
+     * @param  mixed  $storyId  Identifier of the new story.
+     * @param  mixed  $spreadCode  Spread identifier.
+     * @param  float  $y  Vertical coordinate.
+     * @param  int  $col  Column index.
+     * @param  string  $text  Story text.
+     * @param  string  $view  View used to render the story.
+     * @return string
+     */
     protected function storyFrame(
         &$stories,
         &$storyId,
@@ -506,7 +535,7 @@ class BulletinBLReport extends AbstractPDFDocumentReport
     ) {
         $storyId = $this->idml->getUID('story');
         $stories[] = $storyId;
-        $storyCode = view($view, ['uid' => $storyId, 'text' => $text]);
+        $storyCode = ViewFacade::file(ViewFacade::getFinder()->find($view), ['uid' => $storyId, 'text' => $text])->render();
         $this->idml->renderToFile('Stories/Story_'.$storyId.'.xml', $storyCode);
 
         // build a textframe for this story
@@ -524,6 +553,10 @@ class BulletinBLReport extends AbstractPDFDocumentReport
     }
 
     /**
+     * @return string
+     */
+    /**
+     * @param  list<string>  $tags  Tag names.
      * @return string
      */
     protected function setTags(int $col, int $row, array $tags)
@@ -546,7 +579,8 @@ class BulletinBLReport extends AbstractPDFDocumentReport
             );
             $y = str_replace(',', '.', (string) ($coords[1] + (($row - 1) * 34.4685039370106)));
             $uid = $this->idml->getUID('tag_'.$tag);
-            $code .= view('reports.bulletinbl.idml.tags.'.$tag, compact('x', 'y', 'uid'));
+            $tagView = 'reports.bulletinbl.idml.tags.'.$tag;
+            $code .= ViewFacade::file(ViewFacade::getFinder()->find($tagView), compact('x', 'y', 'uid'));
 
             $offset += IDML::mmToPoint($this->tagWidth[$tag] + 1);
         }

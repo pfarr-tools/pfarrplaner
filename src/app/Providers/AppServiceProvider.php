@@ -39,6 +39,7 @@ use Carbon\Carbon;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Events\MigrationsEnded;
 use Illuminate\Http\Request;
 use Illuminate\Mail\MailManager;
@@ -83,9 +84,7 @@ class AppServiceProvider extends ServiceProvider
         App::setLocale(config('app.locale'));
         Carbon::setLocale(config('app.locale'));
 
-        Factory::guessFactoryNamesUsing(function (string $modelName) {
-            return Str::replace('App\\Models\\', '\\Database\\Factories\\', $modelName).'Factory';
-        });
+        Factory::guessFactoryNamesUsing([self::class, 'guessFactoryName']);
 
         Blade::withoutComponentTags();
         Blade::aliasComponent('partials.form.tabheader', 'tabheader');
@@ -176,5 +175,19 @@ class AppServiceProvider extends ServiceProvider
                 $this->app->register(TelescopeServiceProvider::class);
             }
         }
+    }
+
+    /**
+     * Resolve the factory class name for a model class.
+     *
+     * @param  class-string<Model>  $modelName  Model class name.
+     * @return class-string<Factory<Model>> Factory class name.
+     */
+    public static function guessFactoryName(string $modelName): string
+    {
+        $factoryClass = Str::replace('App\\Models\\', 'Database\\Factories\\', $modelName).'Factory';
+
+        /** @var class-string<Factory<Model>> $factoryClass */
+        return $factoryClass;
     }
 }

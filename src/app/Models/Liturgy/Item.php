@@ -35,10 +35,18 @@ use App\Liturgy\Bible\ReferenceParser;
 use App\Liturgy\ItemHelpers\AbstractItemHelper;
 use App\Liturgy\ItemHelpers\ItemHelperNotFoundException;
 use App\Models\People\User;
+use App\Models\Service;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Str;
 
+/**
+ * Liturgischer Eintrag mit serialisierten, typspezifischen Daten.
+ *
+ * @property array<string, mixed> $data Deserialisierte, typspezifische Daten des Eintrags.
+ * @property-read Block $block Der Block, dem dieser Eintrag zugeordnet ist.
+ */
 class Item extends Model
 {
     protected $appends = ['data'];
@@ -49,6 +57,9 @@ class Item extends Model
 
     protected const replacement = ['pastors' => 'P', 'organists' => 'O', 'sacristans' => 'M'];
 
+    /**
+     * @return void
+     */
     protected static function boot()
     {
         parent::boot();
@@ -62,22 +73,45 @@ class Item extends Model
         );
     }
 
-    public function block()
+    /**
+     * Gibt den Block zurück, dem dieser Eintrag zugeordnet ist.
+     *
+     * @return BelongsTo<Block, $this>
+     */
+    public function block(): BelongsTo
     {
         return $this->belongsTo(Block::class, 'liturgy_block_id');
     }
 
-    public function liturgyBlock()
+    /**
+     * Historischer Alias für die Block-Relation.
+     *
+     * @return BelongsTo<Block, $this>
+     */
+    public function liturgyBlock(): BelongsTo
     {
         return $this->block();
     }
 
-    public function getDataAttribute()
+    /**
+     * Gibt die deserialisierten, typspezifischen Daten des Eintrags zurück.
+     *
+     * @return array<string, mixed> Deserialisierte Daten oder ein leeres Array.
+     */
+    public function getDataAttribute(): array
     {
-        return unserialize($this->attributes['serialized_data']) ?: [];
+        $data = unserialize($this->attributes['serialized_data']) ?: [];
+
+        return is_array($data) ? $data : [];
     }
 
-    public function setDataAttribute($data)
+    /**
+     * Serialisiert die typspezifischen Daten des Eintrags für die Datenbank.
+     *
+     * @param  array<string, mixed>  $data  Zu speichernde Daten.
+     * @return string Serialisierte Daten.
+     */
+    public function setDataAttribute($data): string
     {
         return $this->attributes['serialized_data'] = serialize($data);
     }
@@ -85,9 +119,9 @@ class Item extends Model
     /**
      * Resolve all recipients configured for this liturgy item.
      *
-     * @return array
+     * @return array<int, string> Namen der konfigurierten Empfänger.
      */
-    public function recipients()
+    public function recipients(): array
     {
         $list = (isset($this->data['responsible']) ? $this->data['responsible'] : []);
         $p = [];
@@ -108,11 +142,13 @@ class Item extends Model
             }
             if ($type == 'ministry') {
                 $id = isset(self::replacement[$id]) ? self::replacement[$id] : $id;
-                foreach ($this->block->service->participantsByCategory($id) as $user) {
+                /** @var Block&object{service: Service} $block */
+                $block = $this->block;
+                foreach ($block->service->participantsByCategory($id) as $user) {
                     $p[] = $user->fullName(false);
                 }
             } elseif ($type == 'user') {
-                $p[] = User::find($id)->fullName(false);
+                $p[] = User::query()->whereKey($id)->firstOrFail()->fullName(false);
             } else {
                 $p[] = $id;
             }
@@ -126,13 +162,20 @@ class Item extends Model
      */
     public function getHelper(): AbstractItemHelper
     {
-        if (class_exists($class = 'App\\Liturgy\\ItemHelpers\\'.ucfirst($this->data_type).'ItemHelper')) {
+        $class = 'App\\Liturgy\\ItemHelpers\\'.ucfirst($this->data_type).'ItemHelper';
+        if (class_exists($class) && is_subclass_of($class, AbstractItemHelper::class)) {
             return new $class($this);
         }
         throw new ItemHelperNotFoundException('Item helper class not found for data_type '.$this->data_type);
     }
 
-    public function setData($key, $value)
+    /**
+     * Setzt einen einzelnen Wert in den typspezifischen Daten des Eintrags.
+     *
+     * @param  string  $key  Schlüssel des zu setzenden Datenfeldes.
+     * @param  mixed  $value  Neuer Wert des Datenfeldes.
+     */
+    public function setData($key, $value): void
     {
         $this->setDataAttribute(array_merge($this->getDataAttribute(), [$key => $value]));
     }
@@ -140,7 +183,7 @@ class Item extends Model
     /**
      * Add bible text to 'reading' items
      */
-    public function addBibleText()
+    public function addBibleText(): void
     {
         if ($this->data_type != 'reading') {
             return;
@@ -161,7 +204,7 @@ class Item extends Model
     /**
      * On create: Perform specific actions for this data_type
      */
-    public function performTypeSpecificActionsOnCreate()
+    public function performTypeSpecificActionsOnCreate(): void
     {
         $this->addBibleText();
     }
@@ -169,7 +212,7 @@ class Item extends Model
     /**
      * On update: Perform specific actions for this data_type
      */
-    public function performTypeSpecificActionsOnUpdate()
+    public function performTypeSpecificActionsOnUpdate(): void
     {
         $this->addBibleText();
     }

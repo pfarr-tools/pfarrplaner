@@ -32,19 +32,28 @@ namespace App\Models\Calendar\External;
 
 use App\Models\Service;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * Class CalendarConnectionEntry
+ *
+ * @property-read Service|null $service Service represented by this entry.
  */
 class CalendarConnectionEntry extends Model
 {
     protected $fillable = ['calendar_connection_id', 'service_id', 'alternate_key', 'foreign_id'];
 
+    /**
+     * @return BelongsTo<CalendarConnection, $this>
+     */
     public function calendarConnection()
     {
         return $this->belongsTo(CalendarConnection::class);
     }
 
+    /**
+     * @return BelongsTo<Service, $this>
+     */
     public function service()
     {
         return $this->belongsTo(Service::class);

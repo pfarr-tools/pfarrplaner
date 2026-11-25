@@ -30,9 +30,18 @@
 
 namespace App\Services;
 
+use SimpleXMLElement;
+
+/** Service for retrieving book information from Amazon. */
 class AmazonService
 {
-    public static function getInfoForISBN($isbn)
+    /**
+     * Look up the Amazon product information for an ISBN.
+     *
+     * @param  string  $isbn  ISBN to look up.
+     * @return SimpleXMLElement|null Parsed API response, or null if it could not be parsed.
+     */
+    public static function getInfoForISBN(string $isbn): ?SimpleXMLElement
     {
         $ItemId = $_GET['isbn'];
         $ResponseGroup = 'Offers';
@@ -58,6 +67,6 @@ class AmazonService
         $result = curl_exec($ch);
         curl_close($ch);
 
-        return simplexml_load_string($result) ?: null;
+        return is_string($result) ? (simplexml_load_string($result) ?: null) : null;
     }
 }

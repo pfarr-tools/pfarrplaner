@@ -46,9 +46,12 @@ class UpdateBooking extends AbstractUpdateAction implements UpdatesBookings
 
     public function redirectTo(): string
     {
-        return route('service.edit', ['service' => $this->booking->service->slug, 'tab' => 'registrations']);
+        return route('service.edit', ['service' => $this->booking->service->slug ?? '', 'tab' => 'registrations']);
     }
 
+    /**
+     * @param  array<string, mixed>  $input
+     */
     public function update(User $user, Booking $booking, array $input): Booking
     {
         $this->booking = $booking;
@@ -65,6 +68,10 @@ class UpdateBooking extends AbstractUpdateAction implements UpdatesBookings
         return $booking;
     }
 
+    /**
+     * @param  array<string, mixed>  $input
+     * @return array<string, mixed>
+     */
     protected function validateAndNormalize(array $input): array
     {
         $rules = Booking::$validationRules;

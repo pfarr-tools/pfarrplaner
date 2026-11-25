@@ -40,7 +40,15 @@ use Illuminate\Support\Str;
 
 class EventController
 {
-    public function byRange(Request $request, $calendar, $start, $end)
+    /**
+     * Return all occurences within the requested time range.
+     *
+     * @param  string  $calendar  Comma-separated calendar references.
+     * @param  string  $start  Start of the requested range.
+     * @param  string  $end  End of the requested range.
+     * @return JsonResource Occurences in the requested range.
+     */
+    public function byRange(Request $request, string $calendar, string $start, string $end): JsonResource
     {
         $start = Carbon::parse(Str::beforeLast($start, '('));
         $end = Carbon::parse(Str::beforeLast($end, '('));

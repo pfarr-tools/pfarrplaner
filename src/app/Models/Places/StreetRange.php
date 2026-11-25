@@ -65,7 +65,7 @@ class StreetRange extends AbstractModel
     ];
 
     /**
-     * @var string[]
+     * @var list<string>
      */
     protected $fillable = [
         'parish_id',

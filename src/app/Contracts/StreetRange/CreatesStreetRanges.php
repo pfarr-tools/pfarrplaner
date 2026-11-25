@@ -35,6 +35,6 @@ use App\Models\People\User;
 use App\Models\Places\StreetRange;
 
 /**
- * @method StreetRange create(User $user, Parish $parish, array $input)
+ * @method StreetRange create(User $user, Parish $parish, array<string, mixed> $input)
  */
 interface CreatesStreetRanges {}

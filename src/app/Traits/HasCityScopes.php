@@ -51,7 +51,7 @@ trait HasCityScopes
         }
         $cityIds = collect();
         foreach ($cities as $key => $city) {
-            $cities[$key] = $city = ($city instanceof City ? $city : City::query()->findOrFail($city));
+            $cities[$key] = $city = ($city instanceof City ? $city : City::query()->findOrFail((int) $city));
             $cityIds->push($city->id);
             if ($city->is_org) {
                 $cityIds = $cityIds->merge($city->children->pluck('id'));
@@ -72,7 +72,7 @@ trait HasCityScopes
      */
     public function scopeInCity(Builder $query, $city)
     {
-        $city = $city instanceof City ? $city : City::query()->findOrFail($city);
+        $city = $city instanceof City ? $city : City::query()->findOrFail((int) $city);
         if ($city->is_org) {
             return $this->scopeInCities($query, [$city->id]);
         }

@@ -30,6 +30,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\People\User;
 use App\Providers\AuthServiceProvider;
 use Illuminate\Http\Request;
 
@@ -40,18 +41,28 @@ class PatchController extends Controller
         $this->middleware('auth');
     }
 
-    public function patch(Request $request, $patch)
+    /**
+     * Führt einen Wartungspatch über seinen Routennamen aus.
+     *
+     * @param  Request  $request  Anfrage mit dem angemeldeten Benutzer.
+     * @param  string  $patch  Patchname aus der Route, z. B. `beispiel` für `BeispielPatch`.
+     */
+    public function patch(Request $request, string $patch): void
     {
+        $user = $request->user();
+        abort_unless($user instanceof User, 401);
         abort_unless(
-            $request->user()->hasRole(AuthServiceProvider::ADMIN)
-            || $request->user()->hasRole(AuthServiceProvider::SUPER),
+            $user->hasRole(AuthServiceProvider::ADMIN)
+            || $user->hasRole(AuthServiceProvider::SUPER),
             403
         );
 
         $patchClass = '\\App\\Maintenance\\Patches\\'.ucfirst($patch).'Patch';
         if (class_exists($patchClass)) {
             $patch = new $patchClass;
-            $patch->patch($request);
+            if (is_callable([$patch, 'patch'])) {
+                call_user_func([$patch, 'patch'], $request);
+            }
         }
     }
 }

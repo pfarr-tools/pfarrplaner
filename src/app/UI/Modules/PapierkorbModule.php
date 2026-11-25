@@ -27,7 +27,9 @@ class PapierkorbModule extends AbstractModule
 
     public function isActive(): bool
     {
-        return auth()->check() && PapierkorbController::hasAdminModuleAccess(auth()->user());
+        $user = auth()->user();
+
+        return $user !== null && PapierkorbController::hasAdminModuleAccess($user);
     }
 
     public function addItems(array $items): array

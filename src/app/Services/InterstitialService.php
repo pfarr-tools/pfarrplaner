@@ -42,6 +42,8 @@ class InterstitialService
 
     /**
      * Resolve all configured interstitials that should currently be shown.
+     *
+     * @return array<int, array<string, mixed>>
      */
     public function forUser(User $user): array
     {
@@ -94,6 +96,8 @@ class InterstitialService
     /**
      * Persist the user's reaction to an interstitial.
      *
+     * @return array<string, mixed>
+     *
      * @throws ValidationException
      */
     public function remember(User $user, string $key, string $action): array
@@ -133,16 +137,20 @@ class InterstitialService
 
     /**
      * Get the stored interstitial state array for the user.
+     *
+     * @return array<string, array<string, mixed>>
      */
     public function statesForUser(User $user): array
     {
-        $states = Settings::get($user, config('interstitials.setting_key', 'interstitials'), []);
+        $states = Settings::get($user, config('interstitials.setting_key', 'interstitials'));
 
         return is_array($states) ? $states : [];
     }
 
     /**
      * Determine whether a configured interstitial is enabled.
+     *
+     * @param  array<string, mixed>  $item  Configured interstitial.
      */
     public function isEnabled(array $item): bool
     {
@@ -151,6 +159,9 @@ class InterstitialService
 
     /**
      * Check whether the current user belongs to the configured audience.
+     *
+     * @param  User  $user  User to check.
+     * @param  array<string, mixed>  $item  Configured interstitial.
      */
     public function matchesAudience(User $user, array $item): bool
     {

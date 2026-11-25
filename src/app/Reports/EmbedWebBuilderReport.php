@@ -42,17 +42,13 @@ use App\Models\Location;
 use App\Models\Scopes\ServicesOnlyScope;
 use App\Models\Tag;
 use Carbon\Carbon;
-use Illuminate\Contracts\Foundation\Application;
-use Illuminate\Contracts\View\Factory;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\View as ViewFacade;
-use Illuminate\View\View;
 use Inertia\Inertia;
+use Inertia\Response;
 
 /**
  * Class EmbedServiceTableReport
@@ -81,6 +77,9 @@ class EmbedWebBuilderReport extends AbstractEmbedReport
 
     protected $inertia = true;
 
+    /**
+     * @var array<string, string>
+     */
     protected $validationRules = [
         'cities.*' => 'required|int|exists:cities,id',
         'locations.*' => 'nullable|int|exists:cities,id',
@@ -93,8 +92,12 @@ class EmbedWebBuilderReport extends AbstractEmbedReport
         'adChannelCode' => 'nullable|string',
     ];
 
+    /**
+     * @return array<int, array<string, mixed>>
+     */
     protected function getAvailableLayouts(): array
     {
+        /** @var array<int, array<string, mixed>> $allConfiguredLayouts */
         $allConfiguredLayouts = config('webbuilder.layouts');
 
         $layouts = [];
@@ -117,11 +120,11 @@ class EmbedWebBuilderReport extends AbstractEmbedReport
     }
 
     /**
-     * @return JsonResponse
+     * @return Response
      */
     public function setup()
     {
-        $cities = Auth::user()->cities;
+        $cities = $this->authenticatedUser()->cities;
         $locations = Location::inCities($cities->pluck('id'))->get();
         $layouts = $this->getAvailableLayouts();
 
@@ -131,7 +134,7 @@ class EmbedWebBuilderReport extends AbstractEmbedReport
     }
 
     /**
-     * @return Application|Factory|View|string
+     * @return \Illuminate\Contracts\View\View|string
      */
     public function render(Request $request)
     {
@@ -155,6 +158,9 @@ class EmbedWebBuilderReport extends AbstractEmbedReport
         return response()->json(['html' => $html, 'url' => $url, 'randomId' => $randomId]);
     }
 
+    /**
+     * @return array<string, string>
+     */
     protected function getFullValidationRules(Request $request, bool $addOptions = false): array
     {
         $validationRules = $this->validationRules;
@@ -171,6 +177,9 @@ class EmbedWebBuilderReport extends AbstractEmbedReport
         return $validationRules;
     }
 
+    /**
+     * @return \Illuminate\Contracts\View\View
+     */
     public function embed(Request $request)
     {
         if (! $request->hasValidSignatureWhileIgnoring(['cors-origin'])) {
@@ -242,6 +251,8 @@ class EmbedWebBuilderReport extends AbstractEmbedReport
             $eventQuery->adRunningAt($data['adChannelCode'], $start);
         }
 
-        return view('embed.webbuilder.'.$data['template'], ['options' => $data, 'occurences' => $eventQuery->get(), 'randomId' => $randomId]);
+        $viewPath = ViewFacade::getFinder()->find('embed.webbuilder.'.$data['template']);
+
+        return ViewFacade::file($viewPath, ['options' => $data, 'occurences' => $eventQuery->get(), 'randomId' => $randomId]);
     }
 }

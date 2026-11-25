@@ -43,7 +43,6 @@ use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 use Inertia\Inertia;
 
@@ -79,13 +78,13 @@ class EmbedContactLookupReport extends AbstractEmbedReport
      */
     public function setup()
     {
-        $cities = Auth::user()->cities;
+        $cities = $this->authenticatedUser()->cities;
 
         return Inertia::render('Report/EmbedContactLookup/Setup', compact('cities'));
     }
 
     /**
-     * @return Application|Factory|View|string
+     * @return Application|Factory|View|\Inertia\Response|string
      */
     public function render(Request $request)
     {
@@ -110,7 +109,7 @@ class EmbedContactLookupReport extends AbstractEmbedReport
     }
 
     /**
-     * @return Response|Application|Factory|View|string
+     * @return Response|\Illuminate\Contracts\View\View
      */
     public function embed(Request $request)
     {
@@ -149,11 +148,11 @@ class EmbedContactLookupReport extends AbstractEmbedReport
 
         $parish = false;
         if ($request->has('parish')) {
-            $parish = Parish::findOrFail($request->get('parish'));
+            $parish = Parish::findOrFail((int) $request->get('parish'));
         } elseif (($street != '') && ($number != '')) {
             $parish = Parish::byAddress($street, $number)->inCities($cities)->first();
         } elseif ($request->cookie('parish')) {
-            $parish = Parish::findOrFail($request->cookie('parish'));
+            $parish = Parish::findOrFail((int) $request->cookie('parish'));
         }
 
         $url = route('report.embed', compact('report', 'corsOrigin'));

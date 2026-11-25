@@ -32,6 +32,10 @@ namespace App\Actions\Team;
 
 trait NormalizesTeamData
 {
+    /**
+     * @param  array<string, mixed>  $input
+     * @return array<string, mixed>
+     */
     protected function normalizeInput(array $input): array
     {
         /** @var array{users?: array<int, mixed>} $input */

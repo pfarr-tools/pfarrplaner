@@ -59,19 +59,30 @@ class EventCalendarImport
     protected $url = '';
 
     /**
-     * EventCalendarImport constructor.
+     * Initialisiert den Import mit der URL des öffentlichen Veranstaltungskalenders.
+     *
+     * @param  string|null  $url  URL des Kalenders; ein leerer Wert deaktiviert den Import.
      */
-    public function __construct($url)
+    public function __construct(?string $url)
     {
-        $this->url = $url;
+        $this->url = $url ?? '';
     }
 
-    public function getMixedEvents() {}
+    /**
+     * Platzhalter für das Zusammenführen gemischter Veranstaltungen.
+     *
+     * Die Methode ist derzeit leer und liefert kein Ergebnis.
+     */
+    public function getMixedEvents(): void {}
 
     /**
-     * Mix an array of events into another array of events
+     * Fügt die Veranstaltungen des Kalenders in eine bestehende Veranstaltungsmap ein.
      *
-     * @param  bool  $removeServices
+     * @param  array<string, mixed>  $events  Veranstaltungsmap, die erweitert wird.
+     * @param  Carbon  $weekStart  Beginn des zu berücksichtigenden Zeitraums.
+     * @param  Carbon  $weekEnd  Ende des zu berücksichtigenden Zeitraums.
+     * @param  bool  $removeServices  Gottesdienste aus dem Ergebnis entfernen.
+     * @return array<string, mixed> Veranstaltungsmap nach dem Zusammenführen.
      */
     public function mix($events, Carbon $weekStart, Carbon $weekEnd, $removeServices = false): array
     {
@@ -92,7 +103,12 @@ class EventCalendarImport
     }
 
     /**
-     * @param  bool  $removeServices
+     * Liest die Veranstaltungen des Kalenders für den Zeitraum aus Cache oder URL.
+     *
+     * @param  Carbon  $weekStart  Beginn des zu berücksichtigenden Zeitraums.
+     * @param  Carbon  $weekEnd  Ende des zu berücksichtigenden Zeitraums.
+     * @param  bool  $removeServices  Gottesdienste aus dem Ergebnis entfernen.
+     * @return array<string, mixed> Nach Datum sortierte Veranstaltungsmap.
      */
     public function getEvents(Carbon $weekStart, Carbon $weekEnd, $removeServices = false): array
     {
@@ -105,7 +121,7 @@ class EventCalendarImport
             $events = Cache::get($cacheKey);
         } else {
             try {
-                $events = json_decode(file_get_contents($this->url), true);
+                $events = json_decode((string) file_get_contents($this->url), true);
                 Cache::put($cacheKey, $events, 900);
             } catch (ErrorException $e) {
                 $events = [];
@@ -158,7 +174,11 @@ class EventCalendarImport
     }
 
     /**
-     * Formatiert den Titel einer Veranstaltung
+     * Formatiert den Titel einer Veranstaltung und übernimmt Zusatzangaben in das Veranstaltungsarray.
+     *
+     * @param  string  $title  Zu bereinigender Titel.
+     * @param  array<string, mixed>  $event  Veranstaltungsarray, das um Zusatzangaben ergänzt wird.
+     * @return string Bereinigter Titel.
      */
     protected function sanitizeTitle(string $title, array &$event): string
     {

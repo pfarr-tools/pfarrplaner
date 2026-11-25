@@ -47,6 +47,9 @@ class CreateTeam extends AbstractCreateAction implements CreatesTeams
         return route('admin.teams.index');
     }
 
+    /**
+     * @param  array<string, mixed>  $input
+     */
     public function create(User $user, array $input): Team
     {
         Gate::forUser($user)->authorize('create', Team::class);

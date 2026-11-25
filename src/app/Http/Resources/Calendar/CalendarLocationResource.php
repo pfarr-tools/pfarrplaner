@@ -43,11 +43,13 @@ class CalendarLocationResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        /** @var Location $this */
+        /** @var Location $location */
+        $location = $this->resource;
+
         return [
-            'id' => $this->id,
-            'name' => $this->name,
-            'fullName' => $this->fullName,
+            'id' => $location->id,
+            'name' => $location->name,
+            'fullName' => $location->fullName,
         ];
     }
 }

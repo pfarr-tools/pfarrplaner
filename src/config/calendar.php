@@ -30,4 +30,5 @@
 
 return [
     'vacation_state' => env('VACATION_STATE', 'BW'),
+    'vacation_url' => env('VACATION_URL'),
 ];

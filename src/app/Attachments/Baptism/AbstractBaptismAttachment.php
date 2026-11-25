@@ -57,7 +57,7 @@ abstract class AbstractBaptismAttachment extends AbstractAttachment
             static::$fileTitle ?: static::$title,
             static::$extension,
             self::FILE_SIGNATURE,
-            $this->baptism->service->date,
+            $this->baptism->service->date ?? now(),
             false,
             $this->baptism->candidate_name
         );

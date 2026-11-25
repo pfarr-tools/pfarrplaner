@@ -21,6 +21,13 @@ use Spatie\Permission\PermissionRegistrar;
 
 class FirstRunInstallerService
 {
+    /**
+     * Build the environment file contents from a template and the collected values.
+     *
+     * @param  string  $template  Environment file template to populate.
+     * @param  array<string, mixed>  $values  Environment values keyed by variable name.
+     * @return string Populated environment file contents.
+     */
     public function buildEnvironmentFile(string $template, array $values): string
     {
         foreach ($values as $key => $value) {
@@ -30,11 +37,17 @@ class FirstRunInstallerService
         return rtrim($template).PHP_EOL;
     }
 
+    /**
+     * @param  string  $path  Environment file path.\n     * @param  string  $contents  File contents.\n     * @return bool
+     */
     public function writeEnvironmentFile(string $path, string $contents): bool
     {
         return @file_put_contents($path, $contents) !== false;
     }
 
+    /**
+     * @param  string  $path  Database file path.\n     * @return void
+     */
     public function ensureSqliteDatabaseExists(string $path): void
     {
         $directory = dirname($path);
@@ -48,6 +61,11 @@ class FirstRunInstallerService
         }
     }
 
+    /**
+     * Apply the collected environment values to the running process configuration.
+     *
+     * @param  array<string, mixed>  $values  Environment values keyed by variable name.
+     */
     public function applyRuntimeConfiguration(array $values): void
     {
         foreach ($values as $key => $value) {
@@ -107,6 +125,12 @@ class FirstRunInstallerService
         DB::purge();
     }
 
+    /**
+     * Create or update the initial super administrator from the collected profile data.
+     *
+     * @param  array{title: string, first_name: string, last_name: string, email: string}  $data  Initial administrator profile.
+     * @return User Created or updated administrator.
+     */
     public function createOrUpdateAdminUser(array $data): User
     {
         app(RoleConfigurationSynchronizer::class)->synchronize();
@@ -148,7 +172,7 @@ class FirstRunInstallerService
         $pattern = '/^'.preg_quote($key, '/').'=.*$/m';
 
         if (preg_match($pattern, $template)) {
-            return preg_replace($pattern, $line, $template, 1);
+            return preg_replace($pattern, $line, $template, 1) ?? $template;
         }
 
         return rtrim($template).PHP_EOL.$line.PHP_EOL;

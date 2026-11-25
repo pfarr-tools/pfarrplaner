@@ -101,42 +101,27 @@ class CommuniAppIntegration extends AbstractIntegration
      *
      * @throws GuzzleException
      */
-    public function handleServiceCreated(Service $service) {}
+    public function handleServiceCreated(Service $service): void {}
 
     /**
-     * Create a new service on CommuniApp (only here for reference)
-     *
-     * @return ResponseInterface
+     * Push an occurrence to CommuniApp.
      *
      * @throws GuzzleException
      */
-    private function createService(Service $service)
-    {
-        return $this->client->post(self::ROUTE_EVENT, ['body' => json_encode($this->getServiceArray($service))]);
-    }
-
-    public function publish(Occurence $event)
+    public function publish(Occurence $event): ResponseInterface
     {
         return $this->client->post(self::ROUTE_EVENT, ['body' => json_encode($this->getEventArray($event))]);
     }
 
-    public function handleServiceUpdated(Service $service) {}
-
     /**
-     * Update an existing service on CommuniApp (only here for reference)
-     *
-     * @return ResponseInterface
-     *
-     * @throws GuzzleException
+     * Handle an updated service for CommuniApp.
      */
-    private function updateService(Service $service)
-    {
-        return $this->client->put(sprintf('%s/%s', self::ROUTE_EVENT, $service->communiapp_id),
-            ['body' => json_encode($this->getServiceArray($service))]);
-    }
+    public function handleServiceUpdated(Service $service): void {}
 
     /**
      * Convert a service to a dataset array for CommuniApp
+     *
+     * @return array<string, mixed>
      */
     protected function getServiceArray(Service $service): array
     {
@@ -152,16 +137,23 @@ class CommuniAppIntegration extends AbstractIntegration
 
     /**
      * Convert an event to a dataset array for CommuniApp
+     *
+     * @return array<string, mixed>
      */
     protected function getEventArray(Occurence $event): array
     {
+        $service = $event->service;
+        if ($service === null) {
+            throw new \UnexpectedValueException('CommuniApp event has no associated service.');
+        }
+
         return [
             'dateTime' => $event->start->setTimezone('Europe/Berlin')->format('Y-m-d H:i:s'),
             'isOfficial' => true,
             'group' => $this->city->communiapp_default_group_id,
-            'title' => $event->service->titleText(false, true),
-            'location' => $event->service->locationText(),
-            'picUrl' => $event->service->getImageCutUrl('CommuniApp'),
+            'title' => $service->titleText(false, true),
+            'location' => $service->locationText(),
+            'picUrl' => $service->getImageCutUrl('CommuniApp'),
             'description' => $event->getAdText('communiapp'),
         ];
     }
@@ -169,7 +161,7 @@ class CommuniAppIntegration extends AbstractIntegration
     /**
      * Delete a service from CommuniApp
      */
-    public function handleserviceDeleted(Service $service) {}
+    public function handleserviceDeleted(Service $service): void {}
 
     /**
      * Delete a service from CommuniApp (only here for reference)
@@ -180,6 +172,6 @@ class CommuniAppIntegration extends AbstractIntegration
      */
     public function deleteService(Service $service)
     {
-        return $this->client->delete(sprintf('%s/%s', self::ROUTE_EVENT, $service->communiapp_id));
+        return $this->client->delete(sprintf('%s/%s', self::ROUTE_EVENT, $service->id));
     }
 }

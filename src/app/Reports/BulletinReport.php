@@ -30,6 +30,7 @@
 
 namespace App\Reports;
 
+use App\Models\Location;
 use App\Models\Places\City;
 use App\Models\Service;
 use App\Services\FileNameService;
@@ -37,13 +38,13 @@ use App\Services\LiturgyService;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
 use PhpOffice\PhpWord\Element\Section;
 use PhpOffice\PhpWord\Shared\Converter;
 use PhpOffice\PhpWord\Style\Tab;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 /**
  * Class BulletinReport
@@ -74,6 +75,7 @@ class BulletinReport extends AbstractWordDocumentReport
      */
     public $formats = ['Tailfingen', 'Truchtelfingen', 'Gäufelden'];
 
+    /** @var array<int, mixed> */
     public $cities = [];
 
     protected $inertia = true;
@@ -83,7 +85,7 @@ class BulletinReport extends AbstractWordDocumentReport
      */
     public function setup()
     {
-        $cities = Auth::user()->cities;
+        $cities = $this->authenticatedUser()->cities;
         $formats = $this->formats;
 
         return Inertia::render('Report/Bulletin/Setup', compact('cities', 'formats'));
@@ -130,25 +132,32 @@ class BulletinReport extends AbstractWordDocumentReport
     /**
      * @param  $days
      */
+    /**
+     * @param  array<int|string, mixed>  $serviceList  Services grouped by day.
+     * @return BinaryFileResponse
+     */
     public function renderTailfingenFormat($serviceList)
     {
         $section = $this->commonDocumentSetup();
         $table = $section->addTable('table');
 
+        /** @var Service|null $lastService */
+        $lastService = null;
         foreach ($serviceList as $dayList) {
             $ctr = 0;
             foreach ($dayList as $service) {
+                $lastService = $service;
                 $ctr++;
                 $textRun = $section->addTextRun('list');
                 if ($ctr == 1) {
-                    $textRun->addText($service->date->format('d.m.Y'));
+                    $textRun->addText($service->trueDate()->format('d.m.Y'));
                 }
                 if ($ctr == 2) {
-                    $textRun->addText(htmlspecialchars(LiturgyService::getLiturgyInfoByDate($service->date)['Bezeichnung'] ?? ''));
+                    $textRun->addText(htmlspecialchars(LiturgyService::getLiturgyInfoByDate($service->trueDate())['Bezeichnung'] ?? ''));
                 }
                 $textRun->addText("\t");
                 $textRun->addText($service->timeText()."\t");
-                if (! is_object($service->location)) {
+                if (! $service->location instanceof Location) {
                     $textRun->addText(htmlspecialchars($service->special_location)."\t");
                 } else {
                     $textRun->addText(htmlspecialchars($service->location->name)."\t");
@@ -166,7 +175,7 @@ class BulletinReport extends AbstractWordDocumentReport
                 static::FILE_TITLE,
                 '.docx',
                 static::FILE_SIGNATURE,
-                $service->date)
+                $lastService !== null ? $lastService->date : Carbon::now())
         );
     }
 
@@ -179,9 +188,9 @@ class BulletinReport extends AbstractWordDocumentReport
             'list',
             [
                 'tabs' => [
-                    new Tab('left', Converter::cmToTwip(4.5)),
-                    new Tab('left', Converter::cmToTwip(6.7)),
-                    new Tab('left', Converter::cmToTwip(9)),
+                    new Tab('left', (int) Converter::cmToTwip(4.5)),
+                    new Tab('left', (int) Converter::cmToTwip(6.7)),
+                    new Tab('left', (int) Converter::cmToTwip(9)),
                 ],
                 'spaceAfter' => 0,
             ]
@@ -190,10 +199,10 @@ class BulletinReport extends AbstractWordDocumentReport
         $this->wordDocument->setDefaultFontSize(10);
         $section = $this->wordDocument->addSection(
             [
-                'marginTop' => Converter::cmToTwip('1.9'),
-                'marginBottom' => Converter::cmToTwip('0.25'),
-                'marginLeft' => Converter::cmToTwip('1.59'),
-                'marginRight' => Converter::cmToTwip('0.25'),
+                'marginTop' => (int) Converter::cmToTwip(1.9),
+                'marginBottom' => (int) Converter::cmToTwip(0.25),
+                'marginLeft' => (int) Converter::cmToTwip(1.59),
+                'marginRight' => (int) Converter::cmToTwip(0.25),
             ]
         );
 
@@ -203,27 +212,31 @@ class BulletinReport extends AbstractWordDocumentReport
     /**
      * @param  $days
      */
+    /**
+     * @param  array<int|string, mixed>  $serviceList  Services grouped by day.
+     * @return BinaryFileResponse
+     */
     public function renderTruchtelfingenFormat($serviceList)
     {
         $section = $this->commonDocumentSetup();
         $table = $section->addTable('table');
 
         foreach ($serviceList as $day => $dayList) {
-            $liturgy = LiturgyService::getLiturgyInfoByDate($day);
+            $liturgy = LiturgyService::getLiturgyInfoByDate(Carbon::parse((string) $day));
             /** @var Service $service */
             $first = true;
             foreach ($dayList as $service) {
                 $table->addRow();
-                $table->addCell(Converter::cmToTwip(2.5))->addText($first ? ($liturgy['Bezeichnung'] ?? '') : '');
-                $table->addCell(Converter::cmToTwip(1.73))->addText($first ? $service->date->format('d.m.Y') : '');
-                $table->addCell(Converter::cmToTwip(1.58))->addText($service->timeText());
-                $table->addCell(Converter::cmToTwip(2.11))->addText($service->locationText());
-                $table->addCell(Converter::cmToTwip(2.32))->addText($service->descriptionText());
-                $table->addCell(Converter::cmToTwip(3.52))->addText($service->participantsText('P', false, false));
-                $table->addCell(Converter::cmToTwip(2.25))->addText(
+                $table->addCell((int) Converter::cmToTwip(2.5))->addText($first ? ($liturgy['Bezeichnung'] ?? '') : '');
+                $table->addCell((int) Converter::cmToTwip(1.73))->addText($first ? $service->trueDate()->format('d.m.Y') : '');
+                $table->addCell((int) Converter::cmToTwip(1.58))->addText($service->timeText());
+                $table->addCell((int) Converter::cmToTwip(2.11))->addText($service->locationText());
+                $table->addCell((int) Converter::cmToTwip(2.32))->addText($service->descriptionText());
+                $table->addCell((int) Converter::cmToTwip(3.52))->addText($service->participantsText('P', false, false));
+                $table->addCell((int) Converter::cmToTwip(2.25))->addText(
                     isset($liturgy[0]['Predigt']) ? $liturgy[0]['Predigt']['Bibelstelle'] : ''
                 );
-                $table->addCell(Converter::cmToTwip(2.5))->addText(
+                $table->addCell((int) Converter::cmToTwip(2.5))->addText(
                     $service->offeringGoal() ? 'Opfer für '.$service->offeringGoal() : ''
                 );
                 $first = false;
@@ -240,6 +253,10 @@ class BulletinReport extends AbstractWordDocumentReport
 
     }
 
+    /**
+     * @param  array<int|string, mixed>  $serviceList  Services grouped by day.
+     * @return BinaryFileResponse
+     */
     public function renderGaufeldenFormat($serviceList)
     {
         $this->wordDocument->setDefaultFontSize(10);
@@ -247,37 +264,37 @@ class BulletinReport extends AbstractWordDocumentReport
         $section = $this->commonDocumentSetup();
         Carbon::setLocale(config('app.locale'));
 
+        /** @var Service|null $lastService */
+        $lastService = null;
         foreach ($serviceList as $date => $services) {
-            $index = 0;
-
             $run = $section->addTextRun(['spaceAfter' => 0]);
             $dayDate = Carbon::parse($date)->startOfDay();
-            if ($index == 0) {
-                $liturgy = LiturgyService::getLiturgyInfoByDate($dayDate);
 
-                $run->addText(
-                    substr($dayDate->getTranslatedDayName(), 0, 2)
-                    .'., '
-                    .$dayDate->format('d. ')
-                    .$dayDate->getTranslatedMonthName(),
-                    ['name' => 'Lora', 'bold' => true, 'size' => 10]
-                );
-                if (count($liturgy)) {
-                    $run->addText(' | '.$liturgy[0]['Bezeichnung'], ['name' => 'Lora', 'bold' => true, 'size' => 8]);
-                }
+            $liturgy = LiturgyService::getLiturgyInfoByDate($dayDate);
+
+            $run->addText(
+                substr($dayDate->getTranslatedDayName(), 0, 2)
+                .'., '
+                .$dayDate->format('d. ')
+                .$dayDate->getTranslatedMonthName(),
+                ['name' => 'Lora', 'bold' => true, 'size' => 10]
+            );
+            if (count($liturgy)) {
+                $run->addText(' | '.$liturgy[0]['Bezeichnung'], ['name' => 'Lora', 'bold' => true, 'size' => 8]);
             }
 
             $index = 0;
             foreach ($services as $service) {
+                $lastService = $service;
                 $run = $section->addTextRun([
                     'tabs' => [
-                        new Tab('left', Converter::cmToTwip(2)),
-                        new Tab('left', Converter::cmToTwip(4.5)),
-                        new Tab('left', Converter::cmToTwip(8.5)),
+                        new Tab('left', (int) Converter::cmToTwip(2)),
+                        new Tab('left', (int) Converter::cmToTwip(4.5)),
+                        new Tab('left', (int) Converter::cmToTwip(8.5)),
                     ],
                     'indentation' => [
-                        'left' => Converter::cmToTwip(8.5),
-                        'hanging' => Converter::cmToTwip(8.5),
+                        'left' => (int) Converter::cmToTwip(8.5),
+                        'hanging' => (int) Converter::cmToTwip(8.5),
                     ],
                     'spaceAfter' => 0,
                 ]
@@ -310,7 +327,7 @@ class BulletinReport extends AbstractWordDocumentReport
                 static::FILE_TITLE,
                 '.docx',
                 static::FILE_SIGNATURE,
-                $service->date)
+                $lastService !== null ? $lastService->date : Carbon::now())
         );
     }
 }

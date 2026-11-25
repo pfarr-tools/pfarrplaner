@@ -61,7 +61,9 @@ class DeleteAdChannel extends AbstractDeleteAction implements DeletesAdChannels
      */
     public function delete(User $user, AdChannel $adChannel)
     {
-        $this->city = $adChannel->city;
+        $city = $adChannel->city;
+        abort_unless($city instanceof City, 404);
+        $this->city = $city;
         Gate::forUser($user)->authorize('delete', $adChannel);
         DeletedAdChannel::dispatch($user, $adChannel);
         $this->messages = ['success' => 'Der Werbekanal wurde gelöscht.'];

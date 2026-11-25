@@ -45,6 +45,9 @@ class UpdateSongbook extends AbstractUpdateAction implements UpdatesSongbooks
         return route('admin.songbooks.index');
     }
 
+    /**
+     * @param  array<string, mixed>  $input
+     */
     public function update(User $user, Songbook $songbook, array $input): Songbook
     {
         Gate::forUser($user)->authorize('update', $songbook);

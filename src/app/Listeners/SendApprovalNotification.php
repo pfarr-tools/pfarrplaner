@@ -31,7 +31,7 @@
 namespace App\Listeners;
 
 use App\Events\AbsenceApproved;
-use App\Events\OrderShipped;
+use App\Models\Leave\Absence;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
@@ -53,21 +53,27 @@ class SendApprovalNotification
     /**
      * Handle the event.
      *
-     * @param  OrderShipped  $event
+     * Das Legacy-Event liefert die Abwesenheit als dynamische Eigenschaft.
+     *
      * @return void
      */
     public function handle(AbsenceApproved $event)
     {
-        $users = clone $event->absence->user->approvers;
-        $users->push($event->absence->user);
+        /** @var AbsenceApproved&object{absence: Absence} $event */
+        $owner = $event->absence->user;
+        if ($owner === null) {
+            return;
+        }
+        $users = clone $owner->approvers;
+        $users->push($owner);
 
-        if (env('THIS_IS_MY_DEV_HOST')) {
+        if (config('app.dev')) {
             foreach ($users as $user) {
                 $user->email = 'chris@toph.de';
             }
         }
 
         Log::debug('AbsenceApproved listener: Sende AbsenceApproved an '.$users->pluck('email')->unique->join(', '));
-        Mail::to($users)->queue(new \App\Mail\AbsenceApproved($event->absence, $event->approval));
+        Mail::to($users)->queue(new \App\Mail\Absence\AbsenceApproved($event->absence));
     }
 }

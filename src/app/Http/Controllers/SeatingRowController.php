@@ -47,6 +47,8 @@ class SeatingRowController extends AbstractCRUDController
     {
         /** @var Location $location */
         $location = $request->route('location');
+        $section = $location->seatingSections()->first();
+        abort_unless($section !== null, 404);
 
         return [
             'title' => '',
@@ -55,14 +57,14 @@ class SeatingRowController extends AbstractCRUDController
             'divides_into' => 1,
             'spacing' => 0,
             'color' => '',
-            'seating_section_id' => $location->seatingSections->first()->id,
+            'seating_section_id' => $section->id,
         ];
     }
 
     protected function getResourcesForEditor(Request $request, $model = null): array
     {
         $data = parent::getResourcesForEditor($request, $model);
-        $data['location'] = $model ? $model->seatingSection->location : $request->route('location');
+        $data['location'] = $model ? $model->seatingSection?->location : $request->route('location');
 
         return $data;
     }

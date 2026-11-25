@@ -34,7 +34,9 @@ use App\Casts\EncryptedAttribute;
 use App\Models\People\User;
 use Database\Factories\CommentFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 /**
  * Class Comment
@@ -63,7 +65,7 @@ class Comment extends AbstractModel
     ];
 
     /**
-     * @var string[]
+     * @var list<string>
      */
     protected $fillable = [
         'user_id',
@@ -74,7 +76,7 @@ class Comment extends AbstractModel
     ];
 
     /**
-     * @var string[]
+     * @var array<string, string>
      */
     protected $casts = [
         'body' => EncryptedAttribute::class,
@@ -84,8 +86,10 @@ class Comment extends AbstractModel
 
     /**
      * Get all of the owning commentable models.
+     *
+     * @return MorphTo<Model, $this>
      */
-    public function commentable()
+    public function commentable(): MorphTo
     {
         return $this->morphTo();
     }
@@ -98,6 +102,9 @@ class Comment extends AbstractModel
         return $this->belongsTo(User::class);
     }
 
+    /**
+     * @return string
+     */
     public function getLabelAttribute(): string
     {
         return (string) ($this->body ?? '');

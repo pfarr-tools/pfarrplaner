@@ -71,6 +71,12 @@ use Spatie\Permission\Traits\HasRoles;
 /**
  * Class User
  *
+ * @property string|null $canEditFields Comma-separated editable field names.
+ * @property bool $canEdit Whether the viewing user may edit this user.
+ * @property Collection<int, User> $duplicates Potential duplicate accounts.
+ * @property string $fullNameText Display name for duplicate lists.
+ * @property mixed $Church Legacy church flag.
+ * @property mixed $General Legacy general flag.
  * @property-read \Illuminate\Database\Eloquent\Collection<int, City&object{pivot: Pivot&object{permission: string}}> $cities Cities with this user's access level.
  */
 class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticatable
@@ -84,12 +90,13 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
 
     public const NAME_FORMAT_FIRST_AND_LAST = 3;
 
+    /** @var string */
     public $guard_name = 'web';
 
     /**
      * The attributes that are mass assignable.
      *
-     * @var array
+     * @var list<string>
      */
     protected $fillable = [
         'first_name',
@@ -140,7 +147,7 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
     /**
      * The attributes that should be hidden for arrays.
      *
-     * @var array
+     * @var list<string>
      */
     protected $hidden = [
         'password',
@@ -200,13 +207,14 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
     }
 
     /**
-     * @return array
+     * @return list<string>
      */
     public function getAllPermissionsAttribute()
     {
         $permissions = [];
+        $currentUser = Auth::user();
         foreach (Permission::all() as $permission) {
-            if (Auth::user()->can($permission->name)) {
+            if ($currentUser?->can($permission->name)) {
                 $permissions[] = $permission->name;
             }
         }
@@ -273,7 +281,9 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
         return ($withTitle ? ($this->title ? $this->title.' ' : '') : '').$this->last_name;
     }
 
-    /** Return the family-name-first sorting label. */
+    /** Return the family-name-first sorting label.
+     * @return string
+     */
     public function getSortNameAttribute()
     {
         return $this->last_name.($this->first_name ? ', '.$this->first_name : '');
@@ -284,15 +294,18 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
      */
     public function getWritableCitiesAttribute()
     {
-        if ((! Auth::guest()) && Auth::user()->hasRole(AuthServiceProvider::SUPER)) {
+        if (Auth::user()?->hasRole(AuthServiceProvider::SUPER)) {
             return City::all();
         }
         $writableCities = $this->writableCities()->get();
         $replacements = $this->currentReplacements();
         if ($replacements !== null) {
             foreach ($replacements as $replacement) {
-                foreach ($replacement->absence->user->writableCities as $city) {
-                    $writableCities->push($city);
+                $absenceOwner = $replacement->absence?->user;
+                if ($absenceOwner !== null) {
+                    foreach ($absenceOwner->writableCities as $city) {
+                        $writableCities->push($city);
+                    }
                 }
             }
         }
@@ -308,7 +321,9 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
         return $this->belongsToMany(City::class)->withPivot('permission')->wherePivotIn('permission', ['w', 'a']);
     }
 
-    /** Return replacements currently assigned to this user. */
+    /** Return replacements currently assigned to this user.
+     * @return \Illuminate\Database\Eloquent\Collection<int, Replacement>
+     */
     public function currentReplacements()
     {
         return Replacement::with('absence')
@@ -320,7 +335,9 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
             ->get();
     }
 
-    /** Return pools currently mastered by this user. */
+    /** Return pools currently mastered by this user.
+     * @return \Illuminate\Database\Eloquent\Collection<int, Poolmaster>
+     */
     public function currentlyMasteredPools()
     {
         return Poolmaster::with('currentReplacements')
@@ -334,6 +351,9 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
     // MUTATORS
     /**
      * Automatically hash password
+     *
+     * @param  string  $value  Plain-text password.
+     * @return void
      */
     public function setPasswordAttribute($value)
     {
@@ -413,10 +433,9 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
 
     // END SCOPES
     // SETTERS
-    // SETTERS
-    // SETTERS
     /**
-     * @return int|mixed|string
+     * @param  int|string  $name  Identifier or name of the user.
+     * @return int|string User identifier.
      */
     public static function createIfNotExists($name)
     {
@@ -527,6 +546,7 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
     }
 
     /**
+     * @param  string  $area  Area or field to check.
      * @return bool
      */
     public function canEdit($area)
@@ -541,11 +561,12 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
     }
 
     /**
+     * @param  string  $field  Field to check.
      * @return bool
      */
     public function canEditField($field)
     {
-        return $this->isAdmin || in_array($field, $this->getEditableFields());
+        return $this->isAdmin || in_array($field, $this->getEditableFields() ?: []);
     }
 
     /**
@@ -553,7 +574,7 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
      */
     public function getEditableFields()
     {
-        return explode(',', $this->canEditFields);
+        return explode(',', $this->canEditFields ?? '');
     }
 
     /**
@@ -574,6 +595,8 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
 
     /**
      * Ensure certain user settings are present, if not, set a sensible default
+     *
+     * @return void
      */
     public function ensureDefaultSettings()
     {
@@ -598,6 +621,9 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
     }
 
     /**
+     * @param  string  $key  Setting key.
+     * @return void
+     *
      * @throws Exception
      */
     public function forgetSetting($key)
@@ -609,6 +635,7 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
     }
 
     /**
+     * @param  string  $key  Setting key.
      * @return bool
      */
     public function hasSetting($key)
@@ -622,9 +649,17 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
      * @param  bool  $unserialize
      * @return UserSetting|mixed
      */
-    public function getSetting($key, $default = null, $returnObject = false, $unserialize = true)
+    /**
+     * Read a user setting with an arbitrary fallback value.
+     *
+     * @param  string  $key  Setting key.
+     * @param  mixed  $default  Value returned when the setting is absent.
+     * @param  bool  $returnObject  Whether the setting model is returned.
+     * @return mixed
+     */
+    public function getSetting($key, $default = null, $returnObject = false)
     {
-        return Settings::get($this, $key, $default, $returnObject, $unserialize);
+        return Settings::get($this, $key, $default, $returnObject);
     }
 
     /**
@@ -639,10 +674,8 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
         switch ($format) {
             case self::NAME_FORMAT_INITIAL_AND_LAST:
                 return $this->initialedName($withTitle);
-                break;
             case self::NAME_FORMAT_FIRST_AND_LAST:
                 return $this->fullName($withTitle);
-                break;
         }
 
         return $this->lastName($withTitle);
@@ -680,7 +713,7 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
         $homeScreen = $this->getSetting('homeScreen', 'route:calendar');
         if (substr($homeScreen, 0, 11) == 'homescreen:') {
             $homeScreenClass = 'App\\HomeScreens\\'.ucfirst(substr($homeScreen, 11)).'HomeScreen';
-            if (class_exists($homeScreenClass)) {
+            if (class_exists($homeScreenClass) && is_subclass_of($homeScreenClass, AbstractHomeScreen::class)) {
                 return new $homeScreenClass;
             }
         }
@@ -688,7 +721,9 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
         return null;
     }
 
-    /** Return the model field used for its profile image. */
+    /** Return the model field used for its profile image.
+     * @return string
+     */
     public function getImageField()
     {
         return 'image';
@@ -716,7 +751,11 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
         }
     }
 
-    /** Persist one user setting. */
+    /** Persist one user setting.
+     * @param  string  $key  Setting key.
+     * @param  mixed  $value  Value to store.
+     * @return mixed
+     */
     public function setSetting($key, $value)
     {
         return Settings::set($this, $key, $value);
@@ -725,6 +764,7 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
     /**
      * Get the users subscription type for a city
      *
+     * @param  int|City  $city  City or its identifier.
      * @return int
      */
     public function getSubscriptionType($city)
@@ -783,6 +823,8 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
      * (A) Pastors (role Pastor:in, Diakon:in) may see all fellow pastors in their district (cities with view rights) and all staff in their home cities
      * (B) Staff (users with manage_absences flag set) may see all fellow staff in their home city
      * (C) Users without the manage_absences flag see nothing at all
+     *
+     * @return Collection<int, User>
      */
     public function getViewableAbsenceUsers()
     {
@@ -801,7 +843,7 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
                 $query->whereIn('cities.id', $this->homeCities->pluck('id'));
             }
         )->where('manage_absences', 1)
-            ->get()->pluck('id')->toArray();
+            ->pluck('id')->all();
         $ids = array_merge($ids, $newIds);
 
         // (A) Pastors (role Pastor:in, Diakon:in) may also see all fellow pastors in their district (cities with view rights)
@@ -821,7 +863,7 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
                         }
                     );
                 }
-            )->get()->pluck('id')->toArray();
+            )->pluck('id')->all();
             $ids = array_merge($ids, $newIds);
         }
 
@@ -846,7 +888,8 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
 
     /**
      * @param  bool  $returnAbsence
-     * @return bool|Builder|Model|object|null
+     * @param  mixed  $date  Date to check.
+     * @return bool|Absence|null
      *
      * @throws Exception
      */
@@ -869,7 +912,8 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
 
     /**
      * @param  bool  $returnServices
-     * @return bool|null
+     * @param  mixed  $date  Date to check.
+     * @return \Illuminate\Database\Eloquent\Collection<int, Service>|bool|null
      */
     public function isBusy($date, $returnServices = false)
     {
@@ -890,7 +934,8 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
 
     /**
      * @param  bool  $returnAbsence
-     * @return bool|null
+     * @param  mixed  $date  Date to check.
+     * @return Absence|bool|null
      *
      * @throws Exception
      */
@@ -910,7 +955,9 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
         return ($absences !== null) ? ($returnAbsence ? $absences : null) : ($returnAbsence ? null : false);
     }
 
-    /** Merge this user into another account and transfer its associations. */
+    /** Merge this user into another account and transfer its associations.
+     * @return void
+     */
     public function mergeInto(User $user)
     {
         if ((! $user->isOfficialUser) && $this->isOfficialUser) {
@@ -991,7 +1038,8 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
     }
 
     /**
-     * @return string
+     * @param  City|int|string  $city  City or its identifier.
+     * @return string|null
      */
     public function permissionForCity($city)
     {
@@ -1029,11 +1077,14 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
             ->withPivot('category');
     }
 
-    /** Replace city subscriptions from a city/type map. */
+    /** Replace city subscriptions from a city/type map.
+     * @param  array<int|string, mixed>  $subscriptions  Subscription settings.
+     * @return void
+     */
     public function setSubscriptionsFromArray($subscriptions)
     {
         foreach ($subscriptions as $city => $type) {
-            $this->setSubscription($city, $type);
+            $this->setSubscription((int) $city, (int) $type);
         }
     }
 
@@ -1046,7 +1097,7 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
      */
     public function setSubscription($city, int $type)
     {
-        $city = is_int($city) ? City::find($city) : $city;
+        $city = is_int($city) ? City::query()->findOrFail($city) : $city;
         $subscription = $this->getSubscription($city);
         if ($subscription === null) {
             $subscription = new Subscription(
@@ -1065,9 +1116,10 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
     /**
      * Sync related users list for a specific kind of relation
      *
-     * @param  $relation  Kind of relation
-     * @param  $relationString  Relation pivot string
-     * @param  $userIds  User ids
+     * @param  string  $relation  Relation name.  Kind of relation
+     * @param  string  $relationString  Pivot value.  Relation pivot string
+     * @param  array<int, int>  $userIds  User identifiers.  User ids
+     * @return void
      */
     public function syncRelatedUsers($relation, $relationString, $userIds)
     {
@@ -1077,7 +1129,9 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
         }
     }
 
-    /** Return teams assigned to the user. */
+    /** Return teams assigned to the user.
+     * @return BelongsToMany<Team, $this>
+     */
     public function teams()
     {
         return $this->belongsToMany(Team::class);
@@ -1086,6 +1140,9 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
     /**
      * Update this users permissions from an array
      * Format [ city_id => ['permission' => level]]
+     *
+     * @param  array<int|string, mixed>  $permissions  Permissions by city.
+     * @return void
      */
     public function updateCityPermissions($permissions, ?User $actingUser = null)
     {
@@ -1145,8 +1202,8 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
      * Check if another user has admin rights for this user
      * This is the case, if the other user administers one of this users homeCities
      *
-     * @param  $user  User User to be checked for admin rights
-     * @return bool True if other user has admin rights for this one
+     * @param  User  $user  Potential administrator.  User User to be checked for admin rights
+     * @return bool
      */
     public function administeredBy($user)
     {
@@ -1216,14 +1273,17 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
     }
 
     /**
-     * @return array|string|null
+     * @param  int  $format  Name format constant.
+     * @return ($format is NameService::LAST_FIRST_ARRAY ? list<string> : string)
      */
     public function formatName($format)
     {
         return $this->nameService()->format($format);
     }
 
-    /** Determine whether the user is an active poolmaster for a city today. */
+    /** Determine whether the user is an active poolmaster for a city today.
+     * @return bool
+     */
     public function isCurrentlyPoolmasterForCity(City $city)
     {
         return Poolmaster::where('user_id', $this->id)

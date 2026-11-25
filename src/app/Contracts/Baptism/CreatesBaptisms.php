@@ -34,6 +34,6 @@ use App\Models\People\User;
 use App\Models\Rites\Baptism;
 
 /**
- * @method Baptism create(User $user, array $input)
+ * @method Baptism create(User $user, array<string, mixed> $input)
  */
 interface CreatesBaptisms {}

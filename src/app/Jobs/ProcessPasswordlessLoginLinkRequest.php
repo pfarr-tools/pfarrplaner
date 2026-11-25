@@ -30,7 +30,10 @@ class ProcessPasswordlessLoginLinkRequest
         // Keep the nonce out of both database rows and serialized mail payloads.
         $nonce = bin2hex(random_bytes(32));
         $linkId = DB::transaction(function () use ($user, $nonce): ?int {
-            $lockedUser = User::query()->lockForUpdate()->findOrFail($user->getKey());
+            $lockedUser = User::query()->lockForUpdate()->whereKey($user->getKey())->first();
+            if ($lockedUser === null) {
+                return null;
+            }
             if (! $lockedUser->isOfficialUser || $lockedUser->isLocked) {
                 return null;
             }

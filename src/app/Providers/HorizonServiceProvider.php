@@ -8,6 +8,13 @@ use Laravel\Horizon\HorizonApplicationServiceProvider;
 
 class HorizonServiceProvider extends HorizonApplicationServiceProvider
 {
+    /**
+     * Prüfen, ob eine E-Mail-Adresse für den Horizon-Zugang freigegeben ist.
+     *
+     * @param  string|null  $email  Zu prüfende E-Mail-Adresse.
+     * @param  array<int, string>  $allowedEmails  Freigegebene E-Mail-Adressen aus der Konfiguration.
+     * @return bool Ob die Adresse freigegeben ist.
+     */
     public static function isEmailAllowed(?string $email, array $allowedEmails): bool
     {
         $normalizedEmail = strtolower(trim((string) $email));

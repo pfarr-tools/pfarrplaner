@@ -83,7 +83,6 @@ class ServiceController extends Controller
             ->where('city_id', $city->id)
             ->where('day_id', '=', $day->id)
             ->orderBy('time')
-            ->get()
             ->pluck('id');
     }
 
@@ -95,9 +94,12 @@ class ServiceController extends Controller
         $service->load(
             ['location', 'city', 'participants', 'weddings', 'funerals', 'baptisms', 'day', 'tags', 'serviceGroups']
         );
-        $service->liturgy = LiturgyService::getLiturgyInfoByDate($service->day);
-        if (isset($service->liturgy['Bezeichnung']) && ($service->day->name == '')) {
-            $service->day->name = $service->liturgy['title'];
+        $day = $service->day;
+        $service->liturgy = $day !== null && $day->date !== null
+            ? LiturgyService::getLiturgyInfoByDate($day->date->toDateString())
+            : [];
+        if ($day !== null && isset($service->liturgy['Bezeichnung']) && $day->name == '') {
+            $day->name = $service->liturgy['title'];
         }
 
         return response()->json($service);
@@ -114,7 +116,7 @@ class ServiceController extends Controller
     {
         $date = Carbon::parse($date);
         $start = $date->copy()->firstOfMonth()->setTime(0, 0, 0);
-        $end = $start->copy()->addMonth(1)->subSecond(1);
+        $end = $start->copy()->addMonth()->subSecond();
         $services = Service::inCities(explode(',', $cities))->between($start, $end)->ordered()->get();
 
         return new CalendarServicesCollectionResource($services);
@@ -137,7 +139,9 @@ class ServiceController extends Controller
             ->get();
 
         foreach ($services as $service) {
-            $service->liturgy = LiturgyService::getLiturgyInfoByDate($service->day);
+            $service->liturgy = $service->date !== null
+                ? LiturgyService::getLiturgyInfoByDate($service->date->toDateString())
+                : [];
         }
 
         return response()->json(compact('services'))->header('Access-Control-Allow-Origin', '*');
@@ -240,6 +244,7 @@ class ServiceController extends Controller
     public function claimPredicant(Service $service): JsonResponse
     {
         $user = Auth::user();
+        abort_unless($user instanceof User, 401);
         abort_unless($user->hasAnyRole([
             RoleService::ROLE_PREDICANT,
             'Gottesdienstbearbeiter:in',

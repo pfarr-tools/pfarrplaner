@@ -30,42 +30,71 @@
 
 namespace App\Attachments;
 
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
+/** Factory for automatic attachments. */
 class AttachmentFactory
 {
-    public static function getList($type)
+    /**
+     * Liefert die Metadaten der automatischen Attachments eines Eintragstyps.
+     *
+     * Für nicht unterstützte Typen wird ein leeres Array geliefert. Dateien,
+     * deren Name mit „Abstract“ beginnt, werden als Basisklassen ausgeschlossen.
+     *
+     * @param  string  $type  Typ des zugehörigen Eintrags (baptism, funeral oder wedding).
+     * @return array<int, mixed>|Collection<array-key, mixed> Metadaten der verfügbaren Attachments.
+     */
+    public static function getList(string $type): array|Collection
     {
         if (! in_array($type, ['baptism', 'funeral', 'wedding'])) {
             return [];
         }
 
-        /** @var \Closure(mixed): array<string, mixed> $infoMapper */
-        $infoMapper = function ($file) {
-            return (static::getClassFromFile($file))::getInfo();
+        $infoMapper = function (string $file) {
+            /** @var class-string<AbstractAttachment> $class */
+            $class = static::getClassFromFile($file);
+
+            return $class::getInfo();
         };
 
-        return collect(glob(app_path('Attachments/'.ucfirst($type).'/*.php')))
-            ->reject(function ($file) {
+        return collect(glob(app_path('Attachments/'.ucfirst($type).'/*.php')) ?: [])
+            ->reject(function (string $file) {
                 return Str::startsWith(basename($file), 'Abstract');
             })
             ->map($infoMapper);
-
     }
 
-    public static function get($type, $key, $id): ?AbstractAttachment
+    /**
+     * Erzeugt das automatische Attachment mit dem angegebenen Schlüssel für einen Eintrag.
+     *
+     * @param  string  $type  Typ des zugehörigen Eintrags.
+     * @param  string  $key  Schlüssel des Attachments aus getList().
+     * @param  int|string  $id  ID des zugehörigen Eintrags.
+     * @return AbstractAttachment|null Attachment zum Eintrag oder null bei unbekanntem Schlüssel.
+     */
+    public static function get(string $type, string $key, int|string $id): ?AbstractAttachment
     {
-        $item = static::getList($type)->first(function ($item) use ($key) {
+        $item = collect(static::getList($type))->first(function ($item) use ($key) {
             return $item['key'] == $key;
         });
         if (! $item) {
             return null;
         }
 
-        return ($item['class'])::fromId($id);
+        /** @var class-string<AbstractAttachment> $class */
+        $class = $item['class'];
+
+        return $class::fromId($id);
     }
 
-    protected static function getClassFromFile($file)
+    /**
+     * Ermittelt den Klassennamen eines Attachment-Dateipfads.
+     *
+     * @param  string  $file  Dateipfad der Attachment-Klasse innerhalb der Anwendung.
+     * @return string Vollqualifizierter Klassenname der Attachment-Klasse.
+     */
+    protected static function getClassFromFile(string $file): string
     {
         return 'App\\'.Str::replace(['/', '.php'], ['\\', ''], Str::after($file, 'app/'));
     }

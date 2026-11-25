@@ -54,6 +54,7 @@ class UpdateTag extends AbstractUpdateAction implements UpdatesTags
     /**
      * Update a tag
      *
+     * @param  array<string, mixed>  $input
      * @return Tag
      *
      * @throws AuthorizationException

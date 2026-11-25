@@ -62,7 +62,9 @@ class DeleteLocation extends AbstractDeleteAction implements DeletesLocations
     public function delete(User $user, Location $location)
     {
         Gate::forUser($user)->authorize('delete', $location);
-        $this->city = $location->city;
+        $city = $location->city;
+        abort_unless($city instanceof City, 404);
+        $this->city = $city;
         DeletedLocation::dispatch($user, $location);
         $this->messages = ['success' => 'Der Ort wurde gelöscht.'];
 

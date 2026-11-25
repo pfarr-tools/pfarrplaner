@@ -30,42 +30,73 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\People\User;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
+use Inertia\Response;
 use Laravel\Sanctum\PersonalAccessToken;
 
+/** Controller for API token management. */
 class TokenController extends Controller
 {
+    /**
+     * @return void
+     */
     public function __construct()
     {
         $this->middleware('auth');
     }
 
-    public function index()
+    /**
+     * Render the token overview for the authenticated user.
+     *
+     * @return Response Inertia response with the user's tokens.
+     */
+    public function index(): Response
     {
-        Gate::authorize('update', Auth::user());
-        $tokens = Auth::user()->tokens;
+        $user = Auth::user();
+        abort_unless($user instanceof User, 401);
+        Gate::authorize('update', $user);
+        $tokens = $user->tokens;
         $token = null;
 
         return Inertia::render('tokens', compact('tokens', 'token'));
     }
 
-    public function create(Request $request)
+    /**
+     * Create a new personal access token from the validated request.
+     *
+     * @param  Request  $request  Request containing the token title.
+     * @return Response Inertia response with the new token and all tokens.
+     */
+    public function create(Request $request): Response
     {
-        Gate::authorize('update', Auth::user());
+        $user = Auth::user();
+        abort_unless($user instanceof User, 401);
+        Gate::authorize('update', $user);
         $request->validate(['title' => 'required|string']);
-        $token = Auth::user()->createToken($request->get('title'));
-        $tokens = Auth::user()->tokens;
+        $token = $user->createToken($request->get('title'));
+        $tokens = $user->tokens;
 
         return Inertia::render('tokens', compact('tokens', 'token'));
     }
 
-    public function destroy(Request $request, PersonalAccessToken $token)
+    /**
+     * Delete the given personal access token.
+     *
+     * @param  Request  $request  Incoming request.
+     * @param  PersonalAccessToken  $token  Token to delete.
+     * @return RedirectResponse Redirect to the token overview.
+     */
+    public function destroy(Request $request, PersonalAccessToken $token): RedirectResponse
     {
-        Gate::authorize('update', Auth::user());
-        Auth::user()->tokens()->where('id', $token->id)->delete();
+        $user = Auth::user();
+        abort_unless($user instanceof User, 401);
+        Gate::authorize('update', $user);
+        $user->tokens()->where('id', $token->id)->delete();
 
         return redirect()->route('tokens.index');
     }

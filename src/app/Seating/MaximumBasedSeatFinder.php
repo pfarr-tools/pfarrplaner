@@ -33,6 +33,7 @@ namespace App\Seating;
 use App\Models\Seating\Booking;
 use App\Models\Seating\SeatingRow;
 use App\Models\Service;
+use Illuminate\Support\Collection;
 
 class MaximumBasedSeatFinder extends AbstractSeatFinder
 {
@@ -47,12 +48,26 @@ class MaximumBasedSeatFinder extends AbstractSeatFinder
         parent::__construct($service, $preloadExistingBookings);
     }
 
+    /**
+     * Check whether the requested number of people can still be seated.
+     *
+     * @param  int  $number  Number of people.
+     * @param  string  $fixedSeat  Desired fixed seating position.
+     * @param  string  $overrideSeats  Override for the number of seats.
+     * @param  string  $overrideSplit  Override for the split configuration.
+     * @param  Collection<int, Booking>|null  $bookings  Existing bookings.
+     * @return bool True if the booking can be added.
+     */
     public function find($number, $fixedSeat = '', $overrideSeats = '', $overrideSplit = '', $bookings = null)
     {
         return $this->remainingCapacity() - $number >= 0;
     }
 
-    public function checkIfBookingCanBeChanged(Booking $booking, array $data): bool
+    /**
+     * @param  mixed  $data  Proposed booking data.
+     * @return bool
+     */
+    public function checkIfBookingCanBeChanged(Booking $booking, $data): bool
     {
         return ($this->remainingCapacity() + $booking->number - $data['number']) >= 0;
     }

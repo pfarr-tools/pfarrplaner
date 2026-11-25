@@ -34,6 +34,6 @@ use App\Models\People\User;
 use App\Models\Places\StreetRange;
 
 /**
- * @method StreetRange update(User $user, StreetRange $streetRange, array $input)
+ * @method StreetRange update(User $user, StreetRange $streetRange, array<string, mixed> $input)
  */
 interface UpdatesStreetRanges {}

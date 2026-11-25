@@ -39,11 +39,13 @@ class ContactFormMessage extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
+    /** @var array<string, mixed> */
     protected $data = [];
 
     /**
      * Create a new message instance.
      *
+     * @param  array<string, mixed>  $data  Daten des Kontaktformulars.
      * @return void
      */
     public function __construct($data)

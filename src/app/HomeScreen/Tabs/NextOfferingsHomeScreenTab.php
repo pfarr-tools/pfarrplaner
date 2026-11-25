@@ -33,23 +33,32 @@ namespace App\HomeScreen\Tabs;
 use App\Models\Service;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\Auth;
 
+/** Home screen tab showing the next offerings. */
 class NextOfferingsHomeScreenTab extends AbstractHomeScreenTab
 {
     protected $title = 'Nächste Gottesdienste (mit Opferzweck)';
 
     protected $description = 'Zeigt die nächsten Gottesdienste (mit Opferzweck) an';
 
+    /**
+     * @var Builder<Service>
+     */
     protected $query = null;
 
+    /**
+     * @param  array<string, mixed>  $config  Tab configuration.\n     * @return void
+     */
     public function __construct($config = [])
     {
         parent::__construct($config);
         $this->query = $this->buildQuery();
     }
 
-    public function getTitle($full = true): string
+    /**
+     * @param  bool  $full  Whether to show the full title.\n     * @return string
+     */
+    public function getTitle(bool $full = true): string
     {
         if (! $full) {
             return 'Nächste Gottesdienste';
@@ -58,11 +67,17 @@ class NextOfferingsHomeScreenTab extends AbstractHomeScreenTab
         return parent::getTitle();
     }
 
+    /**
+     * @return int
+     */
     public function getCount()
     {
         return $this->query->count();
     }
 
+    /**
+     * @param  array<string, mixed>  $data  View data.\n     * @return mixed
+     */
     public function getContent($data = [])
     {
         $data['services'] = $this->query->get();
@@ -70,6 +85,9 @@ class NextOfferingsHomeScreenTab extends AbstractHomeScreenTab
         return parent::getContent($data);
     }
 
+    /**
+     * @param  array<string, mixed>  $data  Additional data.\n     * @return array<string, mixed>
+     */
     public function toArray($data = [])
     {
         $data['services'] = $this->query->get();
@@ -86,11 +104,11 @@ class NextOfferingsHomeScreenTab extends AbstractHomeScreenTab
     public function buildQuery()
     {
         $start = Carbon::now()->setTime(0, 0, 0);
-        $end = Carbon::now()->addMonth(2);
+        $end = Carbon::now()->addMonths(2);
 
         $query = Service::with(['baptisms', 'weddings', 'funerals', 'location'])
             ->between($start, $end)
-            ->inCities(Auth::user()->writableCities->pluck('id'))
+            ->inCities($this->user()->writableCities->pluck('id'))
             ->ordered();
 
         return $query;

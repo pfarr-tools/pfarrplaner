@@ -238,9 +238,11 @@ class UserPolicy
     }
 
     /**
-     * Determine wether the user can edit another users absences
+     * Determine whether the user may edit another user's absences.
+     *
+     * @return bool Whether absence editing is allowed.
      */
-    public function editAbsences(User $user, User $model)
+    public function editAbsences(User $user, User $model): bool
     {
         if ($user->id == $model->id) {
             return true;

@@ -34,20 +34,33 @@ use Illuminate\Support\Str;
 
 class CalwerPredigtenStudyHelper extends AbstractStudyHelper
 {
+    /** @var string */
     public $title = 'Calwer Predigten';
 
+    /** @var array<string, array<string, string>> */
     protected $records = [];
 
+    /**
+     * Liest die Predigtlinks aller Ergebnisseiten der Calwer Predigten.
+     *
+     * @param array<string, mixed> $data
+     * @return array<string, array<string, string>>
+     */
     public function read(array $data): array
     {
         for ($i = 0; $i <= 90; $i += 10) {
-            $this->records = array_merge($this->records ?? [], $this->readSinglePage('https://www.calwer-stiftung.com/calwer-predigten-online.365730.202264.htm?id=365730&md=202264&skip='.$i));
+            $this->records = array_merge($this->records, $this->readSinglePage('https://www.calwer-stiftung.com/calwer-predigten-online.365730.202264.htm?id=365730&md=202264&skip='.$i));
         }
 
         return $this->records;
     }
 
-    protected function readSinglePage($url)
+    /**
+     * Liest die Predigtlinks einer einzelnen Ergebnisseite.
+     *
+     * @return array<string, array<string, string>>
+     */
+    protected function readSinglePage(string $url): array
     {
         if ('' == ($content = $this->getContent($url))) {
             return [];
@@ -57,7 +70,10 @@ class CalwerPredigtenStudyHelper extends AbstractStudyHelper
         $doc->loadHTML($content);
 
         $records = [];
-        /** @var \DOMNode $li */
+        $recordDate = '';
+        $recordTitle = '';
+        $recordUrl = '';
+        /** @var \DOMElement $li */
         foreach ($doc->getElementsByTagName('li') as $li) {
             foreach ($li->getElementsByTagName('div') as $div) {
                 if ($div->getAttribute('class') == 'list-headline') {
@@ -84,6 +100,12 @@ class CalwerPredigtenStudyHelper extends AbstractStudyHelper
         return $records;
     }
 
+    /**
+     * Ergänzt die Predigtlinks für das angeforderte Datum.
+     *
+     * @param array<string, mixed> $data
+     * @return array<string, mixed>
+     */
     public function getLinks(array $data): array
     {
         $data['links'] = array_merge($data['links'] ?? [], $this->records[$data['date']] ?? []);

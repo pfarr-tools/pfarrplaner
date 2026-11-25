@@ -76,25 +76,30 @@ class AbsencePolicy
      */
     public function update(User $user, Absence $absence)
     {
-        if ($user->id == $absence->user->id) {
+        $absenceUser = $absence->user;
+        if ($absenceUser === null) {
+            return false;
+        }
+
+        if ($user->id == $absenceUser->id) {
             return true;
         }
 
         // via permission
         if ($user->hasPermissionTo('fremden-urlaub-bearbeiten')) {
-            $cityIds = $absence->user->homeCities->pluck('id');
+            $cityIds = $absenceUser->homeCities->pluck('id');
             foreach ($user->writableCities as $city) {
-                if ($cityIds->contains($city->id) && (! $absence->user->hasRole('Pfarrer:in'))) {
+                if ($cityIds->contains($city->id) && (! $absenceUser->hasRole('Pfarrer:in'))) {
                     return true;
                 }
             }
         }
 
         // via workflow
-        if ($absence->user->vacationAdmins->pluck('id')->contains($user->id)) {
+        if ($absenceUser->vacationAdmins->pluck('id')->contains($user->id)) {
             return true;
         }
-        if (($absence->workflow_status > 0) && $absence->user->vacationApprovers->pluck('id')->contains($user->id)) {
+        if (($absence->workflow_status > 0) && $absenceUser->vacationApprovers->pluck('id')->contains($user->id)) {
             return true;
         }
 
@@ -132,8 +137,11 @@ class AbsencePolicy
      */
     public function selfAdminister(User $user, ?Absence $absence = null)
     {
-        if (($absence !== null) && ($absence->user->id != $user->id)) {
-            return false;
+        if ($absence !== null) {
+            $absenceUser = $absence->user;
+            if (($absenceUser === null) || ($absenceUser->id != $user->id)) {
+                return false;
+            }
         }
 
         return ($user->vacationAdmins->count() == 0) && ($user->vacationApprovers->count() == 0);

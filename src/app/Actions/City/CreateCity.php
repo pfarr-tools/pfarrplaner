@@ -48,6 +48,8 @@ class CreateCity extends AbstractCreateAction implements CreatesCities
     }
 
     /**
+     * @param  array<string, mixed>  $input
+     *
      * @throws AuthorizationException
      * @throws ValidationException
      */

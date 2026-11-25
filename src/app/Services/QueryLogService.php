@@ -44,14 +44,15 @@ class QueryLogService
 {
     public const SEPARATOR = PHP_EOL;
 
+    /** @var string */
     protected static $logFile = '';
 
     /**
      * Get the path to the query log
      *
-     * @return string
+     * @param  string  $log  Optional suffix for the query log file name.
      */
-    public static function file($log = '')
+    public static function file($log = ''): string
     {
         if (self::$logFile != '') {
             $file = self::$logFile;
@@ -78,11 +79,12 @@ class QueryLogService
     /**
      * Get all stored queries
      *
-     * @return array
+     * @param  string  $log  Optional suffix for the query log file name.
+     * @return array<int, array{time: Carbon, query: string}>
      *
      * @throws FileNotFoundException
      */
-    public static function all($log = '')
+    public static function all($log = ''): array
     {
         if (! File::exists(self::file($log))) {
             return [];
@@ -106,7 +108,7 @@ class QueryLogService
     /**
      * Register the service
      */
-    public static function register()
+    public static function register(): void
     {
         // Query logging
         /**
@@ -117,7 +119,7 @@ class QueryLogService
                 $bindings = $query->bindings ?? [];
                 $normalizedBindings = array_map(
                     function ($binding) {
-                        if (is_a($binding, \DateTime::class) || is_a($binding, Carbon::class)) {
+                        if (is_a($binding, \DateTime::class)) {
                             return '"'.$binding->format('Y-m-d H:i:s').'"';
                         }
                         if (is_object($binding) && method_exists($binding, '__toString')) {
@@ -157,6 +159,6 @@ class QueryLogService
      */
     public static function date()
     {
-        return Carbon::createFromTimestamp(filemtime(self::file()));
+        return Carbon::createFromTimestamp((int) filemtime(self::file()));
     }
 }

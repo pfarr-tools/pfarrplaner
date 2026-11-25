@@ -42,7 +42,7 @@ use App\Services\NameService;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -71,6 +71,7 @@ class AnnouncementsReport extends AbstractWordDocumentReport
 
     public const FILE_SIGNATURE = '91.8';
 
+    /** @var array<string, mixed> */
     protected $config = [
         'layout' => [
             'orientation' => 'landscape',
@@ -111,6 +112,7 @@ class AnnouncementsReport extends AbstractWordDocumentReport
         ],
     ];
 
+    /** @var bool */
     protected $useDefaultDocument = true;
 
     /**
@@ -138,7 +140,8 @@ class AnnouncementsReport extends AbstractWordDocumentReport
      */
     public function setup()
     {
-        $cities = Auth::user()->cities->load('parent');
+        $user = $this->authenticatedUser();
+        $cities = $user->cities->load('parent');
 
         return Inertia::render('Report/Announcements/Setup', compact('cities'));
     }
@@ -149,7 +152,7 @@ class AnnouncementsReport extends AbstractWordDocumentReport
     public function services(Request $request)
     {
         $data = $request->validate(['city' => 'required|int']);
-        $city = City::findOrFail($data['city']);
+        $city = City::findOrFail((int) $data['city']);
         $serviceList = Service::with(['location'])
             ->regularForCity($city)
             ->displayable()
@@ -161,7 +164,7 @@ class AnnouncementsReport extends AbstractWordDocumentReport
         foreach ($serviceList as $service) {
             $services[] = [
                 'id' => $service->id,
-                'name' => $service->date->format('d.m.Y').' '.$service->timeText().', '.$service->locationText,
+                'name' => $service->trueDate()?->format('d.m.Y').' '.$service->timeText().', '.$service->locationText(),
             ];
         }
 
@@ -180,13 +183,16 @@ class AnnouncementsReport extends AbstractWordDocumentReport
             'service' => 'required|int|exists:services,id',
         ]);
 
-        $city = City::findOrFail($data['city']);
-        $service = Service::findOrFail($data['service']);
+        $city = City::findOrFail((int) $data['city']);
+        $service = Service::findOrFail((int) $data['service']);
+
+        $date = $service->trueDate();
+        abort_unless($date instanceof Carbon, 404);
 
         $days = Service::select(DB::raw('DISTINCT DATE(date) AS day'))
-            ->endingAt($service->date->copy()->subDays(1))
+            ->endingAt($date->copy()->subDays(1))
             ->regularForCity($city)
-            ->orderBy('day', 'DESC')
+            ->orderBy('day', 'desc')
             ->limit(10)
             ->get()
             ->pluck('day');
@@ -214,25 +220,29 @@ class AnnouncementsReport extends AbstractWordDocumentReport
 
         $amount = 0;
         foreach ($services as $service) {
-            $amount += (float) strtr($service->offering_amount, [' ' => '', '€' => '']);
+            $amount += (float) strtr((string) $service->offering_amount, [' ' => '', '€' => '']);
         }
 
         return response()->json($amount);
     }
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function auto(Request $request)
     {
         if (! $request->has('service')) {
             abort(404);
         }
-        $service = Service::findOrFail($request->get('service'));
+        $service = Service::findOrFail((int) $request->get('service'));
         $lastService = Service::where('offering_amount', '!=', '')
             ->endingAt($service->dateTime)
             ->orderedDesc()
             ->first();
+        abort_unless($lastService instanceof Service, 404);
 
         return $this->renderReport([
-            'lastService' => $lastService->date->format('d.m.Y'),
+            'lastService' => $lastService->date?->format('d.m.Y'),
             'offerings' => $lastService->offering_amount,
             'offering_text' => $service->offering_text,
             'service' => $service->id,
@@ -241,16 +251,21 @@ class AnnouncementsReport extends AbstractWordDocumentReport
         ]);
     }
 
+    /**
+     * @param  mixed  $data  Report request data.
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function renderReport($data)
     {
-        $service = Service::findOrFail($data['service']);
-        $city = City::findOrFail($data['city']);
+        $service = Service::findOrFail((int) $data['service']);
+        $city = City::findOrFail((int) $data['city']);
 
         // is this part of an org?
         $localCity = $city;
         if ($city->parent_id) {
             $city = $city->parent;
         }
+        abort_unless($city instanceof City, 404);
 
         $lastService = $data['lastService'];
         $offerings = $data['offerings'];
@@ -264,19 +279,19 @@ class AnnouncementsReport extends AbstractWordDocumentReport
 
         // //////////////////////////////////////////////////////////////////////////////////////////////
 
-        $this->doc->getPhpWord()->getSettings()->setBookFoldPrinting(true);
+        $this->doc->getPhpWord()?->getSettings()->setBookFoldPrinting(true);
 
-        $textRun = $this->doc->getSection()->addTextRun('Bekanntgaben');
-        $textRun->addText(
-            $service->date->isoFormat('DD. MMMM YYYY')
+        $textRun = $this->doc->getSection()?->addTextRun('Bekanntgaben');
+        $textRun?->addText(
+            $service->trueDate()?->isoFormat('DD. MMMM YYYY')
             .(($service->liturgicalInfo['title'] ?? false) ? ' - '.$service->liturgicalInfo['title'] : ''),
             ['bold' => true]
         );
 
-        $textRun = $this->doc->getSection()->addTextRun('Bekanntgaben');
-        $textRun->addText($service->timeText().' '.$service->locationText());
+        $textRun = $this->doc->getSection()?->addTextRun('Bekanntgaben');
+        $textRun?->addText($service->timeText().' '.$service->locationText());
 
-        $this->doc->getSection()->addTextBreak();
+        $this->doc->getSection()?->addTextBreak();
 
         foreach (
             [
@@ -304,7 +319,7 @@ class AnnouncementsReport extends AbstractWordDocumentReport
         $this->doc->renderParagraph(self::NO_INDENT, [
             ['Abkündigungen', self::BOLD_UNDERLINE],
         ]);
-        $this->doc->getSection()->addTextBreak();
+        $this->doc->getSection()?->addTextBreak();
 
         // ANNOUNCEMENTS
 
@@ -322,7 +337,7 @@ class AnnouncementsReport extends AbstractWordDocumentReport
             } else {
                 $this->renderParagraphArray($items, self::NO_INDENT);
             }
-            $this->doc->getSection()->addTextBreak();
+            $this->doc->getSection()?->addTextBreak();
         });
 
         if (! empty($service->konfiapp_event_qr)) {
@@ -334,7 +349,7 @@ class AnnouncementsReport extends AbstractWordDocumentReport
                 static::FILE_TITLE,
                 '.docx',
                 static::FILE_SIGNATURE,
-                $service->date
+                $service->trueDate()
             )
         );
     }
@@ -363,6 +378,10 @@ class AnnouncementsReport extends AbstractWordDocumentReport
     /**
      * @return string
      */
+    /**
+     * @param  mixed  $s  Name to render.
+     * @return mixed
+     */
     protected function renderName($s)
     {
         if (strpos($s, ',') !== false) {
@@ -373,6 +392,11 @@ class AnnouncementsReport extends AbstractWordDocumentReport
         return $s;
     }
 
+    /**
+     * @param  array<int, mixed>|Collection<int, mixed>  $people  People to list.
+     * @param  string  $and  Conjunction for the last item.
+     * @return string
+     */
     protected function getNameListLine($people, $and = ', ')
     {
         $names = collect();
@@ -383,6 +407,11 @@ class AnnouncementsReport extends AbstractWordDocumentReport
         return $names->join(', ', $and);
     }
 
+    /**
+     * @param  mixed  $ministry  Ministry name.
+     * @param  mixed  $people  People in the ministry.
+     * @return void
+     */
     protected function renderMinistryLine($ministry, $people)
     {
         $this->doc->renderParagraph(self::INDENT, [
@@ -390,12 +419,15 @@ class AnnouncementsReport extends AbstractWordDocumentReport
         ]);
     }
 
+    /**
+     * @return mixed
+     */
     protected function renderLiturgy(Service $service)
     {
         if (! count($service->liturgyBlocks)) {
             return;
         }
-        $this->doc->getSection()->addTextBreak(1);
+        $this->doc->getSection()?->addTextBreak(1);
         foreach ($service->liturgyBlocks as $block) {
             $this->doc->renderParagraph(self::NO_INDENT, [
                 [$block->title, ['bold' => true]],
@@ -412,7 +444,7 @@ class AnnouncementsReport extends AbstractWordDocumentReport
                     $title = ': '.$helper->getTitleText();
                 }
                 if ($item->data_type == 'reading') {
-                    $title = ': '.$item->data['reference'] ?? '';
+                    $title = ': '.($item->data['reference'] ?? '');
                 }
 
                 $this->doc->renderParagraph(self::NO_INDENT, [
@@ -422,6 +454,9 @@ class AnnouncementsReport extends AbstractWordDocumentReport
         }
     }
 
+    /**
+     * @return void
+     */
     protected function renderReadings(Service $service)
     {
         foreach ($service->liturgyBlocks as $block) {
@@ -444,22 +479,34 @@ class AnnouncementsReport extends AbstractWordDocumentReport
         }
     }
 
+    /**
+     * @param  array<int, mixed>|Collection<int, mixed>  $paragraphs  Paragraphs to render.
+     * @param  string  $pStyle  Paragraph style.
+     * @return void
+     */
     protected function renderParagraphArray($paragraphs, $pStyle = self::NO_INDENT)
     {
         foreach ($paragraphs as $paragraph) {
             if ($paragraph == '') {
-                $this->doc->getSection()->addTextBreak();
+                $this->doc->getSection()?->addTextBreak();
             } else {
                 $this->doc->renderParagraph($pStyle, [[$paragraph, [], true]]);
             }
         }
     }
 
+    /**
+     * @return void
+     */
     public function renderKonfiAppQR(Service $service)
     {
-        $this->doc->getSection()->addTextBreak(1);
-        $this->doc->getSection()->addTitle('QR-Code für die KonfiApp', 1);
-        $types = KonfiAppIntegration::get($service->city)->listEventTypes();
+        $this->doc->getSection()?->addTextBreak(1);
+        $this->doc->getSection()?->addTitle('QR-Code für die KonfiApp', 1);
+        $city = $service->city;
+        if (! $city instanceof City) {
+            return;
+        }
+        $types = KonfiAppIntegration::get($city)->listEventTypes();
         $text = '';
         foreach ($types as $type) {
             if ($type->id == $service->konfiapp_event_type) {
@@ -467,13 +514,13 @@ class AnnouncementsReport extends AbstractWordDocumentReport
             }
         }
         $this->doc->renderNormalText(
-            $text.'Gültig nur am '.$service->date->isoFormat('dddd, DD. MMMM YYYY')
-            .' von '.$service->date->setTimezone('Europe/Berlin')->format('H:i')
-            .' bis '.$service->date->setTimezone('Europe/Berlin')->copy()->addHours(3)->format('H:i').' Uhr.',
+            $text.'Gültig nur am '.$service->trueDate()?->isoFormat('dddd, DD. MMMM YYYY')
+            .' von '.$service->trueDate()?->setTimezone('Europe/Berlin')->format('H:i')
+            .' bis '.$service->trueDate()?->setTimezone('Europe/Berlin')->copy()->addHours(3)->format('H:i').' Uhr.',
             ['size' => 8],
             true
         );
-        $this->doc->getSection()->addImage(
+        $this->doc->getSection()?->addImage(
             route('qrcode', $service->konfiapp_event_qr),
             ['width' => Converter::cmToPoint(4)]
         );

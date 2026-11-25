@@ -52,25 +52,38 @@ class DefaultLabelSheetDocument extends DefaultWordDocument
         );
     }
 
+    /**
+     * Render label records into a grid of table cells.
+     *
+     * @param  iterable<mixed>  $data  Label records to render.
+     * @param  int  $columns  Number of label columns per row.
+     * @param  int|float  $width  Cell width in twips.
+     * @param  int|float  $height  Row height in twips.
+     * @param  array<string, mixed>  $cellStyle  Style applied to each cell.
+     * @param  callable  $renderFunction  Callback rendering one cell.
+     * @param  int  $skipLabels  Number of leading labels to leave blank.
+     * @return void
+     */
     public function renderLabels($data, $columns, $width, $height, $cellStyle, $renderFunction, $skipLabels = 0)
     {
         $table = $this->section->addTable();
         $x = 0;
         $index = 0;
+        $row = null;
 
         for ($i = 0; $i < $skipLabels; $i++) {
-            if ($x == 0) {
-                $row = $table->addRow($height);
+            if (($x == 0) || ($row === null)) {
+                $row = $table->addRow((int) $height);
             }
-            $row->addCell($width, $cellStyle)->addText('  ');
+            $row->addCell((int) $width, $cellStyle)->addText('  ');
             $x = ($x + 1) % $columns;
         }
 
         foreach ($data as $record) {
-            if ($x == 0) {
-                $row = $table->addRow($height);
+            if (($x == 0) || ($row === null)) {
+                $row = $table->addRow((int) $height);
             }
-            $cell = $row->addCell($width, $cellStyle);
+            $cell = $row->addCell((int) $width, $cellStyle);
             $renderFunction($cell, $record, $index);
             $index++;
             $x = ($x + 1) % $columns;

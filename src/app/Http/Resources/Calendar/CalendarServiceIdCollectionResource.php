@@ -36,7 +36,7 @@ use Illuminate\Support\Facades\DB;
 
 class CalendarServiceIdCollectionResource extends ResourceCollection
 {
-    public $preserveKeys = true;
+    public bool $preserveKeys = true;
 
     /**
      * Transform the resource collection into an array.
@@ -46,7 +46,7 @@ class CalendarServiceIdCollectionResource extends ResourceCollection
     public function toArray(Request $request): array
     {
         $items = [];
-        foreach ($this->collection as $item) {
+        foreach ($this->collection ?? collect() as $item) {
             $items[$item->city_id][] = $item;
             foreach (DB::select('SELECT city_id FROM city_service WHERE service_id=?', [$item->id]) as $id) {
                 $items[$id->city_id][] = $item;

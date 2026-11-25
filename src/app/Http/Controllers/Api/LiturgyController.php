@@ -33,28 +33,38 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Liturgy\Block;
 use App\Models\Liturgy\Item;
+use App\Models\People\User;
 use App\Models\Service;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 
+/** Home screen tab or API controller. */
 class LiturgyController extends Controller
 {
+    /**
+     *   construct.
+     *
+     * @return mixed
+     */
     public function __construct()
     {
         $this->middleware('auth:sanctum,api');
     }
 
-    public function saveTreeState(Request $request, Service $service)
+    /**
+     * Save the sort order of liturgy blocks and items for a service.
+     */
+    public function saveTreeState(Request $request, Service $service): JsonResponse
     {
         Gate::authorize('update', $service);
         $blockIds = $service->liturgyBlocks()->pluck('id');
         foreach ($request->get('blocks') as $block) {
-            $currentBlock = $service->liturgyBlocks()->findOrFail($block['id']);
+            $currentBlock = $service->liturgyBlocks()->whereKey($block['id'])->firstOrFail();
             $currentBlock->update(['sortable' => $block['sortable']]);
             foreach ($block['items'] as $item) {
-                Item::whereIn('liturgy_block_id', $blockIds)->findOrFail($item['id'])->update(
+                Item::whereIn('liturgy_block_id', $blockIds)->whereKey($item['id'])->firstOrFail()->update(
                     [
                         'sortable' => $item['sortable'],
                         'liturgy_block_id' => $currentBlock->id,
@@ -68,7 +78,10 @@ class LiturgyController extends Controller
         return response()->json(compact('tree'));
     }
 
-    public function importToTree(Request $request, Service $service, Service $source)
+    /**
+     * Import all liturgy blocks and items of a source service into a target service.
+     */
+    public function importToTree(Request $request, Service $service, Service $source): JsonResponse
     {
         Gate::authorize('update', $service);
         Gate::authorize('update', $source);
@@ -117,7 +130,6 @@ class LiturgyController extends Controller
     /**
      * Update a block
      *
-     * @param  Service  $service
      * @return JsonResponse
      */
     public function updateBlock(Request $request, Block $block)
@@ -180,7 +192,9 @@ class LiturgyController extends Controller
      */
     public function assignToItem(Request $request, Item $item)
     {
-        Gate::authorize('update', $item->liturgyBlock->service);
+        $block = $item->liturgyBlock;
+        abort_unless($block !== null && $block->service !== null, 404);
+        Gate::authorize('update', $block->service);
         $data = $item->data;
         $data['responsible'] = $request->all();
         unset($data['responsible']['api_token']);
@@ -197,7 +211,9 @@ class LiturgyController extends Controller
      */
     public function updateItem(Request $request, Item $item)
     {
-        Gate::authorize('update', $item->liturgyBlock->service);
+        $block = $item->liturgyBlock;
+        abort_unless($block !== null && $block->service !== null, 404);
+        Gate::authorize('update', $block->service);
         $data = $this->validateItemRequest($request);
         $item->update($data);
         $item->data = $data['data'];
@@ -207,9 +223,14 @@ class LiturgyController extends Controller
         return response()->json(compact('item'));
     }
 
-    public function destroyItem(Item $item)
+    /**
+     * Delete a liturgy item
+     */
+    public function destroyItem(Item $item): JsonResponse
     {
-        Gate::authorize('update', $item->liturgyBlock->service);
+        $block = $item->liturgyBlock;
+        abort_unless($block !== null && $block->service !== null, 404);
+        Gate::authorize('update', $block->service);
         $item->delete();
 
         return response()->json();
@@ -224,11 +245,13 @@ class LiturgyController extends Controller
     {
         $service = Service::findOrFail($serviceId);
         Gate::authorize('view', $service);
+        $user = Auth::user();
+        abort_unless($user instanceof User, 401);
         $serviceGroups = [
             Service::setEagerLoads([])->with(['location'])
                 ->select(['id', 'title', 'date', 'location_id'])
                 ->whereHas('liturgyBlocks')
-                ->userParticipates(Auth::user(), 'P')
+                ->userParticipates($user, 'P')
                 ->get(),
             Service::setEagerLoads([])->with(['location'])
                 ->select(['id', 'title', 'date', 'location_id'])
@@ -244,7 +267,7 @@ class LiturgyController extends Controller
         $sources = [];
         foreach ($serviceGroups as $services) {
             foreach ($services as $service) {
-                if ($service->date->format('Ymd') == '19780305') {
+                if ($service->date?->format('Ymd') == '19780305') {
                     $sources[] = [
                         'id' => $service->id,
                         'date' => 0,
@@ -256,8 +279,8 @@ class LiturgyController extends Controller
                 } else {
                     $sources[] = [
                         'id' => $service->id,
-                        'date' => $service->date->format('YmdHi'),
-                        'name' => $service->date->setTimezone('Europe/Berlin')->isoFormat('L, LT').' Uhr, '.$service->locationText(),
+                        'date' => $service->date?->format('YmdHi'),
+                        'name' => $service->date?->setTimezone('Europe/Berlin')->isoFormat('L, LT').' Uhr, '.$service->locationText(),
                         'group' => 'Gottesdienste',
                     ];
                 }
@@ -271,6 +294,11 @@ class LiturgyController extends Controller
         return response()->json($sources);
     }
 
+    /**
+     * Validate the request data for creating or updating a liturgy item.
+     *
+     * @return array<string, mixed>
+     */
     protected function validateItemRequest(Request $request): array
     {
         return $request->validate(
@@ -284,6 +312,11 @@ class LiturgyController extends Controller
         );
     }
 
+    /**
+     * Validate the request data for creating or updating a liturgy block.
+     *
+     * @return array<string, mixed>
+     */
     protected function validateBlockRequest(Request $request): array
     {
         return $request->validate(

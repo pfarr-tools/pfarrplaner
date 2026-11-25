@@ -58,7 +58,7 @@ class SongMailLiturgySheet extends AbstractLiturgySheet
         $recipients = $dialogData['recipients'];
 
         if (count($recipients) == 0) {
-            $recipients[] = Auth::user()->email;
+            $recipients[] = (string) Auth::user()?->email;
         }
 
         if (strlen($body) > 1000) {
@@ -70,6 +70,7 @@ class SongMailLiturgySheet extends AbstractLiturgySheet
         );
     }
 
+    /** @return array{body: string, subject: string, recipients: list<string>} */
     public function getDialogData(Service $service): array
     {
         $subject = $this->buildSubject($service);
@@ -81,14 +82,14 @@ class SongMailLiturgySheet extends AbstractLiturgySheet
 
     protected function buildSubject(Service $service): string
     {
-        return $service->titleText(false).' am '.$service->date->isoFormat(
+        return $service->titleText(false).' am '.$service->trueDate()->isoFormat(
             'dddd, DD.MM.YYYY'
         ).', '.$service->timeText().', '.$service->locationText();
     }
 
     protected function buildBody(Service $service): string
     {
-        $body = 'Sehr geehrte Mitwirkende am Gottesdienst'.' am '.$service->date->isoFormat(
+        $body = 'Sehr geehrte Mitwirkende am Gottesdienst'.' am '.$service->trueDate()->isoFormat(
             'dddd, DD. MMMM YYYY'
         )
             .', '.$service->timeText().
@@ -147,18 +148,21 @@ class SongMailLiturgySheet extends AbstractLiturgySheet
             .URL::temporarySignedRoute('liturgy.download', now()->addDays(14), ['service' => $service->slug, 'key' => 'A4']).PHP_EOL.PHP_EOL
             .'Außerdem gibt es den Ablauf in einem druckbaren, für Organist:innen optimierten Format hier:'.PHP_EOL
             .URL::temporarySignedRoute('liturgy.download', now()->addDays(14), ['service' => $service->slug, 'key' => 'Organist']).PHP_EOL
-            .PHP_EOL.'Freundliche Grüße, '.PHP_EOL.Auth::user()->fullName();
+            .PHP_EOL.'Freundliche Grüße, '.PHP_EOL.(Auth::user()?->fullName() ?? '');
     }
 
+    /**
+     * @return list<string> Recipient email addresses.
+     */
     protected function getRecipients(Service $service): array
     {
         $recipients = [];
         foreach ($service->organists as $organist) {
-            $recipients[] = $organist->email;
+            $recipients[] = (string) $organist->email;
         }
 
         if (count($recipients) == 0) {
-            $recipients[] = Auth::user()->email;
+            $recipients[] = (string) Auth::user()?->email;
         }
 
         return $recipients;

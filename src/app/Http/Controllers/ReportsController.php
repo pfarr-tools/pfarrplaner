@@ -32,8 +32,6 @@ namespace App\Http\Controllers;
 
 use App\Reports\AbstractEmbedReport;
 use App\Reports\AbstractReport;
-use Illuminate\Contracts\Foundation\Application;
-use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -56,7 +54,7 @@ class ReportsController extends Controller
     public function list()
     {
         $reports = collect();
-        foreach (glob(app_path('Reports').'/*Report.php') as $file) {
+        foreach (glob(app_path('Reports').'/*Report.php') ?: [] as $file) {
             if (substr(pathinfo($file, PATHINFO_FILENAME), 0, 8) !== 'Abstract') {
                 $reportClass = 'App\\Reports\\'.pathinfo($file, PATHINFO_FILENAME);
                 if (class_exists($reportClass)) {
@@ -82,7 +80,8 @@ class ReportsController extends Controller
     }
 
     /**
-     * @return Application|Factory|RedirectResponse|View
+     * @param  string  $report  Report key used to resolve the report class.
+     * @return \Illuminate\Contracts\View\View
      */
     public function setup($report)
     {
@@ -90,6 +89,7 @@ class ReportsController extends Controller
     }
 
     /**
+     * @param  string  $report  Report key used to resolve the report class.
      * @return RedirectResponse|string
      */
     public function render(Request $request, $report)
@@ -98,6 +98,8 @@ class ReportsController extends Controller
     }
 
     /**
+     * @param  string  $report  Report key used to resolve the report class.
+     * @param  string  $step  Step method name to call on the report.
      * @return RedirectResponse
      */
     public function step(Request $request, $report, $step)
@@ -113,6 +115,13 @@ class ReportsController extends Controller
         return $report->$step($request);
     }
 
+    /**
+     * Render the embed view for the report selected by the given key.
+     *
+     * @param  Request  $request  Request
+     * @param  string  $report  Report key used to resolve the embed report class.
+     * @return mixed
+     */
     public function embed(Request $request, $report)
     {
         $report = $this->resolveReport($report, true);
@@ -121,6 +130,10 @@ class ReportsController extends Controller
         return $report->embed($request);
     }
 
+    /**
+     * @param  string  $report  Report name.
+     * @param  bool  $allowPublicEmbed  Whether public embedding is allowed.
+     */
     protected function resolveReport(string $report, bool $allowPublicEmbed = false): AbstractReport
     {
         $reportClass = 'App\\Reports\\'.ucfirst($report).'Report';

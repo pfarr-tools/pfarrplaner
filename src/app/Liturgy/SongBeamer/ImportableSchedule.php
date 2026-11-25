@@ -39,12 +39,18 @@ class ImportableSchedule
     /** @var Schedule */
     protected $schedule;
 
+    /** @var AbstractFile[] */
     protected $files = [];
 
+    /** @var string[] */
     protected $imports = [];
 
+    /** @var ObjectFile */
     protected $profiles;
 
+    /**
+     * @return void
+     */
     public function __construct()
     {
         $this->schedule = new Schedule;
@@ -69,6 +75,15 @@ class ImportableSchedule
         $this->profiles->addItem($song->toProfile());
     }
 
+    /**
+     * Add a simple text slide to the schedule and its song profile
+     *
+     * @param  array<string, string|int>  $scheduleOptions  Additional schedule item options
+     * @param  array<string, string|int>  $profileOptions  Additional song profile options
+     * @param  array<string, string|int>  $headerOptions  Additional SNG header options
+     * @param  bool  $showTitle  Whether the title is rendered as a header
+     * @return void
+     */
     public function addSimpleTextItem(string $title, string $text, array $scheduleOptions = [], array $profileOptions = [], array $headerOptions = [], bool $showTitle = true)
     {
         $simpleText = new SimpleText($title, $text, $scheduleOptions, $profileOptions, $headerOptions, $showTitle);
@@ -77,6 +92,11 @@ class ImportableSchedule
         $this->profiles->addItem($simpleText->toProfile());
     }
 
+    /**
+     * Add a reference to an external file in the schedule
+     *
+     * @return void
+     */
     public function addImport(string $title, string $file, bool $importFile = true)
     {
         if (! file_exists($file)) {
@@ -109,6 +129,7 @@ class ImportableSchedule
     /**
      * Add a colored section title
      *
+     * @param  string  $title  Caption of the section
      * @return void
      */
     public function addSectionTitle($title)
@@ -157,7 +178,7 @@ class ImportableSchedule
     /**
      * Create temporary ZIP file and dump contents to browser before deleting it
      *
-     * @return void
+     * @return string|false Path to the temporary ZIP file, or false if it could not be created
      *
      * @throws ErrorException
      */
@@ -189,31 +210,60 @@ class ImportableSchedule
         return $zipPath;
     }
 
+    /**
+     * @return Schedule
+     */
     public function getSchedule(): Schedule
     {
         return $this->schedule;
     }
 
+    /**
+     * @param  Schedule  $schedule  Schedule to use.
+     * @return void
+     */
     public function setSchedule(Schedule $schedule): void
     {
         $this->schedule = $schedule;
     }
 
+    /**
+     * Get the files to be written to the ZIP archive
+     *
+     * @return AbstractFile[]
+     */
     public function getFiles(): array
     {
         return $this->files;
     }
 
+    /**
+     * Set the files to be written to the ZIP archive
+     *
+     * @param  AbstractFile[]  $files  Files to write to the archive
+     * @return void
+     */
     public function setFiles(array $files): void
     {
         $this->files = $files;
     }
 
+    /**
+     * Get the paths of the files to be imported into the ZIP archive
+     *
+     * @return string[]
+     */
     public function getImports(): array
     {
         return $this->imports;
     }
 
+    /**
+     * Set the paths of the files to be imported into the ZIP archive
+     *
+     * @param  string[]  $imports  Absolute paths of the imported files
+     * @return void
+     */
     public function setImports(array $imports): void
     {
         $this->imports = $imports;

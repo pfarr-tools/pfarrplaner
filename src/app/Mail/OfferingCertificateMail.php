@@ -47,10 +47,10 @@ class OfferingCertificateMail extends Mailable implements ShouldQueue
         /** @var City $city */
         $city = $service->city;
         $pdf = PDF::fromView('reports.offeringcertificate.render', compact('service'))->pdf();
-        $filename = 'Opferurkunde-'.$service->date->format('Y-m-d').'.pdf';
+        $filename = 'Opferurkunde-'.$service->date?->format('Y-m-d').'.pdf';
 
         return $this
-            ->subject('Opferurkunde '.$city->name.' '.$service->date->format('d.m.Y'))
+            ->subject('Opferurkunde '.$city->name.' '.$service->date?->format('d.m.Y'))
             ->view('mail.offering-certificate', compact('service'))
             ->attachData($pdf, $filename, ['mime' => 'application/pdf']);
     }

@@ -34,27 +34,54 @@ use Illuminate\Support\Str;
 
 abstract class AbstractAttachment
 {
+    /** @var string Anzeigetitel des Attachments. */
     protected static $title = '';
 
+    /** @var string Beschreibung des Attachments. */
     protected static $description = '';
 
+    /** @var string CSS-Klasse des Symbols. */
     protected static $icon = '';
 
+    /** @var string Dateiendung ohne führenden Punkt. */
     protected static $extension = '';
 
+    /** @var string MIME-Typ der erzeugten Datei. */
     protected static $mimeType = '';
 
+    /** @var string Kurzzeichen für den Dateinamen. */
     protected static $callSign = '';
 
+    /** @var string Titel für den Dateinamen. */
     protected static $fileTitle = '';
 
+    /** @var bool Gibt an, ob das Attachment eine Einrichtungsseite besitzt. */
     protected static $hasSetup = false;
 
+    /**
+     * Ermittelt den Schlüssel des Attachments aus dem Klassennamen.
+     *
+     * @return string Schlüssel des Attachments.
+     */
     public static function getKey()
     {
         return Str::lcfirst(Str::replace('Attachment', '', Str::afterLast(get_called_class(), '\\')));
     }
 
+    /**
+     * Liefert die Metadaten des Attachments für die Auswahlliste.
+     *
+     * @return array{
+     *     key: string,
+     *     class: class-string,
+     *     title: string,
+     *     description: string,
+     *     icon: string,
+     *     extension: string,
+     *     mimeType: string,
+     *     hasSetup: bool
+     * } Metadaten des Attachments.
+     */
     public static function getInfo()
     {
         return [
@@ -69,12 +96,28 @@ abstract class AbstractAttachment
         ];
     }
 
+    /**
+     * Erzeugt den Dateinamen aus Kurzzeichen, Titel und Endung.
+     *
+     * @return string Dateiname des Attachments.
+     */
     public function getFileName()
     {
         return trim((static::$callSign ? static::$callSign.'_' : '').static::$fileTitle).'.'.static::$extension;
     }
 
+    /**
+     * Erzeugt die Datei und gibt sie zum Download aus.
+     *
+     * @return \Symfony\Component\HttpFoundation\Response Dateiantwort.
+     */
     abstract public function download();
 
+    /**
+     * Erzeugt ein Attachment für den Eintrag mit der angegebenen ID.
+     *
+     * @param  int|string  $id  ID des zugehörigen Eintrags.
+     * @return static Attachment für den angegebenen Eintrag.
+     */
     abstract public static function fromId($id);
 }

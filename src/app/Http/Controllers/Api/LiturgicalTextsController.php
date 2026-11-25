@@ -34,10 +34,17 @@ use App\Http\Controllers\Controller;
 use App\Models\Liturgy\Text;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use PhpOffice\PhpWord\Element\AbstractElement;
+use PhpOffice\PhpWord\Element\Text as WordText;
+use PhpOffice\PhpWord\Element\TextRun;
 use PhpOffice\PhpWord\IOFactory;
 
+/** API controller for liturgical texts. */
 class LiturgicalTextsController extends Controller
 {
+    /**
+     * @return void
+     */
     public function __construct()
     {
         $this->middleware('auth:sanctum,api');
@@ -56,9 +63,9 @@ class LiturgicalTextsController extends Controller
     /**
      * Import text from Word document
      *
-     * @return JsonResponse
+     * @return JsonResponse|null
      */
-    public function importFromWord(Request $request)
+    public function importFromWord(Request $request): ?JsonResponse
     {
         if (! $request->hasFile('import')) {
             return response()->json('');
@@ -72,15 +79,19 @@ class LiturgicalTextsController extends Controller
         $sections = $doc->getSections();
         foreach ($sections as $s) {
             $els = $s->getElements();
-            /** @var ElementTest $e */
+            /** @var AbstractElement $e */
             foreach ($els as $e) {
                 $class = get_class($e);
                 if (method_exists($class, 'getText')) {
+                    /** @var WordText $e */
                     $text .= $e->getText();
                 } else {
-                    if (get_class($e) === 'PhpOffice\PhpWord\Element\TextRun') {
+                    if (get_class($e) === TextRun::class) {
+                        /** @var TextRun $e */
                         $textRunElements = $e->getElements();
+                        /** @var AbstractElement $textRunElement */
                         foreach ($textRunElements as $textRunElement) {
+                            /** @var WordText $textRunElement */
                             $text .= $textRunElement->getText();
                         }
                         $text .= "\n";
@@ -97,5 +108,7 @@ class LiturgicalTextsController extends Controller
 
             return response()->json(html_entity_decode(trim($text)));
         }
+
+        return null;
     }
 }

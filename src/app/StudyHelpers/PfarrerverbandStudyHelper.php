@@ -37,8 +37,13 @@ class PfarrerverbandStudyHelper extends AbstractStudyHelper
 {
     public $title = 'Predigtimpulse des Pfarrerverbands';
 
+    /** @var array<string, array<string, string>> */
     protected $records = [];
 
+    /**
+     * @param  array<string, mixed>  $data  Study helper input data.
+     *      * @return array<string, array<string, string>>
+     */
     public function read(array $data): array
     {
         if ('' == ($content = $this->getContent('https://www.pfarrerverband.de/pfarrerverand-predigtimpulse'))) {
@@ -66,6 +71,10 @@ class PfarrerverbandStudyHelper extends AbstractStudyHelper
         return $this->records;
     }
 
+    /**
+     * @param  array<string, mixed>  $data  Input data.
+     *      * @return array<string, string>
+     */
     public function getLinks(array $data): array
     {
         $data['links'] = array_merge($data['links'] ?? [], $this->records[$data['date']] ?? []);

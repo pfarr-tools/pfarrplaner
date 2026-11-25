@@ -53,9 +53,11 @@ class PapierkorbController extends Controller
 
     public function index(Request $request): Response
     {
-        abort_unless(self::hasAdminModuleAccess($request->user()), 403);
+        $user = $request->user();
+        abort_unless($user instanceof User, 401);
+        abort_unless(self::hasAdminModuleAccess($user), 403);
 
-        $records = $this->trashedRecordsForUser($request->user());
+        $records = $this->trashedRecordsForUser($user);
         $types = collect(self::SUPPORTED_TYPES)
             ->map(fn (array $config, string $type) => ['value' => $type, 'label' => $config['label']])
             ->values();
@@ -71,19 +73,20 @@ class PapierkorbController extends Controller
 
     public function restore(Request $request, string $type, int $id): RedirectResponse
     {
+        /** @var mixed $model */
         $model = $this->loadTrashedModel($type, $id);
         Gate::forUser($request->user())->authorize('restore', $model);
 
         DB::transaction(function () use ($request, $type, $model) {
             if (in_array($type, ['baptism', 'funeral', 'wedding'], true)) {
                 $service = $model->service;
-                if ($service && method_exists($service, 'trashed') && $service->trashed()) {
+                if ($service instanceof Model && method_exists($service, 'trashed') && method_exists($service, 'restore') && $service->trashed()) {
                     Gate::forUser($request->user())->authorize('restore', $service);
                     $service->restore();
                 }
             }
 
-            if (method_exists($model, 'trashed') && $model->trashed()) {
+            if ($model instanceof Model && method_exists($model, 'trashed') && method_exists($model, 'restore') && $model->trashed()) {
                 $model->restore();
             }
         });
@@ -93,6 +96,7 @@ class PapierkorbController extends Controller
 
     public function destroy(Request $request, string $type, int $id): RedirectResponse
     {
+        /** @var mixed $model */
         $model = $this->loadTrashedModel($type, $id);
         Gate::forUser($request->user())->authorize('forceDelete', $model);
         $model->forceDelete();
@@ -101,7 +105,7 @@ class PapierkorbController extends Controller
     }
 
     /**
-     * @return array|bool
+     * @return array<string, mixed>|false
      */
     public static function getAdminModuleConfig()
     {
@@ -143,7 +147,10 @@ class PapierkorbController extends Controller
         return $records->sortByDesc('deletedAt')->values();
     }
 
-    protected function loadTrashedModel(string $type, int $id): Model
+    /**
+     * @return mixed Model from one of the supported trash types.
+     */
+    protected function loadTrashedModel(string $type, int $id)
     {
         return self::baseQueryForType($type)->whereKey($id)->firstOrFail();
     }
@@ -151,7 +158,11 @@ class PapierkorbController extends Controller
     /**
      * @return array<string, mixed>
      */
-    protected function mapRecord(string $type, Model $model, User $user): array
+    /**
+     * @param  mixed  $model  Model from one of the supported trash types.
+     * @return array<string, mixed>
+     */
+    protected function mapRecord(string $type, $model, User $user): array
     {
         $cityName = match ($type) {
             'service' => $model->city?->name,
@@ -207,11 +218,10 @@ class PapierkorbController extends Controller
                 'deletedBy',
                 'service' => fn ($query) => $query->withTrashed()->with('city'),
             ]),
-            'wedding' => Wedding::onlyTrashed()->with([
+            default => Wedding::onlyTrashed()->with([
                 'deletedBy',
                 'service' => fn ($query) => $query->withTrashed()->with('city'),
             ]),
-            default => throw new \InvalidArgumentException('Unsupported trash type: '.$type),
         };
     }
 

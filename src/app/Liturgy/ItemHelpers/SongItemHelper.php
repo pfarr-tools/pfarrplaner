@@ -34,9 +34,17 @@ use Illuminate\Support\Str;
 
 class SongItemHelper extends AbstractItemHelper
 {
+    /**
+     * Extrahierte Liedinformationen wie Urheberrechte, Text- und Melodieautoren.
+     *
+     * @var array<string, string>
+     */
     protected $info = [];
 
-    public function extractInfo()
+    /**
+     * Extrahiert Urheberrechte sowie Text- und Melodieautoren aus den Lieddaten.
+     */
+    public function extractInfo(): void
     {
         $rights = $this->item->data['song']['song']['copyrights'] ?? '';
         if (str_contains($rights, '/')) {
@@ -51,10 +59,13 @@ class SongItemHelper extends AbstractItemHelper
                 }
             }
         }
-        $this->info['rights'] = $rights;
+        $this->info['rights'] = (string) $rights;
     }
 
-    public function getRights()
+    /**
+     * Gibt die Urheberrechtsangaben des Liedes zurück.
+     */
+    public function getRights(): string
     {
         if (! count($this->info)) {
             $this->extractInfo();
@@ -63,7 +74,10 @@ class SongItemHelper extends AbstractItemHelper
         return $this->info['rights'] ?? '';
     }
 
-    public function getTextAuthor()
+    /**
+     * Gibt den Textautor des Liedes zurück.
+     */
+    public function getTextAuthor(): string
     {
         if (! count($this->info)) {
             $this->extractInfo();
@@ -72,7 +86,10 @@ class SongItemHelper extends AbstractItemHelper
         return $this->info['text'] ?? '';
     }
 
-    public function getComposer()
+    /**
+     * Gibt den Komponisten beziehungsweise Melodieautor des Liedes zurück.
+     */
+    public function getComposer(): string
     {
         if (! count($this->info)) {
             $this->extractInfo();
@@ -81,7 +98,10 @@ class SongItemHelper extends AbstractItemHelper
         return $this->info['melodie'] ?? '';
     }
 
-    public function getCodeText()
+    /**
+     * Gibt den Liedcode mit Referenz und gegebenenfalls alternativer EG-Nummer zurück.
+     */
+    public function getCodeText(): string
     {
         if (! isset($this->item->data['song'])) {
             return '';
@@ -93,7 +113,10 @@ class SongItemHelper extends AbstractItemHelper
         return $title;
     }
 
-    public function getTitleText()
+    /**
+     * Gibt den vollständigen Liedtitel zurück.
+     */
+    public function getTitleText(): string
     {
         if (! isset($this->item->data['song'])) {
             return '';
@@ -110,7 +133,12 @@ class SongItemHelper extends AbstractItemHelper
         return trim(str_replace('  ', ' ', $title));
     }
 
-    public function getActiveVerseNumbers()
+    /**
+     * Ermittelt die Nummern der aktiven Strophen aus den Lieddaten.
+     *
+     * @return list<int|string> Aktive Strophennummern oder -bereiche
+     */
+    public function getActiveVerseNumbers(): array
     {
         $verseRefs = [];
         if (($this->item->data['verses'] ?? '') == '') {
@@ -126,19 +154,15 @@ class SongItemHelper extends AbstractItemHelper
         } else {
             foreach (explode('+', $this->item->data['verses']) as $range) {
                 $subRange = explode('-', $range);
-                if (! is_array($subRange)) {
-                    $verseRefs[] = $subRange;
+                if (count($subRange) == 1) {
+                    $verseRefs[] = $subRange[0];
                 } else {
-                    if (count($subRange) == 1) {
-                        $verseRefs[] = $subRange[0];
-                    } else {
-                        if (is_numeric($subRange[0]) && is_numeric($subRange[1]) && ($subRange[0] < $subRange[1])) {
-                            for ($i = $subRange[0]; $i <= $subRange[1]; $i++) {
-                                $verseRefs[] = $i;
-                            }
-                        } else {
-                            $verseRefs[] = $range;
+                    if (is_numeric($subRange[0]) && is_numeric($subRange[1]) && ($subRange[0] < $subRange[1])) {
+                        for ($i = $subRange[0]; $i <= $subRange[1]; $i++) {
+                            $verseRefs[] = $i;
                         }
+                    } else {
+                        $verseRefs[] = $range;
                     }
                 }
             }
@@ -147,7 +171,12 @@ class SongItemHelper extends AbstractItemHelper
         return $verseRefs;
     }
 
-    public function getActiveVerses()
+    /**
+     * Gibt die aktiven Strophen des Liedes zurück.
+     *
+     * @return list<array<string, mixed>>
+     */
+    public function getActiveVerses(): array
     {
         if (! isset($this->item->data['song'])) {
             return [];
@@ -167,7 +196,13 @@ class SongItemHelper extends AbstractItemHelper
         return $verses;
     }
 
-    public function getActiveVerseCount($skipIfZero = false, $stropheText = false)
+    /**
+     * Gibt die Anzahl der aktiven Strophen zurück.
+     *
+     * @param  bool  $skipIfZero  Leere Strophenlisten als leeren String melden
+     * @param  bool  $stropheText  Anzahl als Text mit "Strophe(n)" ausgeben
+     */
+    public function getActiveVerseCount($skipIfZero = false, $stropheText = false): int|string
     {
         if (! isset($this->item->data['song'])) {
             return 0;
@@ -183,7 +218,12 @@ class SongItemHelper extends AbstractItemHelper
         return $count.($stropheText ? ($count == 1 ? ' Strophe' : ' Strophen') : '');
     }
 
-    public function forceVerseString($prefix = '')
+    /**
+     * Erzeugt eine kompakte Strophenangabe für das Lied.
+     *
+     * @param  string  $prefix  Vorzustellender Text
+     */
+    public function forceVerseString($prefix = ''): string
     {
         if (! isset($this->item->data['song'])) {
             return '';

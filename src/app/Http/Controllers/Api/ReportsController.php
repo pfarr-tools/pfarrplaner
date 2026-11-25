@@ -32,15 +32,27 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Reports\AbstractReport;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+/** API controller for report steps. */
 class ReportsController extends Controller
 {
+    /**
+     * @return void
+     */
     public function __construct()
     {
         $this->middleware('auth:sanctum,api');
     }
 
+    /**
+     * Call a report step and return its response.
+     *
+     * @param  string  $report  Report key used to resolve the report class.
+     * @param  string  $step  Step method name to call on the report.
+     * @return JsonResponse Response produced by the report step.
+     */
     public function step(Request $request, $report, $step)
     {
         $reportClass = 'App\\Reports\\'.ucfirst($report).'Report';

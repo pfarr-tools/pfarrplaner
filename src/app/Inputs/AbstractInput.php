@@ -30,7 +30,7 @@
 
 namespace App\Inputs;
 
-use App\Day;
+use App\Models\Calendar\Day;
 use App\Models\Places\City;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
@@ -48,11 +48,15 @@ class AbstractInput
      */
     public $title = '';
 
+    /**
+     * @var string
+     */
     public $description = '';
 
     /**
      * @var string
      */
+    /** @var string */
     protected $setupView = 'inputs.setup';
 
     public function canEdit(): bool
@@ -69,6 +73,7 @@ class AbstractInput
     }
 
     /**
+     * @param  string  $viewName  View name suffix.
      * @return string
      */
     public function getViewName($viewName)
@@ -93,7 +98,9 @@ class AbstractInput
     }
 
     /**
-     * @return array
+     * @param  City  $city  City the values are collected for.
+     * @param  array<array-key, mixed>  $days  Days to collect values for.
+     * @return array<string, mixed> Collected input values.
      */
     public function getValues(City $city, $days)
     {
@@ -105,12 +112,17 @@ class AbstractInput
      */
     public function setup(Request $request)
     {
-        $minDate = Day::orderBy('date', 'ASC')->limit(1)->get()->first();
-        $maxDate = Day::orderBy('date', 'DESC')->limit(1)->get()->first();
-        $cities = Auth::user()->writableCities;
+        $minDate = Day::orderBy('date', 'asc')->limit(1)->first();
+        $maxDate = Day::orderBy('date', 'desc')->limit(1)->first();
+        $user = Auth::user();
+        abort_unless($user !== null, 403);
+        $cities = $user->writableCities;
+
+        /** @var view-string $setupView */
+        $setupView = $this->setupView;
 
         return view(
-            $this->setupView,
+            $setupView,
             [
                 'input' => $this,
                 'minDate' => $minDate,
@@ -120,7 +132,15 @@ class AbstractInput
         );
     }
 
+    /**
+     * @param  Request  $request  Input request.
+     * @return mixed Input response.
+     */
     public function input(Request $request) {}
 
+    /**
+     * @param  Request  $request  Save request.
+     * @return mixed Save response.
+     */
     public function save(Request $request) {}
 }

@@ -54,6 +54,7 @@ class CreateTag extends AbstractCreateAction implements CreatesTags
     /**
      * Create a new tag
      *
+     * @param  array<string, mixed>  $input
      * @return Tag
      *
      * @throws AuthorizationException

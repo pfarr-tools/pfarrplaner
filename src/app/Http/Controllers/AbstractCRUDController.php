@@ -32,6 +32,7 @@ namespace App\Http\Controllers;
 
 use App\Actions\AbstractAction;
 use App\Models\AbstractModel;
+use App\Models\People\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -78,13 +79,16 @@ class AbstractCRUDController extends Controller
      */
     protected function addRightsToModelCollection(Collection $collection): Collection
     {
-        return $collection->map(function ($item) {
-            $item['canEdit'] = (Auth::user()->can('update', $item));
+        $user = Auth::user();
+        abort_unless($user instanceof User, 401);
+
+        return $collection->map(function ($item) use ($user) {
+            $item['canEdit'] = $user->can('update', $item);
             $item['editRoute'] = $item['canEdit'] ? route(
                 ($this->modelClass)::getSingleRouteName('web', 'edit'),
                 $item->id
             ) : null;
-            $item['canDelete'] = (Auth::user()->can('delete', $item));
+            $item['canDelete'] = $user->can('delete', $item);
             $item['deleteRoute'] = $item['canDelete'] ? route(
                 ($this->modelClass)::getSingleRouteName('web', 'destroy'),
                 $item->id
@@ -110,7 +114,7 @@ class AbstractCRUDController extends Controller
             $id = $request->get($this->modelName());
         }
 
-        return ($this->modelClass)::with($relations)->findOrFail($id);
+        return ($this->modelClass)::with($relations)->whereKey($id)->firstOrFail();
     }
 
     /**
@@ -135,9 +139,12 @@ class AbstractCRUDController extends Controller
         Gate::authorize('index', $this->modelClass);
         $records = $this->addRightsToModelCollection($this->getModelsForIndex());
 
+        $user = $request->user();
+        abort_unless($user instanceof User, 401);
+
         return Inertia::render(($this->modelClass)::getVuePath('index'), [
             ($this->modelClass)::pluralKey() => $records,
-            'canCreate' => $request->user()->can('create', $this->modelClass),
+            'canCreate' => $user->can('create', $this->modelClass),
         ]);
     }
 
@@ -187,9 +194,10 @@ class AbstractCRUDController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
+     * @param  int|string  $modelId  Route identifier of the model to edit.
      * @return \Inertia\Response
      */
-    public function edit(Request $request, $modelId)
+    public function edit(Request $request, int|string $modelId)
     {
         $model = $this->getSingleModel($request, $modelId, ($this->modelClass)::$relationsForEditor);
         Gate::authorize('update', $model);
@@ -206,9 +214,10 @@ class AbstractCRUDController extends Controller
     /**
      * Update the specified resource in storage.
      *
+     * @param  int|string  $modelId  Route identifier of the model to update.
      * @return Response|JsonResponse|RedirectResponse
      */
-    public function update(Request $request, $modelId)
+    public function update(Request $request, int|string $modelId)
     {
         $model = $this->getSingleModel($request, $modelId);
         $updater = $model->getContractedAction('update');
@@ -224,9 +233,10 @@ class AbstractCRUDController extends Controller
     /**
      * Remove the specified resource from storage.
      *
+     * @param  int|string  $modelId  Route identifier of the model to remove.
      * @return \Symfony\Component\HttpFoundation\Response Redirect or API deletion response.
      */
-    public function destroy(Request $request, $modelId)
+    public function destroy(Request $request, int|string $modelId)
     {
         $model = $this->getSingleModel($request, $modelId);
         $deleter = $model->getContractedAction('delete');

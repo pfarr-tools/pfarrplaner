@@ -72,7 +72,7 @@ class Parish extends AbstractModel
     ];
 
     /**
-     * @var string[]
+     * @var list<string>
      */
     protected $fillable = [
         'name',
@@ -118,7 +118,7 @@ class Parish extends AbstractModel
      *
      * @throws Exception
      */
-    public function importStreetsFromCSV(User $user, $csv)
+    public function importStreetsFromCSV(User $user, string $csv)
     {
         /** @var StreetRange $streetRange */
         foreach ($this->streetRanges as $streetRange) {
@@ -134,10 +134,10 @@ class Parish extends AbstractModel
         unset($records[0]);
         array_walk(
             $records,
-            function (&$record) use (&$ctr) {
+            function (&$record) use (&$ctr, $user) {
                 if ($record[4] == $this->code) {
-                    $record[5] = explode(' bis ', $record[5]);
-                    $record[6] = explode(' bis ', $record[6]);
+                    $record[5] = array_pad(explode(' bis ', (is_string($record[5] ?? null) ? $record[5] : ''), 2), 2, '');
+                    $record[6] = array_pad(explode(' bis ', (is_string($record[6] ?? null) ? $record[6] : ''), 2), 2, '');
                     app(StreetRange::getContractName('create'))->create($user, $this, [
                         'parish_id' => $this->id,
                         'name' => $record[0],

@@ -34,6 +34,7 @@ use App\Http\Resources\Calendar\CalendarAbsenceResource;
 use App\Http\Resources\Calendar\CalendarMonthServiceResource;
 use App\Models\Calendar\Day;
 use App\Models\Leave\Absence;
+use App\Models\Location;
 use App\Models\People\User;
 use App\Models\Service;
 use Carbon\Carbon;
@@ -42,15 +43,21 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 
+/** Service for calendar periods, filters and holidays. */
 class CalendarService
 {
     /**
+     * @param  int  $year
+     * @param  int  $month
      * @return Collection<int, string>
      */
     public static function initializeMonth($year, $month)
     {
         $days = collect();
         $today = Carbon::create($year, $month, 1, 0, 0, 0);
+        if ($today === null) {
+            return $days;
+        }
         while ($today->month == $month) {
             if ($today->dayOfWeek == 0) {
                 $day = Day::create(
@@ -70,6 +77,10 @@ class CalendarService
 
     /**
      * Get the location filter either from request or from a user setting
+     *
+     * @param  Collection<int, Location>  $possibleLocations  Locations available to the user.
+     * @param  User  $user  User whose filter setting is read and updated.
+     * @return array<int, int|string> Selected location IDs.
      */
     public static function getLocationsFilter(Request $request, $possibleLocations, $user): array
     {
@@ -98,9 +109,9 @@ class CalendarService
     }
 
     /**
-     * @return array
+     * @return array<int, array<string, mixed>> Holidays with start, end and name.
      *
-     * @throws Exception
+     * @throws \Exception
      */
     public static function getHolidays(Carbon $start, Carbon $end)
     {
@@ -112,15 +123,18 @@ class CalendarService
                 .'&validTo='
                 .$end->format('Y-m-d');
 
-            $raw = json_decode(file_get_contents($url), true);
+            $raw = json_decode(file_get_contents($url) ?: '', true);
         } catch (\ErrorException $e) {
+            return [];
+        }
+        if (! is_array($raw)) {
             return [];
         }
         $holidays = [];
         foreach ($raw as $holiday) {
             $holidays[] = [
                 'start' => new Carbon($holiday['startDate']),
-                'end' => (new Carbon($holiday['endDate']))->addDay()->subSecond(1),
+                'end' => (new Carbon($holiday['endDate']))->addDay()->subSecond(),
                 'name' => $holiday['name'][0]['text'],
             ];
         }
@@ -137,11 +151,11 @@ class CalendarService
      */
     public static function getStartOfPeriod($year, $month = null)
     {
-        if (is_a($year, Carbon::class)) {
+        if ($year instanceof Carbon) {
             return $year->setDay(1)->setTime(0, 0, 0);
         }
         if (! $month) {
-            [$year, $month] = explode('-', $year);
+            [$year, $month] = explode('-', (string) $year);
         }
 
         return new Carbon($year.'-'.$month.'-01 0:00:00');
@@ -183,7 +197,7 @@ class CalendarService
             ->servicesOnly()
             ->inCities($user->visibleCities)
             ->inMonthByDate($date)
-            ->orderBy('day', 'ASC')
+            ->orderBy('day', 'asc')
             ->get()->pluck('day');
 
         $dates = self::addMissingDefaultDays($date->copy(), $dates);
@@ -258,7 +272,7 @@ class CalendarService
             ->get();
 
         $services->each(function (Service $service) {
-            $service->participantText = self::buildParticipantText($service);
+            $service->setAttribute('participantText', self::buildParticipantText($service));
         });
 
         return $services;
@@ -288,7 +302,11 @@ class CalendarService
     protected static function addServicesToDays(array &$days, Collection $services, User $user): void
     {
         foreach ($services as $service) {
-            $dayKey = $service->date->format('Y-m-d');
+            $date = $service->date;
+            if ($date === null) {
+                continue;
+            }
+            $dayKey = $date->format('Y-m-d');
             if (! isset($days[$dayKey])) {
                 continue;
             }

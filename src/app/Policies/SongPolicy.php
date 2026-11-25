@@ -56,7 +56,7 @@ class SongPolicy
     /**
      * Determine whether the user can view the index of all songs.
      *
-     * @return mixed
+     * @return bool
      */
     public function viewAny(User $user): bool
     {
@@ -66,7 +66,7 @@ class SongPolicy
     /**
      * Determine whether the user can view the song.
      *
-     * @return mixed
+     * @return bool
      */
     public function view(User $user, Song $song): bool
     {
@@ -76,7 +76,7 @@ class SongPolicy
     /**
      * Determine whether the user can create songs.
      *
-     * @return mixed
+     * @return bool
      */
     public function create(User $user): bool
     {
@@ -86,7 +86,7 @@ class SongPolicy
     /**
      * Determine whether the user can update the song.
      *
-     * @return mixed
+     * @return bool
      */
     public function update(User $user, Song $song): bool
     {
@@ -96,7 +96,7 @@ class SongPolicy
     /**
      * Determine whether the user can delete the song.
      *
-     * @return mixed
+     * @return bool
      */
     public function delete(User $user, Song $song): bool
     {
@@ -106,7 +106,7 @@ class SongPolicy
     /**
      * Determine whether the user can restore the song.
      *
-     * @return mixed
+     * @return bool
      */
     public function restore(User $user, Song $song): bool
     {
@@ -116,7 +116,7 @@ class SongPolicy
     /**
      * Determine whether the user can permanently delete the song.
      *
-     * @return mixed
+     * @return bool
      */
     public function forceDelete(User $user, Song $song): bool
     {

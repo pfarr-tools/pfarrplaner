@@ -99,9 +99,20 @@ class Occurence extends Model
         return $query;
     }
 
-    public function hasAdRunningAt($adChannelSlug, Carbon $adDate, bool $exactDate = false)
+    /**
+     * Determine whether an ad for the given channel is running at the given date
+     *
+     * @param  string  $adChannelSlug  Slug of the ad channel to be used
+     * @param  Carbon  $adDate  Date of the ad
+     * @param  bool  $exactDate  If true, the ad date must match exactly, otherwise the ad date is used as lower bound
+     * @return bool Whether the ad is running at the given date.
+     */
+    public function hasAdRunningAt(string $adChannelSlug, Carbon $adDate, bool $exactDate = false): bool
     {
         $adConfig = $this->getAdConfig($adChannelSlug);
+        if ($adConfig === null) {
+            return false;
+        }
         $adStart = $this->start->copy()->subDays($adConfig->offset);
 
         return $exactDate ? $adStart->toDateString() == $adDate->toDateString() : $adStart <= $adDate;
@@ -116,7 +127,12 @@ class Occurence extends Model
         return $query->where('end', '>=', $start);
     }
 
-    public function getLiturgicalInfoAttribute()
+    /**
+     * Add liturgical info attribute
+     *
+     * @return array<string, mixed> Liturgical information for the occurence.
+     */
+    public function getLiturgicalInfoAttribute(): array
     {
         if (! $this->event) {
             return [];
@@ -134,7 +150,7 @@ class Occurence extends Model
      */
     public function getAdConfig(string $adChannelKey): ?AdConfig
     {
-        return $this->event->adConfigs->firstWhere('slug', $adChannelKey);
+        return $this->event?->adConfigs->firstWhere('slug', $adChannelKey);
     }
 
     /**
@@ -149,6 +165,9 @@ class Occurence extends Model
             $adText = $adConfig->ad_text ?? '';
         }
 
-        return ($adText ?? '') ?: $defaultTo ?: $this->service->ad_text ?: $this->service->descriptionText();
+        $service = $this->service;
+        $serviceText = $service === null ? '' : ($service->ad_text ?: $service->descriptionText());
+
+        return ($adText ?? '') ?: $defaultTo ?: $serviceText;
     }
 }

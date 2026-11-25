@@ -38,7 +38,6 @@ use App\Services\FileNameService;
 use App\Services\LiturgyService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
 use PhpOffice\PhpWord\Element\Section;
@@ -61,6 +60,8 @@ class EventListReport extends AbstractWordDocumentReport
     protected const DEFAULT = 'Gottesdienste';
 
     protected const LIST2 = 'Termine';
+
+    protected const NO_INDENT = 'Bekanntgaben ohne Einrückung';
 
     public const FILE_SIGNATURE = '91.8';
 
@@ -91,7 +92,8 @@ class EventListReport extends AbstractWordDocumentReport
      */
     public function setup()
     {
-        $cities = Auth::user()->cities;
+        $user = $this->authenticatedUser();
+        $cities = $user->cities;
 
         return Inertia::render('Report/EventList/Setup', compact('cities'));
     }
@@ -113,7 +115,7 @@ class EventListReport extends AbstractWordDocumentReport
 
         $start = Carbon::parse($data['start']);
         $end = Carbon::parse($data['end']);
-        $city = City::findOrFail($request->get('city'));
+        $city = City::findOrFail((int) $data['city']);
 
         $services = Service::with(['location'])
             ->regularForCity($city)
@@ -126,7 +128,7 @@ class EventListReport extends AbstractWordDocumentReport
 
         if ($data['mixOutlook'] ?? false) {
             $calendar = new EventCalendarImport($city->public_events_calendar_url);
-            $events = $calendar->mix($events, $start, $end->copy()->subDay(1), true);
+            $events = $calendar->mix($events, $start, $end->copy()->subDay(), true);
         }
 
         $events = Service::mix($events, $services, $start, $end);
@@ -157,10 +159,10 @@ class EventListReport extends AbstractWordDocumentReport
                     'hanging' => Converter::cmToTwip(0),
                 ],
                 'tabs' => [
-                    new Tab('left', Converter::cmToTwip(1.3)),
-                    new Tab('right', Converter::cmToTwip(4.76)),
-                    new Tab('left', Converter::cmToTwip(5.5)),
-                    new Tab('left', Converter::cmToTwip(15.0)),
+                    new Tab('left', (int) Converter::cmToTwip(1.3)),
+                    new Tab('right', (int) Converter::cmToTwip(4.76)),
+                    new Tab('left', (int) Converter::cmToTwip(5.5)),
+                    new Tab('left', (int) Converter::cmToTwip(15.0)),
                 ],
                 'spaceAfter' => 0,
             ]
@@ -174,10 +176,10 @@ class EventListReport extends AbstractWordDocumentReport
                     'hanging' => Converter::cmToTwip(0),
                 ],
                 'tabs' => [
-                    new Tab('left', Converter::cmToTwip(1.3)),
-                    new Tab('left', Converter::cmToTwip(2)),
-                    new Tab('right', Converter::cmToTwip(4.44)),
-                    new Tab('left', Converter::cmToTwip(5.4)),
+                    new Tab('left', (int) Converter::cmToTwip(1.3)),
+                    new Tab('left', (int) Converter::cmToTwip(2)),
+                    new Tab('right', (int) Converter::cmToTwip(4.44)),
+                    new Tab('left', (int) Converter::cmToTwip(5.4)),
                 ],
                 'spaceAfter' => 0,
             ]
@@ -195,15 +197,15 @@ class EventListReport extends AbstractWordDocumentReport
         foreach ($events as $theseEvents) {
             foreach ($theseEvents as $event) {
                 if (is_object(($event))) {
-                    /* @var Service $event */
+                    /** @var Service $event */
                     // only services this time
 
-                    $liturgy = LiturgyService::getLiturgyInfoByDate($event->day)[0] ?? [];
-                    $pericope = (isset($liturgy['perikope']) ? $liturgy['litTextsPerikope'.$liturgy['perikope']] : '');
+                    $liturgy = LiturgyService::getLiturgyInfoByDate($event->trueDate())[0] ?? [];
+                    $pericope = (string) (isset($liturgy['perikope']) ? $liturgy['litTextsPerikope'.$liturgy['perikope']] : '');
 
                     // remove optional verses
                     if ($pericope) {
-                        $pericope = preg_replace('/\([\d–]*\)/', '+', $pericope);
+                        $pericope = (string) preg_replace('/\([\d–]*\)/', '+', $pericope);
                         if (substr($pericope, -1) == '+') {
                             $pericope = substr($pericope, 0, -1);
                         }
@@ -213,7 +215,7 @@ class EventListReport extends AbstractWordDocumentReport
                     $run = $this->renderParagraph(
                         self::DEFAULT,
                         [
-                            [$event->date->format('d.m.Y')."\t", []],
+                            [$event->trueDate()->format('d.m.Y')."\t", []],
                             [$event->timeText(true)."\t", []],
                         ],
                         0
@@ -263,7 +265,7 @@ class EventListReport extends AbstractWordDocumentReport
                             $description = str_replace('; ', ';<w:br />', $description);
                         }
                         // take care of ampersands
-                        $description = trim(preg_replace('/&(?![A-Za-z0-9#]{1,7};)/', '&amp;', $description));
+                        $description = trim((string) preg_replace('/&(?![A-Za-z0-9#]{1,7};)/', '&amp;', $description));
                         $this->renderParagraph(
                             self::DEFAULT,
                             [
@@ -359,9 +361,10 @@ class EventListReport extends AbstractWordDocumentReport
     }
 
     /**
-     * @param  string  $template
-     * @param  int  $emptyParagraphsAfter
-     * @param  null  $existingTextRun
+     * @param  string  $template  Name des zu verwendenden Absatzstils.
+     * @param  array<int, array{0: string, 1: array<string, mixed>}>  $blocks  Textblöcke mit ihren Formatierungsoptionen.
+     * @param  int  $emptyParagraphsAfter  Anzahl der anzuhängenden leeren Absätze.
+     * @param  TextRun|null  $existingTextRun  Optionaler bestehender Textlauf, der ergänzt wird.
      * @return TextRun|null
      */
     protected function renderParagraph(
@@ -381,6 +384,10 @@ class EventListReport extends AbstractWordDocumentReport
         return $textRun;
     }
 
+    /**
+     * @param  string|array<int, string>  $text  Zu rendernder Text oder Absätze.
+     * @return void
+     */
     protected function renderLiteral($text)
     {
         if (! is_array($text)) {

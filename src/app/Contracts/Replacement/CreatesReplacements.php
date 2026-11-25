@@ -35,6 +35,6 @@ use App\Models\Leave\Replacement;
 use App\Models\People\User;
 
 /**
- * @method Replacement create(User $user, Absence $absence, array $input)
+ * @method Replacement create(User $user, Absence $absence, array<string, mixed> $input)
  */
 interface CreatesReplacements {}

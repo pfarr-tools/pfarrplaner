@@ -33,6 +33,7 @@ namespace App\Http\Controllers;
 use App\Integrations\KonfiApp\KonfiAppIntegration;
 use App\Mail\OfferingCertificateMail;
 use App\Models\AbstractModel;
+use App\Models\People\User;
 use App\Models\Places\City;
 use App\Models\Service;
 use App\Services\QRService;
@@ -65,7 +66,8 @@ class CityController extends AbstractCRUDController
 
     protected string $modelClass = City::class;
 
-    protected $model = City::class;
+    /** @var class-string<City> Model class used by the shared attachment traits. */
+    protected string $model = City::class;
 
     /**
      * Class constructor.
@@ -83,6 +85,7 @@ class CityController extends AbstractCRUDController
     protected function getModelsForIndex(): Collection
     {
         $user = Auth::user();
+        abort_unless($user instanceof User, 401);
         if ($user->isAdmin) {
             return ($this->modelClass)::all();
         } else {
@@ -108,7 +111,9 @@ class CityController extends AbstractCRUDController
     protected function getResourcesForEditor(Request $request, $model = null): array
     {
         $data = parent::getResourcesForEditor($request, $model);
-        $data['canDelete'] = Auth::user()->can('delete', $model);
+        $user = Auth::user();
+        abort_unless($user instanceof User, 401);
+        $data['canDelete'] = $user->can('delete', $model);
         $data['possibleChildren'] = City::where('is_org', '!=', 1)
             ->whereNull('parent_id')
             ->get()
@@ -134,7 +139,7 @@ class CityController extends AbstractCRUDController
     public function qr(Request $request, $city)
     {
         $city = City::where('name', 'like', '%'.Str::replace(['-', 'ae', 'oe', 'ue'], [' ', 'ä', 'ö', 'ü'], $city).'%')->first();
-        abort_unless($city, 404);
+        abort_unless($city !== null, 404);
 
         $services = Service::where('city_id', $city->id)->whereDate('date', Carbon::now()->setTime(0, 0, 0))
             ->whereNotNull('konfiapp_event_qr')->get();
@@ -224,7 +229,7 @@ class CityController extends AbstractCRUDController
         ]);
 
         if ($city->offering_certificate_email) {
-            Mail::to($city->offering_certificate_email)->queue(new OfferingCertificateMail($service->fresh()));
+            Mail::to($city->offering_certificate_email)->queue(new OfferingCertificateMail($service->refresh()));
         }
 
         return back()->with('success', 'Die Opferangaben wurden gespeichert.');
@@ -241,6 +246,7 @@ class CityController extends AbstractCRUDController
         $file = QRService::generate(URL::signedRoute('offerings.public', ['city' => $city]));
         $png = file_get_contents($file);
         unlink($file);
+        abort_if($png === false, 500, 'Der QR-Code konnte nicht gelesen werden.');
 
         return response($png)->header('Content-Type', 'image/png');
     }
@@ -333,12 +339,12 @@ class CityController extends AbstractCRUDController
      * Validate and normalize denomination counts.
      *
      * @param  array<string|int, mixed>  $input  Submitted counts.
-     * @return array<string, int> Normalized positive counts.
+     * @return array<int|string, int> Normalized positive counts.
      */
     private function validatedOfferingDenominations(array $input): array
     {
         $allowed = $this->offeringDenominations();
-        /** @var array<string, int> $result */
+        /** @var array<int|string, int> $result */
         $result = [];
         foreach ($input as $cents => $count) {
             abort_unless(array_key_exists((int) $cents, $allowed), 422, 'Ungültige Stückelung.');
@@ -354,7 +360,7 @@ class CityController extends AbstractCRUDController
     /**
      * Calculate a formatted Euro amount from denomination counts.
      *
-     * @param  array<string, int>  $denominations  Counts keyed by cents.
+     * @param  array<int|string, int>  $denominations  Counts keyed by cents.
      * @return string|null Formatted amount or null when no count was entered.
      */
     private function offeringAmountFromDenominations(array $denominations): ?string

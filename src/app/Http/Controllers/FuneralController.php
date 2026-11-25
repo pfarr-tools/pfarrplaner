@@ -46,11 +46,14 @@ use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\View;
 use Inertia\Inertia;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 /**
  * Class FuneralController
@@ -63,6 +66,9 @@ class FuneralController extends AbstractCRUDController
 
     protected string $modelClass = Funeral::class;
 
+    /**
+     * @return void
+     */
     public function __construct()
     {
         $this->middleware('auth');
@@ -95,6 +101,7 @@ class FuneralController extends AbstractCRUDController
     {
         Gate::authorize('create', Funeral::class);
         $user = Auth::user();
+        abort_unless($user instanceof User, 401);
         $cities = $this->getWritableFuneralCities($user);
         $mastered = Poolmaster::with(['pool', 'pool.users', 'pool.cities'])
             ->where('user_id', $user->id)
@@ -103,14 +110,16 @@ class FuneralController extends AbstractCRUDController
             ->get();
 
         $locations = Location::inCities($cities->pluck('id'))->get();
-        $people = User::visibleFor(Auth::user())->get();
+        $people = User::visibleFor($user)->get();
 
         return Inertia::render('Rites/FuneralWizard', compact('cities', 'locations', 'people', 'user', 'mastered'));
     }
 
-    public function wizardSave(Request $request)
+    public function wizardSave(Request $request): RedirectResponse
     {
         Gate::authorize('create', Funeral::class);
+        $user = Auth::user();
+        abort_unless($user instanceof User, 401);
         $data = $request->validate(
             [
                 'date' => 'required|date',
@@ -125,8 +134,8 @@ class FuneralController extends AbstractCRUDController
         }
         $data['date'] = Carbon::parse($data['date'], 'Europe/Berlin')->setTimezone('UTC');
 
-        $city = City::find($data['city']);
-        abort_unless($this->getWritableFuneralCities(Auth::user())->pluck('id')->contains($city?->id), 403);
+        $city = City::query()->whereKey($data['city'])->firstOrFail();
+        abort_unless($this->getWritableFuneralCities($user)->pluck('id')->contains($city->id), 403);
 
         $location = $specialLocation = null;
         if ((! is_numeric($data['location'])) || (Location::find($data['location']) === null)) {
@@ -172,8 +181,8 @@ class FuneralController extends AbstractCRUDController
         );
         $service->update(['slug' => $service->createSlug()]);
         if (! is_array($data['pastor'])) {
-            if (Auth::user()->hasRole('Pfarrer:in')) {
-                $service->pastors()->sync([Auth::user()->id => ['category' => 'P']]);
+            if ($user->hasRole('Pfarrer:in')) {
+                $service->pastors()->sync([$user->id => ['category' => 'P']]);
             }
         } else {
             $sync = [];
@@ -210,15 +219,17 @@ class FuneralController extends AbstractCRUDController
 
     /**
      * Create a pdf form with funeral data
-     *
-     * @return Response
      */
-    public function pdfForm(Funeral $funeral)
+    public function pdfForm(Funeral $funeral): BinaryFileResponse
     {
         Gate::authorize('update', $funeral);
         $funeral->load('service');
-        $funeral->service->load('location', 'city');
-        $filename = $funeral->service->date->format('Ymd').' '.$funeral->buried_name.' KRA.pdf';
+        $service = $funeral->service;
+        abort_unless($service !== null && $service->date !== null, 404);
+        $service->load('location', 'city');
+        $date = $service->date;
+        abort_unless($date !== null, 404);
+        $filename = $date->format('Ymd').' '.$funeral->buried_name.' KRA.pdf';
 
         return PDF::fromView('funerals.pdf.form', compact('funeral'))
             ->format('A5')
@@ -245,7 +256,7 @@ class FuneralController extends AbstractCRUDController
     {
         Gate::authorize('update', $funeral);
         $service = Service::find($funeral->service_id);
-        $raw = View::make('funerals.appointment.ical', compact('funeral', 'service'));
+        $raw = View::make('funerals.appointment.ical', compact('funeral', 'service'))->render();
         $raw = str_replace(
             "\r\n\r\n",
             "\r\n",
@@ -289,7 +300,10 @@ class FuneralController extends AbstractCRUDController
         return response()->json($funeral->attachments);
     }
 
-    protected function getWritableFuneralCities(User $user)
+    /**
+     * @return Collection<int, City> Cities the user may create funerals for.
+     */
+    protected function getWritableFuneralCities(User $user): Collection
     {
         $cities = $user->writableCities;
         $mastered = Poolmaster::with(['pool.cities'])
@@ -298,7 +312,11 @@ class FuneralController extends AbstractCRUDController
             ->where('end', '>=', now()->endOfDay())
             ->get();
         foreach ($mastered as $poolmaster) {
-            foreach ($poolmaster->pool->cities as $city) {
+            $pool = $poolmaster->pool;
+            if ($pool === null) {
+                continue;
+            }
+            foreach ($pool->cities as $city) {
                 $cities->push($city);
             }
         }

@@ -46,6 +46,9 @@ class CreateAdConfig extends AbstractCreateAction implements CreatesAdConfigs
         return '';
     }
 
+    /**
+     * @param  array<string, mixed>  $input
+     */
     public function create(User $user, Service $service, array $input): AdConfig
     {
         Gate::forUser($user)->authorize('create', [AdConfig::class, $service]);

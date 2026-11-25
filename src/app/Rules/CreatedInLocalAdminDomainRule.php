@@ -54,7 +54,11 @@ class CreatedInLocalAdminDomainRule implements Rule
      */
     public function passes($attribute, $value)
     {
-        $cityIds = Auth::user()->adminCities->pluck('id');
+        $user = Auth::user();
+        if ($user === null) {
+            return false;
+        }
+        $cityIds = $user->adminCities->pluck('id');
         $pass = false;
         foreach ($cityIds as $cityId) {
             if (($value[$cityId]['permission'] ?? 'n') != 'n') {

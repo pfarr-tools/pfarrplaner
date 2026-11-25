@@ -81,7 +81,7 @@ class ParishPolicy
      */
     public function update(User $user, Parish $model)
     {
-        if ($user->adminCities->contains($model->owningCity)) {
+        if ($user->adminCities->contains($model->owningCity ?? -1)) {
             return true;
         }
 
@@ -93,7 +93,7 @@ class ParishPolicy
      */
     public function delete(User $user, Parish $model)
     {
-        if ($user->adminCities->contains($model->owningCity)) {
+        if ($user->adminCities->contains($model->owningCity ?? -1)) {
             return true;
         }
 

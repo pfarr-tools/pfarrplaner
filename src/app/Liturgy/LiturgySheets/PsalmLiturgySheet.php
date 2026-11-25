@@ -44,12 +44,17 @@ class PsalmLiturgySheet extends AbstractLiturgySheet
 
     protected $icon = 'fa fa-file-word';
 
+    /** @var Service Service currently rendered for the export. */
     protected $service = null;
 
     protected $extension = 'docx';
 
+    /** @var string Title of the rendered Psalm used as file name. */
     protected $fileName = '';
 
+    /**
+     * @param  Service  $service  Service to render.\n     * @return mixed
+     */
     public function render(Service $service)
     {
         $this->service = $service;

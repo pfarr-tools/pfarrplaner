@@ -42,11 +42,14 @@ class ServiceBeforeStore
     /** @var Service */
     public $service;
 
-    /** @var array */
+    /** @var array<string, mixed> */
     public $data;
 
     /**
      * Create a new event instance.
+     *
+     * @param array<string, mixed> $data
+     * @return void
      */
     public function __construct(Service $service, array $data)
     {

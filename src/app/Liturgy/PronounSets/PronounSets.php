@@ -32,21 +32,33 @@ namespace App\Liturgy\PronounSets;
 
 class PronounSets
 {
-    public static function all()
+    /**
+     * Return all pronoun sets found on disk.
+     *
+     * @return array<int, AbstractPronounSet> Pronoun set instances.
+     */
+    public static function all(): array
     {
         $items = [];
-        foreach (glob(app_path('Liturgy/PronounSets/*PronounSet.php')) as $file) {
+        foreach (glob(app_path('Liturgy/PronounSets/*PronounSet.php')) ?: [] as $file) {
             $short = pathinfo($file, PATHINFO_FILENAME);
             if (substr($short, 0, 8) != 'Abstract') {
                 $class = '\\App\\Liturgy\\PronounSets\\'.$short;
-                $items[] = new $class;
+                /** @var AbstractPronounSet $item */
+                $item = new $class;
+                $items[] = $item;
             }
         }
 
         return $items;
     }
 
-    public static function items()
+    /**
+     * Return pronoun sets as a label-to-key map.
+     *
+     * @return array<string, string> Label to key mapping.
+     */
+    public static function items(): array
     {
         $items = [];
         /** @var AbstractPronounSet $item */
@@ -57,7 +69,13 @@ class PronounSets
         return $items;
     }
 
-    public static function get($key)
+    /**
+     * Return a single pronoun set by its key.
+     *
+     * @param  string|null  $key  Pronoun set key; empty values use the default set.
+     * @return AbstractPronounSet|null Pronoun set or null if it does not exist.
+     */
+    public static function get($key): ?AbstractPronounSet
     {
         if (empty($key)) {
             $key = 'er';
@@ -67,13 +85,18 @@ class PronounSets
             return null;
         }
 
-        return new $class;
+        /** @var AbstractPronounSet $pronounSet */
+        $pronounSet = new $class;
+
+        return $pronounSet;
     }
 
     /**
-     * @return array
+     * Return pronoun sets as arrays with key and label.
+     *
+     * @return array<int, array{key: string, label: string}> Pronoun set data.
      */
-    public static function toArray()
+    public static function toArray(): array
     {
         $pronounSets = [];
         /** @var AbstractPronounSet $pronounSet */

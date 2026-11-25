@@ -32,17 +32,31 @@ namespace App\Http\Controllers;
 
 use App\Facades\Settings;
 use App\Models\People\User;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
+/** Controller for application settings. */
 class SettingsController extends Controller
 {
+    /**
+     * @return void
+     */
     public function __construct()
     {
         $this->middleware('auth');
     }
 
-    public function set(Request $request, User $user, $key)
+    /**
+     * Speichert eine Einstellung des Benutzers und antwortet je nach Inertia-Header mit Redirect oder JSON.
+     *
+     * @param  Request  $request  Anfrage mit dem zu speichernden Wert.
+     * @param  User  $user  Benutzer, dessen Einstellung gespeichert wird.
+     * @param  string  $key  Schlüssel der zu speichernden Einstellung.
+     * @return JsonResponse|RedirectResponse JSON-Antwort mit der gespeicherten Einstellung oder Redirect zurück.
+     */
+    public function set(Request $request, User $user, string $key): JsonResponse|RedirectResponse
     {
         Gate::authorize('update', $user);
         $data = $request->validate(['value' => 'nullable']);

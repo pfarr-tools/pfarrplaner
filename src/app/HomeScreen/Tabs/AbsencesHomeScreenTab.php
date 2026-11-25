@@ -34,20 +34,33 @@ use App\Models\Leave\Absence;
 use App\Models\Leave\Poolmaster;
 use App\Models\Leave\Replacement;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\Eloquent\Builder;
 
+/** Home screen tab showing absences and replacements. */
 class AbsencesHomeScreenTab extends AbstractHomeScreenTab
 {
     protected $title = 'Mein Urlaub';
 
     protected $description = 'Zeigt den eigenen Urlaub und andere Abwesenheiten';
 
-    protected $absenceQuery;
+    /**
+     * @var Builder<Absence>
+     */
+    protected $absenceQuery = null;
 
-    protected $replacementQuery;
+    /**
+     * @var Builder<Replacement>
+     */
+    protected $replacementQuery = null;
 
-    protected $poolmasterQuery;
+    /**
+     * @var Builder<Poolmaster>
+     */
+    protected $poolmasterQuery = null;
 
+    /**
+     * @param  array<string, mixed>  $config  Tab configuration.\n     * @return void
+     */
     public function __construct($config = [])
     {
         parent::__construct($config);
@@ -59,6 +72,9 @@ class AbsencesHomeScreenTab extends AbstractHomeScreenTab
         return parent::getTitle();
     }
 
+    /**
+     * @param  array<string, mixed>  $data  View data.\n     * @return mixed
+     */
     public function getContent($data = [])
     {
         $data['absences'] = $this->absenceQuery->get();
@@ -68,6 +84,9 @@ class AbsencesHomeScreenTab extends AbstractHomeScreenTab
         return parent::getContent($data);
     }
 
+    /**
+     * @param  array<string, mixed>  $data  Additional data.\n     * @return array<string, mixed>
+     */
     public function toArray($data = [])
     {
         $data['absences'] = $this->absenceQuery->get();
@@ -86,21 +105,21 @@ class AbsencesHomeScreenTab extends AbstractHomeScreenTab
     public function buildQueries()
     {
         $start = Carbon::now()->setTime(0, 0, 0);
-        $end = Carbon::now()->addMonth(2);
+        $end = Carbon::now()->addMonth();
 
-        $this->absenceQuery = Absence::where('user_id', Auth::user()->id)->where('to', '>=', now());
+        $this->absenceQuery = Absence::where('user_id', $this->user()->id)->where('to', '>=', now());
         $this->replacementQuery = Replacement::with('absence')
             ->whereHas(
                 'users',
                 function ($query) {
-                    $query->where('users.id', Auth::user()->id);
+                    $query->where('users.id', $this->user()->id);
                 }
             )
             ->where('to', '>=', now())
             ->orderBy('from')
             ->orderBy('to');
 
-        $this->poolmasterQuery = Poolmaster::where('user_id', Auth::user()->id)
+        $this->poolmasterQuery = Poolmaster::where('user_id', $this->user()->id)
             ->where('end', '>=', now())
             ->orderBy('start');
     }

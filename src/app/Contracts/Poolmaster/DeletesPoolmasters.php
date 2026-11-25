@@ -30,6 +30,7 @@
 
 namespace App\Contracts\Poolmaster;
 
+use App\Models\Leave\Poolmaster;
 use App\Models\People\User;
 
 /**

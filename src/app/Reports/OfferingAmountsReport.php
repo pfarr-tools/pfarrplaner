@@ -36,7 +36,6 @@ use App\Models\Service;
 use App\Services\FileNameService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
 use PhpOffice\PhpSpreadsheet\Cell\DataType;
@@ -75,7 +74,7 @@ class OfferingAmountsReport extends AbstractExcelDocumentReport
      */
     public function setup()
     {
-        $cities = Auth::user()->cities;
+        $cities = $this->authenticatedUser()->cities;
         $locations = Location::inCities($cities->pluck('id'))->get();
 
         return Inertia::render('Report/OfferingAmounts/Setup', compact('cities', 'locations'));
@@ -117,7 +116,7 @@ class OfferingAmountsReport extends AbstractExcelDocumentReport
                 if (is_numeric($x)) {
                     $offerings[$offeringGoal]['amount'] += (float) $x;
                 }
-                if ($service->date <= Carbon::now()) {
+                if ($service->trueDate() <= Carbon::now()) {
                     $offerings[$offeringGoal]['done']++;
                 }
             }

@@ -45,6 +45,9 @@ class UpdateStreetRange extends AbstractUpdateAction implements UpdatesStreetRan
         return '';
     }
 
+    /**
+     * @param  array<string, mixed>  $input
+     */
     public function update(User $user, StreetRange $streetRange, array $input): StreetRange
     {
         Gate::forUser($user)->authorize('update', $streetRange);

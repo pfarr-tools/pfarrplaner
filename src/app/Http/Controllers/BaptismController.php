@@ -33,6 +33,7 @@ namespace App\Http\Controllers;
 use App\Attachments\AttachmentFactory;
 use App\Liturgy\PronounSets\PronounSets;
 use App\Models\Attachment;
+use App\Models\People\User;
 use App\Models\Rites\Baptism;
 use App\Models\Service;
 use App\Traits\HandlesAttachmentsTrait;
@@ -98,11 +99,14 @@ class BaptismController extends AbstractCRUDController
      */
     protected function getBaptismalServices($baptismFlag = 1)
     {
+        $user = Auth::user();
+        abort_unless($user instanceof User, 401);
+
         return Service::setEagerLoads([])
             ->with(['baptisms', 'participants'])
             ->where('baptism', '=', $baptismFlag)
             ->whereDoesntHave('funerals')
-            ->inCities(Auth::user()->cities)
+            ->inCities($user->cities)
             ->startingFrom(Carbon::now())
             ->ordered()
             ->get();
@@ -112,14 +116,16 @@ class BaptismController extends AbstractCRUDController
      * Show the form for editing the specified resource.
      *
      * @param  Baptism  $baptism
-     * @return Response
+     * @return array<string, mixed>
      */
     protected function getResourcesForEditor(Request $request, $baptism = null): array
     {
+        $user = Auth::user();
+        abort_unless($user instanceof User, 401);
         $baptismalServicesQuery = Service::setEagerLoads([])
             ->with(['baptisms', 'participants'])
             ->where('baptism', '=', 1)
-            ->inCities(Auth::user()->cities)
+            ->inCities($user->cities)
             ->startingFrom(Carbon::now())
             ->ordered();
         if ($baptism?->service_id) {
@@ -127,7 +133,7 @@ class BaptismController extends AbstractCRUDController
         }
         $baptismalServices = $baptismalServicesQuery->get();
 
-        $cities = Auth::user()->writableCities;
+        $cities = $user->writableCities;
         $pronounSets = PronounSets::toArray();
 
         $otherServices = $this->getBaptismalServices(0);
@@ -166,7 +172,7 @@ class BaptismController extends AbstractCRUDController
     ) {
         Gate::authorize('update', $baptism);
         $service = Service::find($baptism->service_id);
-        $raw = View::make('baptisms.appointment.ical', compact('baptism', 'service'));
+        $raw = View::make('baptisms.appointment.ical', compact('baptism', 'service'))->render();
         $raw = str_replace(
             "\r\n\r\n",
             "\r\n",

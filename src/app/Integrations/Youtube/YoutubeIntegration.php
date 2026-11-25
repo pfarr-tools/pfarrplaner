@@ -90,7 +90,12 @@ class YoutubeIntegration extends AbstractIntegration
      */
     public function authenticate(City $city): void
     {
-        $this->client->refreshToken($city->google_refresh_token);
+        $refreshToken = $city->google_refresh_token;
+        if ($refreshToken === null || $refreshToken === '') {
+            throw new \RuntimeException('YouTube refresh token is not configured for this city.');
+        }
+
+        $this->client->refreshToken($refreshToken);
     }
 
     /**
@@ -104,6 +109,9 @@ class YoutubeIntegration extends AbstractIntegration
     }
 
     /**
+     * Fetch a single video by its YouTube video ID.
+     *
+     * @param  string  $id  YouTube video identifier.
      * @return mixed|null
      */
     public function getVideo($id)
@@ -112,7 +120,10 @@ class YoutubeIntegration extends AbstractIntegration
     }
 
     /**
-     * @param  array  $data
+     * List messages in a YouTube live chat.
+     *
+     * @param  string  $id  YouTube live chat identifier.
+     * @param  array<string, mixed>  $data  Additional parameters for the API request.
      * @return Google_Service_YouTube_LiveChatMessageListResponse
      */
     public function getLiveChat($id, $data = [])
@@ -145,7 +156,7 @@ class YoutubeIntegration extends AbstractIntegration
      * @param  string  $author  Name displayed as the message author.
      * @param  string  $message  Message text supplied by the author.
      */
-    public function sendLiveChatMessage($liveChatId, $author, $message)
+    public function sendLiveChatMessage($liveChatId, $author, $message): void
     {
         $snippet = new Google_Service_YouTube_LiveChatMessageSnippet;
         $messageDetails = new Google_Service_YouTube_LiveChatTextMessageDetails;
@@ -183,9 +194,9 @@ class YoutubeIntegration extends AbstractIntegration
     /**
      * Get all streams (ids) for a city
      *
-     * @return array Streams
+     * @return array<string, string> Streams indexed by stream ID with their titles.
      */
-    public function getAllStreams()
+    public function getAllStreams(): array
     {
         $streams = [];
         $allStreams = $this->getYoutube()->liveStreams->listLiveStreams('id,snippet', ['mine' => 'true', 'maxResults' => 50]);

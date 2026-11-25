@@ -32,18 +32,30 @@ namespace App\HomeScreen\Tabs;
 
 use App\Models\Rites\Baptism;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\Eloquent\Builder;
 
+/** Home screen tab or API controller. */
 class BaptismsHomeScreenTab extends AbstractHomeScreenTab
 {
     protected $title = 'Taufen';
 
     protected $description = 'Zeigt die anstehenden Taufen';
 
+    /**
+     * @var Builder<Baptism>
+     */
     protected $baptismQuery = null;
 
+    /**
+     * @var Builder<Baptism>
+     */
     protected $baptismRequestQuery = null;
 
+    /**
+     *   construct.
+     *
+     * @return mixed
+     */
     public function __construct($config = [])
     {
         // preset default config
@@ -53,6 +65,9 @@ class BaptismsHomeScreenTab extends AbstractHomeScreenTab
         $this->buildQueries();
     }
 
+    /**
+     * Gettitle.
+     */
     public function getTitle(): string
     {
         if ($this->config['mine']) {
@@ -62,16 +77,27 @@ class BaptismsHomeScreenTab extends AbstractHomeScreenTab
         return parent::getTitle();
     }
 
-    public function getBaptismCount()
+    /**
+     * Getbaptismcount.
+     */
+    public function getBaptismCount(): int
     {
         return $this->baptismQuery->count();
     }
 
-    public function getBaptismRequestCount()
+    /**
+     * Getbaptismrequestcount.
+     */
+    public function getBaptismRequestCount(): int
     {
         return $this->baptismRequestQuery->count();
     }
 
+    /**
+     * Getcontent.
+     *
+     * @return mixed
+     */
     public function getContent($data = [])
     {
         $data['baptisms'] = $this->baptismQuery->get();
@@ -80,6 +106,11 @@ class BaptismsHomeScreenTab extends AbstractHomeScreenTab
         return parent::getContent($data);
     }
 
+    /**
+     * Toarray.
+     *
+     * @return mixed
+     */
     public function toArray($data = [])
     {
         $data['baptisms'] = $this->baptismQuery->get();
@@ -97,9 +128,9 @@ class BaptismsHomeScreenTab extends AbstractHomeScreenTab
     public function buildQueries()
     {
         $start = Carbon::now()->setTime(0, 0, 0);
-        $end = Carbon::now()->addMonth(2);
+        $end = Carbon::now()->addMonth();
 
-        $order = $this->config['newestFirst'] ? 'DESC' : 'ASC';
+        $order = $this->config['newestFirst'] ? 'desc' : 'asc';
 
         $this->baptismQuery = Baptism::with(['service'])
             ->select('baptisms.*')
@@ -117,11 +148,11 @@ class BaptismsHomeScreenTab extends AbstractHomeScreenTab
                     $service->whereHas(
                         'participants',
                         function ($query) {
-                            $query->where('user_id', Auth::user()->id);
+                            $query->where('user_id', $this->user()->id);
                         }
                     );
                 } else {
-                    $service->inCities(Auth::user()->writableCities->pluck('id'));
+                    $service->inCities($this->user()->writableCities->pluck('id'));
                 }
             })->orderBy('services.date', $order);
 
@@ -130,7 +161,7 @@ class BaptismsHomeScreenTab extends AbstractHomeScreenTab
         }
 
         $this->baptismRequestQuery = Baptism::whereNull('service_id')
-            ->inCities(Auth::user()->writableCities->pluck('id'));
+            ->inCities($this->user()->writableCities->pluck('id'));
 
     }
 }

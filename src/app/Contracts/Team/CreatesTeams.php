@@ -34,6 +34,6 @@ use App\Models\People\Team;
 use App\Models\People\User;
 
 /**
- * @method Team create(User $user, array $input)
+ * @method Team create(User $user, array<string, mixed> $input)
  */
 interface CreatesTeams {}

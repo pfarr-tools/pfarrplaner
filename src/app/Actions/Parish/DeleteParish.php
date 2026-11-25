@@ -61,7 +61,9 @@ class DeleteParish extends AbstractDeleteAction implements DeletesParishes
     public function delete(User $user, Parish $parish)
     {
         Gate::forUser($user)->authorize('delete', $parish);
-        $this->city = $parish->owningCity;
+        $city = $parish->owningCity;
+        abort_unless($city instanceof City, 404);
+        $this->city = $city;
         DeletedParish::dispatch($user, $parish);
         $this->messages = ['success' => 'Das Pfarramt wurde gelöscht.'];
 

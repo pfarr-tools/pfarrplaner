@@ -21,6 +21,7 @@ use Illuminate\Contracts\Validation\ValidationRule;
 
 class SeatableFixed implements DataAwareRule, ValidationRule
 {
+    /** @var array<string, mixed> */
     protected array $data = [];
 
     /**
@@ -28,6 +29,9 @@ class SeatableFixed implements DataAwareRule, ValidationRule
      */
     public function __construct(protected ?string $bookingIdKey = null) {}
 
+    /**
+     * @param  array<string, mixed>  $data  Validation data passed by the validator.
+     */
     public function setData(array $data): static
     {
         $this->data = $data;
@@ -35,6 +39,9 @@ class SeatableFixed implements DataAwareRule, ValidationRule
         return $this;
     }
 
+    /**
+     * @param  string  $attribute  Attribute name.\n     * @param  mixed  $value  Value to validate.\n     * @param  Closure  $fail  Failure callback.\n     * @return void
+     */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         $data = $this->data;
@@ -45,7 +52,12 @@ class SeatableFixed implements DataAwareRule, ValidationRule
         $seatFinder = $service->getSeatFinder();
 
         if ($this->bookingIdKey && isset($data[$this->bookingIdKey])) {
-            $booking = Booking::find($data[$this->bookingIdKey]);
+            $booking = Booking::find((int) $data[$this->bookingIdKey]);
+            if ($booking === null) {
+                $fail('validation.seatable')->translate();
+
+                return;
+            }
             $success = $seatFinder->checkIfBookingCanBeChanged($booking, $data);
         } else {
             $success = $seatFinder->find(

@@ -35,11 +35,16 @@ class AttachmentUploadService
         return (int) ceil($size / max(1, (int) config('attachments.upload.chunk_size')));
     }
 
-    /** Start an authorized upload session. */
+    /**
+     * Startet eine autorisierte Upload-Sitzung für das angegebene Ziel.
+     *
+     * @param  array<string, mixed>  $input  Upload-Parameter wie Ziel, Dateiname, Größe und Chunk-Anzahl
+     * @return AttachmentUploadSession Neu angelegte Upload-Sitzung
+     */
     public function start(User $user, array $input): AttachmentUploadSession
     {
         $targetClass = self::TARGETS[$input['target_type'] ?? ''] ?? null;
-        $target = $targetClass ? $targetClass::findOrFail($input['target_id']) : null;
+        $target = $targetClass ? $targetClass::query()->whereKey($input['target_id'])->firstOrFail() : null;
         if (! $target) {
             throw ValidationException::withMessages(['target_type' => 'Ungültiges Uploadziel.']);
         }

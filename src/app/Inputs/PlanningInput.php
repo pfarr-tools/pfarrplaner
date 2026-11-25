@@ -39,11 +39,13 @@ use App\Models\Service;
 use Carbon\Carbon;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 use Inertia\Inertia;
+use Inertia\Response;
 
 /**
  * Class PlanningInput
@@ -57,24 +59,30 @@ class PlanningInput extends AbstractInput
 
     public $description = 'Beliebige Dienste für einen bestimmten Zeitraum eintragen';
 
+    /**
+     * @return bool
+     */
     public function canEdit(): bool
     {
-        return Auth::user()->can('gd-pfarrer-bearbeiten') ||
-            Auth::user()->can('gd-organist-bearbeiten') ||
-            Auth::user()->can('gd-mesner-bearbeiten') ||
-            Auth::user()->can('gd-allgemein-bearbeiten');
+        return Auth::user()?->can('gd-pfarrer-bearbeiten') ||
+            Auth::user()?->can('gd-organist-bearbeiten') ||
+            Auth::user()?->can('gd-mesner-bearbeiten') ||
+            Auth::user()?->can('gd-allgemein-bearbeiten');
     }
 
     /**
-     * @return Application|Factory|View
+     * @return Application|Factory|View|Response
      */
     public function setup(Request $request)
     {
-        $cities = Auth::user()->writableCities;
+        $user = Auth::user();
+        abort_unless($user instanceof User, 403);
+
+        $cities = $user->writableCities;
         $locations = Location::inCities($cities->pluck('id'))->get();
 
         $ministries = $this->getAvailableMinistries(
-            Participant::all()
+            Participant::query()
                 ->pluck('category')
                 ->unique()
         );
@@ -83,7 +91,8 @@ class PlanningInput extends AbstractInput
     }
 
     /**
-     * @return array
+     * @param  iterable<string>  $reqMinistries  Zu berücksichtigende Dienste.
+     * @return array<string, string> Dienste mit ihren Anzeigenamen.
      */
     protected function getAvailableMinistries($reqMinistries)
     {
@@ -91,27 +100,27 @@ class PlanningInput extends AbstractInput
         foreach ($reqMinistries as $ministry) {
             switch ($ministry) {
                 case 'P':
-                    if (Auth::user()->can('gd-pfarrer-bearbeiten')) {
+                    if (Auth::user()?->can('gd-pfarrer-bearbeiten')) {
                         $ministries[$ministry] = config('labels.pastor');
                     }
                     break;
                 case 'O':
-                    if (Auth::user()->can('gd-organist-bearbeiten')) {
+                    if (Auth::user()?->can('gd-organist-bearbeiten')) {
                         $ministries[$ministry] = config('labels.organist');
                     }
                     break;
                 case 'M':
-                    if (Auth::user()->can('gd-mesner-bearbeiten')) {
+                    if (Auth::user()?->can('gd-mesner-bearbeiten')) {
                         $ministries[$ministry] = config('labels.sacristan');
                     }
                     break;
                 case 'A':
-                    if (Auth::user()->can('gd-allgemein-bearbeiten')) {
+                    if (Auth::user()?->can('gd-allgemein-bearbeiten')) {
                         $ministries[$ministry] = 'Weitere Beteiligte';
                     }
                     break;
                 default:
-                    if (Auth::user()->can('gd-allgemein-bearbeiten') || Auth::user()->can(
+                    if (Auth::user()?->can('gd-allgemein-bearbeiten') || Auth::user()?->can(
                         'gd-freie-dienste-bearbeiten'
                     )) {
                         $ministries[$ministry] = $ministry;
@@ -123,7 +132,7 @@ class PlanningInput extends AbstractInput
     }
 
     /**
-     * @return Application|Factory|View|void
+     * @return Application|Factory|View|Response|void
      */
     public function input(Request $request)
     {
@@ -137,16 +146,20 @@ class PlanningInput extends AbstractInput
             ]
         );
 
+        $user = Auth::user();
+        abort_unless($user instanceof User, 403);
+
         $locations = Location::inCities($setup['cities'])->get();
 
         $teams = Team::with('users')->inCities($setup['cities'])->get();
 
+        $from = Carbon::createFromFormat('d.m.Y', $setup['from']);
+        $to = Carbon::createFromFormat('d.m.Y', $setup['to']);
+        abort_unless($from instanceof Carbon && $to instanceof Carbon, 400);
+
         $query = Service::with(['city'])
             ->select('services.slug')
-            ->between(
-                Carbon::createFromFormat('d.m.Y', $setup['from']),
-                Carbon::createFromFormat('d.m.Y', $setup['to'])
-            )
+            ->between($from, $to)
             ->inCities($setup['cities'])
             ->ordered();
 
@@ -154,9 +167,9 @@ class PlanningInput extends AbstractInput
             $query->whereIn('services.location_id', $setup['locations']);
         }
 
-        $serviceSlugs = $query->get()->pluck('slug');
+        $serviceSlugs = $query->pluck('slug');
 
-        $users = User::visibleFor(Auth::user())->get();
+        $users = User::visibleFor($user)->get();
 
         $ministries = $this->getAvailableMinistries($setup['ministries'] ?: []);
 
@@ -169,7 +182,7 @@ class PlanningInput extends AbstractInput
     }
 
     /**
-     * @return RedirectResponse|void
+     * @return RedirectResponse|JsonResponse|void
      */
     public function save(Request $request)
     {
@@ -179,6 +192,8 @@ class PlanningInput extends AbstractInput
         ]);
 
         $service = Service::where('slug', $data['slug'])->first();
+        abort_unless($service instanceof Service, 404);
+
         $service->trackChanges();
         $originalParticipants = $service->participants;
 

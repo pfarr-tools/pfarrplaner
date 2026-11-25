@@ -40,15 +40,17 @@ use Throwable;
  */
 class LiturgyService
 {
-    /** @var Liturgy|null Instance */
+    /** @var self|null Instance */
     protected static $instance = null;
 
+    /** @var array<int|string, mixed> Liturgical calendars keyed by year. */
     protected static $calendars = [];
 
+    /** @var array<int|string, mixed> Lectionary data keyed by year. */
     protected static $lectionaryYears = [];
 
     /**
-     * @return Liturgy|null
+     * @return self
      */
     public static function getInstance()
     {
@@ -62,8 +64,8 @@ class LiturgyService
     /**
      * Get a specific liturgical item by code
      *
-     * @param  $year  Year
-     * @param  $code  Code
+     * @param  int|string  $year  Year
+     * @param  string  $code  Code
      * @return array|mixed
      */
     public static function getLiturgyByCode($year, $code)
@@ -85,8 +87,8 @@ class LiturgyService
     /**
      * Get the date for a proprium by code
      *
-     * @param  $year  Year
-     * @param  $code  Code
+     * @param  int|string  $year  Year
+     * @param  string  $code  Code
      * @return Carbon|null
      */
     public static function getPropriumDateByCode($year, $code)
@@ -102,6 +104,7 @@ class LiturgyService
     /**
      * Get all the propria for a specific date
      *
+     * @param  Carbon|string  $date  Date as a Carbon instance or formatted string
      * @return array|mixed
      */
     public static function getLiturgyInfoByDate($date)
@@ -116,6 +119,7 @@ class LiturgyService
     /**
      * Get the liturgical calendar for a specific year
      *
+     * @param  int|string  $year  Liturgical year
      * @return mixed
      */
     public static function getYear($year)
@@ -127,7 +131,7 @@ class LiturgyService
             Storage::put('liturgy/'.$year.'.json', static::fetchCalendarJson('https://kirchenjahr.pfarr.tools/api/jahr/'.$year));
         }
 
-        return static::$calendars[$year] = json_decode(Storage::get('liturgy/'.$year.'.json'), true);
+        return static::$calendars[$year] = json_decode(Storage::get('liturgy/'.$year.'.json') ?? '', true);
     }
 
     /**
@@ -145,7 +149,7 @@ class LiturgyService
             Storage::put('liturgy/lesejahr-'.$year.'.json', static::fetchCalendarJson('https://kirchenjahr.pfarr.tools/api/lesejahr/'.$year));
         }
 
-        return static::$lectionaryYears[$year] = json_decode(Storage::get('liturgy/lesejahr-'.$year.'.json'), true);
+        return static::$lectionaryYears[$year] = json_decode(Storage::get('liturgy/lesejahr-'.$year.'.json') ?? '', true);
     }
 
     /**

@@ -56,7 +56,7 @@ return new class extends Migration
 
         if ($foreignKey) {
             Schema::table('two_factor_login_challenges', function (Blueprint $table) use ($foreignKey): void {
-                $table->dropForeign($foreignKey['name']);
+                $table->dropForeign((string) ($foreignKey['name'] ?? ''));
             });
         }
 

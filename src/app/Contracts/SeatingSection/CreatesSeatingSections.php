@@ -18,5 +18,10 @@ use App\Models\Seating\SeatingSection;
 
 interface CreatesSeatingSections
 {
+    /**
+     * Legt einen Sitzbereich an.
+     *
+     * @param  array<string, mixed>  $input
+     */
     public function create(User $user, array $input): SeatingSection;
 }

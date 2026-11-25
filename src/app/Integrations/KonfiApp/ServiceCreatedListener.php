@@ -34,10 +34,11 @@ use App\Events\ServiceCreated;
 
 class ServiceCreatedListener
 {
-    public function handle(ServiceCreated $event)
+    public function handle(ServiceCreated $event): void
     {
-        if (KonfiAppIntegration::isActive($event->service->city)) {
-            KonfiAppIntegration::get($event->service->city)->handleServiceUpdate($event->service, $event->service->konfiapp_event_type);
+        $city = $event->service->city;
+        if ($city !== null && KonfiAppIntegration::isActive($city)) {
+            KonfiAppIntegration::get($city)->handleServiceUpdate($event->service, $event->service->konfiapp_event_type);
         }
     }
 }

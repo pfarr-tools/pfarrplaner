@@ -31,6 +31,7 @@
 namespace App\Traits;
 
 use App\Models\Attachment;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -40,6 +41,12 @@ use Illuminate\Support\Str;
  */
 trait HandlesAttachmentsTrait
 {
+    /**
+     * Create, replace and remove attachments from a request.
+     *
+     * @param  mixed  $object  Model owning the attachments.
+     * @return void
+     */
     protected function handleAttachments(Request $request, $object)
     {
         if ($request->hasFile('attachments')) {
@@ -65,7 +72,7 @@ trait HandlesAttachmentsTrait
             }
         } elseif ($request->has('uploadFromUrl')) {
             $path = 'attachments/'.Str::random(32).'.'.pathinfo($request->get('uploadFromUrl'), PATHINFO_EXTENSION);
-            Storage::put($path, file_get_contents($request->get('uploadFromUrl')));
+            Storage::put($path, (string) file_get_contents($request->get('uploadFromUrl')));
             $description = $request->get('attachment_text') ?: 'ohne Beschreibung';
             $object->attachments()->create(['title' => $description, 'file' => $path]);
         } elseif ($request->has('uploadFromInbox')) {
@@ -73,7 +80,7 @@ trait HandlesAttachmentsTrait
             $fileOrigin = storage_path(config('inbox.path').'/'.$request->get('uploadFromInbox'));
             if (file_exists($fileOrigin)) {
                 $path = 'attachments/'.Str::random(32).'.'.pathinfo($request->get('uploadFromUrl'), PATHINFO_EXTENSION);
-                Storage::put($path, file_get_contents($fileOrigin));
+                Storage::put($path, (string) file_get_contents($fileOrigin));
                 unlink($fileOrigin);
                 $object->attachments()->create(['title' => $description, 'file' => $path]);
             }
@@ -83,7 +90,12 @@ trait HandlesAttachmentsTrait
         $object->unsetRelation('attachments');
     }
 
-    /** Replace the single attachment assigned to a target cut. */
+    /**
+     * Replace the single attachment assigned to a target cut.
+     *
+     * @param  mixed  $object  Model owning the attachments.
+     * @param  string  $cut  Cut identifier.
+     */
     protected function replaceAttachmentCut($object, string $cut): void
     {
         $object->attachments()->where('cut', $cut)->get()->each(function (Attachment $attachment): void {
@@ -105,6 +117,9 @@ trait HandlesAttachmentsTrait
     {
         if ($request->has('remove_attachment')) {
             foreach ($request->get('remove_attachment') as $attachmentId) {
+                if (! method_exists($object, 'attachments')) {
+                    continue;
+                }
                 $attachment = $object->attachments()->findOrFail($attachmentId);
                 if (Attachment::where('file', $attachment->file)->count() == 1) {
                     Storage::delete($attachment->file);
@@ -125,6 +140,7 @@ trait HandlesAttachmentsTrait
      */
     protected function handleIndividualAttachment(Request $request, $object, $key)
     {
+        /** @var Model $object */
         if ($request->hasFile($key)) {
             // delete previous upload
             if ($object->$key != '') {
@@ -148,6 +164,7 @@ trait HandlesAttachmentsTrait
      */
     protected function removeIndividualAttachment(Request $request, $object, $key)
     {
+        /** @var Model $object */
         if ($request->has('remove_'.$key)) {
             if (Storage::exists($object->$key)) {
                 Storage::delete($object->$key);

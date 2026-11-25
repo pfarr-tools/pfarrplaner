@@ -75,6 +75,8 @@ class InstallSetup extends Command
                 $result !== false ? ' <fg=green;options=bold>DONE</>' : ' <fg=red;options=bold>FAIL</>'
             );
         }
+
+        return self::SUCCESS;
     }
 
     /**

@@ -34,6 +34,7 @@ use App\Http\Controllers\Controller;
 use App\Mail\Absence\AbsenceApproved;
 use App\Mail\Absence\AbsenceChecked;
 use App\Models\Leave\Absence;
+use App\Models\People\User;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
@@ -67,13 +68,17 @@ class AbsenceController extends Controller
     )]
     public function setChecked(Absence $absence)
     {
+        $user = Auth::user();
+        abort_unless($user instanceof User, 401);
         $absence->update([
-            'admin_id' => Auth::user()->id,
+            'admin_id' => $user->id,
             'checked_at' => Carbon::now(),
             'workflow_status' => Absence::STATUS_CHECKED,
         ]);
         $absence->refresh();
-        Mail::to($absence->user->vacationApprovers)->queue(new AbsenceChecked($absence));
+        $absenceUser = $absence->user;
+        abort_unless($absenceUser !== null, 404);
+        Mail::to($absenceUser->vacationApprovers)->queue(new AbsenceChecked($absence));
 
         return response()->json($absence);
     }
@@ -86,16 +91,20 @@ class AbsenceController extends Controller
      */
     public function setApproved(Absence $absence)
     {
+        $user = Auth::user();
+        abort_unless($user instanceof User, 401);
         $absence->update([
-            'approver_id' => Auth::user()->id,
+            'approver_id' => $user->id,
             'approved_at' => Carbon::now(),
             'workflow_status' => Absence::STATUS_APPROVED,
         ]);
         $absence->refresh();
+        $absenceUser = $absence->user;
+        abort_unless($absenceUser !== null, 404);
         Mail::to(
-            collect([$absence->user])
-                ->merge($absence->user->vacationAdmins)
-                ->merge($absence->user->vacationApprovers)
+            collect([$absenceUser])
+                ->merge($absenceUser->vacationAdmins)
+                ->merge($absenceUser->vacationApprovers)
                 ->reject(function ($user) {
                     // filter out users without email address
                     return empty($user->email);

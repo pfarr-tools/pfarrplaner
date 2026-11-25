@@ -35,7 +35,6 @@ use App\Models\Service;
 use App\Services\FileNameService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -70,7 +69,7 @@ class PersonReport extends AbstractPDFDocumentReport
      */
     public function setup()
     {
-        $users = User::visibleFor(Auth::user())->get();
+        $users = User::visibleFor($this->authenticatedUser())->get();
 
         return Inertia::render('Report/Person/Setup', compact('users'));
     }

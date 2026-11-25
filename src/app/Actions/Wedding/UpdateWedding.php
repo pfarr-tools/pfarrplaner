@@ -34,6 +34,11 @@ class UpdateWedding extends AbstractUpdateAction implements UpdatesWeddings
         return $this->redirectUrl ?: route('home');
     }
 
+    /**
+     * Aktualisiert die Hochzeit und die zugehörigen Dienste.
+     *
+     * @param  array<string, mixed>  $input
+     */
     public function update(User $user, Wedding $wedding, array $input): Wedding
     {
         Gate::forUser($user)->authorize('update', $wedding);
@@ -58,6 +63,9 @@ class UpdateWedding extends AbstractUpdateAction implements UpdatesWeddings
         return $wedding;
     }
 
+    /**
+     * @param  Service  $service  Service to derive the slug from.\n     * @return string
+     */
     protected function getServiceSlug(Service $service): string
     {
         return $service->slug ?: $service->createSlug();

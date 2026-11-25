@@ -36,8 +36,13 @@ class VELKDStudyHelper extends AbstractStudyHelper
 {
     public $title = 'VELKD Lesepredigt';
 
+    /** @var array<string, array<string, string>> */
     protected $records = [];
 
+    /**
+     * @param  array<string, mixed>  $data  Study helper input data.
+     *                                      * @return array<string, array<string, string>>
+     */
     public function read(array $data): array
     {
         if ('' == ($content = $this->getContent('https://www.velkd.de/schwerpunkte/liturgie/lesepredigt'))) {
@@ -47,6 +52,9 @@ class VELKDStudyHelper extends AbstractStudyHelper
 
         // https://www.velkd.de/fileadmin/user_upload/VELKD/PDF/Lesepredigt/Lesepredigt-01-02-2026.pdf
         preg_match('/Lesepredigt-(\d\d\-\d\d\-\d\d\d\d)/', $content, $matches);
+        if (! isset($matches[1])) {
+            return $this->records;
+        }
 
         $myDate = Str::replace('-', '.', $matches[1]);
         $this->records[$myDate] = ['[VELKD] Lesepredigt für den '.$myDate => 'https://www.velkd.de/fileadmin/user_upload/VELKD/PDF/Lesepredigt/Lesepredigt-'.$matches[1].'.pdf'];
@@ -54,6 +62,10 @@ class VELKDStudyHelper extends AbstractStudyHelper
         return $this->records;
     }
 
+    /**
+     * @param  array<string, mixed>  $data  Input data.
+     *                                      * @return array<string, string>
+     */
     public function getLinks(array $data): array
     {
         $data['links'] = array_merge($data['links'] ?? [], $this->records[$data['date']] ?? []);

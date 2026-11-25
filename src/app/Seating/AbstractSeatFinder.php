@@ -36,13 +36,19 @@ use Illuminate\Support\Collection;
 
 class AbstractSeatFinder
 {
+    /** @var string */
     public $viewName = '';
 
+    /** @var bool */
     public $hasSeats = true;
 
     /** @var Service */
     protected $service = null;
 
+    /** @var bool */
+    protected $preloadExistingBookings = true;
+
+    /** @var array<string, string> */
     protected $errors = [];
 
     /**
@@ -53,62 +59,92 @@ class AbstractSeatFinder
     public function __construct(Service $service, $preloadExistingBookings = true)
     {
         $this->service = $service;
+        $this->preloadExistingBookings = $preloadExistingBookings;
     }
 
     /**
      * Check if a specified number of people can still be seated in the location
      *
-     * @param  $number  Number of people
+     * @param  int  $number  Number of people
      * @param  string  $fixedSeat  Desired fixed seating position
      * @param  string  $overrideSeats  Override the default maximum number of seats for a fixed position
      * @param  string  $overrideSplit  Override the default splitting configuration for a fixed position
      * @param  Collection<int, Booking>  $bookings  Existing bookings used for the check
      * @return bool True if this booking can be added
      */
-    public function find($number, $fixedSeat = '', $overrideSeats = '', $overrideSplit = '', $bookings = null) {}
-
-    /**
-     * Check if seating is still possible after proposed changes to a booking
-     *
-     * @return bool True if this booking can be changed
-     */
-    public function checkIfBookingCanBeChanged(Booking $booking, array $data): bool
+    public function find($number, $fixedSeat = '', $overrideSeats = '', $overrideSplit = '', $bookings = null)
     {
         return false;
     }
 
-    public function finalList() {}
+    /**
+     * Check if seating is still possible after proposed changes to a booking
+     *
+     * @param  mixed  $data  Proposed booking data.
+     * @return bool True if this booking can be changed
+     */
+    public function checkIfBookingCanBeChanged(Booking $booking, $data): bool
+    {
+        return false;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function finalList()
+    {
+        return [];
+    }
 
     /**
      * Get all rows available for seating
      *
-     * @return array
+     * @return array<string, mixed>
      */
-    public function getAllRows() {}
+    public function getAllRows()
+    {
+        return [];
+    }
 
     /**
      * Get the maximum seating capacity of the venue
      *
      * @return int Number of seats
      */
-    public function maximumCapacity() {}
+    public function maximumCapacity()
+    {
+        return 0;
+    }
 
-    public function remainingCapacity($bookings = null) {}
+    /**
+     * @param  Collection<int, Booking>|null  $bookings  Bookings to consider.
+     * @return int
+     */
+    public function remainingCapacity($bookings = null)
+    {
+        return 0;
+    }
 
     /**
      * Get the full row record, even for a partial row
      *
+     * @param  string|int  $key  Grid key.
      * @return mixed
      */
     public function getFullRow($key) {}
 
+    /**
+     * Get the collected error messages
+     *
+     * @return array<string, string> Error messages indexed by error key.
+     */
     public function getErrors(): array
     {
         return $this->errors;
     }
 
     /**
-     * @param  string  $errors
+     * @param  array<string, string>  $errors
      */
     public function setErrors(array $errors): void
     {
@@ -135,16 +171,24 @@ class AbstractSeatFinder
 
     /**
      * Get a seating table arranged by booking codes
+     *
+     * @return array<int|string, mixed> Seating table entries indexed by booking code or grid key.
      */
     public function getSeatingTable(): array
     {
         return [];
     }
 
+    /**
+     * Get the remaining capacity as formatted text
+     *
+     * @param  string  $format  Optional sprintf-compatible format receiving the remaining capacity.
+     * @return string Formatted remaining capacity.
+     */
     public function remainingCapacityText($format = ''): string
     {
         if ($format == '') {
-            return $this->remainingCapacity();
+            return (string) $this->remainingCapacity();
         }
 
         return sprintf($format, $this->remainingCapacity());

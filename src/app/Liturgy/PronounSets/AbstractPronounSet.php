@@ -32,17 +32,26 @@ namespace App\Liturgy\PronounSets;
 
 class AbstractPronounSet
 {
+    /**
+     * @var string
+     */
     protected $label;
 
+    /**
+     * @var array<string, string>
+     */
     protected $pronouns = [];
 
+    /**
+     * @return string Pronoun set key.
+     */
     public function getKey()
     {
         return lcfirst(strtr(get_called_class(), ['App\\Liturgy\\PronounSets\\' => '', 'PronounSet' => '']));
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getLabel()
     {
@@ -50,13 +59,18 @@ class AbstractPronounSet
     }
 
     /**
-     * @param  mixed  $label
+     * @param  string  $label  Label text.
      */
     public function setLabel($label): void
     {
         $this->label = $label;
     }
 
+    /**
+     * @param  string  $text  Text to replace the pronouns in.
+     * @param  string  $prefix  Placeholder prefix.
+     * @return string Text with replaced pronouns.
+     */
     public function replacePronouns($text, $prefix)
     {
         foreach ($this->pronouns as $pronoun => $replacement) {
@@ -69,11 +83,17 @@ class AbstractPronounSet
         return $text;
     }
 
+    /**
+     * @return array<string, string> Pronoun to replacement mapping.
+     */
     public function getPronouns(): array
     {
         return $this->pronouns;
     }
 
+    /**
+     * @param  array<string, string>  $pronouns  Pronoun to replacement mapping.
+     */
     public function setPronouns(array $pronouns): void
     {
         $this->pronouns = $pronouns;

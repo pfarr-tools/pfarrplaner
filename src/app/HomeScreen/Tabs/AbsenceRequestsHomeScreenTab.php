@@ -32,18 +32,28 @@ namespace App\HomeScreen\Tabs;
 
 use App\Models\Leave\Absence;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\Eloquent\Builder;
 
+/** Home screen tab for absence requests. */
 class AbsenceRequestsHomeScreenTab extends AbstractHomeScreenTab
 {
     protected $title = 'Urlaubsanträge';
 
     protected $description = 'Zeigt zu bearbeitende Urlaubsanträge';
 
-    protected $checkQuery;
+    /**
+     * @var Builder<Absence>
+     */
+    protected $checkQuery = null;
 
-    protected $approveQuery;
+    /**
+     * @var Builder<Absence>
+     */
+    protected $approveQuery = null;
 
+    /**
+     * @param  array<string, mixed>  $config  Tab configuration.\n     * @return void
+     */
     public function __construct($config = [])
     {
         parent::__construct($config);
@@ -55,6 +65,9 @@ class AbsenceRequestsHomeScreenTab extends AbstractHomeScreenTab
         return parent::getTitle();
     }
 
+    /**
+     * @param  array<string, mixed>  $data  View data.\n     * @return mixed
+     */
     public function getContent($data = [])
     {
         $data['check'] = $this->checkQuery->get();
@@ -63,6 +76,9 @@ class AbsenceRequestsHomeScreenTab extends AbstractHomeScreenTab
         return parent::getContent($data);
     }
 
+    /**
+     * @param  array<string, mixed>  $data  Additional data.\n     * @return array<string, mixed>
+     */
     public function toArray($data = [])
     {
         $data['check'] = $this->checkQuery->get();
@@ -80,17 +96,17 @@ class AbsenceRequestsHomeScreenTab extends AbstractHomeScreenTab
     public function buildQueries()
     {
         $start = Carbon::now()->setTime(0, 0, 0);
-        $end = Carbon::now()->addMonth(2);
+        $end = Carbon::now()->addMonth();
 
         $this->checkQuery = Absence::whereHas('user', function ($query) {
             $query->whereHas('vacationAdmins', function ($query2) {
-                $query2->where('related_user_id', Auth::user()->id);
+                $query2->where('related_user_id', $this->user()->id);
             })->where('workflow_status', 0);
         });
         $this->approveQuery = Absence::with(['checkedBy'])
             ->whereHas('user', function ($query) {
                 $query->whereHas('vacationApprovers', function ($query2) {
-                    $query2->where('related_user_id', Auth::user()->id);
+                    $query2->where('related_user_id', $this->user()->id);
                 })->where('workflow_status', 1);
             });
     }

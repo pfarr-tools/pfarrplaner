@@ -47,6 +47,9 @@ class CreateComment extends AbstractCreateAction implements CreatesComments
         return '';
     }
 
+    /**
+     * @param  array<string, mixed>  $input
+     */
     public function create(User $user, array $input): Comment
     {
         $validated = Validator::make($input, [

@@ -31,6 +31,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Integrations\KonfiApp\KonfiAppIntegration;
+use App\Models\People\User;
 use App\Models\Places\City;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -49,6 +50,7 @@ class CityController extends AbstractApiCRUDController
     {
         Gate::authorize('viewAny', $this->modelClass);
         $user = $request->user();
+        abort_unless($user instanceof User, 401);
         if ($user->isAdmin) {
             return response()->json(City::all());
         }

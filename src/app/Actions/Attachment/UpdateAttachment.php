@@ -47,6 +47,9 @@ class UpdateAttachment extends AbstractUpdateAction implements UpdatesAttachment
         return '';
     }
 
+    /**
+     * @param  array<string, mixed>  $input
+     */
     public function update(User $user, Attachment $attachment, array $input): Attachment
     {
         Gate::forUser($user)->authorize('update', $attachment);

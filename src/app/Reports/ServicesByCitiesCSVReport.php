@@ -35,7 +35,6 @@ use App\Models\Service;
 use App\Services\FileNameService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -62,7 +61,7 @@ class ServicesByCitiesCSVReport extends AbstractCSVReport
      */
     public function setup()
     {
-        $cities = Auth::user()->cities;
+        $cities = $this->authenticatedUser()->cities;
 
         return Inertia::render('Report/ServicesByCitiesCSV/Setup', compact('cities'));
     }
@@ -91,7 +90,7 @@ class ServicesByCitiesCSVReport extends AbstractCSVReport
             ->ordered()
             ->get()
             ->groupBy(function ($service) {
-                return $service->date->format('Y-m-d');
+                return $service->trueDate()->format('Y-m-d');
             });
 
         return $this->csv(

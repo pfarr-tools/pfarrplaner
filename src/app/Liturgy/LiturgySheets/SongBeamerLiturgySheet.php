@@ -30,11 +30,14 @@
 
 namespace App\Liturgy\LiturgySheets;
 
+use App\Liturgy\ItemHelpers\FreetextItemHelper;
 use App\Liturgy\SongBeamer\ImportableSchedule;
 use App\Models\Liturgy\Songbook;
 use App\Models\Liturgy\SongReference;
 use App\Models\Service;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
+/** Liturgy sheet rendered as a SongBeamer slide list. */
 class SongBeamerLiturgySheet extends AbstractLiturgySheet
 {
     protected $title = 'Songbeamer: Importierbarer Ablauf';
@@ -53,6 +56,10 @@ class SongBeamerLiturgySheet extends AbstractLiturgySheet
         'includeSongList' => 1,
     ];
 
+    /**
+     * @param  Service  $service  Service to render.
+     * @return mixed
+     */
     public function render(Service $service)
     {
         $songBeamerSchedule = new ImportableSchedule;
@@ -76,7 +83,7 @@ class SongBeamerLiturgySheet extends AbstractLiturgySheet
                     && ($item->data_type == 'freetext')
                     && ($item->title == 'Ehr sei dem Vater')
                     && (isset($item->data['description']))) {
-                    /** @var Liturgy\ItemHelpers\FreetextItemHelper $ftHelper */
+                    /** @var FreetextItemHelper $ftHelper */
                     $ftHelper = $item->getHelper();
                     $songBeamerSchedule->addSimpleTextItem('Ehr sei dem Vater', $ftHelper->getText());
                 } else {
@@ -115,6 +122,12 @@ class SongBeamerLiturgySheet extends AbstractLiturgySheet
         return $this->sendToBrowser($this->getFileName($service, 'Texte und Lieder'), $songBeamerSchedule);
     }
 
+    /**
+     * Send the generated SongBeamer schedule as a ZIP download.
+     *
+     * @param  string  $filename  Name of the downloaded file.
+     * @return BinaryFileResponse Download response for the generated ZIP.
+     */
     protected function sendToBrowser($filename, ImportableSchedule $sb)
     {
         header('Content-Description: File Transfer');
@@ -124,12 +137,21 @@ class SongBeamerLiturgySheet extends AbstractLiturgySheet
         header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
         header('Expires: 0');
         $tempFile = $sb->toZip();
+        if ($tempFile === false) {
+            throw new \RuntimeException('SongBeamer-Archiv konnte nicht erstellt werden.');
+        }
 
         return response()->download($tempFile, $filename, ['Content-Type' => 'application/zip'])
             ->deleteFileAfterSend(true);
     }
 
-    protected function renderSongListSlide(Service $service, ImportableSchedule $songBeamerSchedule)
+    /**
+     * Add a slide listing the service's songs and psalms to the schedule.
+     *
+     * @param  Service  $service  Service whose songs are listed.
+     * @param  ImportableSchedule  $songBeamerSchedule  Schedule receiving the slide.
+     */
+    protected function renderSongListSlide(Service $service, ImportableSchedule $songBeamerSchedule): void
     {
         $slideText = '';
 

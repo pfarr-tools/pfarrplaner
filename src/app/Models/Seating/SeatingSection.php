@@ -142,7 +142,13 @@ class SeatingSection extends AbstractModel
         return $this->hasMany(SeatingRow::class);
     }
 
-    public function setSeatingModelAttribute($seatingModel)
+    /**
+     * Setzt das Sitzplatzmodell und akzeptiert sowohl Klassennamen als auch Instanzen.
+     *
+     * @param  object|string  $seatingModel  Klassenname oder Instanz des Sitzplatzmodells.
+     * @return void
+     */
+    public function setSeatingModelAttribute(object|string $seatingModel): void
     {
         if (! is_string($seatingModel)) {
             $seatingModel = get_class($seatingModel);

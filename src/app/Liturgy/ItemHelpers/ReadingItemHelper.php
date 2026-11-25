@@ -37,7 +37,17 @@ use App\Models\Liturgy\Item;
 
 class ReadingItemHelper extends AbstractItemHelper
 {
-    /** @var array */
+    /**
+     * Geparste Referenz der Schriftlesung mit Version und Copyright-Angabe.
+     *
+     * @var array{
+     *     originalReference: string,
+     *     correctedReference: string,
+     *     version: string,
+     *     versionCopyrights: string,
+     *     parsed: array<int, array<string, mixed>>
+     * }
+     */
     protected $reference;
 
     /**
@@ -54,9 +64,11 @@ class ReadingItemHelper extends AbstractItemHelper
     }
 
     /**
-     * Get the bible text for this reading item.
+     * Liefert den Bibeltext der Schriftlesung als Abschnitte mit Versen.
+     *
+     * @return array<int, array<string, mixed>> Abschnitte mit je einem text-Eintrag.
      */
-    public function getText()
+    public function getText(): array
     {
         // return (new BibleText('LUT17'))->get($this->reference);
         if ($this->reference['version'] == 'Eigener Text') {
@@ -68,10 +80,15 @@ class ReadingItemHelper extends AbstractItemHelper
         return (new BibleText($this->reference['version']))->get($this->reference);
     }
 
-    public function getHtml()
+    /**
+     * Liefert die Schriftlesung als HTML für die öffentliche Ansicht.
+     *
+     * @return string HTML der Lesung mit Versnummern oder der eigene Text.
+     */
+    public function getHtml(): string
     {
         if ($this->reference['version'] == 'Eigener Text') {
-            return $item->data->customText();
+            return $this->item->data['customText'];
         }
         $bibleText = (new BibleText($this->reference['version']))->get($this->reference);
         $text = '';
@@ -84,7 +101,16 @@ class ReadingItemHelper extends AbstractItemHelper
         return $text;
     }
 
-    public function renderToWordDocument(DefaultWordDocument $doc, bool $includeFullReadings = true, bool $includeIntro = false, string $includeTitle = '', int $depth = 3)
+    /**
+     * Rendert die Schriftlesung in ein Word-Dokument.
+     *
+     * @param  DefaultWordDocument  $doc  Dokument, in das die Lesung gerendert wird.
+     * @param  bool  $includeFullReadings  Ob der vollständige Bibeltext eingefügt wird.
+     * @param  bool  $includeIntro  Ob die Einleitung der Lesung eingefügt wird.
+     * @param  string  $includeTitle  Alternativer Titel; leer für die korrigierte Referenz.
+     * @param  int  $depth  Überschriftenebene des Titels.
+     */
+    public function renderToWordDocument(DefaultWordDocument $doc, bool $includeFullReadings = true, bool $includeIntro = false, string $includeTitle = '', int $depth = 3): void
     {
         $doc->getSection()->addTitle($includeTitle ?: $this->reference['correctedReference'], $depth);
         if (! $includeFullReadings) {
@@ -117,11 +143,33 @@ class ReadingItemHelper extends AbstractItemHelper
 
     }
 
+    /**
+     * Liefert die geparste Referenz der Schriftlesung.
+     *
+     * @return array{
+     *     originalReference: string,
+     *     correctedReference: string,
+     *     version: string,
+     *     versionCopyrights: string,
+     *     parsed: array<int, array<string, mixed>>
+     * }
+     */
     public function getReference(): array
     {
         return $this->reference;
     }
 
+    /**
+     * Setzt die geparste Referenz der Schriftlesung.
+     *
+     * @param  array{
+     *     originalReference: string,
+     *     correctedReference: string,
+     *     version: string,
+     *     versionCopyrights: string,
+     *     parsed: array<int, array<string, mixed>>
+     * }  $reference  Geparste Referenz inklusive Version und Copyright-Angabe.
+     */
     public function setReference(array $reference): void
     {
         $this->reference = $reference;

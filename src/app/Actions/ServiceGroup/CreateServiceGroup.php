@@ -45,6 +45,9 @@ class CreateServiceGroup extends AbstractCreateAction implements CreatesServiceG
         return '';
     }
 
+    /**
+     * @param  array<string, mixed>  $input
+     */
     public function create(User $user, array $input): ServiceGroup
     {
         Gate::forUser($user)->authorize('create', ServiceGroup::class);

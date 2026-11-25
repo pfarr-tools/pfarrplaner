@@ -41,7 +41,11 @@ abstract class AbstractSkeletonBuilder extends GeneratorCommand
     /** @var string Verb (like "creates") */
     protected $verb = '';
 
-    /** @var array */
+    /**
+     * Additional namespace segments for the generated classes.
+     *
+     * @var array<int, string>
+     */
     protected $namespaceAdditions = [];
 
     /**
@@ -73,7 +77,7 @@ abstract class AbstractSkeletonBuilder extends GeneratorCommand
     /**
      * Get the console command options.
      *
-     * @return array
+     * @return array<int, array{0: string, 1: string|null, 2: int, 3: string}>
      */
     protected function getOptions()
     {
@@ -82,6 +86,14 @@ abstract class AbstractSkeletonBuilder extends GeneratorCommand
         ];
     }
 
+    /**
+     * Add both placeholder syntaxes for a replacement value.
+     *
+     * @param  array<string, string>  $replacements
+     * @param  string  $key
+     * @param  string  $value
+     * @return array<string, string>
+     */
     protected function buildReplacement($replacements, $key, $value)
     {
         $replacements['{{ '.$key.' }}'] = $value;
@@ -90,6 +102,12 @@ abstract class AbstractSkeletonBuilder extends GeneratorCommand
         return $replacements;
     }
 
+    /**
+     * Determine the singular base name of a class name.
+     *
+     * @param  string  $name
+     * @return string
+     */
     protected function getBaseName($name)
     {
         return Str::singular(
@@ -117,6 +135,12 @@ abstract class AbstractSkeletonBuilder extends GeneratorCommand
         return $this->resolveStubPath('/stubs/'.strtolower(Str::plural($this->type)).'.'.strtolower($this->verb).'.stub');
     }
 
+    /**
+     * Find the model class matching the given name.
+     *
+     * @param  string  $name
+     * @return string|null
+     */
     protected function guessModel($name)
     {
         $basename = str_replace(Str::studly($this->verb), '', $this->getBaseName($name));
@@ -136,9 +160,13 @@ abstract class AbstractSkeletonBuilder extends GeneratorCommand
             ->first();
     }
 
+    /**
+     * @param  string  $name  Class name to build.
+     * @return string
+     */
     protected function buildClass($name)
     {
-        $model = $this->guessModel($name);
+        $model = $this->guessModel($name) ?? '';
         $modelBase = $this->getBaseName($model);
         $replace = $this->buildReplacement([], 'model', $model);
         $replace = $this->buildReplacement($replace, 'modelBase', $modelBase);
@@ -155,8 +183,25 @@ abstract class AbstractSkeletonBuilder extends GeneratorCommand
         );
     }
 
+    /**
+     * Get the fully qualified names of all models in the application.
+     *
+     * @return array<int, string>
+     */
     protected function possibleModels()
     {
         $modelPath = is_dir(app_path('Models')) ? app_path('Models') : app_path();
+
+        return new Collection(Finder::create()->files()->depth('< 2')->in($modelPath))
+            ->map(
+                fn ($file) => str_replace(
+                    '.php',
+                    '',
+                    str_replace('/', '\\', str_replace($modelPath, 'App/Models', $file->getPathName()))
+                )
+            )
+            ->sort()
+            ->values()
+            ->all();
     }
 }

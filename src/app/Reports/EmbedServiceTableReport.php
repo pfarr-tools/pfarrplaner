@@ -41,7 +41,6 @@ use App\Models\Location;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -78,14 +77,14 @@ class EmbedServiceTableReport extends AbstractEmbedReport
      */
     public function setup()
     {
-        $cities = Auth::user()->cities;
+        $cities = $this->authenticatedUser()->cities;
         $locations = Location::inCities($cities->pluck('id'))->get();
 
         return Inertia::render('Report/EmbedServiceTable/Setup', compact('cities', 'locations'));
     }
 
     /**
-     * @return Application|Factory|View|string
+     * @return Application|Factory|View|Response|string
      */
     public function render(Request $request)
     {

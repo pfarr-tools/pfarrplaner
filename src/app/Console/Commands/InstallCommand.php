@@ -80,6 +80,11 @@ class InstallCommand extends Command
         }
 
         $template = file_get_contents($templatePath);
+        if ($template === false) {
+            $this->components->error('Die Vorlage .env.example konnte nicht gelesen werden.');
+
+            return Command::FAILURE;
+        }
         $defaults = $this->extractDefaults($template);
         $values = $this->collectEnvironmentValues($defaults);
         $adminData = $this->collectAdminData($values['APP_ADMINISTRATOR']);
@@ -295,7 +300,14 @@ class InstallCommand extends Command
             return $default;
         }
 
-        return (string) $this->choice($question, $choices, $default);
+        $answer = $this->choice($question, $choices, $default);
+        if (is_array($answer)) {
+            $selected = $answer[0] ?? null;
+
+            return is_string($selected) ? $selected : $default;
+        }
+
+        return $answer;
     }
 
     /**
@@ -363,7 +375,7 @@ class InstallCommand extends Command
     {
         $defaults = [];
 
-        foreach (preg_split('/\r\n|\r|\n/', $template) as $line) {
+        foreach (preg_split('/\r\n|\r|\n/', $template) ?: [] as $line) {
             if ((! $line) || Str::startsWith(trim($line), '#') || ! str_contains($line, '=')) {
                 continue;
             }

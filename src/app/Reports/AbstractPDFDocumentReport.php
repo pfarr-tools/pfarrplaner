@@ -53,25 +53,32 @@ class AbstractPDFDocumentReport extends AbstractReport
     public $icon = 'fa fa-file-pdf';
 
     /**
+     * @param  string  $filename  Name of the downloaded file.
+     * @param  array<string, mixed>  $data  Variables passed to the render view.
+     * @param  mixed  $layout  Optional layout configuration; currently unused.
      * @return mixed
      */
-    public function sendToBrowser($filename, $data, $layout)
+    public function sendToBrowser(string $filename, array $data, mixed $layout)
     {
         return $this->sendToFile($filename, $data, $layout);
     }
 
     /**
+     * @param  array<string, mixed>  $data  Variables passed to the render view.
      * @return string
      */
-    public function renderPDF($data)
+    public function renderPDF(array $data)
     {
-        return View::make($this->getRenderViewName(), $data)->render();
+        return View::file(View::getFinder()->find($this->getRenderViewName()), $data)->render();
     }
 
     /**
+     * @param  string  $filename  Name of the downloaded file.
+     * @param  array<string, mixed>  $data  Variables passed to the render view.
+     * @param  mixed  $layout  Optional layout configuration; currently unused.
      * @return mixed
      */
-    public function sendToFile($filename, $data, $layout)
+    public function sendToFile(string $filename, array $data, mixed $layout)
     {
         return PDF::fromView($this->getRenderViewName(), $data, $this->header, $this->footer)->download($filename);
     }
@@ -81,6 +88,9 @@ class AbstractPDFDocumentReport extends AbstractReport
         return $this->landscape;
     }
 
+    /**
+     * @param  bool  $landscape  Landscape flag.
+     */
     public function setLandscape(bool $landscape): void
     {
         $this->landscape = $landscape;
@@ -91,6 +101,9 @@ class AbstractPDFDocumentReport extends AbstractReport
         return $this->header;
     }
 
+    /**
+     * @param  string  $header  Header text.
+     */
     public function setHeader(string $header): void
     {
         $this->header = $header;
@@ -101,6 +114,9 @@ class AbstractPDFDocumentReport extends AbstractReport
         return $this->footer;
     }
 
+    /**
+     * @param  string  $footer  Footer text.
+     */
     public function setFooter(string $footer): void
     {
         $this->footer = $footer;
@@ -111,6 +127,9 @@ class AbstractPDFDocumentReport extends AbstractReport
         return $this->icon;
     }
 
+    /**
+     * @param  string  $icon  Icon name.
+     */
     public function setIcon(string $icon): void
     {
         $this->icon = $icon;

@@ -85,9 +85,16 @@ class PowerPoint extends AbstractZIPBasedFileFormat
      */
     protected function addVBAProject($vbaProjectPath)
     {
-        $this->zip->addFromString('ppt/vbaProject.bin', file_get_contents($vbaProjectPath));
+        $vbaProject = file_get_contents($vbaProjectPath);
+        if ($vbaProject === false) {
+            throw new \RuntimeException("VBA-Projekt konnte nicht gelesen werden: $vbaProjectPath");
+        }
+        $this->zip->addFromString('ppt/vbaProject.bin', $vbaProject);
         $this->patchXMLFile('[Content_Types].xml', function (DOMDocument $doc) {
             $types = $doc->documentElement;
+            if (! $types instanceof DOMElement) {
+                return $doc;
+            }
             $hasBinDefault = false;
             foreach ($types->getElementsByTagName('Default') as $def) {
                 /** @var DOMElement $def */
@@ -151,6 +158,9 @@ class PowerPoint extends AbstractZIPBasedFileFormat
 
         $this->patchXMLFile('ppt/_rels/presentation.xml.rels', function (DOMDocument $doc) {
             $relsRoot = $doc->documentElement; // <Relationships ...>
+            if (! $relsRoot instanceof DOMElement) {
+                return $doc;
+            }
 
             // Falls schon vorhanden: nichts doppelt anlegen
             $already = false;
@@ -196,6 +206,9 @@ class PowerPoint extends AbstractZIPBasedFileFormat
     {
         $this->patchXMLFile('_rels/.rels', function (DOMDocument $doc) {
             $relsRoot = $doc->documentElement;
+            if (! $relsRoot instanceof DOMElement) {
+                return $doc;
+            }
             $newDef = $doc->createElement('Relationship');
             $newDef->setAttribute('Id', 'rIdCustomUI');
             $newDef->setAttribute('Type', 'http://schemas.microsoft.com/office/2006/relationships/ui/extensibility');
@@ -221,9 +234,12 @@ class PowerPoint extends AbstractZIPBasedFileFormat
         $this->zip->open($this->documentFilePath);
         $this->patchXMLFile('[Content_Types].xml', function (DOMDocument $doc) {
             $types = $doc->documentElement;
+            if (! $types instanceof DOMElement) {
+                return $doc;
+            }
             foreach ($types->getElementsByTagName('Default') as $type) {
                 if (strtolower($type->getAttribute('Extension')) === 'svg') {
-                    $type->parentNode->removeChild($type);
+                    $type->parentNode?->removeChild($type);
                     break;
                 }
             }
@@ -372,6 +388,9 @@ class PowerPoint extends AbstractZIPBasedFileFormat
     {
         $this->patchXMLFile('[Content_Types].xml', function (DOMDocument $doc) use ($renamedPaths, $imageFormats) {
             $types = $doc->documentElement;
+            if (! $types instanceof DOMElement) {
+                return $doc;
+            }
             $requiredTypes = [];
             $emptyDefaults = [];
 
@@ -437,6 +456,7 @@ class PowerPoint extends AbstractZIPBasedFileFormat
      * This is necessary to fix a bug in the current version of PHPPresentation, where slide names are
      * not written to the presentation file.
      *
+     * @param  array<array-key, string>  $slideNames  Slide names keyed by slide index
      * @return void
      */
     public function applySlideNameFix(array $slideNames)
@@ -445,7 +465,13 @@ class PowerPoint extends AbstractZIPBasedFileFormat
         foreach ($slideNames as $slideIndex => $name) {
             $this->patchXMLFile('ppt/slides/slide'.$slideIndex.'.xml', function (DOMDocument $doc) use ($name) {
                 $slide = $doc->documentElement;
-                $slide->getElementsByTagName('cSld')->item(0)->setAttribute('name', $name);
+                if (! $slide instanceof DOMElement) {
+                    return $doc;
+                }
+                $cSld = $slide->getElementsByTagName('cSld')->item(0);
+                if ($cSld instanceof DOMElement) {
+                    $cSld->setAttribute('name', $name);
+                }
 
                 return $doc;
             });
@@ -464,7 +490,7 @@ class PowerPoint extends AbstractZIPBasedFileFormat
         $slidePaths = [];
         for ($index = 0; $index < $this->zip->numFiles; $index++) {
             $path = $this->zip->getNameIndex($index);
-            if (preg_match('#^ppt/slides/slide\d+\.xml$#', $path)) {
+            if (is_string($path) && preg_match('#^ppt/slides/slide\d+\.xml$#', $path)) {
                 $slidePaths[] = $path;
             }
         }
@@ -474,7 +500,14 @@ class PowerPoint extends AbstractZIPBasedFileFormat
                 $xpath = new DOMXPath($doc);
                 $xpath->registerNamespace('a', 'http://schemas.openxmlformats.org/drawingml/2006/main');
 
-                foreach ($xpath->query('//a:t') as $textNode) {
+                $textNodes = $xpath->query('//a:t');
+                if ($textNodes === false) {
+                    return $doc;
+                }
+                foreach ($textNodes as $textNode) {
+                    if (! $textNode instanceof DOMElement) {
+                        continue;
+                    }
                     $decodedText = html_entity_decode($textNode->textContent, ENT_QUOTES | ENT_HTML5, 'UTF-8');
                     if ($decodedText !== $textNode->textContent) {
                         $textNode->nodeValue = $decodedText;

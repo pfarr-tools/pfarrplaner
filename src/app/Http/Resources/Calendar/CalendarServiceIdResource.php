@@ -36,7 +36,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class CalendarServiceIdResource extends JsonResource
 {
-    public $preserveKeys = true;
+    public bool $preserveKeys = true;
 
     /**
      * Transform the resource into an array.
@@ -45,12 +45,14 @@ class CalendarServiceIdResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        /** @var Service $this */
+        /** @var Service $service */
+        $service = $this->resource;
+
         return [
-            'id' => $this->id,
-            'slug' => $this->slug,
-            'city_id' => $this->city_id,
-            'isEditable' => $this->isEditable,
+            'id' => $service->id,
+            'slug' => $service->slug,
+            'city_id' => $service->city_id,
+            'isEditable' => $service->isEditable,
         ];
     }
 }

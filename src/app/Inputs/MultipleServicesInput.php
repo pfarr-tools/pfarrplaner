@@ -56,7 +56,7 @@ class MultipleServicesInput extends AbstractInput
 
     public function canEdit(): bool
     {
-        return Auth::user()->can('gd-bearbeiten');
+        return Auth::user()?->can('gd-bearbeiten') ?? false;
     }
 
     /**
@@ -65,7 +65,9 @@ class MultipleServicesInput extends AbstractInput
     public function setup(Request $request)
     {
         $eventTypes = [];
-        foreach (Auth::user()->writableCities as $city) {
+        $user = Auth::user();
+        abort_unless($user !== null, 403);
+        foreach ($user->writableCities as $city) {
             if ($city->konfiapp_apikey) {
                 $konfiApp = new KonfiAppIntegration($city->konfiapp_apikey);
                 $eventTypes[$city->id] = [
@@ -75,7 +77,7 @@ class MultipleServicesInput extends AbstractInput
             }
         }
 
-        $locations = Location::inCities(Auth::user()->writableCities->pluck('id'))->get();
+        $locations = Location::inCities($user->writableCities->pluck('id'))->get();
 
         return Inertia::render('Inputs/MultipleServices/Setup', compact('locations', 'eventTypes'));
     }
@@ -106,7 +108,14 @@ class MultipleServicesInput extends AbstractInput
         $eventTypes = [];
 
         foreach ($data['services'] ?? [] as $serviceData) {
-            $location = Location::find($serviceData['location']);
+            $location = Location::query()->whereKey($serviceData['location'])->first();
+            if ($location === null) {
+                abort(404);
+            }
+            $city = $location->city;
+            if ($city === null) {
+                abort(404);
+            }
             $date = Carbon::parse($serviceData['date'], 'UTC')
                 ->setTimezone('Europe/Berlin')
                 ->setTimeFromTimeString($serviceData['time'])
@@ -136,13 +145,13 @@ class MultipleServicesInput extends AbstractInput
                 ];
 
                 // check KonfiApp event types
-                if ($data['eventType'] && $location->city->konfiapp_apikey) {
+                if (($data['eventType'] ?? null) && $city->konfiapp_apikey) {
                     $service['konfiapp_event_type'] = $data['eventType'];
                 }
                 $serviceRecords[] = $serviceModel = Service::create($service);
 
-                if ($data['eventType'] && $location->city->konfiapp_apikey) {
-                    $konfiApp = new KonfiAppIntegration($location->city->konfiapp_apikey);
+                if (($data['eventType'] ?? null) && $city->konfiapp_apikey) {
+                    $konfiApp = new KonfiAppIntegration($city->konfiapp_apikey);
                     $serviceModel->update(['konfiapp_event_qr' => $konfiApp->createQRCode($serviceModel)]);
                 }
 
@@ -159,7 +168,9 @@ class MultipleServicesInput extends AbstractInput
 
         // use the first service created to create a mass notification
         $service = reset($serviceRecords);
-        Subscription::send($service, ServiceCreatedMultiple::class, ['services' => $serviceRecords]);
+        if ($service !== false) {
+            Subscription::send($service, ServiceCreatedMultiple::class, ['services' => $serviceRecords]);
+        }
 
         if ($ctrExisting) {
             return redirect()->route('calendar')->with(

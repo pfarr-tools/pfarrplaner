@@ -30,9 +30,11 @@
 
 namespace App\Http\Resources\Calendar;
 
+use App\Models\Service;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/** Resource for calendar ministries. */
 class CalendarMinistriesResource extends JsonResource
 {
     /**
@@ -42,8 +44,11 @@ class CalendarMinistriesResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        /** @var Service $service */
+        $service = $this->resource;
+
         $data = [];
-        foreach ($this->participantsWithMinistry->groupBy('pivot.category') as $category => $participants) {
+        foreach ($service->participantsWithMinistry->groupBy('pivot.category') as $category => $participants) {
             $data[$category] = [];
             foreach ($participants as $participant) {
                 $data[$category][] = new CalendarParticipantResource($participant);

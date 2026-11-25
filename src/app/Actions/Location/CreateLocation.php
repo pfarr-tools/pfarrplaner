@@ -57,6 +57,7 @@ class CreateLocation extends AbstractCreateAction implements CreatesLocations
     /**
      * Create a new location
      *
+     * @param  array<string, mixed>  $input
      * @return Location
      *
      * @throws AuthorizationException
@@ -65,7 +66,7 @@ class CreateLocation extends AbstractCreateAction implements CreatesLocations
     public function create(User $user, array $input)
     {
         $input = Validator::make($input, Location::$validationRules)->validateWithBag('createLocation');
-        $this->city = City::findOrFail($input['city_id']);
+        $this->city = City::findOrFail((int) $input['city_id']);
         Gate::forUser($user)->authorize('create', [Location::class, $this->city]);
         $location = Location::create($input);
         CreatedLocation::dispatch($user, $location);

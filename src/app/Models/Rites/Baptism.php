@@ -105,9 +105,7 @@ class Baptism extends AbstractModel implements HasDAVCalendarItems
 
     public static $relationsForEditor = ['attachments'];
 
-    /**
-     * @var string[]
-     */
+    /** @var list<string> */
     protected $fillable = [
         'service_id',
         'candidate_name',
@@ -136,7 +134,7 @@ class Baptism extends AbstractModel implements HasDAVCalendarItems
         'birth_place',
     ];
 
-    /** @var string[] */
+    /** @var array<string, string> */
     protected $casts = [
         'candidate_name' => EncryptedAttribute::class,
         'candidate_address' => EncryptedAttribute::class,
@@ -166,6 +164,9 @@ class Baptism extends AbstractModel implements HasDAVCalendarItems
         };
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function fillDefaults(): array
     {
         return [
@@ -215,11 +216,18 @@ class Baptism extends AbstractModel implements HasDAVCalendarItems
     /**
      * Generate a record for sync'ing to external calendars
      *
-     * @return array[]|null
+     * @param  array<string, mixed>  $config  Event options.
+     * @return array<string, array<string, mixed>>|null
      */
-    public function getAdditionalEvents($config = [])
+    public function getAdditionalEvents(array $config = [])
     {
         if (! $this->appointment) {
+            return null;
+        }
+
+        $service = $this->service;
+        $serviceDate = $service?->date;
+        if ($service === null || $serviceDate === null) {
             return null;
         }
 
@@ -235,10 +243,10 @@ class Baptism extends AbstractModel implements HasDAVCalendarItems
 
         $record = [
             'startDate' => $this->appointment->copy(),
-            'endDate' => $this->appointment->copy()->addHour(1),
+            'endDate' => $this->appointment->copy()->addHour(),
             'title' => 'Taufgespräch '.$this->candidate_name,
-            'description' => '<p>Taufe am '.$this->service->date->format('d.m.Y').' um '.$this->service->timeText(
-            ).' ('.$this->service->locationText().')</p>'
+            'description' => '<p>Taufe am '.$serviceDate->format('d.m.Y').' um '.$service->timeText(
+            ).' ('.$service->locationText().')</p>'
                 .'<p><a href="'.route('baptisms.edit', $this->id).'">Taufe im Pfarrplaner öffnen</a></p>'
                 .(count($contacts) ? '<p>Kontakt: '.implode(', ', $contacts).'</p>' : '')
                 .AbstractSyncEngine::AUTO_WARNING,
@@ -285,8 +293,14 @@ class Baptism extends AbstractModel implements HasDAVCalendarItems
      */
     public function getCalendarItem(string $itemType): DAVCalendarItem
     {
-        $description = 'Taufe am '.$this->service->date->format('d.m.Y').' um '.$this->service->timeText(
-        ).' ('.$this->service->locationText().")\n\n"
+        $service = $this->service;
+        $serviceDate = $service?->date;
+        if ($service === null || $serviceDate === null) {
+            throw new \InvalidArgumentException('Taufe ohne Gottesdienst kann keinen Kalendereintrag erzeugen.');
+        }
+
+        $description = 'Taufe am '.$serviceDate->format('d.m.Y').' um '.$service->timeText(
+        ).' ('.$service->locationText().")\n\n"
             .'Taufe im Pfarrplaner öffnen: '
             .route('baptisms.edit', $this->id)
             ."\n\nKontakt:\n"
@@ -295,31 +309,34 @@ class Baptism extends AbstractModel implements HasDAVCalendarItems
 
         switch ($itemType) {
             case 'prep':
+                $appointment = $this->appointment;
+                if ($appointment === null) {
+                    throw new \InvalidArgumentException('Taufgespräch-Termin fehlt.');
+                }
+
                 return new DAVCalendarItem(
                     $this,
                     'Taufgespräch '.$this->candidate_name,
-                    $this->appointment->copy(),
-                    $this->appointment->copy()->addHour(1),
+                    $appointment->copy(),
+                    $appointment->copy()->addHour(),
                     $this->appointment_address ?? '',
                     $description,
                     'prep',
                     ['busyStatus' => 'BUSY'],
                     ['Taufgespräch', 'Amtskalender: Amtshandlungen']
                 );
-                break;
             case 'anniv':
                 return new DAVCalendarItem(
                     $this,
                     '1. Jahrestag der Taufe von '.$this->candidate_name,
-                    $this->service->date->copy()->addYears(1),
-                    $this->service->date->copy()->addYears(1)->addDays(1)->startOfDay(),
+                    $serviceDate->copy()->addYears(1),
+                    $serviceDate->copy()->addYears(1)->addDays(1)->startOfDay(),
                     $this->candidate_address,
                     $description,
                     'anniv',
                     ['allDay' => true, 'busy' => false, 'busyStatus' => 'FREE'],
                     ['Jahrestag Taufe']
                 );
-                break;
         }
 
         throw new \InvalidArgumentException("Unknown baptism calendar item type: {$itemType}");

@@ -15,24 +15,25 @@ class ServiceResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        /** @var Service $this */
+        /** @var Service $service */
+        $service = $this->resource;
+
         return [
-            'id' => $this->id,
-            'slug' => $this->slug,
-            'title' => $this->titleText(false),
-            'body' => $this->description,
-            'location' => $this->locationText(),
-            'start' => $this->date,
-            'end' => $this->date->copy()->addHour(1),
-            'calendar_id' => $this->city_id,
+            'id' => $service->id,
+            'slug' => $service->slug,
+            'title' => $service->titleText(false),
+            'body' => $service->description,
+            'start' => $service->date,
+            'end' => $service->date?->copy()->addHour(),
+            'calendar_id' => $service->city_id,
             'state' => 'Busy',
-            'location' => $this->location,
-            'funerals' => $this->funerals,
-            'weddings' => $this->weddings,
-            'baptisms' => $this->baptisms,
-            'cc' => $this->cc,
-            'cc_location' => $this->cc_location,
-            'cc_lesson' => $this->cc_lesson,
+            'location' => $service->location,
+            'funerals' => $service->funerals,
+            'weddings' => $service->weddings,
+            'baptisms' => $service->baptisms,
+            'cc' => $service->cc,
+            'cc_location' => $service->cc_location,
+            'cc_lesson' => $service->cc_lesson,
         ];
     }
 }

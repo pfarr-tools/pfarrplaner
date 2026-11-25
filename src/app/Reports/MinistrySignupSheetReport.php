@@ -36,7 +36,6 @@ use App\Services\FileNameService;
 use App\Services\MinistryService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -70,7 +69,7 @@ class MinistrySignupSheetReport extends AbstractPDFDocumentReport
      */
     public function setup()
     {
-        $cities = Auth::user()->writableCities;
+        $cities = $this->authenticatedUser()->writableCities;
         $ministries = MinistryService::selectList();
 
         return Inertia::render('Report/MinistrySignupSheet/Setup', compact('cities', 'ministries'));
@@ -86,13 +85,13 @@ class MinistrySignupSheetReport extends AbstractPDFDocumentReport
         ]);
 
         foreach ($data['cities'] as $key => $id) {
-            $data['cities'][$key] = City::find($id);
+            $data['cities'][$key] = City::findOrFail($id);
         }
         /** @var array<int, mixed> $cityIds */
         $cityIds = $data['cities'];
         $data['cities'] = collect($cityIds);
-        $data['start'] = Carbon::createFromFormat('d.m.Y H:i:s', $data['start'].' 0:00:00');
-        $data['end'] = Carbon::createFromFormat('d.m.Y H:i:s', $data['end'].' 23:59:00');
+        $data['start'] = $this->requireParsedDate(Carbon::createFromFormat('d.m.Y H:i:s', $data['start'].' 0:00:00'));
+        $data['end'] = $this->requireParsedDate(Carbon::createFromFormat('d.m.Y H:i:s', $data['end'].' 23:59:00'));
         $data['services'] = Service::between($data['start'], $data['end'])
             ->inCities($data['cities']->pluck('id'))->ordered()->get();
 

@@ -42,6 +42,8 @@ use Illuminate\Support\Str;
 
 /**
  * Base model for application models with shared administrative behavior.
+ *
+ * @phpstan-consistent-constructor
  */
 class AbstractModel extends Model
 {
@@ -82,7 +84,7 @@ class AbstractModel extends Model
     /** @var string Path segment used for the editor. */
     protected static $editVerb = 'bearbeiten';
 
-    /** @var array[] Default validation rules */
+    /** @var array<string, mixed> Default validation rules */
     public static array $validationRules = [];
 
     protected static string $prefix = '';
@@ -137,31 +139,51 @@ class AbstractModel extends Model
         ];
     }
 
+    /**
+     * @param  string  $verb  Action verb.\n     * @return string
+     */
     public static function getContractName(string $verb): string
     {
         return static::relatedClass('App\\Contracts\\###\\'.ucfirst($verb).'s#p#');
     }
 
+    /**
+     * @param  string  $verb  Action verb.\n     * @return string
+     */
     public static function getActionName(string $verb): string
     {
         return static::relatedClass('App\\Actions\\###\\'.ucfirst($verb).'###');
     }
 
-    public function getContractedAction(string $verb)
+    /**
+     * Resolve the container-bound action for the model contract of a verb.
+     *
+     * @return mixed Action instance registered for the derived contract.
+     */
+    public function getContractedAction(string $verb): mixed
     {
         return app(static::getContractName($verb));
     }
 
+    /**
+     * @param  string  $pattern  Related model pattern.\n     * @return string
+     */
     public static function relatedClass(string $pattern): string
     {
         return static::relatedName($pattern);
     }
 
+    /**
+     * @param  string  $pattern  Related model pattern.\n     * @return string
+     */
     public static function relatedName(string $pattern): string
     {
         return Str::replace(['###', '#p#'], [static::modelName(), Str::plural(static::modelName())], $pattern);
     }
 
+    /**
+     * @param  string  $pattern  Related model pattern.\n     * @return string
+     */
     public static function relatedUrl(string $pattern): string
     {
         return Str::replace(['###', '#p#'], [static::$prefix, static::$prefixPlural], $pattern);
@@ -172,6 +194,9 @@ class AbstractModel extends Model
         return Str::afterLast(get_called_class(), '\\');
     }
 
+    /**
+     * @param  string  $verb  Action verb.\n     * @return string
+     */
     public static function getEventName(string $verb): string
     {
         return static::relatedClass('App\\Events\\'.ucfirst($verb).'###');
@@ -283,6 +308,10 @@ class AbstractModel extends Model
      */
     protected static function registerDefaultRoutes($routeClass, $controllerClass)
     {
+        if (! class_exists($controllerClass)) {
+            return;
+        }
+
         foreach (static::getRoutes()[$routeClass] ?? [] as $routeKey => $routeData) {
             if (method_exists($controllerClass, $routeData['verb'])) {
                 Route::match($routeData['httpVerbs'], $routeData['urlPattern'], [$controllerClass, $routeData['verb']])
@@ -299,7 +328,10 @@ class AbstractModel extends Model
         Route::middleware([
             'auth',
         ])->group(function () {
-            static::registerDefaultRoutes('web', static::controllerClass());
+            $controllerClass = static::controllerClass();
+            if (class_exists($controllerClass)) {
+                static::registerDefaultRoutes('web', $controllerClass);
+            }
         });
     }
 
@@ -309,7 +341,10 @@ class AbstractModel extends Model
         Route::middleware([
             'auth:sanctum,api',
         ])->group(function () {
-            static::registerDefaultRoutes('api', static::apiControllerClass());
+            $controllerClass = static::apiControllerClass();
+            if (class_exists($controllerClass)) {
+                static::registerDefaultRoutes('api', $controllerClass);
+            }
         });
     }
 
@@ -331,12 +366,14 @@ class AbstractModel extends Model
     }
 
     /** Return the web controller class name derived from this model. */
+    /** @return string Controller class for this model. */
     public static function controllerClass(): string
     {
         return 'App\\Http\\Controllers\\'.static::modelName().'Controller';
     }
 
     /** Return the API controller class name derived from this model. */
+    /** @return string API controller class for this model. */
     public static function apiControllerClass(): string
     {
         return 'App\\Http\\Controllers\\Api\\'.static::modelName().'Controller';

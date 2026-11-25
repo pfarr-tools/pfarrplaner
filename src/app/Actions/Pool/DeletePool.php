@@ -59,7 +59,7 @@ class DeletePool extends AbstractDeleteAction implements DeletesPools
         DeletedPool::dispatch($user, $pool);
         $this->messages = ['success' => 'Der Pool wurde gelöscht.'];
 
-        return $pool->delete();
+        return (bool) $pool->delete();
 
     }
 }

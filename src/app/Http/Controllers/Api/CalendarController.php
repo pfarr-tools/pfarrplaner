@@ -33,6 +33,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Calendar\CalendarMonthServiceResource;
 use App\Http\Resources\Calendar\CalendarServiceResource;
+use App\Models\People\User;
 use App\Models\Places\City;
 use App\Models\Service;
 use App\Services\CalendarService;
@@ -55,14 +56,17 @@ class CalendarController extends Controller
     /**
      * Provide basic calendar data for a given date
      *
+     * @param  string  $date  Month in YYYY-MM format.
      * @return JsonResponse
      */
-    public function month($date)
+    public function month(string $date)
     {
+        $user = Auth::user();
+        abort_unless($user instanceof User, 401);
         $date = Carbon::parse($date.'-01 0:00:00');
         RedirectorService::setReturnRoute(route('calendar', $date->format('Y-m')));
 
-        return response()->json(CalendarService::buildMonthPayload($date, Auth::user()));
+        return response()->json(CalendarService::buildMonthPayload($date, $user));
     }
 
     /**
@@ -73,8 +77,10 @@ class CalendarController extends Controller
      */
     public function service(Service $service)
     {
+        $user = Auth::user();
+        abort_unless($user instanceof User, 401);
         abort_unless(
-            Auth::user()->visibleCities()->whereKey($service->city_id)->exists(),
+            $user->visibleCities()->whereKey($service->city_id)->exists(),
             404
         );
 
@@ -115,10 +121,14 @@ class CalendarController extends Controller
      */
     public function quickPick($date)
     {
-        $date = Carbon::createFromFormat('d.m.Y', $date)->setTime(0, 0, 0);
+        $date = Carbon::createFromFormat('d.m.Y', $date);
+        abort_unless($date !== null, 404);
+        $date->setTime(0, 0, 0);
+        $user = Auth::user();
+        abort_unless($user instanceof User, 401);
         $services = Service::setEagerLoads([])->without(['city', 'location', 'participants'])
             ->select(['id', 'slug', 'title', 'date', 'location_id', 'city_id', 'special_location'])
-            ->inCities(Auth::user()->writableCities->pluck('id'))
+            ->inCities($user->writableCities->pluck('id'))
             ->startingFrom($date)->endingAt($date->copy()->endOfDay())->ordered()
             ->get();
 

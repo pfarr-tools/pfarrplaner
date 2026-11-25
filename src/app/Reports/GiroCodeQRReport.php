@@ -39,9 +39,9 @@ use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 use Inertia\Inertia;
+use Inertia\Response;
 
 /**
  * Class KonfiAppQRReport
@@ -75,7 +75,7 @@ class GiroCodeQRReport extends AbstractPDFDocumentReport
     public function isActive(): bool
     {
         $isActive = false;
-        foreach (Auth::user()->cities as $city) {
+        foreach ($this->authenticatedUser()->cities as $city) {
             $isActive = $isActive || (! empty($city->iban));
         }
 
@@ -83,11 +83,11 @@ class GiroCodeQRReport extends AbstractPDFDocumentReport
     }
 
     /**
-     * @return Application|Factory|View
+     * @return Application|Factory|View|Response
      */
     public function setup()
     {
-        $cities = Auth::user()->writableCities->reject(function ($item) {
+        $cities = $this->authenticatedUser()->writableCities->reject(function ($item) {
             return empty($item->iban);
         });
 
@@ -111,18 +111,23 @@ class GiroCodeQRReport extends AbstractPDFDocumentReport
         );
 
         $allServices = Service::where('city_id', $data['city'])
-            ->between(Carbon::createFromFormat('Y-m-d', $data['start']),
-                Carbon::createFromFormat('Y-m-d', $data['end'])
+            ->between(Carbon::parse($data['start']),
+                Carbon::parse($data['end'])
             )->ordered()->get();
 
         // group by location
         $services = [];
+        $service = null;
         foreach ($allServices as $service) {
             $services[$service->locationText()][] = $service;
         }
         ksort($services);
 
-        if (count($services) == '0') {
+        if (count($services) === 0) {
+            return redirect()->route('reports.setup', 'konfiAppQR');
+        }
+        $lastService = $allServices->last();
+        if (! $lastService instanceof Service) {
             return redirect()->route('reports.setup', 'konfiAppQR');
         }
 
@@ -131,7 +136,7 @@ class GiroCodeQRReport extends AbstractPDFDocumentReport
                 static::FILE_TITLE,
                 'pdf',
                 static::FILE_SIGNATURE,
-                $service->date),
+                $lastService->trueDate()),
             [
                 'services' => $services,
                 'copies' => $data['copies'],
@@ -147,13 +152,17 @@ class GiroCodeQRReport extends AbstractPDFDocumentReport
      */
     public function single(Request $request)
     {
-        $service = Service::findOrFail($request->get('service'));
+        $service = Service::findOrFail((int) $request->get('service'));
         $services[$service->locationText()][] = $service;
-        $types = KonfiAppIntegration::get($service->city)->listEventTypes();
+        $city = $service->city;
+        if ($city === null) {
+            abort(404);
+        }
+        $types = KonfiAppIntegration::get($city)->listEventTypes();
         $copies = $request->get('copies', 1);
 
         return $this->sendToFile(
-            $service->date->format('Ymd').' QR-Code.pdf',
+            $service->trueDate()->format('Ymd').' QR-Code.pdf',
             [
                 'services' => $services,
                 'types' => $types,

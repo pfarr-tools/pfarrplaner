@@ -34,6 +34,6 @@ use App\Models\People\User;
 use App\Models\Seating\Booking;
 
 /**
- * @method Booking update(User $user, Booking $booking, array $input)
+ * @method Booking update(User $user, Booking $booking, array<string, mixed> $input)
  */
 interface UpdatesBookings {}

@@ -57,7 +57,7 @@ class ParishController extends AbstractCRUDController
     protected function preFillNewModel(Request $request): array
     {
         $data = parent::preFillNewModel($request);
-        $city = City::findOrFail($request->get('city', -1));
+        $city = City::query()->whereKey($request->get('city', -1))->firstOrFail();
         $data['city_id'] = $city->id;
         $data['name'] = 'Pfarramt '.$city->name;
 

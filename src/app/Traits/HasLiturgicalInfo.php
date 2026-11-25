@@ -34,10 +34,13 @@ use App\Services\LiturgyService;
 
 trait HasLiturgicalInfo
 {
+    /** @var array<string, mixed>|null */
     protected $cachedLiturgicalInfo = null;
 
     /**
      * Add liturgy attribute
+     *
+     * @return array<string, mixed>
      */
     public function getLiturgicalInfoAttribute(): array
     {
@@ -49,7 +52,7 @@ trait HasLiturgicalInfo
         } else {
             $litInfo = (LiturgyService::getLiturgyByAltPropriumCode($this->alt_proprium) ?? []);
         }
-        if (($litInfo) && ($litInfo !== [])) {
+        if ($litInfo) {
             $this->cachedLiturgicalInfo = $litInfo;
         }
 

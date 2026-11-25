@@ -44,7 +44,7 @@ class Song extends AbstractSngFile
     public function __construct(Item $item)
     {
         $this->item = $item;
-        $this->helper = $item->getHelper();
+        $this->helper = new SongItemHelper($item);
         parent::__construct($this->helper->getTitleText());
     }
 
@@ -80,7 +80,7 @@ class Song extends AbstractSngFile
 
         foreach ($this->item->data['song']['song']['verses'] ?? [] as $verse) {
             $text .= $this->line('---')
-                .$this->line('Vers '.$verse['number'] ?? '')
+                .$this->line('Vers '.$verse['number'])
                 .$this->wordWrap($verse['text'] ?? '');
         }
 

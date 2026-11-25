@@ -32,16 +32,24 @@ namespace App\UI\Modules;
 
 class AbstractModule
 {
+    /** @var string */
     protected $title = '';
 
+    /** @var string */
     protected $icon = 'puzzle';
 
+    /** @var string */
     protected $color = 'black';
 
+    /** @var array<string, mixed> */
     protected $config = [];
 
+    /** @var string */
     protected $defaultRoute = '';
 
+    /**
+     * @param  array<string, mixed>  $config  Module configuration values.
+     */
     public function __construct(array $config)
     {
         $this->config = $config;
@@ -54,6 +62,9 @@ class AbstractModule
 
     /**
      * Add menu items to the group array
+     *
+     * @param  array<int|string, mixed>  $items  Existing menu items.
+     * @return array<int|string, mixed>
      */
     public function addItems(array $items): array
     {
@@ -95,11 +106,13 @@ class AbstractModule
         return strtolower(str_replace('App\\UI\\s\\', '', str_replace('Module', '', get_called_class())));
     }
 
+    /** @return array<string, mixed> */
     public function getConfig(): array
     {
         return $this->config;
     }
 
+    /** @param  array<string, mixed>  $config  Module configuration values. */
     public function setConfig(array $config): void
     {
         $this->config = $config;

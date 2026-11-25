@@ -30,12 +30,18 @@
 
 namespace App\Calendars;
 
+/**
+ * @method AbstractCalendarItem|null find(string $id)
+ * @method AbstractCalendarItem|null create(array<string, mixed> $record)
+ * @method void delete(string $id)
+ */
 abstract class AbstractCalendar
 {
+    /** @var mixed Last error reported by the concrete calendar implementation. */
     protected $lastError = null;
 
     /**
-     * @return null
+     * @return mixed
      */
     public function getLastError()
     {
@@ -43,7 +49,7 @@ abstract class AbstractCalendar
     }
 
     /**
-     * @param  null  $lastError
+     * @param  mixed  $lastError
      */
     public function setLastError($lastError): void
     {

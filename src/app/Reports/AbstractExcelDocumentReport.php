@@ -33,6 +33,7 @@ namespace App\Reports;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Exception;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 /**
  * Class AbstractExcelDocumentReport
@@ -47,15 +48,21 @@ class AbstractExcelDocumentReport extends AbstractReport
     /** @var Spreadsheet */
     protected $spreadsheet = null;
 
+    /**
+     * @return void
+     */
     public function __construct()
     {
         $this->spreadsheet = new Spreadsheet;
     }
 
     /**
+     * @param  string  $filename  Name of the downloaded file.
+     * @return BinaryFileResponse
+     *
      * @throws Exception
      */
-    public function sendToBrowser($filename)
+    public function sendToBrowser(string $filename): BinaryFileResponse
     {
         $tempFile = tempnam(sys_get_temp_dir(), $filename);
         $writer = IOFactory::createWriter($this->spreadsheet, 'Xlsx');

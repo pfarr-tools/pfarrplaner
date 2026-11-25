@@ -33,25 +33,41 @@ namespace App\Http\Controllers;
 use App\Calendars\LocalEventCalendars\LocalEventCalendarFactory;
 use App\Models\Calendar\Day;
 use App\Models\Leave\Absence;
+use App\Models\People\User;
 use App\Models\Places\City;
 use App\Models\Service;
 use App\Services\CalendarService;
 use App\Services\RedirectorService;
 use Carbon\Carbon;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
+use Inertia\Response;
 
+/** Controller for the calendar views. */
 class CalController extends Controller
 {
+    /**
+     * @return void
+     */
     public function __construct()
     {
         $this->middleware('auth');
     }
 
-    public function singleDay($day, City $city)
+    /**
+     * Render the calendar page for a single day.
+     *
+     * @param  string  $day  Day to display in Y-m-d format.
+     * @param  City  $city  City whose services and absences are shown.
+     * @return Response Inertia response for the single-day calendar.
+     */
+    public function singleDay(string $day, City $city): Response
     {
+        $user = Auth::user();
+        abort_unless($user instanceof User, 401);
         $day = Carbon::parse($day)->setTime(0, 0, 0);
         $services = Service::setEagerLoads([])
             ->with(['day', 'baptisms', 'funerals', 'weddings', 'participants'])
@@ -60,18 +76,26 @@ class CalController extends Controller
             ->orderBy('time')
             ->get();
 
-        $canCreate = Auth::user()->can('create', Service::class);
+        $canCreate = $user->can('create', Service::class);
 
         // absences
         $absences = Absence::with('user')->byPeriod($day, $day)
-            ->visibleForUser(Auth::user())
+            ->visibleForUser($user)
             ->get();
 
         return Inertia::render('Calendar/SingleDay', compact('day', 'city', 'services', 'absences', 'canCreate'));
 
     }
 
-    public function index(Request $request, $date = null, $month = null)
+    /**
+     * Render the monthly calendar overview.
+     *
+     * @param  Request  $request  Current request.
+     * @param  string|null  $date  Year or year-month selector from the route.
+     * @param  string|null  $month  Month from the route, appended to the date when present.
+     * @return Response Inertia response for the calendar overview.
+     */
+    public function index(Request $request, ?string $date = null, ?string $month = null): Response
     {
         RedirectorService::saveCurrentRoute();
         if ($month) {
@@ -81,17 +105,19 @@ class CalController extends Controller
         if ($date->format('Ym') < 201801) {
             abort(404);
         }
-        $monthEnd = $date->copy()->addMonth(1)->subSecond(1);
+        $monthEnd = $date->copy()->addMonth()->subSecond();
+
+        $user = Auth::user();
+        abort_unless($user instanceof User, 401);
 
         $yearExpression = DB::connection()->getDriverName() == 'sqlite'
             ? "strftime('%Y', services.date)"
             : 'YEAR(DATE(services.date))';
         $years = Service::select(DB::raw('DISTINCT '.$yearExpression.' as year'))
-            ->inCities(Auth::user()->visibleCities)
-            ->orderBy('year', 'ASC')
+            ->inCities($user->visibleCities)
+            ->orderBy('year', 'asc')
             ->get()->pluck('year');
 
-        $user = Auth::user();
         $writableCities = $user->writableCities;
         $cities = array_values($user->getSortedCities()->map(function ($city) {
             $city->childIds = $city->is_org ? $city->children->pluck('id')->toArray() : [];
@@ -109,7 +135,14 @@ class CalController extends Controller
         );
     }
 
-    public function day(Day $day, City $city)
+    /**
+     * Return the services of a calendar day as JSON.
+     *
+     * @param  Day  $day  Day whose services are returned.
+     * @param  City  $city  City whose services are returned.
+     * @return JsonResponse JSON response containing the services.
+     */
+    public function day(Day $day, City $city): JsonResponse
     {
         $services = Service::setEagerLoads([])
             ->with(['day', 'baptisms', 'funerals', 'weddings', 'participants'])

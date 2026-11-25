@@ -78,7 +78,13 @@ return new class extends Migration
 
     }
 
-    private function unquote($value)
+    /**
+     * Remove enclosing quotes from a legacy database value.
+     *
+     * @param  string  $value  Raw value read from the old schema.
+     * @return string Value without leading or trailing quotes.
+     */
+    private function unquote(string $value): string
     {
         while (substr($value, 0, 1) == '\'') {
             $value = substr($value, 1);
@@ -103,12 +109,18 @@ return new class extends Migration
      */
     public function down() {}
 
-    private function getModels()
+    /**
+     * Collect all application models that define encrypted attributes.
+     *
+     * @return array<int, array<string, mixed>> Model definitions with class, table and encrypted fields.
+     */
+    private function getModels(): array
     {
         $models = [];
-        foreach (glob(app_path('*.php')) as $file) {
+        foreach (glob(app_path('*.php')) ?: [] as $file) {
             $class = 'App\\'.pathinfo($file, PATHINFO_FILENAME);
             $instance = new $class;
+            /** @var class-string $class */
             $reflectionClass = new ReflectionClass($class);
             if ($reflectionClass->hasProperty('casts')) {
 

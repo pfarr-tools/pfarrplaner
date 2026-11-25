@@ -63,7 +63,7 @@ class KonfiAppIntegration extends AbstractIntegration
     /** @var Client */
     protected $client;
 
-    /** @var array last request */
+    /** @var array<string, mixed> Last request data. */
     protected $lastRequest = [];
 
     /** @var string last endpoint */
@@ -74,6 +74,9 @@ class KonfiAppIntegration extends AbstractIntegration
 
     /**
      * KonfiAppIntegration constructor.
+     */
+    /**
+     * @param  string  $apiKey  KonfiApp API key.
      */
     public function __construct($apiKey)
     {
@@ -90,7 +93,7 @@ class KonfiAppIntegration extends AbstractIntegration
      */
     public static function get(City $city): KonfiAppIntegration
     {
-        return new self($city->konfiapp_apikey);
+        return new self($city->konfiapp_apikey ?? '');
     }
 
     /**
@@ -147,21 +150,22 @@ class KonfiAppIntegration extends AbstractIntegration
     /**
      * Send a request to the public API for KonfiApp and return the contents of the response's data field
      *
-     * @param  array  $arguments
-     * @param  string  $requestType
-     * @return mixed Response data field
+     * @param  string  $path  API path.
+     * @param  array<string, mixed>  $arguments  Request arguments.
+     * @param  string  $requestType  HTTP method.
+     * @return stdClass|bool Response data field.
      *
      * @throws Exception
      */
     protected function requestData($path, $arguments = [], $requestType = 'GET'): stdClass|bool
     {
         $response = $this->request($requestType, $path, $arguments);
-        if ((! $response) || ($response->getStatusCode() != 200)) {
+        if ($response === false || $response->getStatusCode() != 200) {
             return false;
         }
 
         $data = json_decode((string) $response->getBody());
-        if ((! $data) || (! isset($data->data))) {
+        if (! $data instanceof stdClass || (! isset($data->data))) {
             return false;
         }
 
@@ -173,9 +177,11 @@ class KonfiAppIntegration extends AbstractIntegration
      *
      * This will automatically add the api key
      *
-     * @param  array  $arguments
+     * @param  string  $requestType  HTTP method.
+     * @param  string  $path  API path.
+     * @param  array<string, mixed>  $arguments  Request arguments.
      */
-    protected function request($requestType, $path, $arguments = []): ResponseInterface|bool
+    protected function request($requestType, $path, $arguments = []): ResponseInterface|false
     {
         $this->lastRequest = [
             'headers' => ['X-Konfiapp-Token' => $this->apiKey],
@@ -224,6 +230,9 @@ class KonfiAppIntegration extends AbstractIntegration
      * Handle service update
      *
      * This will create a new qr code if the service does not have one yet
+     *
+     * @param  mixed  $requestedChange  Requested service change.
+     * @return Service|null
      *
      * @throws Exception
      */
@@ -280,6 +289,8 @@ class KonfiAppIntegration extends AbstractIntegration
     /**
      * Update a service's existing QR code
      *
+     * @param  int|null  $eventType  Event type override.
+     *
      * @throws Exception
      */
     public function updateServiceQRCode(Service $service, $eventType = null): Service
@@ -303,6 +314,9 @@ class KonfiAppIntegration extends AbstractIntegration
             ['konfiapp_event_type' => $eventType, 'konfiapp_event_qr' => $code]
         );
         $service2 = Service::find($service->id);
+        if ($service2 === null) {
+            throw new \RuntimeException('Updated KonfiApp service could not be reloaded.');
+        }
         Log::debug('Updated service to code '.$service2->konfiapp_event_qr);
 
         return $service2;
@@ -311,19 +325,22 @@ class KonfiAppIntegration extends AbstractIntegration
     /**
      * Create a QR code for a service
      *
-     * @return mixed
      *
      * @throws Exception
      */
     public function createQRCode(Service $service, ?int $eventType = null): ?string
     {
-        $start = $service->date->setTimeZone('Europe/Berlin');
+        $start = $service->date;
+        if ($start === null) {
+            return null;
+        }
+        $start->setTimeZone('Europe/Berlin');
         $data = [
             'veranstaltungID' => $eventType ?? $service->konfiapp_event_type,
             'dateStart' => $start->format('Y.m.d'),
             'dateEnd' => $start->format('Y.m.d'),
             'timeStart' => $start->format('H:i'),
-            'timeEnd' => $start->clone()->addHour(3)->format('H:i'),
+            'timeEnd' => $start->clone()->addHours(3)->format('H:i'),
         ];
 
         $response = $this->requestData(
@@ -335,10 +352,17 @@ class KonfiAppIntegration extends AbstractIntegration
     }
 
     /**
+     * @param  string  $code  QR code value.
+     * @param  mixed  $type  Event type.
+     *
      * @throws Exception
      */
-    public function deleteQRCodeByCode($code, $type)
+    public function deleteQRCodeByCode(?string $code, $type): void
     {
+        if ($code === null || $code === '') {
+            return;
+        }
+
         $response = $this->requestData(
             'verwaltung/veranstaltungen/qr/',
             [
@@ -361,7 +385,7 @@ class KonfiAppIntegration extends AbstractIntegration
      *
      * @throws Exception
      */
-    public function deleteQRCode($id)
+    public function deleteQRCode($id): void
     {
         $this->requestData(
             'verwaltung/veranstaltungen/qr/delete/',
@@ -398,7 +422,7 @@ class KonfiAppIntegration extends AbstractIntegration
             'verwaltung/veranstaltungen/qr/list/',
             ['veranstaltungID' => $eventType]
         );
-        if (! $response) {
+        if ($response === false) {
             return collect();
         }
 

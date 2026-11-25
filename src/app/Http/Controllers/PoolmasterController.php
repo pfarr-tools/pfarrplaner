@@ -51,7 +51,7 @@ class PoolmasterController extends AbstractCRUDController
             abort(404);
         }
 
-        $user = User::findOrFail($user);
+        $user = User::query()->whereKey($user)->firstOrFail();
         $pools = $user->pools;
 
         $year = $request->get('year', Carbon::now()->year);

@@ -64,7 +64,7 @@ class AIPromptLiturgySheet extends AbstractLiturgySheet
     protected function buildPrompt(Service $service): string
     {
         $liturgy = $service->liturgical_info;
-        $prompt = 'Am '.$service->date->isoFormat('dddd, DD. MMMM YYYY').', '.$service->timeText().
+        $prompt = 'Am '.$service->trueDate()->isoFormat('dddd, DD. MMMM YYYY').', '.$service->timeText().
             (($service->location && $service->location->at_text) ? ' '.$service->location->at_text : ', '.$service->locationText(
             ));
         if ($liturgy['Bezeichnung'] ?? false) {

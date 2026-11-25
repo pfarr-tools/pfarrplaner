@@ -30,6 +30,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\People\User;
 use App\Models\Places\City;
 use App\Services\RoleService;
 use App\UI\Modules\AdminModule;
@@ -66,15 +67,17 @@ class AdminController extends Controller
      */
     public function index()
     {
+        $user = Auth::user();
+        abort_unless($user instanceof User, 401);
         /** @var Collection<int|string, Collection<int, non-empty-array<string, mixed>>> $modules */
         $modules = collect(AdminModule::modules())->sortBy(['group', 'text'])
             ->reject(fn ($module) => empty($module['group']))
             ->groupBy('group');
 
-        if (Auth::user()->hasRole(RoleService::ROLE_SUPER_ADMIN)) {
+        if ($user->hasRole(RoleService::ROLE_SUPER_ADMIN)) {
             $cities = City::all();
         } else {
-            $cities = collect(Auth::user()->writableCities)->merge(Auth::user()->adminCities)->unique('id');
+            $cities = collect($user->writableCities)->merge($user->adminCities)->unique('id');
         }
         if (count($cities) > 0) {
             $modules['Orte'] = $this->emptyCityModules();
@@ -92,7 +95,7 @@ class AdminController extends Controller
             unset($modules['Orte']);
         }
 
-        $canCreateCities = Auth::user()->can('create', City::class);
+        $canCreateCities = $user->can('create', City::class);
 
         return Inertia::render('Admin/Index', compact('modules', 'canCreateCities'));
     }

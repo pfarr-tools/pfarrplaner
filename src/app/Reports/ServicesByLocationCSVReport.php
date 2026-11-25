@@ -35,7 +35,6 @@ use App\Models\Service;
 use App\Services\FileNameService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -62,7 +61,7 @@ class ServicesByLocationCSVReport extends AbstractCSVReport
      */
     public function setup()
     {
-        $locations = Location::inCities(Auth::user()->cities->pluck('id'))->get();
+        $locations = Location::inCities($this->authenticatedUser()->cities->pluck('id'))->get();
 
         return Inertia::render('Report/ServicesByLocationCSV/Setup', compact('locations'));
     }
@@ -79,7 +78,7 @@ class ServicesByLocationCSVReport extends AbstractCSVReport
 
         $start = Carbon::parse($data['start']);
         $end = Carbon::parse($data['end']);
-        $location = Location::findOrFail($data['location_id']);
+        $location = Location::findOrFail((int) $data['location_id']);
 
         $services = Service::between($start, $end)->where('location_id', $location->id)->ordered()->get();
 

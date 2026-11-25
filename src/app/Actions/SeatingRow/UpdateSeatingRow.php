@@ -32,13 +32,20 @@ class UpdateSeatingRow extends AbstractUpdateAction implements UpdatesSeatingRow
         return route('admin.location.edit', ['modelId' => $this->location->id, 'tab' => 'seating']);
     }
 
+    /**
+     * Aktualisiert eine Sitzreihe.
+     *
+     * @param  array<string, mixed>  $input
+     */
     public function update(User $user, SeatingRow $seatingRow, array $input): SeatingRow
     {
         Gate::forUser($user)->authorize('update', $seatingRow);
         $input = Validator::make($input, SeatingRow::$validationRules)->validateWithBag('updateSeatingRow');
 
-        $section = SeatingSection::findOrFail($input['seating_section_id']);
-        $this->location = $section->location;
+        $section = SeatingSection::findOrFail((int) $input['seating_section_id']);
+        $location = $section->location;
+        abort_unless($location instanceof Location, 404);
+        $this->location = $location;
         Gate::forUser($user)->authorize('update', $this->location);
 
         $seatingRow->update(NormalizesSeatingRowData::normalize($input));

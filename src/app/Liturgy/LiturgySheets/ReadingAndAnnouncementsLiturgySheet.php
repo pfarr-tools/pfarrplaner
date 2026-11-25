@@ -31,6 +31,7 @@
 namespace App\Liturgy\LiturgySheets;
 
 use App\Documents\Word\DefaultWordDocument;
+use App\Liturgy\ItemHelpers\FreetextItemHelper;
 use App\Liturgy\ItemHelpers\PsalmItemHelper;
 use App\Liturgy\ItemHelpers\ReadingItemHelper;
 use App\Liturgy\ItemHelpers\SongItemHelper;
@@ -102,6 +103,10 @@ class ReadingAndAnnouncementsLiturgySheet extends AbstractLiturgySheet
         return $doc->sendToBrowser($this->getFileName($service));
     }
 
+    /**
+     * @param  string  $category  Participant category.
+     * @return string
+     */
     public function renderParticipantRow($category)
     {
         $p = [];
@@ -112,6 +117,10 @@ class ReadingAndAnnouncementsLiturgySheet extends AbstractLiturgySheet
         return implode(', ', $p);
     }
 
+    /**
+     * @param  string  $recipient  Recipient filter.
+     * @return void
+     */
     protected function renderLiturgyTable(DefaultWordDocument $doc, $recipient = '')
     {
         foreach ($this->service->liturgyBlocks as $block) {
@@ -127,15 +136,17 @@ class ReadingAndAnnouncementsLiturgySheet extends AbstractLiturgySheet
         }
     }
 
-    protected function setProperties(DefaultWordDocument $doc)
+    protected function setProperties(DefaultWordDocument $doc): void
     {
         $properties = $doc->getPhpWord()->getDocInfo();
-        $properties->setCreator(Auth::user()->fullName());
-        $properties->setCompany(Auth::user()->office ?? '');
+        $user = Auth::user();
+        $userName = $user?->fullName() ?? '';
+        $properties->setCreator($userName);
+        $properties->setCompany($user->office ?? '');
         $properties->setTitle($this->getFileTitle());
         $properties->setDescription($this->getFileTitle().' ('.$this->title.')');
         $properties->setCategory('Gottesdienste');
-        $properties->setLastModifiedBy(Auth::user()->fullName());
+        $properties->setLastModifiedBy($userName);
         $properties->setSubject('Ablauf und Texte');
     }
 
@@ -144,16 +155,23 @@ class ReadingAndAnnouncementsLiturgySheet extends AbstractLiturgySheet
         return 'Gottesdienst'.(($this->service) && ($this->service->sermon) ? ' - '.$this->service->sermon->title : '');
     }
 
+    /**
+     * @param  string  $text  Row text.
+     * @return void
+     */
     protected function renderRow(Table $table, Item $item, $text)
     {
-        $table->addCell(Converter::cmToTwip(4.3))->addText($item->title, ['bold' => true]);
-        $table->addCell(Converter::cmToTwip(8.5))->addText($text);
+        $table->addCell((int) Converter::cmToTwip(4.3))->addText($item->title, ['bold' => true]);
+        $table->addCell((int) Converter::cmToTwip(8.5))->addText($text);
         $this->renderRecipients($table, $item);
     }
 
+    /**
+     * @return void
+     */
     protected function renderRecipients(Table $table, Item $item)
     {
-        $cell = $table->addCell(Converter::cmToTwip(4.3));
+        $cell = $table->addCell((int) Converter::cmToTwip(4.3));
         $run = $cell->addTextRun();
         $first = true;
         foreach ($item->recipients() as $recipient) {
@@ -164,21 +182,32 @@ class ReadingAndAnnouncementsLiturgySheet extends AbstractLiturgySheet
         }
     }
 
+    /**
+     * @return void
+     */
     protected function renderFreetextItemRow(DefaultWordDocument $doc, Table $table, Item $item)
     {
         $text = '';
         if ($item->data['description']) {
-            $text = Replacement::replaceAll($item->getHelper()->getText(), $this->service);
+            /** @var FreetextItemHelper $helper */
+            $helper = $item->getHelper();
+            $text = Replacement::replaceAll($helper->getText(), $this->service);
             $text = (strpos($text, "\n") !== false) ? explode("\n", $text)[0] : substr($text, 0, 80).'...';
         }
         $this->renderRow($table, $item, $text);
     }
 
+    /**
+     * @return void
+     */
     protected function renderSermonItemRow(DefaultWordDocument $doc, Table $table, Item $item)
     {
-        $this->renderRow($table, $item, $this->service->sermon_id ? $this->service->sermon->title : '');
+        $this->renderRow($table, $item, $this->service->sermon->title ?? '');
     }
 
+    /**
+     * @return void
+     */
     protected function renderPsalmItemRow(DefaultWordDocument $doc, Table $table, Item $item)
     {
         /** @var PsalmItemHelper $helper */
@@ -186,6 +215,9 @@ class ReadingAndAnnouncementsLiturgySheet extends AbstractLiturgySheet
         $this->renderRow($table, $item, $helper->getTitleText());
     }
 
+    /**
+     * @return void
+     */
     protected function renderSongItemRow(DefaultWordDocument $doc, Table $table, Item $item)
     {
         if (! isset($item->data['song'])) {
@@ -196,11 +228,17 @@ class ReadingAndAnnouncementsLiturgySheet extends AbstractLiturgySheet
         $this->renderRow($table, $item, $helper->getTitleText());
     }
 
+    /**
+     * @return void
+     */
     protected function renderReadingItemRow(DefaultWordDocument $doc, Table $table, Item $item)
     {
         $this->renderRow($table, $item, $item->data['reference'] ?? '');
     }
 
+    /**
+     * @return void
+     */
     protected function renderFreetextItem(DefaultWordDocument $doc, Item $item)
     {
         if (! $item->data['description']) {
@@ -210,15 +248,29 @@ class ReadingAndAnnouncementsLiturgySheet extends AbstractLiturgySheet
             return;
         }
         $doc->getSection()->addTitle($item->title, 2);
-        $doc->renderNormalText(Replacement::replaceAll($item->getHelper()->getText(), $this->service));
+        /** @var FreetextItemHelper $helper */
+        $helper = $item->getHelper();
+        $doc->renderNormalText(Replacement::replaceAll($helper->getText(), $this->service));
     }
 
+    /**
+     * @return void
+     */
     protected function renderSermonItem(DefaultWordDocument $doc, Item $item) {}
 
+    /**
+     * @return void
+     */
     protected function renderPsalmItem(DefaultWordDocument $doc, Item $item) {}
 
+    /**
+     * @return void
+     */
     protected function renderSongItem(DefaultWordDocument $doc, Item $item) {}
 
+    /**
+     * @return void
+     */
     protected function renderReadingItem(DefaultWordDocument $doc, Item $item)
     {
         if (! $item->data['reference']) {

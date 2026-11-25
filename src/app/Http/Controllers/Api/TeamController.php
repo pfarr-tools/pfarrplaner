@@ -31,6 +31,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Models\People\Team;
+use App\Models\People\User;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 
@@ -45,8 +46,11 @@ class TeamController extends AbstractApiCRUDController
 
     protected function getModelsForIndex(): Collection
     {
+        $user = Auth::user();
+        abort_unless($user instanceof User, 401);
+
         return Team::with(Team::$relationsForIndex)
-            ->inCities(Auth::user()->cities->pluck('id'))
+            ->inCities($user->cities->pluck('id'))
             ->orderBy('name')
             ->get();
     }

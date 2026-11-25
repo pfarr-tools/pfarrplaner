@@ -40,10 +40,7 @@ namespace App\Imports;
 use App\Models\Places\City;
 use Carbon\Carbon;
 use Exception;
-use GuzzleHttp\Client;
-use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Facades\Cache;
-use Psr\Http\Message\StreamInterface;
 
 /**
  * Class OPEventsImport
@@ -62,10 +59,15 @@ class OPEventsImport
     }
 
     /**
-     * @param  bool  $removeMatching
-     * @return mixed
+     * Merge events from the online-planned backend into an existing event list.
+     *
+     * @param  array<array-key, mixed>  $events  Events grouped by their start timestamp.
+     * @param  Carbon  $start  First day of the period to include.
+     * @param  Carbon  $end  Last day of the period to include.
+     * @param  bool  $removeMatching  Whether existing events with a matching title are removed.
+     * @return array<array-key, mixed> Events grouped by their start timestamp.
      */
-    public function mix($events, Carbon $start, Carbon $end, $removeMatching = false)
+    public function mix(array $events, Carbon $start, Carbon $end, bool $removeMatching = false): array
     {
         if (empty($this->city->op_customer_token.$this->city->op_customer_key)) {
             return $events;
@@ -105,9 +107,9 @@ class OPEventsImport
     }
 
     /**
-     * @return mixed
+     * Load the events from the online-planned backend or the cache.
      *
-     * @throws GuzzleException
+     * @return mixed Events grouped by their start timestamp.
      */
     public function getEvents()
     {
@@ -127,34 +129,28 @@ class OPEventsImport
     }
 
     /**
-     * @return StreamInterface
+     * Fetch the event data from the given backend URL.
      *
-     * @throws GuzzleException
+     * The request is currently disabled, so an empty list is returned.
+     *
+     * @param  string  $url  Backend URL to request.
+     * @return array<array-key, mixed> Fetched event data, currently always empty.
      */
-    public function getUrl($url)
+    public function getUrl(string $url): array
     {
         // temporarily disabled:
         return [];
-        $client = new Client;
-        $response = $client->request(
-            'GET',
-            $url,
-            [
-                'headers' => [
-                    'Origin' => 'https://'.$this->city->op_domain,
-                    'Referer' => 'https://'.$this->city->op_domain,
-                ],
-            ]
-        );
-        $body = json_decode($response->getBody(), true);
-
-        return $body['data'] ?? [];
     }
 
     /**
+     * Normalize the start and end timestamps of an event.
+     *
+     * @param  array<array-key, mixed>  $event  Event data to normalize in place.
+     * @return void
+     *
      * @throws Exception
      */
-    protected function fixTimeAndDates(&$event)
+    protected function fixTimeAndDates(array &$event): void
     {
         $event['start'] = new Carbon($event['startdate'], 'Europe/Berlin');
         if ($event['timestart'] !== null) {
@@ -169,7 +165,7 @@ class OPEventsImport
             unset($event['end']);
         }
         if (isset($event['end']) && ($event['end'] <= $event['start'])) {
-            $event['end'] = $event['start']->copy()->addHour(1);
+            $event['end'] = $event['start']->copy()->addHour();
         }
     }
 }

@@ -35,7 +35,6 @@ use App\Models\Calendar\Occurence;
 use App\Models\Location;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\View;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -72,14 +71,16 @@ class NewsletterReport extends AbstractWordDocumentReport
      */
     public function setup()
     {
-        $cities = Auth::user()->cities;
+        $cities = $this->authenticatedUser()->cities;
         $locations = Location::inCities($cities->pluck('id'))->get();
 
         return Inertia::render('Report/Newsletter/Setup', compact('cities', 'locations'));
     }
 
     /**
-     * @return Response
+     * Render the newsletter preview.
+     *
+     * @return Response|string
      */
     public function render(Request $request)
     {
