@@ -127,8 +127,8 @@ Bezeichnern, Dateinamen, URLs und CLI-Optionen vorbehalten.
 - Neue oder geänderte PHP-Deklarationen erhalten aussagekräftige PHPDoc-Blöcke;
   neue oder geänderte JavaScript-/Vue-Deklarationen erhalten JSDoc.
 - Qualitätswerkzeuge laufen ausschließlich über Docker: `./planer dev format`,
-  `./planer dev format:check`, `./planer dev analyse`, `./planer dev lint`,
-  `./planer dev docs:check` und `./planer dev quality`.
+  `./planer dev format:check`, `./planer dev analyse`, `./planer dev taint:check`,
+  `./planer dev lint`, `./planer dev docs:check` und `./planer dev quality`.
 - Prettier ist für JavaScript, Vue, Skripte, CSS, SCSS, Sass, JSON und YAML
   verbindlich;
   `blade-formatter` ist für `src/resources/views/**/*.blade.php` verbindlich.

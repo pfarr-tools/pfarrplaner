@@ -16,12 +16,23 @@ Im Repository-Stamm stehen folgende Befehle zur Verfügung:
 - `./planer dev format:check` prüft alle genannten Formate, ohne Dateien zu
   ändern. Im Quality-Lauf werden dabei nur geänderte Quellen geprüft.
 - `./planer dev analyse` führt PHPStan/Larastan auf Level 10 aus.
+- `./planer dev taint:check` führt Psalm mit Taint-Analyse aus; die Prüfung
+  muss ohne Befunde bleiben.
 - `./planer dev lint` führt ESLint mit Vue-Regeln aus.
 - `./planer dev docs:check` prüft PHPDoc für den Bestand und JSDoc für
   geänderte JavaScript-/Vue-Dateien.
 - `./planer dev complexity:check` gibt nicht blockierende Lesbarkeitshinweise.
 - `./planer dev quality` führt alle Prüfungen, isolierte PHPUnit-/Vitest-Tests
   und den Vite-Produktionsbuild schreibgeschützt aus.
+
+## Psalm-Taint-Analyse
+
+Psalm prüft mit `taintAnalysis` und `errorLevel="1"` die Verzeichnisse `app`,
+`routes` und `database` auf unsichere Datenflüsse. Taint-Befunde (etwa
+`TaintedSSRF`) sind immer blockierend; eine Baseline oder Ignore-Kommentare
+sind nicht vorgesehen. Nutzereingaben müssen vor der Verwendung in
+Netzwerkaufrufen, Dateisystempfaden oder shell-Kommandos validiert oder
+kodiert werden. Der aktuelle Stand ist 0 Fehler.
 
 ## PHPStan-Baseline als Ratchet
 
