@@ -31,11 +31,7 @@
 namespace App\HomeScreen\Tabs;
 
 use App\Models\People\User;
-use Illuminate\Support\Facades\Auth;
 
-/**
- * Home screen tab showing backup status to administrators.
- */
 class AdminBackupHomeScreenTab extends AbstractHomeScreenTab
 {
     protected $title = 'Backups';
@@ -44,20 +40,11 @@ class AdminBackupHomeScreenTab extends AbstractHomeScreenTab
 
     protected $config = [];
 
-    /**
-     * Check whether the backup tab is available to the user.
-     *
-     * @param  User|null  $user  User whose administrator access should be checked
-     * @return bool Whether the user is an administrator
-     */
     public function isAvailable(?User $user = null): bool
     {
-        return ($user ?? Auth::user())->isAdmin;
+        return ($user ?? $this->user())->isAdmin;
     }
 
-    /**
-     * Add backup status data to the serialized tab.
-     */
     public function toArray($data = [])
     {
         $data['backups'] = $this->getBackups();
@@ -66,9 +53,11 @@ class AdminBackupHomeScreenTab extends AbstractHomeScreenTab
     }
 
     /**
-     * Get backup status records for display.
+     * Collect the backup status information for the admin home screen.
+     *
+     * @return array<string, mixed>
      */
-    protected function getBackups()
+    protected function getBackups(): array
     {
         return [];
     }

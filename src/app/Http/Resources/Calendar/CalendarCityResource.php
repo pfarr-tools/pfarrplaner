@@ -43,12 +43,14 @@ class CalendarCityResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        /** @var City $this */
+        /** @var City $city */
+        $city = $this->resource;
+
         return [
-            'id' => $this->id,
-            'name' => $this->name,
-            'youtube_channel_url' => $this->youtube_channel_url,
-            'default_ministries' => $this->defaultMinistries,
+            'id' => $city->id,
+            'name' => $city->name,
+            'youtube_channel_url' => $city->youtube_channel_url,
+            'default_ministries' => $city->defaultMinistries,
         ];
     }
 }

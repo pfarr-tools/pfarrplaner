@@ -43,9 +43,10 @@ use Illuminate\Support\Facades\Mail;
 class TestController extends Controller
 {
     /**
+     * @param  string  $address  Recipient address.
      * @return Application|ResponseFactory|Response
      */
-    public function mail($address)
+    public function mail(string $address)
     {
         Log::debug('Sending test mail to '.$address);
         Mail::to($address)->bcc('dev@toph.de')->queue(new TestMail);

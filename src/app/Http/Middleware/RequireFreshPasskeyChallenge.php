@@ -32,7 +32,10 @@ class RequireFreshPasskeyChallenge
         }
 
         try {
-            return $next($request);
+            /** @var Response $response */
+            $response = $next($request);
+
+            return $response;
         } finally {
             $this->forgetChallenge($request, $challengeKey, $optionsKey);
         }

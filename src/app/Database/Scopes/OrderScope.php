@@ -37,16 +37,26 @@ use Illuminate\Database\Eloquent\Scope;
 /** @implements Scope<Model> */
 class OrderScope implements Scope
 {
+    /** @var string */
     private $column;
 
+    /** @var 'asc'|'desc' */
     private $direction;
 
-    public function __construct($column, $direction = 'asc')
+    /**
+     * @param  'asc'|'desc'  $direction  Sortrichtung für die Abfrage.
+     */
+    public function __construct(string $column, $direction = 'asc')
     {
         $this->column = $column;
         $this->direction = $direction;
     }
 
+    /**
+     * @param  Builder<covariant Model>  $builder  Query builder.
+     * @param  Model  $model  Model instance.
+     * @return void
+     */
     public function apply(Builder $builder, Model $model)
     {
         $builder->orderBy($this->column, $this->direction);

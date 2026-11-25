@@ -34,6 +34,7 @@ use App\Http\Resources\Calendar\CalendarAbsenceResource;
 use App\Http\Resources\Calendar\CalendarMonthServiceResource;
 use App\Models\Calendar\Day;
 use App\Models\Leave\Absence;
+use App\Models\Location;
 use App\Models\People\User;
 use App\Models\Service;
 use Carbon\Carbon;
@@ -42,15 +43,22 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 
+/** Service for calendar periods, filters and holidays. */
 class CalendarService
 {
     /**
-     * @return Collection<int, string>
+     * @param  int  $year
+     * @param  int  $month
+     * @return Collection<int, Day>
      */
     public static function initializeMonth($year, $month)
     {
+        /** @var Collection<int, Day> $days */
         $days = collect();
         $today = Carbon::create($year, $month, 1, 0, 0, 0);
+        if ($today === null) {
+            return $days;
+        }
         while ($today->month == $month) {
             if ($today->dayOfWeek == 0) {
                 $day = Day::create(
@@ -70,6 +78,10 @@ class CalendarService
 
     /**
      * Get the location filter either from request or from a user setting
+     *
+     * @param  Collection<int, Location>  $possibleLocations  Locations available to the user.
+     * @param  User  $user  User whose filter setting is read and updated.
+     * @return array<int, int|string> Selected location IDs.
      */
     public static function getLocationsFilter(Request $request, $possibleLocations, $user): array
     {
@@ -77,12 +89,15 @@ class CalendarService
             $user->setSetting('calendar_filter_locations', '');
         }
         if ($request->has('filter_location')) {
-            if ($request->get('filter_location') == '') {
+            /** @var string $filterLocation */
+            $filterLocation = $request->get('filter_location');
+            if ($filterLocation == '') {
                 $filteredLocations = [];
             } else {
+                /** @var array<int, string> $filteredLocations */
                 $filteredLocations = (clone $possibleLocations)->filter(
-                    function ($location) use ($request) {
-                        return in_array($location->id, explode(',', $request->get('filter_location')));
+                    function ($location) use ($filterLocation) {
+                        return in_array($location->id, explode(',', $filterLocation));
                     }
                 )->pluck('id')->toArray();
             }
@@ -91,36 +106,44 @@ class CalendarService
             if ($user->getSetting('calendar_filter_locations', '') === '') {
                 return [];
             }
-            $filteredLocations = explode(',', $user->getSetting('calendar_filter_locations', []));
+            /** @var string $filterSetting */
+            $filterSetting = $user->getSetting('calendar_filter_locations', []);
+            $filteredLocations = explode(',', $filterSetting);
         }
 
         return $filteredLocations;
     }
 
     /**
-     * @return array
+     * @return array<int, array<string, mixed>> Holidays with start, end and name.
      *
-     * @throws Exception
+     * @throws \Exception
      */
     public static function getHolidays(Carbon $start, Carbon $end)
     {
         try {
+            /** @var string $vacationState */
+            $vacationState = config('calendar.vacation_state');
             $url = 'https://openholidaysapi.org/SchoolHolidays?countryIsoCode=DE&subdivisionCode=DE-'
-                .config('calendar.vacation_state')
+                .$vacationState
                 .'&languageIsoCode=DE&validFrom='
                 .$start->format('Y-m-d')
                 .'&validTo='
                 .$end->format('Y-m-d');
 
-            $raw = json_decode(file_get_contents($url), true);
+            $raw = json_decode(file_get_contents($url) ?: '', true);
         } catch (\ErrorException $e) {
+            return [];
+        }
+        if (! is_array($raw)) {
             return [];
         }
         $holidays = [];
         foreach ($raw as $holiday) {
+            /** @var array{startDate: string, endDate: string, name: list<array{text: string}>} $holiday */
             $holidays[] = [
                 'start' => new Carbon($holiday['startDate']),
-                'end' => (new Carbon($holiday['endDate']))->addDay()->subSecond(1),
+                'end' => (new Carbon($holiday['endDate']))->addDay()->subSecond(),
                 'name' => $holiday['name'][0]['text'],
             ];
         }
@@ -137,11 +160,11 @@ class CalendarService
      */
     public static function getStartOfPeriod($year, $month = null)
     {
-        if (is_a($year, Carbon::class)) {
+        if ($year instanceof Carbon) {
             return $year->setDay(1)->setTime(0, 0, 0);
         }
         if (! $month) {
-            [$year, $month] = explode('-', $year);
+            [$year, $month] = explode('-', (string) $year);
         }
 
         return new Carbon($year.'-'.$month.'-01 0:00:00');
@@ -157,6 +180,7 @@ class CalendarService
     public static function addMissingDefaultDays($date, $days)
     {
         $currentDate = $date->copy()->firstOfMonth()->startOfDay();
+        /** @var array<string, mixed> $litInfo */
         $litInfo = LiturgyService::getYear($currentDate->year);
         while ($currentDate <= $date->endOfMonth()) {
             if (isset($litInfo[$currentDate->format('Y-m-d')])) {
@@ -178,12 +202,13 @@ class CalendarService
         $monthStart = $date->copy()->firstOfMonth()->startOfDay();
         $monthEnd = $date->copy()->endOfMonth()->endOfDay();
 
+        /** @var Collection<int, string> $dates */
         $dates = Service::setEagerLoads([])->with([])
             ->select(DB::raw('DISTINCT DATE(services.date) as day'))
             ->servicesOnly()
             ->inCities($user->visibleCities)
             ->inMonthByDate($date)
-            ->orderBy('day', 'ASC')
+            ->orderBy('day', 'asc')
             ->get()->pluck('day');
 
         $dates = self::addMissingDefaultDays($date->copy(), $dates);
@@ -206,11 +231,12 @@ class CalendarService
      * Initialize the day map for a calendar month.
      *
      * @param  Collection<int, string>  $dates  Dates in the current month.
-     * @return array<string, array<string, mixed>>
+     * @return array<string, array{services: array<int|string, list<mixed>>}>
      */
     protected static function initializeMonthDayMap(Collection $dates, Carbon $date): array
     {
         $days = [];
+        /** @var array{Tage?: array<string, list<array<string, mixed>>>} $liturgyYear */
         $liturgyYear = LiturgyService::getYear($date->year);
         $liturgyDays = $liturgyYear['Tage'] ?? [];
 
@@ -258,7 +284,7 @@ class CalendarService
             ->get();
 
         $services->each(function (Service $service) {
-            $service->participantText = self::buildParticipantText($service);
+            $service->setAttribute('participantText', self::buildParticipantText($service));
         });
 
         return $services;
@@ -282,17 +308,23 @@ class CalendarService
     /**
      * Attach service data to the day map keyed by visible city.
      *
-     * @param  array<string, array<string, mixed>>  $days
+     * @param  array<string, array{services: array<int|string, list<mixed>>}>  $days
      * @param  Collection<int, Service>  $services
      */
     protected static function addServicesToDays(array &$days, Collection $services, User $user): void
     {
+        /** @var Service $service */
         foreach ($services as $service) {
-            $dayKey = $service->date->format('Y-m-d');
+            $date = $service->date;
+            if ($date === null) {
+                continue;
+            }
+            $dayKey = $date->format('Y-m-d');
             if (! isset($days[$dayKey])) {
                 continue;
             }
 
+            /** @var Collection<int, int|string> $cityIds */
             $cityIds = collect([$service->city_id])
                 ->merge($service->relatedCities->pluck('id'))
                 ->unique()
@@ -307,6 +339,9 @@ class CalendarService
             $resource = (new CalendarMonthServiceResource($service))->resolve();
 
             foreach ($cityIds as $cityId) {
+                if (! is_int($cityId) && ! is_string($cityId)) {
+                    continue;
+                }
                 if (! isset($days[$dayKey]['services'][$cityId])) {
                     $days[$dayKey]['services'][$cityId] = [];
                 }
@@ -323,6 +358,7 @@ class CalendarService
      */
     protected static function addAbsencesToDays(array &$days, Collection $absences, Carbon $monthStart, Carbon $monthEnd): void
     {
+        /** @var Absence $absence */
         foreach ($absences as $absence) {
             $currentDate = $absence->from->copy()->startOfDay()->max($monthStart->copy());
             $lastDate = $absence->to->copy()->endOfDay()->min($monthEnd->copy());
@@ -331,7 +367,12 @@ class CalendarService
             while ($currentDate <= $lastDate) {
                 $dayKey = $currentDate->format('Y-m-d');
                 if (isset($days[$dayKey])) {
-                    $days[$dayKey]['absences'][] = $absenceResource;
+                    $absences = $days[$dayKey]['absences'] ?? [];
+                    if (! is_array($absences)) {
+                        $absences = [];
+                    }
+                    $absences[] = $absenceResource;
+                    $days[$dayKey]['absences'] = $absences;
                 }
                 $currentDate->addDay();
             }
@@ -348,7 +389,9 @@ class CalendarService
         $result = [];
 
         foreach ($service->participants->groupBy('pivot.category') as $category => $participants) {
-            $result[$category] = $participants->map(function ($participant) {
+            /** @var string $category */
+            $categoryKey = $category;
+            $result[$categoryKey] = $participants->map(function ($participant) {
                 return trim(implode(' ', array_filter([
                     $participant->title,
                     $participant->first_name,

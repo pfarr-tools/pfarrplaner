@@ -34,6 +34,7 @@ use App\Documents\Word\DefaultWordDocument;
 use PhpOffice\PhpWord\Exception\Exception;
 use PhpOffice\PhpWord\IOFactory;
 use PhpOffice\PhpWord\PhpWord;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 /**
  * Class AbstractWordDocumentReport
@@ -53,11 +54,15 @@ class AbstractWordDocumentReport extends AbstractReport
     /** @var DefaultWordDocument */
     protected $doc;
 
+    /** @var bool */
     protected $useDefaultDocument = false;
 
-    /** @var array */
+    /** @var array<string, mixed> */
     protected $config = [];
 
+    /**
+     * @return void
+     */
     public function __construct()
     {
         $this->wordDocument = new PhpWord;
@@ -67,15 +72,17 @@ class AbstractWordDocumentReport extends AbstractReport
     /**
      * Prepare the DefaultWordDocument
      */
-    protected function prepareWordDocument()
+    protected function prepareWordDocument(): void
     {
         $this->doc = new DefaultWordDocument($this->config);
     }
 
     /**
+     * @param  string  $filename  Name of the downloaded file.
+     *
      * @throws Exception
      */
-    public function sendToBrowser($filename)
+    public function sendToBrowser(string $filename): BinaryFileResponse
     {
         $tempFile = tempnam(sys_get_temp_dir(), $filename);
         $objWriter = IOFactory::createWriter($this->useDefaultDocument ? $this->doc->getPhpWord() : $this->wordDocument, 'Word2007');

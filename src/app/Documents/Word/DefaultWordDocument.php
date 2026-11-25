@@ -44,22 +44,28 @@ use PhpOffice\PhpWord\SimpleType\Jc;
 use PhpOffice\PhpWord\Style\Font;
 use PhpOffice\PhpWord\Style\Language;
 use PhpOffice\PhpWord\Style\Tab;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class DefaultWordDocument
 {
-    /** @var PhpWord|null */
-    protected $phpWord = null;
+    /** @var PhpWord Word document initialized by the constructor. */
+    protected PhpWord $phpWord;
 
-    /** @var Section */
-    protected $section = null;
+    /** @var Section Document section initialized by configureLayout(). */
+    protected Section $section;
 
+    /** @var array<string, mixed> */
     protected $instructionsFontStyle = ['size' => 8, 'italic' => true];
 
+    /** @var array<string, mixed> */
     protected $instructionsParagraphStyle = [];
 
+    /** @var string|null */
     protected $recipient = null;
 
     public const NORMAL = 'Standard';
+
+    public const NO_INDENT = 'Bekanntgaben ohne Einrückung';
 
     public const BLOCKQUOTE = 'Zitat';
 
@@ -71,16 +77,25 @@ class DefaultWordDocument
 
     public const BOLD_UNDERLINE = ['bold' => true, 'underline' => Font::UNDERLINE_SINGLE];
 
+    /** @var array<string, mixed> */
     protected $config = [];
 
-    public function __construct($config = [])
+    /**
+     * @param  array<string, mixed>  $config  Document configuration.
+     */
+    public function __construct(array $config = [])
     {
 
-        $this->config = array_replace_recursive($this->getBaseConfig(), $this->config, $config);
+        /** @var array<string, mixed> $mergedConfig */
+        $mergedConfig = array_replace_recursive($this->getBaseConfig(), $this->config, $config);
+        $this->config = $mergedConfig;
         Settings::setOutputEscapingEnabled(true);
         $this->phpWord = new PhpWord;
         $this->phpWord->getSettings()->setThemeFontLang(new Language(Language::DE_DE));
-        $this->configureLayout($config['layout'] ?? []);
+        $layout = $config['layout'] ?? [];
+        /** @var array<string, mixed> $layoutConfig */
+        $layoutConfig = is_array($layout) ? $layout : [];
+        $this->configureLayout($layoutConfig);
         $this->setDefaultDocumentStyles($config);
     }
 
@@ -89,14 +104,18 @@ class DefaultWordDocument
      *
      * This will expand all ['tabs'] configs to PhpWord's Tab objects.
      */
+    /**
+     * @return array<string, mixed>
+     */
     public function getBaseConfig(): array
     {
+        /** @var array{styles: array{paragraphs: array<string, array{tabs?: array<int, array{position: int, type: string}>}>}} $baseConfig */
         $baseConfig = config('documents.word.default');
         foreach ($baseConfig['styles']['paragraphs'] as $pKey => $pStyle) {
             if (isset($pStyle['tabs'])) {
                 $tabs = [];
                 foreach ($pStyle['tabs'] as $tab) {
-                    $tabs[] = new Tab($tab['type'], $tab['position']);
+                    $tabs[] = new Tab((string) $tab['type'], (int) $tab['position']);
                 }
                 $baseConfig['styles']['paragraphs'][$pKey]['tabs'] = $tabs;
             }
@@ -106,7 +125,12 @@ class DefaultWordDocument
                 if (isset($pStyle['tabs'])) {
                     $tabs = [];
                     foreach ($pStyle['tabs'] as $tab) {
-                        $tabs[] = new Tab($tab['type'], $tab['position']);
+                        if (! is_array($tab)) {
+                            continue;
+                        }
+                        $tabType = $tab['type'] ?? '';
+                        $tabPosition = $tab['position'] ?? 0;
+                        $tabs[] = new Tab(is_string($tabType) ? $tabType : '', is_int($tabPosition) ? $tabPosition : 0);
                     }
                     $baseConfig['styles']['paragraphs'][$sKey][$pKey]['tabs'] = $tabs;
                 }
@@ -116,61 +140,92 @@ class DefaultWordDocument
         return $baseConfig;
     }
 
+    /**
+     * @param  array<string, mixed>  $config  Layout configuration.
+     * @return void
+     */
     protected function configureLayout($config)
     {
         $this->section = $this->phpWord->addSection($config);
     }
 
+    /**
+     * @param  array<string, mixed>  $config  Style configuration.
+     * @return void
+     */
     protected function setDefaultDocumentStyles($config = [])
     {
-        $this->phpWord->setDefaultFontName($config['defaultFont'] ?? 'Sarabun Light');
-        $this->phpWord->setDefaultFontSize($config['defaultFontSize'] ?? 11);
+        $phpWord = $this->phpWord;
+        $fontName = $config['defaultFont'] ?? 'Sarabun Light';
+        $fontSize = $config['defaultFontSize'] ?? 11;
+        $phpWord->setDefaultFontName(is_string($fontName) ? $fontName : 'Sarabun Light');
+        $phpWord->setDefaultFontSize(is_int($fontSize) ? $fontSize : 11);
+
+        $styles = $this->config['styles'] ?? [];
+        if (! is_array($styles)) {
+            return;
+        }
+        $paragraphs = $styles['paragraphs'] ?? [];
+        $fonts = $styles['fonts'] ?? [];
+        if (! is_array($paragraphs) || ! is_array($fonts)) {
+            return;
+        }
 
         // Standard
-        $this->phpWord->setDefaultParagraphStyle($this->config['styles']['paragraphs']['default'] ?? []);
-        $this->phpWord->addFontStyle(self::NORMAL, $this->config['styles']['fonts'][self::NORMAL]);
+        $defaultParagraphStyle = $paragraphs['default'] ?? [];
+        $phpWord->setDefaultParagraphStyle(is_array($defaultParagraphStyle) ? $defaultParagraphStyle : []);
+        $normalFont = $fonts[self::NORMAL] ?? [];
+        $phpWord->addFontStyle(self::NORMAL, is_array($normalFont) ? $normalFont : []);
 
         // title styles
-        foreach ($this->config['styles']['paragraphs']['titles'] as $level => $pStyle) {
-            $this->phpWord->addTitleStyle($level, $this->config['styles']['fonts']['titles'][$level] ?? [], $pStyle);
+        $titles = $paragraphs['titles'] ?? [];
+        $titleFonts = $fonts['titles'] ?? [];
+        foreach (is_array($titles) ? $titles : [] as $level => $pStyle) {
+            $titleFont = is_array($titleFonts) ? ($titleFonts[$level] ?? []) : [];
+            $phpWord->addTitleStyle((int) $level, is_array($titleFont) ? $titleFont : [], is_array($pStyle) ? $pStyle : []);
         }
 
-        foreach ($this->config['styles']['paragraphs']['custom'] as $pKey => $pStyle) {
-            $this->phpWord->addParagraphStyle($pKey, $pStyle);
+        $customParagraphs = $paragraphs['custom'] ?? [];
+        foreach (is_array($customParagraphs) ? $customParagraphs : [] as $pKey => $pStyle) {
+            $phpWord->addParagraphStyle((string) $pKey, is_array($pStyle) ? $pStyle : []);
         }
 
-        foreach ($this->config['styles']['fonts']['custom'] as $fKey => $fStyle) {
-            $this->phpWord->addFontStyle($fKey, $fStyle);
+        $customFonts = $fonts['custom'] ?? [];
+        foreach (is_array($customFonts) ? $customFonts : [] as $fKey => $fStyle) {
+            $phpWord->addFontStyle((string) $fKey, is_array($fStyle) ? $fStyle : []);
         }
 
     }
 
     // SETTERS
 
-    public function getPhpWord(): ?PhpWord
+    public function getPhpWord(): PhpWord
     {
         return $this->phpWord;
     }
 
-    public function setPhpWord(?PhpWord $phpWord): void
+    public function setPhpWord(PhpWord $phpWord): void
     {
         $this->phpWord = $phpWord;
     }
 
-    public function getSection(): ?Section
+    public function getSection(): Section
     {
         return $this->section;
     }
 
-    public function setSection(?Section $section): void
+    public function setSection(Section $section): void
     {
         $this->section = $section;
     }
 
     /**
-     * @param  string  $template
-     * @param  int  $emptyParagraphsAfter
-     * @param  null  $existingTextRun
+     * Render a styled paragraph block.
+     *
+     * @param  string  $template  Paragraph style name.
+     * @param  array<int, mixed>  $blocks  Paragraph text blocks.
+     * @param  int  $emptyParagraphsAfter  Number of empty paragraphs after this block.
+     * @param  TextRun|null  $existingTextRun  Existing text run to extend.
      * @return TextRun|null
      */
     public function renderParagraph(
@@ -181,9 +236,10 @@ class DefaultWordDocument
     ) {
         $textRun = $existingTextRun ?: $this->section->addTextRun($template);
         foreach ($blocks as $block) {
-            if ($block[0] !== null) {
+            $text = is_array($block) ? ($block[0] ?? null) : null;
+            if ($text !== null) {
                 $ct = 0;
-                foreach (explode("\n", $block[0]) as $item) {
+                foreach (explode("\n", is_string($text) ? $text : '') as $item) {
                     if ($ct > 0) {
                         $textRun->addTextBreak();
                     }
@@ -205,10 +261,15 @@ class DefaultWordDocument
     /**
      * @throws Exception
      */
+    /**
+     * @param  string  $filename  Download file name.
+     * @return BinaryFileResponse
+     */
     public function sendToBrowser($filename)
     {
         $tempFile = tempnam(sys_get_temp_dir(), $filename);
-        $objWriter = IOFactory::createWriter($this->phpWord, 'Word2007');
+        $phpWord = $this->phpWord;
+        $objWriter = IOFactory::createWriter($phpWord, 'Word2007');
         $objWriter->save($tempFile);
 
         return response()->download($tempFile, $filename, ['Content-Type' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'])
@@ -247,9 +308,15 @@ class DefaultWordDocument
      * @param  array  $fontOption  Font options
      * @param  false  $breakAfter  Text break at the end?
      */
+    /**
+     * @param  string  $text  Text to render.
+     * @param  array<string, mixed>  $fontOption  Font options.
+     * @param  bool  $breakAfter  Whether a break follows the text.
+     * @return void
+     */
     public function renderNormalText($text, $fontOption = [], $breakAfter = false)
     {
-        return $this->renderText($text, self::NORMAL, $fontOption, $breakAfter);
+        $this->renderText($text, self::NORMAL, $fontOption, $breakAfter);
     }
 
     /**
@@ -259,6 +326,13 @@ class DefaultWordDocument
      * @param  array|string  $paragraphOption  Font options
      * @param  array  $fontOption  Font options
      * @param  false  $breakAfter  Text break at the end?
+     */
+    /**
+     * @param  string  $text  Text to render.
+     * @param  array<string, mixed>|string  $paragraphOption  Paragraph style.
+     * @param  array<string, mixed>  $fontOption  Font options.
+     * @param  bool  $breakAfter  Whether a break follows the text.
+     * @return void
      */
     public function renderText($text, $paragraphOption = [], $fontOption = [], $breakAfter = false)
     {
@@ -280,7 +354,7 @@ class DefaultWordDocument
                 preg_match('/\[(.*)?]/', $paragraph, $matches);
                 $keyWord = '';
                 if (count($matches)) {
-                    $keyWord = $matches[1];
+                    $keyWord = $matches[1] ?? '';
                     $paragraph = trim(str_replace('['.$keyWord.']', '', $paragraph));
                     $paragraph = strtr($paragraph, ["\r" => '', "\n" => '', '>>' => "\t"]);
                 }
@@ -306,6 +380,11 @@ class DefaultWordDocument
         }
     }
 
+    /**
+     * @param  string  $text  Text containing line separators.
+     * @param  array<string, mixed>  $fontOption  Font options.
+     * @return void
+     */
     protected function renderWithLineBreaks(TextRun $textRun, $text, $fontOption)
     {
         $lines = explode("\n", str_replace('|', "\n", $text));
@@ -349,12 +428,14 @@ class DefaultWordDocument
         return $text;
     }
 
-    public function renderLiteral(string $text)
+    /**
+     * @param  string|array<int, string>  $text  Literal text or paragraphs.
+     * @return void
+     */
+    public function renderLiteral(string|array $text)
     {
-        if (! is_array($text)) {
-            $text = [$text];
-        }
-        foreach ($text as $paragraph) {
+        $paragraphs = is_array($text) ? $text : [$text];
+        foreach ($paragraphs as $paragraph) {
             switch (substr($paragraph, 0, 1)) {
                 case '*':
                     $format = self::BOLD;
@@ -380,6 +461,10 @@ class DefaultWordDocument
         }
     }
 
+    /**
+     * @param  string  $style  Paragraph style name.
+     * @return array<string, mixed>|null
+     */
     public function getParagraphStyle($style)
     {
         switch ($style) {
@@ -398,26 +483,38 @@ class DefaultWordDocument
                     'spaceAfter' => 0,
                 ];
         }
+
+        return null;
     }
 
     /**
      * Render the title for a service-related document in something resembling "Heading 1"
      */
+    /**
+     * @return void
+     */
     public function renderServiceTitleHeading(Service $service)
     {
-        $run = new TextRun($this->config['styles']['paragraphs']['titles'][1]);
-        $run->addText($service->titleText(false), $this->config['styles']['fonts']['titles'][1]);
+        $styles = $this->config['styles'] ?? [];
+        $paragraphStyles = is_array($styles) ? ($styles['paragraphs'] ?? []) : [];
+        $fontStyles = is_array($styles) ? ($styles['fonts'] ?? []) : [];
+        $titleParagraphs = is_array($paragraphStyles) ? ($paragraphStyles['titles'] ?? []) : [];
+        $titleFonts = is_array($fontStyles) ? ($fontStyles['titles'] ?? []) : [];
+        $titleParagraph = is_array($titleParagraphs) ? ($titleParagraphs[1] ?? []) : [];
+        $titleFont = is_array($titleFonts) ? ($titleFonts[1] ?? []) : [];
+        $run = new TextRun(is_array($titleParagraph) ? $titleParagraph : []);
+        $run->addText($service->titleText(false), is_array($titleFont) ? $titleFont : []);
         $run->addTextBreak();
         $run->addText(
-            $service->date->setTimeZone('Europe/Berlin')->isoFormat('DD.MM.YYYY, HH:mm').' Uhr'.', '
+            $service->trueDate()->setTimeZone('Europe/Berlin')->isoFormat('DD.MM.YYYY, HH:mm').' Uhr'.', '
             .$service->locationText(),
-            $this->config['styles']['fonts']['titles'][1]
+            is_array($titleFont) ? $titleFont : []
         );
         $this->getSection()->addTitle($run, 0);
     }
 
     /**
-     * @return null
+     * @return string|null
      */
     public function getRecipient()
     {
@@ -432,11 +529,17 @@ class DefaultWordDocument
         $this->recipient = $recipient;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getConfig(): array
     {
         return $this->config;
     }
 
+    /**
+     * @param  array<string, mixed>  $config  Document configuration.
+     */
     public function setConfig(array $config): void
     {
         $this->config = $config;

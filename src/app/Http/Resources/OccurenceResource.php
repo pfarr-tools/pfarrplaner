@@ -30,11 +30,24 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Service;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * Serialize an occurence for calendar views.
+ *
+ * @property-read Service $event Event behind the occurence.
+ * @property-read Carbon $start Start of the occurence.
+ * @property-read Carbon $end End of the occurence.
+ * @property-read int $id Identifier of the occurence.
+ */
 class OccurenceResource extends JsonResource
 {
+    /**
+     * @return string CSS color value.
+     */
     protected function getBackgroundColor()
     {
         if ($this->event->hidden) {
@@ -61,6 +74,9 @@ class OccurenceResource extends JsonResource
         return 'lightblue';
     }
 
+    /**
+     * @return string CSS color value.
+     */
     protected function getColor()
     {
         if (count($this->event->funerals)) {
@@ -70,6 +86,9 @@ class OccurenceResource extends JsonResource
         return 'black';
     }
 
+    /**
+     * @return string CSS color value.
+     */
     protected function getBorderColor()
     {
         if (count($this->event->funerals) && $this->event->isMine) {
@@ -86,7 +105,6 @@ class OccurenceResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        /** @var Occurence $this */
         return [
             'id' => $this->event->slug,
             'title' => $this->event->titleText(false),

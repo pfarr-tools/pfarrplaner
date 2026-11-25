@@ -42,7 +42,6 @@ use App\Services\FileNameService;
 use App\Services\MinistryService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -77,7 +76,7 @@ class ReplaceableServicesReport extends AbstractPDFDocumentReport
      */
     public function setup()
     {
-        $users = User::visibleFor(Auth::user())->get();
+        $users = User::visibleFor($this->authenticatedUser())->get();
 
         return Inertia::render('Report/ReplaceableServices/Setup', compact('users'));
     }
@@ -94,8 +93,8 @@ class ReplaceableServicesReport extends AbstractPDFDocumentReport
                 'end' => 'required|date',
             ]
         );
-
-        $user = User::find($data['person']);
+        /** @var array{person: int|string, start: string, end: string} $data */
+        $user = User::findOrFail((int) $data['person']);
 
         $services = Service::with(['location'])
             ->between(Carbon::parse($data['start']), Carbon::parse($data['end']))
@@ -128,10 +127,10 @@ class ReplaceableServicesReport extends AbstractPDFDocumentReport
 
         return $this->sendToBrowser(
             FileNameService::make(
-                static::FILE_TITLE,
+                self::FILE_TITLE,
                 'pdf',
                 static::FILE_SIGNATURE,
-                [$request->get('start'), $request->get('end')],
+                [$data['start'], $data['end']],
                 false,
                 $user
             ),
@@ -148,7 +147,12 @@ class ReplaceableServicesReport extends AbstractPDFDocumentReport
         );
     }
 
-    public function wizard(Request $request)
+    /**
+     * Show the wizard for replacing services of a selected person.
+     *
+     * @return Response The Inertia response containing the wizard data.
+     */
+    public function wizard(Request $request): Response
     {
         $data = $request->validate(
             [
@@ -157,10 +161,10 @@ class ReplaceableServicesReport extends AbstractPDFDocumentReport
                 'end' => 'required|date',
             ]
         );
-
-        $user = User::find($data['person']);
+        /** @var array{person: int|string, start: string, end: string} $data */
+        $user = User::findOrFail((int) $data['person']);
         $people = ListedPerson::select(['id', 'name'])
-            ->visibleFor(Auth::user())
+            ->visibleFor($this->authenticatedUser())
             ->get();
         $teams = Team::with('users')->get();
 

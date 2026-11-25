@@ -31,12 +31,14 @@
 namespace App\Http\Controllers\Extranet;
 
 use App\Http\Controllers\Controller;
+use App\Models\People\User;
 use App\Models\Sermon;
 use App\Models\Service;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
+/** Controller for public sermon pages. */
 class SermonController extends Controller
 {
     /**
@@ -64,25 +66,37 @@ class SermonController extends Controller
                 ];
             }
         }
-        $sermon->events = $services;
-        $sermon->isPrivate = $isPrivate;
+        // Diese Properties werden vom Modell zur Laufzeit dynamisch ergänzt.
+        /** @var Sermon&object{events: array<int, array<string, mixed>>, isPrivate: bool} $sermon */
+        $sermon->setAttribute('events', $services);
+        $sermon->setAttribute('isPrivate', $isPrivate);
 
         return $sermon;
     }
 
+    /**
+     * Headers.
+     *
+     * @return mixed
+     */
     public function headers()
     {
         $user = Auth::user();
+        abort_unless($user instanceof User, 401);
 
         $services = Service::with('sermon')->userParticipates($user, 'P')->whereHas('sermon')->orderedDesc()->get();
         $sermons = [];
         foreach ($services as $service) {
             if (! isset($sermons[$service->sermon_id])) {
+                $sermon = $service->sermon;
+                if ($sermon === null || $service->date === null) {
+                    continue;
+                }
                 $sermons[$service->sermon_id] = [
-                    'title' => $service->sermon->fullTitle,
+                    'title' => $sermon->fullTitle,
                     'date' => $service->date->format('c'),
-                    'id' => $service->sermon->id,
-                    'slug' => $service->sermon->slug,
+                    'id' => $sermon->id,
+                    'slug' => $sermon->slug,
                     'location' => $service->locationText(),
                     'time' => $service->timeText(),
                 ];
@@ -92,9 +106,15 @@ class SermonController extends Controller
         return response()->json(array_values($sermons));
     }
 
+    /**
+     * Latest.
+     *
+     * @return mixed
+     */
     public function latest(Request $request)
     {
         $user = Auth::user();
+        abort_unless($user instanceof User, 401);
         $events = [];
         $includeText = $request->get('includeText', false);
 
@@ -124,7 +144,13 @@ class SermonController extends Controller
         return response()->json(compact('user', 'sermons'));
     }
 
-    public function details($sermonId)
+    /**
+     * Details.
+     *
+     * @param  int|string  $sermonId  Numerische ID oder Slug der Predigt.
+     * @return mixed
+     */
+    public function details(int|string $sermonId)
     {
         if (is_numeric($sermonId)) {
             $sermon = Sermon::findOrFail($sermonId);

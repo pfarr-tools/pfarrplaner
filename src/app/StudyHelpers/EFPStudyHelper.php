@@ -34,8 +34,12 @@ class EFPStudyHelper extends AbstractStudyHelper
 {
     public $title = 'Exegese für die Predigt';
 
+    /** @var array<string, array<string, string>> */
     protected $records = [];
 
+    /**
+     * @param  array<string, mixed>  $data  Study helper input data.\n     * @return array<string, array<string, string>>
+     */
     public function read(array $data): array
     {
         if ('' == ($content = $this->getContent('https://www.die-bibel.de/efp'))) {
@@ -46,18 +50,25 @@ class EFPStudyHelper extends AbstractStudyHelper
             '~</?\s*ibep-[a-z0-9-]+(?:\s+[^<>]*?)?\s*/?>~i',
             '',
             $content
-        );
+        ) ?? $content;
         $content = preg_replace(
             '~<svg\b[^>]*>.*?</svg>~is',
             '',
             $content
-        );
+        ) ?? $content;
 
         $table = preg_match('/<table(.*)<\/table>/m', $content, $matches);
+        if ($table !== 1 || ! isset($matches[0])) {
+            return [];
+        }
+        $doc = new \DOMDocument;
         try {
-            $doc = new \DOMDocument;
-            $doc->loadHTML('$matches[0]', LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+            $loaded = $doc->loadHTML($matches[0], LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
         } catch (\Throwable $th) {
+            return [];
+        }
+        if (! $loaded) {
+            return [];
         }
 
         $records = [];
@@ -67,19 +78,28 @@ class EFPStudyHelper extends AbstractStudyHelper
             foreach ($tr->getElementsByTagName('td') as $td) {
                 switch ($colIdx) {
                     case 0:
-                        $record['url'] = 'https://www.die-bibel.de'.$td->childNodes[0]->getAttribute('href');
+                        $href = $td->firstChild?->attributes?->getNamedItem('href')?->nodeValue;
+                        if (is_string($href)) {
+                            $record['url'] = 'https://www.die-bibel.de'.$href;
+                        }
                         break;
                     case 1:
-                        $record['date'] = $td->nodeValue;
+                        $record['date'] = (string) $td->nodeValue;
                         break;
                     case 2:
-                        $record['ref'] = $td->nodeValue;
+                        $record['ref'] = (string) $td->nodeValue;
                         break;
                 }
                 $colIdx++;
             }
-            if ($record['date']) {
-                $records[$record['date']] = ['[Exegese für die Predigt] '.$record['date'].': '.$record['ref'] => $record['url']];
+            if (isset($record['date'], $record['ref'], $record['url'])) {
+                /** @var string $date Datum des Eintrags. */
+                $date = $record['date'];
+                /** @var string $reference Bibelreferenz des Eintrags. */
+                $reference = $record['ref'];
+                /** @var non-falsy-string $url URL des Eintrags. */
+                $url = $record['url'];
+                $records[$date] = ['[Exegese für die Predigt] '.$date.': '.$reference => $url];
             }
         }
         $this->records = $records;
@@ -87,9 +107,16 @@ class EFPStudyHelper extends AbstractStudyHelper
         return $records;
     }
 
+    /**
+     * @param  array<string, mixed>  $data  Input data.\n     * @return array<string, string>
+     */
     public function getLinks(array $data): array
     {
-        $data['links'] = array_merge($data['links'] ?? [], $this->records[$data['date']] ?? []);
+        /** @var array<string, string> $links Bereits vorhandene Links. */
+        $links = $data['links'] ?? [];
+        /** @var string $date Angefragtes Datum. */
+        $date = $data['date'];
+        $data['links'] = array_merge($links, $this->records[$date] ?? []);
 
         return $data;
     }

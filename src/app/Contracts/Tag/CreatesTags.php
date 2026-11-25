@@ -34,6 +34,6 @@ use App\Models\People\User;
 use App\Models\Tag;
 
 /**
- * @method Tag create(User $user, array $input)
+ * @method Tag create(User $user, array<string, mixed> $input)
  */
 interface CreatesTags {}

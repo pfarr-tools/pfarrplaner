@@ -32,9 +32,17 @@ namespace App\Traits;
 
 use Auth;
 
+/**
+ * Exposes the current user's permissions on a model as boolean attributes.
+ */
 trait IncludesPermissionAttributes
 {
-    public function getIsShowableAttribute()
+    /**
+     * Determines whether the authenticated user may show this model.
+     *
+     * @return bool True when the user is allowed to show the model.
+     */
+    public function getIsShowableAttribute(): bool
     {
         if (Auth::guest()) {
             return false;
@@ -43,7 +51,12 @@ trait IncludesPermissionAttributes
         return Auth::user()->can('show', $this);
     }
 
-    public function getIsEditableAttribute()
+    /**
+     * Determines whether the authenticated user may edit this model.
+     *
+     * @return bool True when the user is allowed to update the model.
+     */
+    public function getIsEditableAttribute(): bool
     {
         if (Auth::guest()) {
             return false;
@@ -52,7 +65,12 @@ trait IncludesPermissionAttributes
         return Auth::user()->can('update', $this);
     }
 
-    public function getIsDeletableAttribute()
+    /**
+     * Determines whether the authenticated user may delete this model.
+     *
+     * @return bool True when the user is allowed to delete the model.
+     */
+    public function getIsDeletableAttribute(): bool
     {
         if (Auth::guest()) {
             return false;

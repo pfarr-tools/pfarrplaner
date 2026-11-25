@@ -50,15 +50,16 @@ class PsalmPolicy
 
     /**
      * Determine whether the user can view the index of all psalms.
-     *
-     * @return mixed
      */
-    public function viewAny(User $user)
+    public function viewAny(User $user): bool
     {
         return true;
     }
 
-    public function index(User $user)
+    /**
+     * Determine whether the user can access the psalm index.
+     */
+    public function index(User $user): bool
     {
         return $this->viewAny($user);
     }

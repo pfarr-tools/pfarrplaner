@@ -74,6 +74,7 @@ class SeatingRow extends AbstractModel
 
     protected $fillable = ['seating_section_id', 'title', 'seats', 'divides_into', 'spacing', 'split', 'color'];
 
+    /** @var array<int, Booking> */
     public $bookings = [];
 
     public static function singularKey(): string
@@ -86,6 +87,10 @@ class SeatingRow extends AbstractModel
         return 'seatingRows';
     }
 
+    /**
+     * @param  string  $page  Page name.
+     *                        * @return string
+     */
     public static function getVuePath(string $page)
     {
         return match ($page) {
@@ -94,6 +99,9 @@ class SeatingRow extends AbstractModel
         };
     }
 
+    /**
+     * @return void
+     */
     protected static function boot()
     {
         parent::boot();
@@ -107,6 +115,9 @@ class SeatingRow extends AbstractModel
         return $this->title;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function fillDefaults(): array
     {
         return [
@@ -135,7 +146,7 @@ class SeatingRow extends AbstractModel
      */
     public function getCSS()
     {
-        $color = $this->color ?: $this->seatingSection->color ?: '';
+        $color = $this->color ?: $this->seatingSection?->color ?: '';
         if ($color != '') {
             $color = 'background-color: '.$color;
         }

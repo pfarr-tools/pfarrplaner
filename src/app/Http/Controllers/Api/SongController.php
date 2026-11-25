@@ -30,12 +30,16 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Contracts\Song\CreatesSongs;
+use App\Contracts\Song\UpdatesSongs;
 use App\Liturgy\Music\ABCMusic;
 use App\Models\Liturgy\Psalm;
 use App\Models\Liturgy\Song;
 use App\Models\Liturgy\SongReference;
+use App\Models\People\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 
 /**
  * Handles CRUD requests for Song records.
@@ -59,6 +63,7 @@ class SongController extends AbstractApiCRUDController
      */
     public function index(Request $request)
     {
+        /** @var Collection<int, mixed> $listed */
         $listed = SongReference::orderBy('code')->orderBy('reference')->get();
         $songsWithoutSongBook = Song::whereDoesntHave('songbooks')->orderBy('title')->get();
         foreach ($songsWithoutSongBook as $song) {
@@ -165,29 +170,43 @@ class SongController extends AbstractApiCRUDController
      */
     public function store(Request $request)
     {
+        /** @var array<string, mixed> $data */
         $data = $this->validateRequest($request)['song'];
+        /** @var User $user */
+        $user = $request->user();
+        /** @var CreatesSongs $creator */
         $creator = app(Song::getContractName('create'));
-        $song = $creator->create($request->user(), $data);
+        $song = $creator->create($user, $data);
 
         return response()->json($song);
     }
 
     /**
+     * @param  int|string|null  $modelId
      * @return JsonResponse
      */
     public function update(Request $request, $modelId)
     {
         /** @var Song $song */
         $song = $this->getSingleModel($request, $modelId);
+        /** @var array<string, mixed> $data */
         $data = $this->validateRequest($request)['song'];
+        /** @var User $user */
+        $user = $request->user();
+        /** @var UpdatesSongs $updater */
         $updater = $song->getContractedAction('update');
-        $song = $updater->update($request->user(), $song, $data);
+        /** @var Song $song */
+        $song = $updater->update($user, $song, $data);
         $song->refresh();
         $song->load(Song::$relationsForEditor);
 
         $id = $request->get('ref');
         if ($id < 1000000) {
-            $songReference = SongReference::where('song_id', $song->id)->where('songbook_id', $request->get('songbook')['id'])->first();
+            /** @var array{id: int|string} $songbook */
+            $songbook = $request->get('songbook');
+            $songReference = SongReference::where('song_id', $song->id)
+                ->where('songbook_id', $songbook['id'])
+                ->firstOrFail();
             $listEntry = [
                 'id' => $songReference->id,
                 'name' => ($songReference->songbook->code ?: $songReference->songbook->name).' '.$songReference->reference.' '.$song->title,
@@ -204,11 +223,12 @@ class SongController extends AbstractApiCRUDController
     }
 
     /**
-     * @return array
+     * @return array<string, mixed>
      */
     protected function validateRequest(Request $request)
     {
-        return $request->validate(
+        /** @var array<string, mixed> $validated */
+        $validated = $request->validate(
             [
                 'song.title' => 'required|string',
                 'song.refrain' => 'nullable|string',
@@ -230,8 +250,17 @@ class SongController extends AbstractApiCRUDController
                 'song.songbooks.*.pivot.color' => 'nullable|string',
             ]
         );
+
+        return $validated;
     }
 
+    /**
+     * Music.
+     *
+     * @param  string|array<int, string>  $verses
+     * @param  int|null  $lineNumber
+     * @return mixed
+     */
     public function music(Song $song, $verses = '', $lineNumber = null)
     {
         return response()->file(ABCMusic::renderToFile($song, $verses, ABCMusic::make($song, $verses, $lineNumber)));

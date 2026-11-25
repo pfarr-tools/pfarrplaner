@@ -39,6 +39,7 @@ namespace App\CalendarLinks;
 
 use App\Models\People\User;
 use App\Models\Service;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -65,6 +66,10 @@ class PersonalServicesCalendarLink extends AbstractCalendarLink
         return route('ical.link', ['key' => $this->getKey(), 'includeHidden' => request()->get('includeHidden', 0)]);
     }
 
+    /**
+     * @param  Request  $request  Incoming request.
+     * @return void
+     */
     public function setDataFromRequest(Request $request)
     {
         if (Auth::user() !== null) {
@@ -73,7 +78,9 @@ class PersonalServicesCalendarLink extends AbstractCalendarLink
     }
 
     /**
-     * @return array
+     * Return the services the given user participates in.
+     *
+     * @return Collection<int, Service>
      */
     public function getRenderData(Request $request, User $user)
     {

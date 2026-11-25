@@ -64,7 +64,9 @@ class GenerateDatabaseKey extends Command
         $key = $this->generateRandomKey();
 
         if ($this->option('show')) {
-            return $this->line('<comment>'.$key.'</comment>');
+            $this->line('<comment>'.$key.'</comment>');
+
+            return;
         }
 
         // Next, we will replace the application key in the environment file so it is
@@ -74,7 +76,7 @@ class GenerateDatabaseKey extends Command
             return;
         }
 
-        $this->laravel['config']['database.key'] = $key;
+        config()->set('database.key', $key);
 
         $this->info('Database encryption key set successfully.');
     }
@@ -86,9 +88,10 @@ class GenerateDatabaseKey extends Command
      */
     protected function generateRandomKey()
     {
-        return 'base64:'.base64_encode(
-            Encrypter::generateKey($this->laravel['config']['database.cipher'])
-        );
+        /** @var string $cipher Konfiguriertes Verschlüsselungsverfahren. */
+        $cipher = config('database.cipher');
+
+        return 'base64:'.base64_encode(Encrypter::generateKey($cipher));
     }
 
     /**
@@ -99,7 +102,8 @@ class GenerateDatabaseKey extends Command
      */
     protected function setKeyInEnvironmentFile($key)
     {
-        $currentKey = $this->laravel['config']['database.key'];
+        /** @var string $currentKey Aktuell konfigurierter Datenbankschlüssel. */
+        $currentKey = config('database.key');
 
         if (strlen($currentKey) !== 0 && (! $this->confirmToProceed())) {
             return false;
@@ -110,12 +114,17 @@ class GenerateDatabaseKey extends Command
         return true;
     }
 
-    protected function environmentFileWithExists()
+    /**
+     * Check whether the environment file already contains a database key entry.
+     */
+    protected function environmentFileWithExists(): int|false
     {
-        return preg_match(
-            $this->keyReplacementPattern(),
-            file_get_contents($this->laravel->environmentFilePath())
-        );
+        $contents = file_get_contents($this->laravel->environmentFilePath());
+        if ($contents === false) {
+            return false;
+        }
+
+        return preg_match($this->keyReplacementPattern(), $contents);
     }
 
     /**
@@ -126,17 +135,23 @@ class GenerateDatabaseKey extends Command
      */
     protected function writeNewEnvironmentFileWith($key)
     {
+        $environmentFilePath = $this->laravel->environmentFilePath();
+        $contents = file_get_contents($environmentFilePath);
+        if ($contents === false) {
+            $contents = '';
+        }
+
         if ($this->environmentFileWithExists()) {
-            file_put_contents($this->laravel->environmentFilePath(), preg_replace(
+            file_put_contents($environmentFilePath, preg_replace(
                 $this->keyReplacementPattern(),
                 'DATABASE_KEY='.$key,
-                file_get_contents($this->laravel->environmentFilePath())
+                $contents
             ));
 
             return;
         }
-        file_put_contents($this->laravel->environmentFilePath(),
-            file_get_contents($this->laravel->environmentFilePath()).PHP_EOL.
+        file_put_contents($environmentFilePath,
+            $contents.PHP_EOL.
             '# You should backup this key in a safe secure place'.PHP_EOL.
             'DATABASE_KEY='.$key.PHP_EOL
         );
@@ -149,7 +164,9 @@ class GenerateDatabaseKey extends Command
      */
     protected function keyReplacementPattern()
     {
-        $escaped = preg_quote('='.$this->laravel['config']['database.key'], '/');
+        /** @var string $currentKey Aktuell konfigurierter Datenbankschlüssel. */
+        $currentKey = config('database.key');
+        $escaped = preg_quote('='.$currentKey, '/');
 
         return "/^DATABASE_KEY{$escaped}/m";
     }

@@ -31,6 +31,7 @@
 namespace App\Traits;
 
 use App\Models\Attachment;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Facades\Storage;
 
 /**
@@ -41,12 +42,18 @@ trait HasAttachmentsTrait
     public static function bootHasAttachmentsTrait(): void
     {
         static::forceDeleted(function ($model) {
+            if (! $model instanceof self) {
+                return;
+            }
             $model->purgeAttachments();
         });
     }
 
     /**
      * @return mixed
+     */
+    /**
+     * @return MorphMany<Attachment, $this>
      */
     public function attachments()
     {

@@ -30,7 +30,10 @@
 
 namespace App\Models;
 
+use App\Liturgy\ItemHelpers\PsalmItemHelper;
+use App\Liturgy\ItemHelpers\SongItemHelper;
 use App\Models\Calendar\Occurence;
+use App\Models\Liturgy\Item;
 use App\Models\Places\City;
 use App\Models\Rites\Baptism;
 use App\Models\Rites\Funeral;
@@ -38,6 +41,7 @@ use App\Models\Rites\Wedding;
 use App\Models\Scopes\ServicesOnlyScope;
 use App\Services\NameService;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
@@ -53,33 +57,39 @@ class Announcements
 
     protected City $city;
 
-    /** @var Collection<array-key, mixed> */
+    /** @var Collection<array-key, Collection<int, Occurence>> */
     protected $events;
 
-    /** @var Collection<array-key, mixed> */
+    /** @var Collection<int, Occurence> */
     protected $featuredEvents;
 
     /** @var Collection<array-key, mixed> */
     protected $texts;
 
-    /** @var Collection<array-key, mixed> */
+    /** @var Collection<array-key, Collection<int, Baptism>> */
     protected $baptisms;
 
-    /** @var Collection<array-key, mixed> */
+    /** @var EloquentCollection<int, Funeral> */
     protected $funerals;
 
-    /** @var Collection<array-key, mixed> */
+    /** @var Collection<array-key, Collection<int, Wedding>> */
     protected $weddings;
 
     /** @var bool Use tabs \t in output? */
     protected bool $useTabs = false;
 
+    /** @var string */
     protected $eventListKeyFormat = 'dddd, D. MMMM';
 
+    /**
+     * @param  City|array<int, int|City>|int  $city  Cities included in the announcements.
+     * @param  bool  $excludeRegularWeekly  Whether weekly recurring services are excluded.
+     * @param  string  $eventListKeyFormat  Date format used as the event group key.
+     */
     public function __construct(Service $service, $city, $excludeRegularWeekly = false, $eventListKeyFormat = 'dddd, D. MMMM')
     {
         $this->service = $service;
-        if (is_a($city, City::class)) {
+        if ($city instanceof City) {
             $city = [$city->id];
         } elseif (! is_array($city)) {
             $city = [$city];
@@ -87,15 +97,17 @@ class Announcements
         $city = City::whereIn('id', $city)->get();
         $this->eventListKeyFormat = $eventListKeyFormat;
 
-        $lastWeek = Carbon::createFromTimeString($service->date->format('Y-m-d').' 0:00:00 last Sunday');
+        /** @var Carbon $serviceDate Service date provided by the datetime cast. */
+        $serviceDate = $service->date;
+        $lastWeek = Carbon::createFromTimeString($serviceDate->format('Y-m-d').' 0:00:00 last Sunday');
         $nextWeek = $lastWeek->copy()->addWeeks(2)->setTime(
             23,
             59,
             59
         );
 
-        $this->events = Occurence::with('event')
-            ->between($service->date->copy()->addHour(2), $nextWeek)
+        $events = Occurence::with('event')
+            ->between($serviceDate->copy()->addHours(2), $nextWeek)
             ->whereHas('service', function ($query) use ($service, $city, $excludeRegularWeekly) {
                 $query->withoutGlobalScope(ServicesOnlyScope::class);
                 $query->where('id', '!=', $service->id);
@@ -112,7 +124,7 @@ class Announcements
             ->get();
 
         // expand multi-full-day events to each of the days
-        $this->events = static::expandMultiDayEvents($this->events)->groupBy(function ($event) {
+        $this->events = static::expandMultiDayEvents($events)->groupBy(function ($event) {
             return $event->start->setTimezone('Europe/Berlin')->isoFormat($this->eventListKeyFormat);
         });
 
@@ -120,11 +132,11 @@ class Announcements
             ->whereHas('service', function ($query) use ($service, $city) {
                 $query->inCities($city)->displayable($service->date);
             })
-            ->adRunningAt('bekanntgaben', $service->date)
+            ->adRunningAt('bekanntgaben', $serviceDate)
             ->orderBy('start')
             ->get();
 
-        $this->funerals = Funeral::where('announcement', $service->date->format('Y-m-d'))
+        $this->funerals = Funeral::where('announcement', $serviceDate->format('Y-m-d'))
             ->whereHas(
                 'service',
                 function ($query) use ($service, $city) {
@@ -134,56 +146,83 @@ class Announcements
             )
             ->get();
 
-        $this->weddings = Wedding::with('service')
+        /** @var Collection<array-key, Collection<int, Wedding>> $weddings Weddings grouped by service. */
+        $weddings = Wedding::with('service')
             ->whereHas(
                 'service',
-                function ($query) use ($service, $nextWeek, $city) {
-                    $query->between($service->date, $nextWeek)
+                function ($query) use ($serviceDate, $nextWeek, $city) {
+                    $query->between($serviceDate, $nextWeek)
                         ->inCities($city)
-                        ->displayable($service->date)
+                        ->displayable($serviceDate)
                         ->ordered();
                 }
             )->get()
-            ->groupBy(function ($rite) use ($service) {
-                $day = ($rite->service->date->format('Ymd') == $service->date->format(
+            ->groupBy(function ($rite) use ($serviceDate) {
+                /** @var Service $riteService Service relation of the rite. */
+                $riteService = $rite->service;
+                /** @var Carbon $riteDate Service date provided by the datetime cast. */
+                $riteDate = $riteService->date;
+                $day = ($riteDate->format('Ymd') == $serviceDate->format(
                     'Ymd'
-                )) ? 'heute' : 'am '.$rite->service->date->isoFormat('dddd, DD. MMMM,');
+                )) ? 'heute' : 'am '.$riteDate->isoFormat('dddd, DD. MMMM,');
 
-                return 'Im Gottesdienst '.$day.' um '.$rite->service->timeText(
-                ).' in '.$rite->service->city->name;
+                return 'Im Gottesdienst '.$day.' um '.$riteService->timeText(
+                ).' in '.$riteService->city?->name;
             });
+        $this->weddings = $weddings;
 
-        $this->baptisms = Baptism::with('service')
+        /** @var Collection<array-key, Collection<int, Baptism>> $baptisms Baptisms grouped by service. */
+        $baptisms = Baptism::with('service')
             ->whereHas(
                 'service',
-                function ($query) use ($service, $nextWeek, $city) {
-                    $query->between($service->date, $nextWeek)
+                function ($query) use ($serviceDate, $nextWeek, $city) {
+                    $query->between($serviceDate, $nextWeek)
                         ->inCities($city)
-                        ->displayable($service->date)
+                        ->displayable($serviceDate)
                         ->ordered();
                 }
             )->get()
             ->reject(function ($rite) use ($service) {
-                return $rite->service->id == $service->id;
-            })
-            ->groupBy(function ($rite) use ($service) {
-                $day = ($rite->service->date->format('Ymd') == $service->date->format(
-                    'Ymd'
-                )) ? 'heute' : 'am '.$rite->service->date->isoFormat('dddd, DD. MMMM,');
+                /** @var Service $riteService Service relation of the rite. */
+                $riteService = $rite->service;
 
-                return 'Im Gottesdienst '.$day.' um '.$rite->service->timeText(
-                ).' in '.$rite->service->city->name;
+                return $riteService->id == $service->id;
+            })
+            ->groupBy(function ($rite) use ($serviceDate) {
+                /** @var Service $riteService Service relation of the rite. */
+                $riteService = $rite->service;
+                /** @var Carbon $riteDate Service date provided by the datetime cast. */
+                $riteDate = $riteService->date;
+                $day = ($riteDate->format('Ymd') == $serviceDate->format(
+                    'Ymd'
+                )) ? 'heute' : 'am '.$riteDate->isoFormat('dddd, DD. MMMM,');
+
+                return 'Im Gottesdienst '.$day.' um '.$riteService->timeText(
+                ).' in '.$riteService->city?->name;
             });
+        $this->baptisms = $baptisms;
     }
 
-    protected static function defaultCallback(string $key, array $items)
+    /**
+     * @param  list<string>  $items  Paragraphs to join.
+     * @return string
+     */
+    protected static function defaultCallback(int|string $key, array $items)
     {
         return count($items) ? implode("\n", $items)."\n" : '';
     }
 
+    /**
+     * @param  mixed  $lastService  Last service description.
+     * @param  mixed  $offerings  Offering amount.
+     * @param  (callable(mixed, mixed): mixed)|null  $callback  Optional paragraph renderer.
+     * @param  string|null  $separator  Separator for a flattened result.
+     * @param  list<string>  $remove  Keys to omit.
+     * @return array<string, mixed>|string
+     */
     public function render($lastService = '', $offerings = '', $callback = null, $separator = null, array $remove = [])
     {
-        $data = $this->renderArray($lastService, $offerings);
+        $data = $this->renderArray(self::stringify($lastService), self::stringify($offerings));
 
         $result = [];
         foreach ($data as $key => $items) {
@@ -192,12 +231,15 @@ class Announcements
             }
         }
 
-        return $separator ? collect($result)->reject(function ($item) {
+        return $separator ? self::stringify(collect($result)->reject(function ($item) {
             return $item == '';
-        })->join($separator) : $result;
+        })->join($separator)) : $result;
     }
 
-    public function renderArray($lastService = '', $offerings = ''): array
+    /**
+     * @return array<string, list<string>>
+     */
+    public function renderArray(string $lastService = '', string $offerings = ''): array
     {
         return [
             'thanks' => $this->getThanksArray(),
@@ -214,6 +256,9 @@ class Announcements
         ];
     }
 
+    /**
+     * @return list<string>
+     */
     public function getRitesArray(): array
     {
         $paragraphs = array_merge($this->getBaptismsArray(), $this->getWeddingsArray(), $this->getFuneralsArray());
@@ -222,6 +267,9 @@ class Announcements
         return $paragraphs;
     }
 
+    /**
+     * @return list<string>
+     */
     public function getBaptismsArray(): array
     {
         if ($this->baptisms->count() == 0) {
@@ -230,10 +278,10 @@ class Announcements
         $paragraphs = [''];
         foreach ($this->baptisms as $day => $baptisms) {
             $paragraphs[] = implode(' ', [
-                $day,
-                Str::choice($baptisms->count(), 'wird', 'werden'),
+                (string) $day,
+                self::stringify(Str::choice($baptisms->count(), 'wird', 'werden')),
                 $baptisms->map(function ($baptism) {
-                    return NameService::fromName($baptism->candidate_name)->format(NameService::FIRST_LAST);
+                    return NameService::fromName(self::stringify($baptism->candidate_name))->format(NameService::FIRST_LAST);
                 })->join(', ', 'und'),
                 'getauft.',
             ]);
@@ -241,9 +289,15 @@ class Announcements
         $paragraphs[] = '';
         $paragraphs[] = static::DEFAULT_BAPTISM_VOTE;
 
-        return $paragraphs;
+        /** @var list<string> $result Baptism paragraphs including the closing vote. */
+        $result = $paragraphs;
+
+        return $result;
     }
 
+    /**
+     * @return list<string>
+     */
     public function getFuneralsArray(): array
     {
         if ($this->funerals->count() == 0) {
@@ -253,29 +307,44 @@ class Announcements
             '',
         ])->merge(
             $this->funerals->map(function ($funeral) {
-                if ($funeral->service->location) {
-                    $location = ($funeral->service->location->at_text ?: 'auf dem Friedhof').' '
-                    .($funeral->service->location->general_location_name ?: 'in '.$funeral->service->location->city->name);
-                } else {
-                    $location = 'in '.$funeral->service->city->name;
+                $funeralService = $funeral->service;
+                if (! $funeralService) {
+                    return '';
                 }
+                $funeralLocation = $funeralService->location;
+                if ($funeralLocation) {
+                    $location = (self::stringify($funeralLocation->at_text) ?: 'auf dem Friedhof').' '
+                    .(self::stringify($funeralLocation->general_location_name) ?: 'in '.self::stringify($funeralLocation->city?->name));
+                } else {
+                    $location = 'in '.self::stringify($funeralService->city?->name);
+                }
+                /** @var string $buriedName Formatted name of the deceased. */
+                $buriedName = NameService::fromName(self::stringify($funeral->buried_name))->format(NameService::FIRST_LAST);
+                $buriedAddress = self::stringify($funeral->buried_address);
+                $funeralDate = $funeralService->date;
 
-                return 'Am '.$funeral->dod->isoFormat('D. MMMM').' ist '
-                    .NameService::fromName($funeral->buried_name)->format(NameService::FIRST_LAST)
-                    .($funeral->buried_address ? ', '.$funeral->buried_address.',' : '')
+                return 'Am '.($funeral->dod?->isoFormat('D. MMMM') ?? '').' ist '
+                    .$buriedName
+                    .($buriedAddress ? ', '.$buriedAddress.',' : '')
                     .($funeral->age ? ' im Alter von '.$funeral->age.' Jahren' : '')
-                    .' verstorben. Die '.$funeral->type
-                    .($funeral->service->date < $this->service->date ? ' fand bereits am ' : ' findet am ')
-                    .$funeral->service->date->isoFormat('dddd, DD. MMMM').', um '.$funeral->service->timeText()
+                    .' verstorben. Die '.self::stringify($funeral->type)
+                    .($funeralDate < $this->service->date ? ' fand bereits am ' : ' findet am ')
+                    .($funeralDate?->isoFormat('dddd, DD. MMMM') ?? '').', um '.$funeralService->timeText()
                     .' '.$location.' statt.';
             })
         );
         $paragraphs[] = '';
         $paragraphs[] = static::DEFAULT_FUNERAL_VOTE;
 
-        return $paragraphs->toArray();
+        /** @var list<string> $result Funeral paragraphs including the closing vote. */
+        $result = $paragraphs->toArray();
+
+        return $result;
     }
 
+    /**
+     * @return list<string>
+     */
     public function getWeddingsArray(): array
     {
         if ($this->weddings->count() == 0) {
@@ -284,11 +353,15 @@ class Announcements
         $paragraphs = [''];
         foreach ($this->weddings as $day => $weddings) {
             $paragraphs[] = implode(' ', [
-                $day,
+                (string) $day,
                 'werden',
                 $weddings->map(function ($wedding) {
-                    return NameService::fromName($wedding->spouse1_name)->format(NameService::FIRST_LAST)
-                        .' und '.NameService::fromName($wedding->spouse2_name)->format(NameService::FIRST_LAST);
+                    /** @var string $spouse1 Formatted name of the first spouse. */
+                    $spouse1 = NameService::fromName(self::stringify($wedding->spouse1_name))->format(NameService::FIRST_LAST);
+                    /** @var string $spouse2 Formatted name of the second spouse. */
+                    $spouse2 = NameService::fromName(self::stringify($wedding->spouse2_name))->format(NameService::FIRST_LAST);
+
+                    return $spouse1.' und '.$spouse2;
                 })->join('; ', 'und'),
                 'kirchlich getraut.',
             ]);
@@ -296,29 +369,52 @@ class Announcements
         $paragraphs[] = '';
         $paragraphs[] = static::DEFAULT_WEDDING_VOTE;
 
-        return $paragraphs;
+        /** @var list<string> $result Wedding paragraphs including the closing vote. */
+        $result = $paragraphs;
+
+        return $result;
     }
 
+    /**
+     * @param  string  $separator  Paragraph separator.
+     */
     public function getRitesText($separator = ''): string
     {
         return implode($separator, $this->getRitesArray());
     }
 
+    /**
+     * @return list<string>
+     */
     public function getCustomAnnouncementsArray(): array
     {
         return [];
     }
 
+    /**
+     * @param  string  $separator  Paragraph separator.
+     */
     public function getCustomAnnouncementsText($separator = ''): string
     {
         return implode($separator, $this->getCustomAnnouncementsArray());
     }
 
+    /**
+     * @return list<string>
+     */
     public function getFinalSongArray(): array
     {
+        /** @var Collection<int, Item> $liturgy Liturgy items after the announcements. */
         $liturgy = collect();
         foreach ($this->service->liturgyBlocks->pluck('items') as $items) {
-            $liturgy->push(...$items);
+            if (! is_iterable($items)) {
+                continue;
+            }
+            foreach ($items as $item) {
+                if ($item instanceof Item) {
+                    $liturgy->push($item);
+                }
+            }
         }
         $afterAnnouncements = false;
         $finalSong = $liturgy->filter(function ($item) use (&$afterAnnouncements) {
@@ -333,14 +429,24 @@ class Announcements
             return [];
         }
 
-        return ['Wir singen:', $finalSong->getHelper()->getTitleText().(($item->data['verses'] ?? '') ? ', '.$item->data['verses'] : '')];
+        $verses = self::stringify($finalSong->data['verses'] ?? '');
+        $helper = $finalSong->getHelper();
+        $titleText = ($helper instanceof SongItemHelper || $helper instanceof PsalmItemHelper) ? $helper->getTitleText() : '';
+
+        return ['Wir singen:', $titleText.($verses ? ', '.$verses : '')];
     }
 
+    /**
+     * @param  string  $separator  Paragraph separator.
+     */
     public function getFinalSongText($separator = ''): string
     {
         return implode($separator, $this->getFinalSongArray());
     }
 
+    /**
+     * @return list<string>
+     */
     public function getEventsIntroArray()
     {
         if ($this->events->count() == 0) {
@@ -349,16 +455,22 @@ class Announcements
 
         return [
             'Ganz herzlich laden wir Sie '
-            .Str::choice($this->events->count(), 'zu folgender Veranstaltung', 'zu den folgenden Veranstaltungen')
+            .self::stringify(Str::choice($this->events->count(), 'zu folgender Veranstaltung', 'zu den folgenden Veranstaltungen'))
             .' ein:',
         ];
     }
 
+    /**
+     * @param  string  $separator  Paragraph separator.
+     */
     public function getEventsIntroText($separator = ''): string
     {
         return implode($separator, $this->getEventsIntroArray());
     }
 
+    /**
+     * @return list<string>
+     */
     public function getFeaturedEventsIntroArray()
     {
         if ($this->featuredEvents->count() == 0) {
@@ -367,16 +479,22 @@ class Announcements
 
         return [
             'Ganz besonders möchten wir Sie auf folgende '
-            .Str::choice($this->events->count(), 'Veranstaltung', 'Veranstaltungen')
+            .self::stringify(Str::choice($this->events->count(), 'Veranstaltung', 'Veranstaltungen'))
             .' hinweisen:',
         ];
     }
 
+    /**
+     * @param  string  $separator  Paragraph separator.
+     */
     public function getFeaturedEventsIntroText($separator = ''): string
     {
         return implode($separator, $this->getFeaturedEventsIntroArray());
     }
 
+    /**
+     * @return list<string>
+     */
     public function getThanksArray(): array
     {
         $music = $this->service->organists;
@@ -385,6 +503,7 @@ class Announcements
                 $music->merge($people);
             }
         }
+        /** @var Collection<int, string> $musicians Names of the musicians. */
         $musicians = collect();
         foreach ($music as $musician) {
             $musicians->push(NameService::fromUser($musician)->format(NameService::FIRST_LAST));
@@ -398,27 +517,38 @@ class Announcements
         ];
     }
 
+    /**
+     * @return string
+     */
     protected function tab()
     {
         return $this->useTabs ? "\t" : ' ';
     }
 
+    /**
+     * @return list<string>
+     */
     public function getEventsArray(): array
     {
         $paragraphs = [];
         foreach ($this->events as $day => $events) {
             $paragraphs[] = '';
-            $paragraphs[] = $day;
+            $paragraphs[] = (string) $day;
             foreach ($events as $event) {
-                $paragraphs[] = ($event->event->is_allday ? '' : $event->event->timeText().$this->tab())
-                    .Str::replace('&', '&amp;', (string) $event->event->titleText(false, false))
-                    .(count($event->event->pastors ?? []) ?
-                        ' mit '.$event->event->pastors->map(function ($pastor) {
+                $eventService = $event->event;
+                if (! $eventService) {
+                    continue;
+                }
+                $pastors = $eventService->pastors;
+                $paragraphs[] = ($eventService->is_allday ? '' : $eventService->timeText().$this->tab())
+                    .Str::replace('&', '&amp;', self::stringify($eventService->titleText(false, false)))
+                    .(count($pastors ?? []) ?
+                        ' mit '.$pastors->map(function ($pastor) {
                             return NameService::fromUser($pastor)->format(NameService::TITLE_FIRST_LAST);
                         })->join(', ')
                         : '')
-                    .' ('.$event->event->locationTextWithCity.')'
-                    .($event->event->description ? "\n".$event->event->description : '');
+                    .' ('.self::stringify($eventService->locationTextWithCity).')'
+                    .($eventService->description ? "\n".self::stringify($eventService->description) : '');
             }
         }
 
@@ -427,20 +557,33 @@ class Announcements
         return $paragraphs;
     }
 
+    /**
+     * @param  string  $separator  Paragraph separator.
+     */
     public function getEventsText($separator = ''): string
     {
         return implode($separator, $this->getEventsArray());
     }
 
+    /**
+     * @return list<string>
+     */
     public function getFeaturedEventsArray(): array
     {
+        /** @var list<string> $paragraphs Featured event paragraphs. */
         $paragraphs = [];
         foreach ($this->featuredEvents as $event) {
-            $paragraphs[] = '';
-            $paragraphs[] = $event->start->setTimeZone('Europe/Berlin')->isoFormat('dddd, DD. MMMM')
-                .($event->event->is_allday ? ($event->start->setTimeZone('Europe/Berlin')->format('Ymd') != $event->end->setTimeZone('Europe/Berlin')->format('Ymd') ? ' - '.$event->end->setTimeZone('Europe/Berlin')->isoFormat('dddd, DD. MMMM') : '') : ', '.$event->service->timeText())
-                .', '.$event->service->locationTextWithCity;
-            $paragraphs[] = $event->service->titleText(false);
+            $eventService = $event->event;
+            $eventOccurenceService = $event->service;
+            if (! $eventService || ! $eventOccurenceService) {
+                continue;
+            }
+            $start = $event->start;
+            $end = $event->end;
+            $paragraphs[] = $start->setTimeZone('Europe/Berlin')->isoFormat('dddd, DD. MMMM')
+                .($eventService->is_allday ? ($start->setTimeZone('Europe/Berlin')->format('Ymd') != $end->setTimeZone('Europe/Berlin')->format('Ymd') ? ' - '.$end->setTimeZone('Europe/Berlin')->isoFormat('dddd, DD. MMMM') : '') : ', '.$eventOccurenceService->timeText())
+                .', '.self::stringify($eventOccurenceService->locationTextWithCity);
+            $paragraphs[] = self::stringify($eventOccurenceService->titleText(false));
             $paragraphs[] = $event->getAdText('newsletter');
         }
         array_shift($paragraphs);
@@ -448,18 +591,24 @@ class Announcements
         return $paragraphs;
     }
 
+    /**
+     * @param  string  $separator  Paragraph separator.
+     */
     public function getFeaturedEventsText($separator = ''): string
     {
         return implode($separator, $this->getFeaturedEventsArray());
     }
 
+    /**
+     * @return list<string>
+     */
     public function getEventsExtroArray(): array
     {
         $sources = collect(['in den Aushängen']);
-        if ($this->service->city->homepage) {
+        if ($this->service->city?->homepage) {
             $sources->push('auf unserer Homepage');
         }
-        if ($this->service->city->communiapp_token) {
+        if ($this->service->city?->communiapp_token) {
             $sources->push('in unserer App');
         }
 
@@ -468,21 +617,30 @@ class Announcements
         ];
     }
 
+    /**
+     * @param  string  $separator  Paragraph separator.
+     */
     public function getEventsExtroText($separator = ''): string
     {
         return implode($separator, $this->getEventsExtroArray());
     }
 
+    /**
+     * @param  string  $separator  Separator.\n     * @return string
+     */
     public function getThanksText(string $separator = ''): string
     {
         return implode($separator, $this->getThanksArray());
     }
 
+    /**
+     * @return list<string>
+     */
     public function getLastOfferingsArray(string $lastService = '', string $offerings = ''): array
     {
         $paragraphs = [];
         if ($lastService) {
-            $lastService = is_object($lastService) ? $lastService : Carbon::parse($lastService);
+            $lastService = Carbon::parse($lastService);
             if ($offerings == "0,00\u{A0}€") {
                 $offerings = '';
             }
@@ -492,12 +650,18 @@ class Announcements
         return $paragraphs;
     }
 
+    /**
+     * @param  string  $separator  Paragraph separator.
+     */
     public function getLastOfferingsText($separator = ''): string
     {
         return implode($separator, $this->getLastOfferingsArray());
 
     }
 
+    /**
+     * @return list<string>
+     */
     public function getOfferingsArray(string $lastService = '', string $offerings = ''): array
     {
         $paragraphs = [];
@@ -517,9 +681,12 @@ class Announcements
         return $paragraphs;
     }
 
+    /**
+     * @param  string  $lastService  Last service.\n     * @param  string  $offerings  Offerings.\n     * @param  string  $separator  Separator.\n     * @return string
+     */
     public function getOfferingsText(string $lastService = '', string $offerings = '', string $separator = ''): string
     {
-        return implode($separator, $this->renderOfferingsArray($lastService, $offerings));
+        return implode($separator, $this->getOfferingsArray($lastService, $offerings));
     }
 
     public function getService(): Service
@@ -527,13 +694,13 @@ class Announcements
         return $this->service;
     }
 
-    /** @return Collection<array-key, mixed> */
+    /** @return Collection<array-key, Collection<int, Occurence>> */
     public function getEvents(): Collection
     {
         return $this->events;
     }
 
-    /** @return Collection<array-key, mixed> */
+    /** @return Collection<int, Occurence> */
     public function getFeaturedEvents(): Collection
     {
         return $this->featuredEvents;
@@ -545,19 +712,19 @@ class Announcements
         return $this->texts;
     }
 
-    /** @return Collection<array-key, mixed> */
+    /** @return Collection<array-key, Collection<int, Baptism>> */
     public function getBaptisms(): Collection
     {
         return $this->baptisms;
     }
 
-    /** @return Collection<array-key, mixed> */
+    /** @return EloquentCollection<int, Funeral> */
     public function getFunerals(): Collection
     {
         return $this->funerals;
     }
 
-    /** @return Collection<array-key, mixed> */
+    /** @return Collection<array-key, Collection<int, Wedding>> */
     public function getWeddings(): Collection
     {
         return $this->weddings;
@@ -573,6 +740,9 @@ class Announcements
         return $this->useTabs;
     }
 
+    /**
+     * @param  bool  $useTabs  Use tabs.\n     * @return void
+     */
     public function setUseTabs(bool $useTabs): void
     {
         $this->useTabs = $useTabs;
@@ -583,6 +753,9 @@ class Announcements
         return $this->eventListKeyFormat;
     }
 
+    /**
+     * @param  string  $eventListKeyFormat  Key format.\n     * @return void
+     */
     public function setEventListKeyFormat(string $eventListKeyFormat): void
     {
         $this->eventListKeyFormat = $eventListKeyFormat;
@@ -594,9 +767,11 @@ class Announcements
      */
     public static function expandMultiDayEvents(Collection $events): Collection
     {
+        /** @var Collection<int, Occurence> $extra Additional occurences for multi-day events. */
         $extra = collect();
         foreach ($events as $event) {
-            if (! $event->event->is_allday) {
+            $eventService = $event->event;
+            if (! $eventService || ! $eventService->is_allday) {
                 continue;
             }
             if ($event->start->setTimezone('Europe/Berlin')->format('Ymd') == $event->end->setTimezone('Europe/Berlin')->format('Ymd')) {
@@ -605,14 +780,39 @@ class Announcements
             $cursor = $event->start->copy()->addDay();
             while ($cursor < $event->end) {
                 $newEvent = clone $event;
-                $newEvent->setRelation('event', clone $event->event);
+                $eventClone = clone $eventService;
+                $eventClone->date = $cursor;
+                $newEvent->setRelation('event', $eventClone);
                 $newEvent->start = $cursor;
-                $newEvent->event->date = $cursor;
                 $extra->push($newEvent);
                 $cursor->addDay();
             }
         }
 
         return $events->concat($extra)->sortBy('start');
+    }
+
+    /**
+     * Convert a mixed value to a string for announcement output.
+     *
+     * @param  mixed  $value  Value to convert.
+     * @return string String representation.
+     */
+    private static function stringify(mixed $value): string
+    {
+        if (is_string($value)) {
+            return $value;
+        }
+        if (is_int($value) || is_float($value)) {
+            return (string) $value;
+        }
+        if (is_bool($value)) {
+            return $value ? '1' : '';
+        }
+        if ($value instanceof \Stringable) {
+            return (string) $value;
+        }
+
+        return '';
     }
 }

@@ -16,7 +16,8 @@ class PasskeyLoginResponse implements PasskeyLoginResponseContract
      */
     public function toResponse($request): Response
     {
-        $user = Auth::guard(config('passkeys.guard'))->user();
+        $guard = config('passkeys.guard');
+        $user = Auth::guard(is_string($guard) ? $guard : null)->user();
 
         if ($user?->two_factor_recovery_required_at) {
             $target = route('user.two-factor.recovery');

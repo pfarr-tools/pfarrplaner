@@ -79,8 +79,12 @@ class ManageUserAccount
                 ->update(['consumed_at' => now(), 'updated_at' => now()]);
 
             if (config('session.driver') === 'database') {
-                DB::connection(config('session.connection') ?: config('database.default'))
-                    ->table(config('session.table', 'sessions'))
+                /** @var string|null $sessionConnection */
+                $sessionConnection = config('session.connection') ?: config('database.default');
+                /** @var string $sessionTable */
+                $sessionTable = config('session.table', 'sessions');
+                DB::connection($sessionConnection)
+                    ->table($sessionTable)
                     ->where('user_id', $userId)
                     ->delete();
             }

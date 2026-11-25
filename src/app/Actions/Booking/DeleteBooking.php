@@ -43,7 +43,7 @@ class DeleteBooking extends AbstractDeleteAction implements DeletesBookings
 
     public function redirectTo(): string
     {
-        return route('service.edit', ['service' => $this->booking->service->slug, 'tab' => 'registrations']);
+        return route('service.edit', ['service' => $this->booking->service->slug ?? '', 'tab' => 'registrations']);
     }
 
     public function delete(User $user, Booking $booking): ?bool

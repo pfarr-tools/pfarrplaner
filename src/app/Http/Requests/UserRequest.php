@@ -45,6 +45,9 @@ class UserRequest extends FormRequest
     {
         $target = $this->user;
         $actor = $this->user();
+        if (! $actor instanceof User) {
+            return false;
+        }
 
         if (isset($this->user)) {
             return $actor->can('update', $this->user);
@@ -55,6 +58,8 @@ class UserRequest extends FormRequest
 
     /**
      * Get the validation rules that apply to the request.
+     *
+     * @return array<string, string>
      */
     public function rules(): array
     {
@@ -127,29 +132,43 @@ class UserRequest extends FormRequest
     /**
      * Return validated relation identifiers for a form field.
      *
+     * @param  string  $key  Form field holding the relation identifiers.
+     * @param  string|null  $table  Table used by the exists rule; defaults to the field name.
+     * @param  string  $tableKey  Key column used by the exists rule.
      * @return array<int, int|string>
      */
-    public function getRelationIdsForSync($key, $table = null, $tableKey = 'id'): array
+    public function getRelationIdsForSync(string $key, ?string $table = null, string $tableKey = 'id'): array
     {
         $table ??= $key;
 
-        return $this->validate([$key => 'nullable|exists:'.$table.','.$tableKey])[$key] ?? [];
+        /** @var array<string, mixed> $validated Validierte Relation-IDs. */
+        $validated = $this->validate([$key => 'nullable|exists:'.$table.','.$tableKey]);
+        /** @var array<int, int|string> $ids IDs der zu synchronisierenden Relation. */
+        $ids = $validated[$key] ?? [];
+
+        return $ids;
     }
 
-    /** Return role identifiers allowed for the current actor and target. */
+    /**
+     * Return role identifiers allowed for the current actor and target.
+     *
+     * @return array<int, int|string>
+     */
     public function getRoles(): array
     {
-        $superAdminRole = Role::where('name', RoleService::ROLE_SUPER_ADMIN)->first()->id;
-        $adminRole = Role::where('name', RoleService::ROLE_ADMIN)->first()->id;
+        $superAdminRole = Role::where('name', RoleService::ROLE_SUPER_ADMIN)->firstOrFail()->id;
+        $adminRole = Role::where('name', RoleService::ROLE_ADMIN)->firstOrFail()->id;
         $extranetApiRole = Role::where('name', RoleService::ROLE_EXTRANET_API_MANAGER)->first()?->id;
-        $actorCanGrantExtranetRole = $this->user()?->can(RoleService::PERMISSION_CREATE_CHURCH_API_TOKENS) ?? false;
+        $actor = $this->user();
+        $actorCanGrantExtranetRole = $actor instanceof User
+            && $actor->can(RoleService::PERMISSION_CREATE_CHURCH_API_TOKENS);
 
         $roles = collect($this->getRelationIdsForSync('roles'));
         if (! count($roles)) {
             return [];
         }
 
-        if (! $this->user) {
+        if (! $actor instanceof User || ! $this->user) {
             if ($extranetApiRole !== null && ! $actorCanGrantExtranetRole) {
                 $roles = $roles->reject(function ($item) use ($extranetApiRole) {
                     return $item == $extranetApiRole;
@@ -159,13 +178,13 @@ class UserRequest extends FormRequest
             return $roles->toArray();
         }
 
-        if (! $this->user->hasRole(RoleService::ROLE_SUPER_ADMIN)) {
+        if (! $actor->hasRole(RoleService::ROLE_SUPER_ADMIN)) {
             $roles = $roles->reject(function ($item) use ($superAdminRole) {
                 return $item == $superAdminRole;
             });
         }
-        if (! $this->user->hasRole(RoleService::ROLE_SUPER_ADMIN)
-            || $this->user()->hasRole(RoleService::ROLE_ADMIN)) {
+        if (! $actor->hasRole(RoleService::ROLE_SUPER_ADMIN)
+            || $actor->hasRole(RoleService::ROLE_ADMIN)) {
             $roles = $roles->reject(function ($item) use ($adminRole) {
                 return $item == $adminRole;
             });
@@ -178,6 +197,6 @@ class UserRequest extends FormRequest
             });
         }
 
-        return $roles->toArray();
+        return $roles->all();
     }
 }

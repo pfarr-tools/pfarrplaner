@@ -45,10 +45,14 @@ class UpdateStreetRange extends AbstractUpdateAction implements UpdatesStreetRan
         return '';
     }
 
+    /**
+     * @param  array<string, mixed>  $input
+     */
     public function update(User $user, StreetRange $streetRange, array $input): StreetRange
     {
         Gate::forUser($user)->authorize('update', $streetRange);
         $input['parish_id'] = $streetRange->parish_id;
+        /** @var array<string, mixed> $input */
         $input = Validator::make($input, StreetRange::$validationRules)->validateWithBag('updateStreetRange');
         $streetRange->update($input);
         UpdatedStreetRange::dispatch($user, $streetRange);

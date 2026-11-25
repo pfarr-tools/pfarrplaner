@@ -59,6 +59,7 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 class PublicController extends Controller
 {
     /**
+     * @param  string  $lastName  Last name to look up.
      * @return Builder|Model|object|null
      */
     protected function findUserByLastName($lastName)
@@ -68,6 +69,10 @@ class PublicController extends Controller
 
     /**
      * @return Factory|RedirectResponse|BinaryFileResponse
+     */
+    /**
+     * @param  string  $city  City name.
+     * @return \Illuminate\Contracts\View\View|RedirectResponse|BinaryFileResponse
      */
     public function childrensChurch(Request $request, $city)
     {
@@ -81,7 +86,7 @@ class PublicController extends Controller
             ->ordered('DESC')
             ->limit(1)
             ->first();
-        if ($latest) {
+        if ($latest?->date !== null) {
             $maxDate = $latest->date;
         }
 
@@ -95,20 +100,22 @@ class PublicController extends Controller
         $serviceList = $serviceList->groupBy('key_date');
 
         if ($count) {
-            $minDate = Service::with(['location', 'day'])
+            $firstService = Service::with(['location', 'day'])
                 ->between($minDate, $maxDate)
                 ->where('cc', 1)
                 ->inCity($city)
                 ->ordered()
-                ->first()
-                ->date;
-            $maxDate = Service::with(['location', 'day'])
+                ->first();
+            abort_unless($firstService?->date !== null, 404);
+            $minDate = $firstService->date;
+            $lastService = Service::with(['location', 'day'])
                 ->between($minDate, $maxDate)
                 ->where('cc', 1)
                 ->inCity($city)
                 ->ordered('DESC')
-                ->first()
-                ->date;
+                ->first();
+            abort_unless($lastService?->date !== null, 404);
+            $maxDate = $lastService->date;
         }
 
         if ($request->is('*/pdf')) {
@@ -136,12 +143,13 @@ class PublicController extends Controller
     }
 
     /**
-     * @param  string|City  $city
+     * @param  string|City  $city  City name or model.
+     * @return mixed
      */
     public function nextStream($city)
     {
         $cityIds = [];
-        if (! is_a(City::class, $city)) {
+        if (! $city instanceof City) {
             $cities = explode(',', $city);
             foreach ($cities as $cityName) {
                 $city = City::where('name', 'like', '%'.trim($cityName).'%')->first();
@@ -175,11 +183,14 @@ class PublicController extends Controller
         return redirect($service->youtube_url);
     }
 
+    /**
+     * @param  string  $ministry  Ministry identifier.
+     * @param  mixed  $sender  Requesting sender.
+     * @param  string  $services  Comma-separated service identifiers.
+     * @return mixed
+     */
     public function ministryRequest(Request $request, $ministry, User $user, $services, $sender = null)
     {
-        if (is_numeric($user)) {
-            $user = User::findOrFail($user);
-        }
         if (! $request->hasValidSignature()) {
             abort(401);
         }
@@ -195,19 +206,24 @@ class PublicController extends Controller
         );
     }
 
+    /**
+     * @param  string  $ministry  Ministry identifier.
+     * @param  mixed  $sender  Requesting sender.
+     * @param  string  $services  Comma-separated service identifiers.
+     * @return mixed
+     */
     public function ministryRequestFilled(Request $request, $ministry, User $user, $services, $sender = null)
     {
         if (! $request->hasValidSignature()) {
             abort(401);
         }
-        if (is_numeric($user)) {
-            $user = User::findOrFail($user);
-        }
         $allowedServiceIds = collect(explode(',', $services))
             ->filter()
             ->map(fn ($serviceId) => (int) $serviceId);
         $selectedServiceIds = [];
-        foreach ($request->get('services', []) as $key => $service) {
+        /** @var array<array-key, mixed> $requestedServices */
+        $requestedServices = $request->get('services', []);
+        foreach ($requestedServices as $key => $service) {
             if ($service && $allowedServiceIds->contains((int) $key)) {
                 $selectedServiceIds[] = (int) $key;
             }
@@ -218,7 +234,7 @@ class PublicController extends Controller
         }
 
         if ($sender !== null) {
-            $sender = User::find($sender);
+            $sender = User::query()->whereKey($sender)->first();
             if ($sender !== null) {
                 Mail::to($sender->email)
                     ->queue(new MinistryRequestFilled($user, $sender, $ministry, $services));
@@ -230,6 +246,11 @@ class PublicController extends Controller
         return view('reports.ministryrequest.thanks', compact('user', 'ministry', 'ministryTitle'));
     }
 
+    /**
+     * @param  string  $cityName  City name.
+     * @param  string  $ministry  Ministry identifier.
+     * @return mixed
+     */
     public function ministryPlan($cityName, $ministry)
     {
         $city = City::where('name', 'like', $cityName)->first();
@@ -265,6 +286,11 @@ class PublicController extends Controller
     /**
      * @return Baptism|Funeral|Wedding|null
      */
+    /**
+     * @param  int|string  $id  Rite identifier.
+     * @param  string  $type  Rite type.
+     * @return Baptism|Funeral|Wedding|null
+     */
     protected function getRite($type, $id)
     {
         switch ($type) {
@@ -282,6 +308,11 @@ class PublicController extends Controller
     /**
      * @return Application|Factory|View
      */
+    /**
+     * @param  int|string  $id  Service identifier.
+     * @param  string  $type  Document type.
+     * @return mixed
+     */
     public function showDimissorial(Request $request, $type, $id)
     {
         if (! $request->hasValidSignature()) {
@@ -296,17 +327,18 @@ class PublicController extends Controller
                 abort(404);
             }
             $spouse = $request->get('spouse');
+            abort_unless(is_string($spouse) || is_int($spouse), 404);
             $method = 'spouse'.$spouse.'_needs_dimissorial';
-            if (! $rite->$method) {
+            if (! $rite->getAttribute($method)) {
                 abort(403);
             }
             $dimissorialReceived = (bool) $rite->{'spouse'.$spouse.'_dimissorial_received'};
         } else {
-            if (! $rite->needs_dimissorial) {
+            if (! $rite->getAttribute('needs_dimissorial')) {
                 abort(403);
             }
             $spouse = null;
-            $dimissorialReceived = (bool) $rite->dimissorial_received;
+            $dimissorialReceived = (bool) $rite->getAttribute('dimissorial_received');
         }
 
         $rite->load(['service']);
@@ -315,6 +347,11 @@ class PublicController extends Controller
         return view('public.dimissorial.show', compact('rite', 'type', 'id', 'spouse', 'dimissorialReceived'));
     }
 
+    /**
+     * @param  int|string  $id  Service identifier.
+     * @param  string  $type  Document type.
+     * @return mixed
+     */
     public function grantDimissorial(Request $request, $type, $id)
     {
         if (! $request->hasValidSignature()) {
@@ -329,13 +366,14 @@ class PublicController extends Controller
                 abort(404);
             }
             $spouse = $request->get('spouse');
+            abort_unless(is_string($spouse) || is_int($spouse), 404);
             $method = 'spouse'.$spouse.'_needs_dimissorial';
-            if (! $rite->$method) {
+            if (! $rite->getAttribute($method)) {
                 abort(403);
             }
             $rite->update(['spouse'.$spouse.'_dimissorial_received' => Carbon::now()]);
         } else {
-            if (! $rite->needs_dimissorial) {
+            if (! $rite->getAttribute('needs_dimissorial')) {
                 abort(403);
             }
             $rite->update(['dimissorial_received' => Carbon::now()]);
@@ -345,8 +383,20 @@ class PublicController extends Controller
         return view('public.dimissorial.thanks', compact('rite', 'type'));
     }
 
+    /**
+     * @return mixed
+     */
     public function submitContactForm(Request $request)
     {
+        /**
+         * @var array{
+         *     name: string,
+         *     email: string,
+         *     subject: string,
+         *     message: string,
+         *     'g-recaptcha-response': string
+         * } $data
+         */
         $data = $request->validate([
             'name' => 'required|string',
             'email' => 'required|email',
@@ -362,7 +412,8 @@ class PublicController extends Controller
                 'response' => $data['g-recaptcha-response'],
             ],
         ]);
-        if (! json_decode($response->getBody(), true)['success']) {
+        $captchaResult = json_decode($response->getBody(), true);
+        if (! is_array($captchaResult) || ! ($captchaResult['success'] ?? false)) {
             abort(403);
         }
 
@@ -371,6 +422,9 @@ class PublicController extends Controller
         return response('OK');
     }
 
+    /**
+     * @return mixed
+     */
     public function whatIs()
     {
         $count = [
@@ -379,7 +433,10 @@ class PublicController extends Controller
             'services' => Service::count(),
         ];
 
-        $packageConfig = json_decode(file_get_contents(base_path('package.json')), true);
+        $packageContents = file_get_contents(base_path('package.json'));
+        abort_unless(is_string($packageContents), 500);
+        /** @var array{version: string} $packageConfig */
+        $packageConfig = json_decode($packageContents, true);
         $version = $packageConfig['version'];
 
         $recaptchaKey = config('recaptcha.key');

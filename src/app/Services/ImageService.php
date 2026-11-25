@@ -41,7 +41,7 @@ class ImageService
     {
         $im = imagecreatefromjpeg($jpgPath);
         if (! $im) {
-            throw new RuntimeException("Cannot load jpg: $jpgPath");
+            throw new \RuntimeException("Cannot load jpg: $jpgPath");
         }
 
         $imgW = imagesx($im);
@@ -109,6 +109,8 @@ class ImageService
 
     /**
      * Get an ARGB color string for a tinted overlay on a background color
+     *
+     * @param  int[]  $avgRgb  ['r'=>0..255,'g'=>0..255,'b'=>0..255] average background
      */
     public static function tintedOverlayArgb(array $avgRgb, float $opacity = 0.75): string
     {
@@ -131,16 +133,16 @@ class ImageService
      * against a semi-transparent ARGB overlay.
      *
      * @param  string  $argb  AARRGGBB
-     * @param  array  $bgRgb  ['r'=>0..255,'g'=>0..255,'b'=>0..255] average background
+     * @param  int[]  $bgRgb  ['r'=>0..255,'g'=>0..255,'b'=>0..255] average background
      * @return string 'black' or 'white'
      */
     public static function bestTextColorForOverlay(string $argb, array $bgRgb): string
     {
         // Parse ARGB
         $a = hexdec(substr($argb, 0, 2)) / 255;
-        $r = hexdec(substr($argb, 2, 2));
-        $g = hexdec(substr($argb, 4, 2));
-        $b = hexdec(substr($argb, 6, 2));
+        $r = (int) hexdec(substr($argb, 2, 2));
+        $g = (int) hexdec(substr($argb, 4, 2));
+        $b = (int) hexdec(substr($argb, 6, 2));
 
         // Alpha blend overlay onto background
         $R = (int) round($r * $a + $bgRgb['r'] * (1 - $a));
@@ -154,11 +156,15 @@ class ImageService
         return $lum > 0.5 ? 'black' : 'white';
     }
 
+    /**
+     * @param  string  $argb  ARGB color value.
+     * @param  float  $threshold  Brightness threshold.
+     */
     public static function blackOrWhiteForArgb(string $argb, float $threshold = 0.82): string
     {
-        $r = hexdec(substr($argb, 2, 2));
-        $g = hexdec(substr($argb, 4, 2));
-        $b = hexdec(substr($argb, 6, 2));
+        $r = (int) hexdec(substr($argb, 2, 2));
+        $g = (int) hexdec(substr($argb, 4, 2));
+        $b = (int) hexdec(substr($argb, 6, 2));
 
         $lum = static::relativeLuminance($r, $g, $b);
 

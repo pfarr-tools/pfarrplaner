@@ -54,6 +54,7 @@ class CreateTag extends AbstractCreateAction implements CreatesTags
     /**
      * Create a new tag
      *
+     * @param  array<string, mixed>  $input
      * @return Tag
      *
      * @throws AuthorizationException
@@ -62,6 +63,7 @@ class CreateTag extends AbstractCreateAction implements CreatesTags
     public function create(User $user, array $input)
     {
         Gate::forUser($user)->authorize('create', Tag::class);
+        /** @var array{name: string, ...} $input */
         $input = Validator::make($input, Tag::$validationRules)->validateWithBag('createTag');
         if (empty($input['code'] ?? '')) {
             $input['code'] = Str::slug($input['name']);

@@ -31,7 +31,6 @@
 namespace App\Casts;
 
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
-use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Encryption\Encrypter;
 use Illuminate\Support\Facades\Crypt;
@@ -44,8 +43,13 @@ use Illuminate\Support\Str;
  */
 class EncryptedAttribute implements CastsAttributes
 {
+    /** @var Encrypter|null */
     public static $encrypter = null;
 
+    /**
+     * @param  string  $key  Configured application key.
+     * @return string Decoded binary key.
+     */
     private static function parseKey($key)
     {
         if (Str::startsWith($key, 'base64:')) {
@@ -55,20 +59,41 @@ class EncryptedAttribute implements CastsAttributes
         return $key;
     }
 
+    /**
+     * @return Encrypter
+     */
     public static function getEncrypter()
     {
         if (! self::$encrypter) {
-            self::$encrypter = new Encrypter(self::parseKey(config('database.key')), config('database.cipher'));
+            /** @var string $key */
+            $key = config('database.key');
+            /** @var string $cipher */
+            $cipher = config('database.cipher');
+            self::$encrypter = new Encrypter(self::parseKey($key), $cipher);
         }
 
         return self::$encrypter;
     }
 
+    /**
+     * @param  mixed  $string  Stored value.
+     * @return bool
+     */
     private function isEncrypted($string)
     {
-        return isset(json_decode(base64_decode($string ?? ''), true)['mac']);
+        if (! is_string($string)) {
+            return false;
+        }
+
+        $payload = json_decode(base64_decode($string), true);
+
+        return is_array($payload) && isset($payload['mac']);
     }
 
+    /**
+     * @param  string  $string  Stored value.
+     * @return bool
+     */
     private function hasObsoleteEncryption($string)
     {
         $prefix = chr(1).chr(2).'__LARAVEL-DATABASE-ENCRYPTED-';
@@ -76,22 +101,16 @@ class EncryptedAttribute implements CastsAttributes
         return substr($string, 0, strlen($prefix)) == $prefix && str_contains($string, chr(4));
     }
 
+    /**
+     * @param  string  $string  Legacy encrypted value.
+     * @return mixed
+     */
     private function decryptObsoleteEncryption($string)
     {
-        $decrypted = Crypt::decryptString(substr($string, strpos($string, chr(4))));
+        $offset = strpos($string, chr(4));
+        $decrypted = Crypt::decryptString($offset === false ? $string : substr($string, $offset));
 
         return @unserialize($decrypted) ?: $decrypted;
-    }
-
-    private function decrypt($string)
-    {
-        try {
-            $decrypted = self::getEncrypter()->decryptString($string);
-        } catch (DecryptException $e) {
-            $decrypted = Crypt::decryptString($string);
-        }
-
-        return $decrypted;
     }
 
     /**
@@ -105,6 +124,9 @@ class EncryptedAttribute implements CastsAttributes
      */
     public function get($model, $key, $value, $attributes)
     {
+        if (! is_string($value)) {
+            return $value;
+        }
         if ($this->isEncrypted($value)) {
             return self::getEncrypter()->decryptString($value);
         }
@@ -129,12 +151,16 @@ class EncryptedAttribute implements CastsAttributes
         return self::encrypt($value);
     }
 
+    /**
+     * @param  mixed  $value  Value to encrypt.
+     * @return string
+     */
     public static function encrypt($value)
     {
         if (! is_string($value) && ! is_null($value)) {
             $value = serialize($value);
         }
 
-        return self::getEncrypter()->encryptString($value);
+        return self::getEncrypter()->encryptString((string) $value);
     }
 }

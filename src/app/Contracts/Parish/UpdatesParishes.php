@@ -34,6 +34,6 @@ use App\Models\Parish;
 use App\Models\People\User;
 
 /**
- * @method Parish update(User $user, Parish $parish, array $input)
+ * @method Parish update(User $user, Parish $parish, array<string, mixed> $input)
  */
 interface UpdatesParishes {}

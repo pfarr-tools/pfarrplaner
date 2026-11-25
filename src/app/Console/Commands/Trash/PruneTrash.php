@@ -21,7 +21,9 @@ use App\Models\Service;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 
+/** Command zum Bereinigen des Papierkorbs. */
 class PruneTrash extends Command
 {
     /**
@@ -41,7 +43,9 @@ class PruneTrash extends Command
         $pruned = 0;
 
         foreach ($this->supportedModels() as $label => $modelClass) {
-            $records = $modelClass::onlyTrashed()
+            $records = $modelClass::query()
+                ->withoutGlobalScope(SoftDeletingScope::class)
+                ->whereNotNull('deleted_at')
                 ->where('deleted_at', '<', $cutoff)
                 ->get();
 

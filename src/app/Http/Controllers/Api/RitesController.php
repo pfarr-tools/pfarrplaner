@@ -31,6 +31,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\People\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
@@ -40,6 +42,9 @@ use Illuminate\Support\Facades\Auth;
  */
 class RitesController extends Controller
 {
+    /**
+     * @return void
+     */
     public function __construct()
     {
         $this->middleware('auth:sanctum,api');
@@ -52,21 +57,23 @@ class RitesController extends Controller
      * In order to solve this, we need to load all available (i.e. in writable cities or active user is pastor)
      * rites and manually filter the relevant fields.
      *
-     * @return Response
+     * @return Response|JsonResponse
      */
-    public function query(Request $request, $query)
+    public function query(Request $request, string $query)
     {
         $query = strtolower($query);
-        $cityIds = Auth::user()->writableCities->pluck('id');
+        $user = Auth::user();
+        abort_unless($user instanceof User, 401);
+        $cityIds = $user->writableCities->pluck('id');
 
         $results = [];
-        foreach (
-            [
-                'Baptism' => ['candidate_name'],
-                'Funeral' => ['buried_name', 'relative_name'],
-                'Wedding' => ['spouse1_name', 'spouse2_name'],
-            ] as $riteType => $queryFields
-        ) {
+        /** @var array<'Baptism'|'Funeral'|'Wedding', list<string>> $queryConfig */
+        $queryConfig = [
+            'Baptism' => ['candidate_name'],
+            'Funeral' => ['buried_name', 'relative_name'],
+            'Wedding' => ['spouse1_name', 'spouse2_name'],
+        ];
+        foreach ($queryConfig as $riteType => $queryFields) {
             $key = strtolower($riteType).'s';
             $riteType = 'App\\Models\\Rites\\'.$riteType;
             $ids = [];
@@ -74,15 +81,16 @@ class RitesController extends Controller
             $selectFields = array_merge(['id'], $queryFields);
 
             foreach (
-                $riteType::select($selectFields)->whereHas('service', function ($q) use ($cityIds) {
-                    $q->userParticipates(Auth::user(), 'P')
+                $riteType::select($selectFields)->whereHas('service', function ($q) use ($cityIds, $user) {
+                    $q->userParticipates($user, 'P')
                         ->orWhere(function ($q) use ($cityIds) {
                             $q->inCities($cityIds);
                         });
                 })->get() as $riteRecord
             ) {
                 foreach ($queryFields as $queryField) {
-                    if (str_contains(strtolower($riteRecord->$queryField), $query)) {
+                    $name = $riteRecord->$queryField;
+                    if (is_string($name) && str_contains(strtolower($name), $query)) {
                         $ids[] = $riteRecord->id;
                     }
                 }

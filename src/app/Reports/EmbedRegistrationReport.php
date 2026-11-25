@@ -45,7 +45,6 @@ use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\MessageBag;
 use Illuminate\View\View;
@@ -83,13 +82,13 @@ class EmbedRegistrationReport extends AbstractEmbedReport
      */
     public function setup()
     {
-        $cities = Auth::user()->cities;
+        $cities = $this->authenticatedUser()->cities;
 
         return Inertia::render('Report/EmbedRegistration/Setup', compact('cities'));
     }
 
     /**
-     * @return Application|Factory|View|string
+     * @return Application|Factory|View|string|\Inertia\Response
      */
     public function render(Request $request)
     {
@@ -102,13 +101,21 @@ class EmbedRegistrationReport extends AbstractEmbedReport
                 'singleService' => 'nullable|exists:services,id',
             ]
         );
-        $cities = implode(',', $request->get('includeCities', []));
-        $corsOrigin = CORS::formatUrl($request->get('cors-origin'));
+        $includeCities = $request->get('includeCities', []);
+        /** @var array<string> $includeCities */
+        $includeCities = is_array($includeCities) ? $includeCities : [];
+        $cities = implode(',', $includeCities);
+        $corsOriginValue = $request->get('cors-origin');
+        abort_unless(is_string($corsOriginValue), 400);
+        $corsOrigin = CORS::formatUrl($corsOriginValue);
         $report = $this->getKey();
         $singleDay = $request->get('singleDay', '');
+        if (! is_string($singleDay)) {
+            $singleDay = '';
+        }
         $singleService = $request->get('singleService', '');
         if ($singleDay != '') {
-            $singleDay = Carbon::createFromFormat('d.m.Y', $singleDay)->format('Y-m-d');
+            $singleDay = $this->requireParsedDate(Carbon::createFromFormat('d.m.Y', $singleDay))->format('Y-m-d');
         }
 
         $url = route('report.embed', compact('report', 'cities', 'corsOrigin', 'singleDay', 'singleService'));
@@ -127,19 +134,22 @@ class EmbedRegistrationReport extends AbstractEmbedReport
     {
         $cities = $request->get('cities', []);
         if (! is_array($cities)) {
-            $cities = explode(',', $cities);
+            $cities = is_string($cities) ? explode(',', $cities) : [];
         }
 
         $noScript = $request->get('noScript', 0);
         $singleService = $request->get('singleService', '');
 
         $singleDay = $request->get('singleDay', '');
+        if (! is_string($singleDay)) {
+            $singleDay = '';
+        }
         if ($singleDay != '') {
-            $start = Carbon::createFromFormat('Y-m-d', $request->get('singleDay'))->setTime(0, 0, 0);
-            $end = $start->copy()->setTime(23.59, 59);
+            $start = $this->requireParsedDate(Carbon::createFromFormat('Y-m-d', $singleDay))->setTime(0, 0, 0);
+            $end = $start->copy()->setTime((int) 23.59, 59);
         } else {
             $start = Carbon::now()->setTime(0, 0, 0);
-            $end = $start->copy()->addMonth(1);
+            $end = $start->copy()->addMonth();
         }
 
         $errors = new MessageBag;
@@ -158,10 +168,11 @@ class EmbedRegistrationReport extends AbstractEmbedReport
                 ]
             );
             $errors = $data->errors();
+            /** @var array{service: int|string, number: int|string, service_id?: int, code?: string} $data */
             $data = $data->getData();
             if (count($errors) == 0) {
-                $service = Service::find($data['service']);
-                $test = $service->getSeatFinder()->find($data['number']);
+                $service = Service::findOrFail((int) $data['service']);
+                $test = $service->getSeatFinder()->find((int) $data['number']);
                 if ($test) {
                     $data['service_id'] = $data['service'];
                     $data['code'] = Booking::createCode();
@@ -190,7 +201,7 @@ class EmbedRegistrationReport extends AbstractEmbedReport
 
         $services = [];
         foreach ($tmpServices as $service) {
-            $services[$service->date->format('Ymd')][] = $service;
+            $services[$service->trueDate()->format('Ymd')][] = $service;
         }
 
         $corsOrigin = $request->get('corsOrigin', '');

@@ -32,9 +32,11 @@ namespace App\Models\Ads;
 
 use App\Models\AbstractModel;
 use App\Models\Places\City;
-use Database\Factories\AdChannelFactory;
+use Database\Factories\Ads\AdChannelFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/** Advertisement channel model. */
 class AdChannel extends AbstractModel
 {
     /** @use HasFactory<AdChannelFactory> */
@@ -53,7 +55,10 @@ class AdChannel extends AbstractModel
 
     protected $fillable = ['name', 'slug', 'city_id'];
 
-    public function city()
+    /**
+     * @return BelongsTo<City, $this>
+     */
+    public function city(): BelongsTo
     {
         return $this->belongsTo(City::class);
     }

@@ -34,6 +34,6 @@ use App\Models\Liturgy\Psalm;
 use App\Models\People\User;
 
 /**
- * @method Psalm update(User $user, Psalm $psalm, array $input)
+ * @method Psalm update(User $user, Psalm $psalm, array<string, mixed> $input)
  */
 interface UpdatesPsalms {}

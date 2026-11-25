@@ -35,6 +35,10 @@ use App\Integrations\Youtube\YoutubeIntegration;
 use App\Models\Places\City;
 use App\Models\Service;
 use Google\Service\Exception;
+use Google\Service\YouTube\LiveBroadcast;
+use Google\Service\YouTube\LiveBroadcastListResponse;
+use Google\Service\YouTube\Resource\LiveBroadcasts;
+use Google\Service\YouTube\Resource\Videos;
 use Google_Client;
 use Google_Exception;
 use Google_Service_YouTube;
@@ -51,7 +55,7 @@ class Broadcast
     /** @var Service */
     protected $service = null;
 
-    /** @var City */
+    /** @var City|null */
     protected $city = null;
 
     /** @var Google_Client */
@@ -64,13 +68,13 @@ class Broadcast
     protected $liveBroadcast = null;
 
     /**
-     * Broadcast constructor.
+     * Initialize the YouTube API client, optionally for a given service.
      *
-     * @param  null  $service
+     * @param  Service|null  $service  Service whose YouTube broadcast should be managed.
      *
      * @throws Google_Exception
      */
-    public function __construct($service = null)
+    public function __construct(?Service $service = null)
     {
         if (! YoutubeIntegration::isConfigured()) {
             return;
@@ -80,7 +84,9 @@ class Broadcast
         }
 
         $client = new Google_Client;
-        $client->setAuthConfig(config('google'));
+        /** @var array<string, mixed>|string $googleConfig */
+        $googleConfig = config('google');
+        $client->setAuthConfig($googleConfig);
         $client->addScope(Google_Service_YouTube::YOUTUBE);
         $this->setClient($client);
 
@@ -105,20 +111,22 @@ class Broadcast
 
         $instance = new Broadcast;
         $instance->authenticate($city);
-        $broadcastsResponse = $instance->getYoutube()->liveBroadcasts->listLiveBroadcasts(
+        /** @var LiveBroadcastListResponse $broadcastsResponse */
+        $broadcastsResponse = $instance->liveBroadcasts()->listLiveBroadcasts(
             'id,snippet,contentDetails,status',
             ['id' => $id]
         );
-        if (isset($broadcastsResponse['items'][0])) {
-            $instance->setLiveBroadcast($broadcastsResponse['items'][0]);
-            $broadcast = $broadcastsResponse['items'][0];
+        /** @var LiveBroadcast|null $broadcast */
+        $broadcast = $broadcastsResponse->getItems()[0] ?? null;
+        if ($broadcast !== null) {
+            $instance->setLiveBroadcast($broadcast);
             $service = Service::where('youtube_url', 'https://youtu.be/'.$id)->first();
             if ($service !== null) {
                 $instance->setService($service);
             }
         }
 
-        return $broadcast ? $instance : null;
+        return $broadcast !== null ? $instance : null;
     }
 
     /**
@@ -131,8 +139,12 @@ class Broadcast
         }
 
         $instance = new Broadcast($service);
+        $city = $service->city;
+        if ($city === null) {
+            return null;
+        }
         try {
-            $instance->authenticate($service->city);
+            $instance->authenticate($city);
         } catch (\Exception $exception) {
             Log::warning(
                 'YouTube broadcast lookup skipped for city ID '.$service->city_id
@@ -141,19 +153,19 @@ class Broadcast
 
             return null;
         }
-        $broadcast = null;
-
-        $broadcastsResponse = $instance->getYoutube()->liveBroadcasts->listLiveBroadcasts(
+        /** @var LiveBroadcastListResponse $broadcastsResponse */
+        $broadcastsResponse = $instance->liveBroadcasts()->listLiveBroadcasts(
             'id,snippet,contentDetails,status',
-            ['id' => YoutubeHelper::getCode($service->youtube_url)]
+            ['id' => YoutubeHelper::getCode($service->youtube_url ?? '')]
         );
 
-        if (isset($broadcastsResponse['items'][0])) {
-            $instance->setLiveBroadcast($broadcastsResponse['items'][0]);
-            $broadcast = $broadcastsResponse['items'][0];
+        /** @var LiveBroadcast|null $broadcast */
+        $broadcast = $broadcastsResponse->getItems()[0] ?? null;
+        if ($broadcast !== null) {
+            $instance->setLiveBroadcast($broadcast);
         }
 
-        return $broadcast ? $instance : null;
+        return $broadcast !== null ? $instance : null;
     }
 
     /**
@@ -166,7 +178,7 @@ class Broadcast
         if ($this->getCity() != $city) {
             $this->setCity($city);
         }
-        $this->client->refreshToken($city->google_refresh_token);
+        $this->client->refreshToken($city->google_refresh_token ?? '');
     }
 
     /**
@@ -188,6 +200,28 @@ class Broadcast
     }
 
     /**
+     * Return the typed liveBroadcasts resource of the configured YouTube service.
+     */
+    private function liveBroadcasts(): LiveBroadcasts
+    {
+        /** @var LiveBroadcasts $liveBroadcasts */
+        $liveBroadcasts = $this->getYoutube()->liveBroadcasts;
+
+        return $liveBroadcasts;
+    }
+
+    /**
+     * Return the typed videos resource of the configured YouTube service.
+     */
+    private function videos(): Videos
+    {
+        /** @var Videos $videos */
+        $videos = $this->getYoutube()->videos;
+
+        return $videos;
+    }
+
+    /**
      * Update video metadata and remove a partially created broadcast if that update fails.
      *
      * @param  Google_Service_YouTube_Video  $video  Video metadata to apply.
@@ -196,10 +230,10 @@ class Broadcast
     protected function updateBroadcastVideo(Google_Service_YouTube_Video $video, string $broadcastId): void
     {
         try {
-            $this->youtube->videos->update('snippet,status', $video);
+            $this->videos()->update('snippet,status', $video);
         } catch (\Throwable $exception) {
             try {
-                $this->youtube->liveBroadcasts->delete($broadcastId);
+                $this->liveBroadcasts()->delete($broadcastId);
             } catch (\Throwable $cleanupException) {
                 Log::warning(
                     'YouTube broadcast cleanup failed after video metadata update error ('
@@ -223,7 +257,12 @@ class Broadcast
 
         $instance = new Broadcast($service);
 
-        $instance->authenticate($service->city);
+        $city = $service->city;
+        if ($city === null) {
+            throw new \RuntimeException('Dem Gottesdienst ist keine Kirchengemeinde zugeordnet.');
+        }
+
+        $instance->authenticate($city);
 
         $broadcast = null;
         $broadcastSnippet = $service->getBroadcastSnippet();
@@ -231,12 +270,15 @@ class Broadcast
         // Create an object for the liveBroadcast resource's status, and set the
         // broadcast's status to "private".
         $status = new Google_Service_YouTube_LiveBroadcastStatus;
+        if (! in_array($statusString, ['private', 'public', 'unlisted'], true)) {
+            $statusString = 'public';
+        }
         $status->setPrivacyStatus($statusString);
-        $status->setSelfDeclaredMadeForKids('false');
+        $status->setSelfDeclaredMadeForKids(false);
 
         $contentDetails = new \Google_Service_YouTube_LiveBroadcastContentDetails;
-        if ($service->city->youtube_passive_stream_id) {
-            $contentDetails->setBoundStreamId($service->city->youtube_passive_stream_id);
+        if ($city->youtube_passive_stream_id) {
+            $contentDetails->setBoundStreamId($city->youtube_passive_stream_id);
         }
 
         // Create the API request that inserts the liveBroadcast resource.
@@ -248,7 +290,8 @@ class Broadcast
 
         // Execute the request and return an object that contains information
         // about the new broadcast.
-        $broadcastsResponse = $instance->getYoutube()->liveBroadcasts->insert(
+        /** @var LiveBroadcast $broadcastsResponse */
+        $broadcastsResponse = $instance->liveBroadcasts()->insert(
             'snippet,status,contentDetails',
             $broadcastInsert,
             []
@@ -259,7 +302,7 @@ class Broadcast
         $video->setId($broadcastsResponse->id);
         $video->setSnippet($service->getVideoSnippet());
         $videoStatus = new \Google_Service_YouTube_VideoStatus;
-        $videoStatus->setSelfDeclaredMadeForKids($service->city->youtube_self_declared_for_children == 1);
+        $videoStatus->setSelfDeclaredMadeForKids($city->youtube_self_declared_for_children == 1);
         $video->setStatus($videoStatus);
 
         $instance->updateBroadcastVideo($video, (string) $broadcastsResponse->id);
@@ -272,21 +315,28 @@ class Broadcast
      *
      * @param  Service  $service  Service whose broadcast should be deleted.
      */
-    public static function delete(Service $service)
+    public static function delete(Service $service): void
     {
+        if ($service->city === null) {
+            return;
+        }
         $youtube = YoutubeIntegration::get($service->city)->getYoutube();
-        $youtube->liveBroadcasts->delete(YoutubeHelper::getCode($service->youtube_url));
+        /** @var LiveBroadcasts $liveBroadcasts */
+        $liveBroadcasts = $youtube->liveBroadcasts;
+        /** @var string $broadcastId */
+        $broadcastId = YoutubeHelper::getCode($service->youtube_url ?? '');
+        $liveBroadcasts->delete($broadcastId);
         $service->update(['youtube_url' => '']);
     }
 
     /**
      * Update the remote broadcast description from the current service data.
      */
-    public function update()
+    public function update(): void
     {
         $broadcast = $this->getLiveBroadcast();
         $broadcast->setSnippet($this->service->getBroadcastSnippet());
-        $this->getYoutube()->liveBroadcasts->update('id,snippet,contentDetails,status', $broadcast);
+        $this->liveBroadcasts()->update('id,snippet,contentDetails,status', $broadcast);
     }
 
     /**
@@ -296,7 +346,7 @@ class Broadcast
      */
     public function getSharerUrl()
     {
-        return $this->liveBroadcast ? 'https://youtu.be/'.$this->liveBroadcast['id'] : '';
+        return $this->liveBroadcast ? 'https://youtu.be/'.$this->liveBroadcast->getId() : '';
     }
 
     /**
@@ -366,9 +416,12 @@ class Broadcast
     }
 
     /**
-     * Get the currently active broadcast for a city
+     * Get the currently active broadcasts for a city.
+     *
+     * @param  City  $city  City whose YouTube broadcasts should be queried.
+     * @return Google_Service_YouTube_LiveBroadcast[] Broadcasts bound to the active stream.
      */
-    public static function getActive(City $city)
+    public static function getActive(City $city): array
     {
         if (! $city->youtube_active_stream_id || ! YoutubeIntegration::isConfigured()) {
             return [];
@@ -377,15 +430,20 @@ class Broadcast
         $instance->authenticate($city);
         $broadcasts = [];
 
-        $broadcastsResponse = $instance->getYoutube()->liveBroadcasts->listLiveBroadcasts(
+        /** @var LiveBroadcastListResponse $broadcastsResponse */
+        $broadcastsResponse = $instance->liveBroadcasts()->listLiveBroadcasts(
             'id,snippet,status,contentDetails,contentDetails',
             ['mine' => true, 'maxResults' => 255]
         );
 
         foreach ($broadcastsResponse->getItems() as $broadcastItem) {
+            /** @var LiveBroadcast $broadcastItem */
             if ($broadcastItem->getContentDetails()->boundStreamId == $city->youtube_active_stream_id
                 && $broadcastItem->getStatus()->getLifeCycleStatus() != 'complete') {
-                $broadcastItem->service = Service::where('youtube_url', 'https://youtu.be/'.$broadcastItem->getId())->first();
+                // Das Google-Modell kennt keine deklarierte service-Eigenschaft.
+                /** @var string $serviceProperty */
+                $serviceProperty = 'service';
+                $broadcastItem->{$serviceProperty} = Service::where('youtube_url', 'https://youtu.be/'.$broadcastItem->getId())->first();
                 $broadcasts[] = $broadcastItem;
 
             }
@@ -398,7 +456,7 @@ class Broadcast
      * Get incomplete broadcasts that are not bound to the active stream.
      *
      * @param  City  $city  City whose YouTube broadcasts should be queried.
-     * @return array
+     * @return Google_Service_YouTube_LiveBroadcast[] Incomplete broadcasts not bound to the active stream.
      */
     public static function getInactive(City $city)
     {
@@ -409,14 +467,19 @@ class Broadcast
         $instance->authenticate($city);
         $broadcasts = [];
 
-        $broadcastsResponse = $instance->getYoutube()->liveBroadcasts->listLiveBroadcasts(
+        /** @var LiveBroadcastListResponse $broadcastsResponse */
+        $broadcastsResponse = $instance->liveBroadcasts()->listLiveBroadcasts(
             'id,snippet,status,contentDetails',
             ['mine' => true, 'maxResults' => 255]
         );
 
         foreach ($broadcastsResponse->getItems() as $broadcastItem) {
+            /** @var LiveBroadcast $broadcastItem */
             if ($broadcastItem->getContentDetails()->boundStreamId != $city->youtube_active_stream_id && $broadcastItem->getStatus()->getLifeCycleStatus() != 'complete') {
-                $broadcastItem->service = Service::where('youtube_url', 'https://youtu.be/'.$broadcastItem->getId())->first();
+                // Das Google-Modell kennt keine deklarierte service-Eigenschaft.
+                /** @var string $serviceProperty */
+                $serviceProperty = 'service';
+                $broadcastItem->{$serviceProperty} = Service::where('youtube_url', 'https://youtu.be/'.$broadcastItem->getId())->first();
                 $broadcasts[] = $broadcastItem;
 
             }
@@ -429,40 +492,48 @@ class Broadcast
     /**
      * Activate this broadcast and move other active broadcasts to the passive stream.
      */
-    public function activate()
+    public function activate(): void
     {
-        $this->authenticate($this->getCity());
+        $city = $this->getCity();
+        if ($city === null) {
+            throw new \RuntimeException('Dem Stream ist keine Kirchengemeinde zugeordnet.');
+        }
+        $this->authenticate($city);
 
         $broadcast = $this->getLiveBroadcast();
 
-        $this->getYoutube()->liveBroadcasts->bind($broadcast->getId(), 'id,snippet,status', ['streamId' => $this->getCity()->youtube_active_stream_id]);
-        $broadcastsResponse = $this->getYoutube()->liveBroadcasts->listLiveBroadcasts(
+        $this->liveBroadcasts()->bind($broadcast->getId(), 'id,snippet,status', ['streamId' => $city->youtube_active_stream_id]);
+        /** @var LiveBroadcastListResponse $broadcastsResponse */
+        $broadcastsResponse = $this->liveBroadcasts()->listLiveBroadcasts(
             'id,snippet,contentDetails',
             ['id' => $broadcast->getId()]
         );
+        /** @var LiveBroadcast $broadcast */
         $broadcast = $broadcastsResponse->getItems()[0];
 
-        if ($this->getCity()->youtube_auto_startstop) {
+        if ($city->youtube_auto_startstop) {
             $contentDetails = $broadcast->getContentDetails();
             if ((! $contentDetails->getEnableAutoStart()) || (! $contentDetails->getEnableAutoStop())) {
-                $contentDetails->setEnableAutoStart('true');
-                $contentDetails->setEnableAutoStop('true');
+                $contentDetails->setEnableAutoStart(true);
+                $contentDetails->setEnableAutoStop(true);
                 $broadcast->setContentDetails($contentDetails);
-                $this->getYoutube()->liveBroadcasts->update('snippet,contentDetails', $broadcast);
+                $this->liveBroadcasts()->update('snippet,contentDetails', $broadcast);
             }
         }
 
         // set all others to passive:
-        $broadcastsResponse = $this->getYoutube()->liveBroadcasts->listLiveBroadcasts(
+        /** @var LiveBroadcastListResponse $broadcastsResponse */
+        $broadcastsResponse = $this->liveBroadcasts()->listLiveBroadcasts(
             'id,snippet,status,contentDetails',
             ['mine' => true, 'maxResults' => 255]
         );
         foreach ($broadcastsResponse->getItems() as $item) {
+            /** @var LiveBroadcast $item */
             if (($item->getId() != $broadcast->getId())
                 && ($item->getStatus()->getLifeCycleStatus() != 'complete')
-                && ($item->getContentDetails()->getBoundStreamId() == $this->getCity()->youtube_active_stream_id)) {
+                && ($item->getContentDetails()->getBoundStreamId() == $city->youtube_active_stream_id)) {
                 try {
-                    $this->getYoutube()->liveBroadcasts->bind($item->getId(), 'id,snippet,status', ['streamId' => $this->getCity()->youtube_passive_stream_id]);
+                    $this->liveBroadcasts()->bind($item->getId(), 'id,snippet,status', ['streamId' => $city->youtube_passive_stream_id]);
                 } catch (Exception $e) {
                     report($e);
                 }

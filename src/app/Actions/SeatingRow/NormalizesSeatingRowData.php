@@ -15,6 +15,10 @@ namespace App\Actions\SeatingRow;
 
 class NormalizesSeatingRowData
 {
+    /**
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
     public static function normalize(array $data): array
     {
         if (is_numeric($data['title'])) {
@@ -24,7 +28,8 @@ class NormalizesSeatingRowData
         $data['divides_into'] = $data['divides_into'] ?? 1;
         $data['seats'] = $data['seats'] ?? 1;
         $data['spacing'] = $data['spacing'] ?? 0;
-        $data['split'] = str_replace(' ', '', $data['split'] ?? '');
+        $split = $data['split'] ?? '';
+        $data['split'] = is_string($split) ? str_replace(' ', '', $split) : '';
 
         return $data;
     }

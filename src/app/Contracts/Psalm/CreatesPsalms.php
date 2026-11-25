@@ -34,6 +34,6 @@ use App\Models\Liturgy\Psalm;
 use App\Models\People\User;
 
 /**
- * @method Psalm create(User $user, array $input)
+ * @method Psalm create(User $user, array<string, mixed> $input)
  */
 interface CreatesPsalms {}

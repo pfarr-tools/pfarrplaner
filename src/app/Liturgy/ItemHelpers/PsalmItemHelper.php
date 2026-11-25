@@ -32,36 +32,54 @@ namespace App\Liturgy\ItemHelpers;
 
 class PsalmItemHelper extends AbstractItemHelper
 {
-    public function getCodeText()
+    /**
+     * Gibt den Psalmcode mit Referenz und gegebenenfalls alternativer EG-Nummer zurück.
+     */
+    public function getCodeText(): string
     {
         if (! isset($this->item->data['psalm'])) {
             return '';
         }
-        $codeText = $this->item->data['psalm']['code'] ?? $this->item->data['psalm']['songbook_abbreviation'] ?? '';
-        $codeText .= ' '.($this->item->data['psalm']['reference'] ?? '')
-            .(isset($this->item->data['psalm']['alt_eg']) ? ' (EG '.$this->item->data['psalm']['alt_eg'].')' : '');
+        /** @var array{code?: string, songbook_abbreviation?: string, reference?: string, alt_eg?: string|int} $psalm */
+        $psalm = $this->item->data['psalm'];
+        $codeText = $psalm['code'] ?? $psalm['songbook_abbreviation'] ?? '';
+        $codeText .= ' '.($psalm['reference'] ?? '')
+            .(isset($psalm['alt_eg']) ? ' (EG '.$psalm['alt_eg'].')' : '');
 
         return $codeText;
     }
 
-    public function getTitleText()
+    /**
+     * Gibt den Titel des Psalms zurück.
+     */
+    public function getTitleText(): string
     {
         if (! isset($this->item->data['psalm'])) {
             return '';
         }
 
-        return $this->item->data['psalm']['name'] ?? '';
+        /** @var array{name?: string} $psalm */
+        $psalm = $this->item->data['psalm'];
+
+        return $psalm['name'] ?? '';
     }
 
-    public function getVerses()
+    /**
+     * Gibt die Verse des Psalms als Gruppen von Zeilen zurück.
+     *
+     * @return list<list<string>> Durch Einrückung gruppierte Psalmzeilen
+     */
+    public function getVerses(): array
     {
         if (! isset($this->item->data['psalm'])) {
             return [];
         }
+        /** @var array{text?: string} $psalm */
+        $psalm = $this->item->data['psalm'];
         $verses = [];
         $verse = [];
         $indent = false;
-        foreach (explode("\n", $this->item->data['psalm']['text']) as $line) {
+        foreach (explode("\n", $psalm['text'] ?? '') as $line) {
             if ($indent && (substr($line, 0, 1) != "\t")) {
                 $indent = false;
                 $verses[] = $verse;
@@ -78,7 +96,12 @@ class PsalmItemHelper extends AbstractItemHelper
         return $verses;
     }
 
-    public function getFinalVerses($number = 2)
+    /**
+     * Gibt die letzten Verse des Psalms als Text zurück.
+     *
+     * @param  int  $number  Anzahl der abschließenden Verse
+     */
+    public function getFinalVerses(int $number = 2): string
     {
         $verses = $this->getVerses();
         $stop = min($number, count($verses));

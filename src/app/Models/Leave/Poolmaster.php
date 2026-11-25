@@ -33,6 +33,7 @@ namespace App\Models\Leave;
 use App\Models\AbstractModel;
 use App\Models\People\User;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Poolmaster extends AbstractModel
@@ -54,12 +55,18 @@ class Poolmaster extends AbstractModel
         'end' => 'required|date',
     ];
 
+    /**
+     * @return BelongsTo<Pool, $this>
+     */
     public function pool()
     {
         return $this->belongsTo(Pool::class, 'pool_id', 'id');
     }
 
-    public function user()
+    /**
+     * @return BelongsTo<User, $this>
+     */
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id', 'id');
     }
@@ -75,6 +82,9 @@ class Poolmaster extends AbstractModel
             ->where('to', '>=', Carbon::now());
     }
 
+    /**
+     * @return array<string, mixed>|false
+     */
     public static function getAdminModuleConfig()
     {
         return false;
@@ -92,7 +102,7 @@ class Poolmaster extends AbstractModel
      */
     public static function getEmptyModel(): AbstractModel
     {
-        $model = new static;
+        $model = new self;
         $data = array_merge(array_fill_keys($model->getFillable(), null), $model->fillDefaults());
         $model->fill($data);
 
@@ -101,17 +111,25 @@ class Poolmaster extends AbstractModel
 
     /**
      * Mutator for start date, needed to deal with ISO date strings
+     *
+     * @param  mixed  $value  Date value.
      */
     public function setStartAttribute($value): void
     {
-        $this->attributes['start'] = $value ? Carbon::parse($value)->toDateString() : null;
+        $this->attributes['start'] = $value && (is_string($value) || is_int($value) || is_float($value) || $value instanceof \DateTimeInterface)
+            ? Carbon::parse($value)->toDateString()
+            : null;
     }
 
     /**
      * Mutator for end date, needed to deal with ISO date strings
+     *
+     * @param  mixed  $value  Date value.
      */
     public function setEndAttribute($value): void
     {
-        $this->attributes['end'] = $value ? Carbon::parse($value)->toDateString() : null;
+        $this->attributes['end'] = $value && (is_string($value) || is_int($value) || is_float($value) || $value instanceof \DateTimeInterface)
+            ? Carbon::parse($value)->toDateString()
+            : null;
     }
 }

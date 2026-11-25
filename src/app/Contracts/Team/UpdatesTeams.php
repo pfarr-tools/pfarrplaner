@@ -34,6 +34,6 @@ use App\Models\People\Team;
 use App\Models\People\User;
 
 /**
- * @method Team update(User $user, Team $team, array $input)
+ * @method Team update(User $user, Team $team, array<string, mixed> $input)
  */
 interface UpdatesTeams {}

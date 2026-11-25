@@ -58,8 +58,6 @@ class SongbookPolicy
 
     /**
      * Determine whether the user can view the index of all songbooks.
-     *
-     * @return mixed
      */
     public function viewAny(User $user): bool
     {
@@ -68,8 +66,6 @@ class SongbookPolicy
 
     /**
      * Determine whether the user can view the songbook.
-     *
-     * @return mixed
      */
     public function view(User $user, Songbook $songbook): bool
     {
@@ -78,8 +74,6 @@ class SongbookPolicy
 
     /**
      * Determine whether the user can create services.
-     *
-     * @return mixed
      */
     public function create(User $user): bool
     {
@@ -88,8 +82,6 @@ class SongbookPolicy
 
     /**
      * Determine whether the user can update the songbook.
-     *
-     * @return mixed
      */
     public function update(User $user, Songbook $songbook): bool
     {
@@ -98,8 +90,6 @@ class SongbookPolicy
 
     /**
      * Determine whether the user can delete the songbook.
-     *
-     * @return mixed
      */
     public function delete(User $user, Songbook $songbook): bool
     {
@@ -108,8 +98,6 @@ class SongbookPolicy
 
     /**
      * Determine whether the user can restore the songbook.
-     *
-     * @return mixed
      */
     public function restore(User $user, Songbook $songbook): bool
     {
@@ -118,8 +106,6 @@ class SongbookPolicy
 
     /**
      * Determine whether the user can permanently delete the songbook.
-     *
-     * @return mixed
      */
     public function forceDelete(User $user, Songbook $songbook): bool
     {

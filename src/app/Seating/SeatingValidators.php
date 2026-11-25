@@ -38,9 +38,18 @@ class SeatingValidators
 {
     public static function register(): void {}
 
-    public static function seatable($attribute, $value, $parameters, $validator)
+    /**
+     * Check whether a booking can be seated in the service.
+     *
+     * @param  string  $attribute  Name of the validated attribute.
+     * @param  mixed  $value  Value of the validated attribute.
+     * @param  array<int, mixed>  $parameters  Parameters passed to the validation rule.
+     * @param  Validator  $validator  Validator instance.
+     * @return bool True if the booking can be seated.
+     */
+    public static function seatable(string $attribute, mixed $value, array $parameters, Validator $validator): bool
     {
-        /** @var Validator $data */
+        /** @var array<string, mixed> $data */
         $data = $validator->getData();
         if ($attribute == 'number') {
             $data['fixed_seat'] = '';
@@ -53,18 +62,25 @@ class SeatingValidators
         /** @var AbstractSeatFinder $seatFinder */
         $seatFinder = $service->getSeatFinder();
 
-        if (isset($parameters[0]) && isset($data[$parameters[0]])) {
+        $parameter = $parameters[0] ?? null;
+        if ((is_string($parameter) || is_int($parameter)) && isset($data[$parameter])) {
             // existing booking
-            $booking = Booking::find($data[$parameters[0]]);
+            $booking = Booking::find($data[$parameter]);
+            if (! $booking instanceof Booking) {
+                return false;
+            }
             $success = $seatFinder->checkIfBookingCanBeChanged($booking, $data);
         } else {
             // new booking
-            $success = $seatFinder->find(
-                $data['number'],
-                $data['fixed_seat'],
-                $data['override_seats'],
-                $data['override_split']
-            );
+            /** @var int $number */
+            $number = $data['number'];
+            /** @var string $fixedSeat */
+            $fixedSeat = $data['fixed_seat'];
+            /** @var string $overrideSeats */
+            $overrideSeats = $data['override_seats'];
+            /** @var string $overrideSplit */
+            $overrideSplit = $data['override_split'];
+            $success = $seatFinder->find($number, $fixedSeat, $overrideSeats, $overrideSplit);
         }
 
         return $success;

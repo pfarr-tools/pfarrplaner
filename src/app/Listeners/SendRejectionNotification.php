@@ -31,6 +31,8 @@
 namespace App\Listeners;
 
 use App\Events\AbsenceRejected;
+use App\Models\Leave\Absence;
+use Illuminate\Support\Facades\Mail;
 
 /**
  * Class SendRejectionNotification
@@ -50,19 +52,27 @@ class SendRejectionNotification
     /**
      * Handle the event.
      *
+     * Das Legacy-Event liefert die Abwesenheit als dynamische Eigenschaft.
+     *
      * @return void
      */
     public function handle(AbsenceRejected $event)
     {
-        $users = clone $event->absence->user->approvers;
-        $users->push($event->absence->user);
+        /** @var AbsenceRejected&object{absence: Absence} $event */
+        $user = $event->absence->user;
+        if (! $user) {
+            return;
+        }
 
-        if (env('THIS_IS_MY_DEV_HOST')) {
+        $users = clone $user->approvers;
+        $users->push($user);
+
+        if (config('app.dev')) {
             foreach ($users as $user) {
                 $user->email = 'dev@peregrinus.de';
             }
         }
 
-        Mail::to($users)->queue(new \App\Mail\AbsenceRejected($event->absence));
+        Mail::to($users)->queue(new \App\Mail\Absence\AbsenceRejected($event->absence, $user));
     }
 }

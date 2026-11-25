@@ -64,6 +64,7 @@ class PPTUnitsHelper
         }
 
         // Convert from $fromUnit to EMU
+        /** @var int $value */
         switch ($fromUnit) {
             case self::UNIT_MILLIMETER:
                 $value *= 36000;
@@ -97,7 +98,7 @@ class PPTUnitsHelper
                 $value /= 914400;
                 break;
             case self::UNIT_PIXEL:
-                $value = Drawing::emuToPixels($value);
+                $value = Drawing::emuToPixels((int) $value);
                 break;
             case self::UNIT_POINT:
                 $value /= 12700;
@@ -114,6 +115,8 @@ class PPTUnitsHelper
      * Estimate wrapped lines based on actual font metrics (TTF) and max pixel width.
      * This is stable across PPTX/ODP because we're not relying on viewer tab stops,
      * but on our own wrapping + line counting.
+     *
+     * @return list<string> Wrapped lines, at least one line (an empty string for empty input)
      */
     public static function wrapTextByPixelWidth(
         string $text,
@@ -121,12 +124,13 @@ class PPTUnitsHelper
         int $fontSizePx,
         int $maxWidthPx
     ): array {
-        $text = trim(preg_replace('/\s+/u', ' ', $text));
+        $normalized = preg_replace('/\s+/u', ' ', $text) ?? '';
+        $text = trim($normalized);
         if ($text === '') {
             return [''];
         }
 
-        $words = preg_split('/\s+/u', $text);
+        $words = preg_split('/\s+/u', $text) ?: [];
         $lines = [];
         $currentLine = '';
 
@@ -168,17 +172,22 @@ class PPTUnitsHelper
             return (int) (mb_strlen($text) * ($fontSizePx * 0.55));
         }
 
+        /** @var array<int, int> $box */
         return (int) abs($box[2] - $box[0]);
     }
 
-    /** Split a too-long word into chunks that fit maxWidthPx (pixel-based). */
+    /**
+     * Split a too-long word into chunks that fit maxWidthPx (pixel-based).
+     *
+     * @return list<string> Chunks that each fit the maximum width
+     */
     public static function hardSplitWordByPixelWidth(
         string $word,
         string $ttfPath,
         int $fontSizePx,
         int $maxWidthPx
     ): array {
-        $chars = preg_split('//u', $word, -1, PREG_SPLIT_NO_EMPTY);
+        $chars = preg_split('//u', $word, -1, PREG_SPLIT_NO_EMPTY) ?: [];
         $parts = [];
         $current = '';
 
@@ -203,6 +212,8 @@ class PPTUnitsHelper
 
     /**
      * Return true if the text (array of lines) fits into the text area height.
+     *
+     * @param  list<string>  $lines
      */
     public static function textFitsOnSlide(array $lines, int $fontSizePx, int $maxWidthPx, int $maxHeightPx, string $ttfPath): bool
     {
@@ -212,6 +223,8 @@ class PPTUnitsHelper
     /**
      * Estimate height in pixels after wrapping using TTF font metrics.
      * We model each input line as one paragraph.
+     *
+     * @param  list<string>  $lines
      */
     public static function estimateTextHeightPx(array $lines, int $fontSizePx, int $maxWidthPx, string $ttfPath): int
     {
@@ -266,6 +279,7 @@ class PPTUnitsHelper
         if ($box === false) {
             return (int) round($fontSizePx * 1.25);
         }
+        /** @var array<int, int> $box */
         $height = abs($box[7] - $box[1]); // y coords
 
         // Add a little leading
@@ -275,6 +289,9 @@ class PPTUnitsHelper
     /**
      * Split text into two parts so part1 fits. Prefer punctuation split.
      * Returns [part1Lines, part2Lines]. If it cannot split reasonably, part2Lines may be empty.
+     *
+     * @param  list<string>  $lines
+     * @return array{list<string>, list<string>} The two parts as arrays of lines
      */
     public static function splitTextToFitSlide(array $lines, int $fontSizePx, int $maxWidthPx, int $maxHeightPx, string $ttfPath): array
     {
@@ -331,6 +348,8 @@ class PPTUnitsHelper
     /**
      * Split into chunks like sentences/clauses while keeping delimiters, including newlines.
      * This makes it easier to grow text until it fits.
+     *
+     * @return list<string> Chunks including their trailing delimiter
      */
     public static function splitIntoChunksKeepingDelimiters(string $text): array
     {
@@ -345,6 +364,9 @@ class PPTUnitsHelper
     /**
      * Return best split position in the given text (end of last preferred punctuation, else secondary).
      * Position returned is the index *after* the punctuation and following whitespace.
+     *
+     * @param  list<string>  $preferred
+     * @param  list<string>  $secondary
      */
     public static function bestPunctuationSplitPosition(string $text, array $preferred, array $secondary): ?int
     {
@@ -387,11 +409,13 @@ class PPTUnitsHelper
 
     /**
      * Fallback split by words around the middle (keeps newlines as spaces).
+     *
+     * @return array{list<string>, list<string>} The two parts as arrays of lines
      */
     public static function fallbackSplitByWords(string $text): array
     {
-        $normalized = preg_replace("/\n+/u", ' ', $text);
-        $words = preg_split('/\s+/u', trim($normalized));
+        $normalized = preg_replace("/\n+/u", ' ', $text) ?? '';
+        $words = preg_split('/\s+/u', trim($normalized)) ?: [];
         $half = (int) floor(count($words) / 2);
 
         $part1 = implode(' ', array_slice($words, 0, max(1, $half)));

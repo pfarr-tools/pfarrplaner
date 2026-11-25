@@ -30,11 +30,14 @@
 
 namespace App\Liturgy\LiturgySheets;
 
+use App\Liturgy\ItemHelpers\FreetextItemHelper;
 use App\Liturgy\SongBeamer\ImportableSchedule;
 use App\Models\Liturgy\Songbook;
 use App\Models\Liturgy\SongReference;
 use App\Models\Service;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
+/** Liturgy sheet rendered as a SongBeamer slide list. */
 class SongBeamerLiturgySheet extends AbstractLiturgySheet
 {
     protected $title = 'Songbeamer: Importierbarer Ablauf';
@@ -53,6 +56,10 @@ class SongBeamerLiturgySheet extends AbstractLiturgySheet
         'includeSongList' => 1,
     ];
 
+    /**
+     * @param  Service  $service  Service to render.
+     * @return mixed
+     */
     public function render(Service $service)
     {
         $songBeamerSchedule = new ImportableSchedule;
@@ -76,7 +83,7 @@ class SongBeamerLiturgySheet extends AbstractLiturgySheet
                     && ($item->data_type == 'freetext')
                     && ($item->title == 'Ehr sei dem Vater')
                     && (isset($item->data['description']))) {
-                    /** @var Liturgy\ItemHelpers\FreetextItemHelper $ftHelper */
+                    /** @var FreetextItemHelper $ftHelper */
                     $ftHelper = $item->getHelper();
                     $songBeamerSchedule->addSimpleTextItem('Ehr sei dem Vater', $ftHelper->getText());
                 } else {
@@ -115,6 +122,12 @@ class SongBeamerLiturgySheet extends AbstractLiturgySheet
         return $this->sendToBrowser($this->getFileName($service, 'Texte und Lieder'), $songBeamerSchedule);
     }
 
+    /**
+     * Send the generated SongBeamer schedule as a ZIP download.
+     *
+     * @param  string  $filename  Name of the downloaded file.
+     * @return BinaryFileResponse Download response for the generated ZIP.
+     */
     protected function sendToBrowser($filename, ImportableSchedule $sb)
     {
         header('Content-Description: File Transfer');
@@ -124,45 +137,71 @@ class SongBeamerLiturgySheet extends AbstractLiturgySheet
         header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
         header('Expires: 0');
         $tempFile = $sb->toZip();
+        if ($tempFile === false) {
+            throw new \RuntimeException('SongBeamer-Archiv konnte nicht erstellt werden.');
+        }
 
         return response()->download($tempFile, $filename, ['Content-Type' => 'application/zip'])
             ->deleteFileAfterSend(true);
     }
 
-    protected function renderSongListSlide(Service $service, ImportableSchedule $songBeamerSchedule)
+    /**
+     * Add a slide listing the service's songs and psalms to the schedule.
+     *
+     * @param  Service  $service  Service whose songs are listed.
+     * @param  ImportableSchedule  $songBeamerSchedule  Schedule receiving the slide.
+     */
+    protected function renderSongListSlide(Service $service, ImportableSchedule $songBeamerSchedule): void
     {
         $slideText = '';
 
+        /** @var array<int, array{ref: string, verses: string, image: string, code: string, color: string, psalm: bool}> $listItems */
         $listItems = [];
         foreach ($service->liturgyBlocks as $block) {
             foreach ($block->items as $item) {
-                if (($item->data_type == 'song') && (isset($item->data['song']))) {
+                /** @var array<string, mixed> $data */
+                $data = $item->data;
+                if (($item->data_type == 'song') && isset($data['song'])) {
+                    /** @var array{id?: int|string, reference?: string, songbook?: array{image?: string, code?: string}} $song */
+                    $song = $data['song'];
                     $refColor = '';
-                    if (isset($item->data['song']['id'])) {
-                        $songRef = SongReference::find($item->data['song']['id']);
-                        $refColor = $songRef->color ?? '';
+                    if (isset($song['id'])) {
+                        $songRef = SongReference::find($song['id']);
+                        /** @var string|null $color */
+                        $color = $songRef->color ?? null;
+                        $refColor = $color ?? '';
                     }
+                    /** @var string $verses */
+                    $verses = $data['verses'] ?? '';
+                    /** @var string $songbookImage */
+                    $songbookImage = $song['songbook']['image'] ?? '';
+                    /** @var string $songbookCode */
+                    $songbookCode = $song['songbook']['code'] ?? '';
                     $listItems[] = [
-                        'ref' => $item->data['song']['reference'] ?? '',
-                        'verses' => $item->data['verses'],
-                        'image' => isset($item->data['song']['songbook']) ? ($item->data['song']['songbook']['image'] ?? '') : '',
-                        'code' => isset($item->data['song']['songbook']) ? ($item->data['song']['songbook']['code'] ?? '') : '',
+                        'ref' => $song['reference'] ?? '',
+                        'verses' => $verses,
+                        'image' => $songbookImage,
+                        'code' => $songbookCode,
                         'color' => $refColor,
                         'psalm' => false,
                     ];
-                } elseif (($item->data_type == 'psalm') && isset($item->data['psalm'])) {
+                } elseif (($item->data_type == 'psalm') && isset($data['psalm'])) {
+                    /** @var array{songbook_abbreviation?: string, reference?: string, title?: string} $psalm */
+                    $psalm = $data['psalm'];
                     $refColor = '';
                     $songbook = null;
-                    if (isset($item->data['psalm']['songbook_abbreviation'])) {
-                        $refColor = ($item->data['psalm']['songbook_abbreviation'] == 'EG') ? '#c8baf7' : '';
-                        $songbook = Songbook::where('code', $item->data['psalm']['songbook_abbreviation'])->first();
+                    if (isset($psalm['songbook_abbreviation'])) {
+                        $refColor = ($psalm['songbook_abbreviation'] == 'EG') ? '#c8baf7' : '';
+                        $songbook = Songbook::where('code', $psalm['songbook_abbreviation'])->first();
                     }
 
+                    /** @var string|null $songbookImage */
+                    $songbookImage = $songbook ? $songbook->image : null;
                     $listItems[] = [
-                        'ref' => $item->data['psalm']['reference'] ?? '',
-                        'verses' => $item->data['psalm']['title'] ?? '',
-                        'image' => $songbook ? $songbook->image : '',
-                        'code' => $item->data['psalm']['songbook_abbreviation'] ?? '',
+                        'ref' => $psalm['reference'] ?? '',
+                        'verses' => $psalm['title'] ?? '',
+                        'image' => $songbookImage ?? '',
+                        'code' => $psalm['songbook_abbreviation'] ?? '',
                         'color' => $refColor,
                         'psalm' => true,
                     ];

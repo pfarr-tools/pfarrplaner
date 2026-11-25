@@ -50,32 +50,48 @@ class CreateBooking extends AbstractCreateAction implements CreatesBookings
         return route('service.edit', ['service' => $this->service->slug, 'tab' => 'registrations']);
     }
 
+    /**
+     * @param  array<string, mixed>  $input
+     */
     public function create(User $user, array $input): Booking
     {
-        $this->service = Service::findOrFail($input['service_id']);
+        /** @var int|string $serviceId */
+        $serviceId = $input['service_id'];
+        $this->service = Service::findOrFail((int) $serviceId);
         Gate::forUser($user)->authorize('create', [Booking::class, $this->service]);
         $input = $this->validateAndNormalize($input);
         $input['code'] = $input['code'] ?? Booking::createCode();
 
         $booking = Booking::create($input);
         CreatedBooking::dispatch($user, $booking);
-        $this->messages = ['success' => (($input['number'] ?? 1) == 1)
+        /** @var int|string $number */
+        $number = $input['number'] ?? 1;
+        $this->messages = ['success' => ($number == 1)
             ? 'Der Platz wurde reserviert.'
-            : $input['number'].' zusammenhängende Plätze wurden reserviert.'];
+            : $number.' zusammenhängende Plätze wurden reserviert.'];
 
         return $booking;
     }
 
+    /**
+     * @param  array<string, mixed>  $input
+     * @return array<string, mixed>
+     */
     protected function validateAndNormalize(array $input): array
     {
+        /** @var array{number: array<int, mixed>, fixed_seat: array<int, mixed>} $rules */
         $rules = Booking::$validationRules;
         $rules['number'][] = new Seatable('booking_id');
         $rules['fixed_seat'][] = new SeatableFixed('booking_id');
 
+        /** @var array<string, mixed> $input */
         $input = Validator::make($input, $rules)->validateWithBag('createBooking');
-        $input['fixed_seat'] = strtoupper($input['fixed_seat'] ?? '');
-        $input['override_seats'] = strtoupper((string) ($input['override_seats'] ?? ''));
-        $input['override_split'] = strtoupper($input['override_split'] ?? '');
+        $fixedSeat = $input['fixed_seat'] ?? '';
+        $input['fixed_seat'] = strtoupper(is_string($fixedSeat) ? $fixedSeat : '');
+        $overrideSeats = $input['override_seats'] ?? '';
+        $input['override_seats'] = strtoupper(is_scalar($overrideSeats) ? (string) $overrideSeats : '');
+        $overrideSplit = $input['override_split'] ?? '';
+        $input['override_split'] = strtoupper(is_string($overrideSplit) ? $overrideSplit : '');
 
         return $input;
     }

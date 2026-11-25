@@ -18,12 +18,19 @@ class EmailLoginLinkController extends Controller
 {
     private const GENERIC_STATUS = 'Wenn die Adresse zu einem Konto gehört, das sich anmelden kann, senden wir einen Anmeldelink. Bitte prüfen Sie Ihr Postfach.';
 
-    /** Send a generic passwordless sign-in response for known and unknown addresses. */
-    public function request(Request $request)
+    /**
+     * Send a generic passwordless sign-in response for known and unknown addresses.
+     *
+     * @param  Request  $request  Current login-link request.
+     * @return RedirectResponse Redirect to the login page with a generic status message.
+     */
+    public function request(Request $request): RedirectResponse
     {
         $validated = $request->validate(['email' => ['required', 'string', 'email', 'max:254']]);
+        /** @var array{email: string} $validated */
         $email = mb_strtolower(trim($validated['email']));
-        $emailKey = 'login-link-email:'.hash_hmac('sha256', $email, (string) config('app.key'));
+        $appKey = config('app.key');
+        $emailKey = 'login-link-email:'.hash_hmac('sha256', $email, is_string($appKey) ? $appKey : '');
 
         if (! RateLimiter::tooManyAttempts($emailKey, 3)) {
             RateLimiter::hit($emailKey, 300);
@@ -33,8 +40,14 @@ class EmailLoginLinkController extends Controller
         return redirect()->route('login')->with('status', self::GENERIC_STATUS);
     }
 
-    /** Validate a nonce without consuming it, then redirect away from its URL. */
-    public function open(Request $request, string $token)
+    /**
+     * Validate a nonce without consuming it, then redirect away from its URL.
+     *
+     * @param  Request  $request  Current login-link request.
+     * @param  string  $token  One-time nonce from the email link.
+     * @return RedirectResponse Redirect to the login page or the confirmation form.
+     */
+    public function open(Request $request, string $token): RedirectResponse
     {
         $link = strlen($token) === 64
             ? DB::table('passwordless_login_links')->where('token_hash', hash('sha256', $token))
@@ -84,11 +97,16 @@ class EmailLoginLinkController extends Controller
         $linkId = $request->session()->get('login.link.confirmation_id');
         $result = DB::transaction(function () use ($linkId): array {
             $link = $linkId ? DB::table('passwordless_login_links')->where('id', $linkId)->lockForUpdate()->first() : null;
-            if (! $link || $link->consumed_at || now()->greaterThanOrEqualTo($link->expires_at)) {
+            if (! $link || $link->consumed_at) {
+                return ['state' => 'invalid'];
+            }
+            /** @var string $expiresAt */
+            $expiresAt = $link->expires_at;
+            if (now()->greaterThanOrEqualTo($expiresAt)) {
                 return ['state' => 'invalid'];
             }
 
-            $user = User::query()->lockForUpdate()->find($link->user_id);
+            $user = User::query()->lockForUpdate()->whereKey($link->user_id)->first();
             if (! $user || ! $user->isOfficialUser || $user->isLocked) {
                 DB::table('passwordless_login_links')->where('id', $link->id)->update([
                     'consumed_at' => now(),

@@ -46,7 +46,8 @@ class ForceDomain extends Middleware
         if (app()->environment(['local', 'testing', 'dusk'])) {
             return $next($request);
         }
-        $host = parse_url(config('app.url'), PHP_URL_HOST);
+        $appUrl = config('app.url');
+        $host = parse_url(is_string($appUrl) ? $appUrl : '', PHP_URL_HOST);
         if ($host == '127.0.0.1') {
             abort(403);
         }

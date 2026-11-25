@@ -36,11 +36,14 @@ namespace App\CalendarLinks;
 class CalendarLinks
 {
     /**
-     * @return mixed
+     * Find a calendar link by its key.
+     *
+     * @param  string  $key  Calendar link key.
+     * @return AbstractCalendarLink|null Matching calendar link, or null if none was found.
      */
-    public static function findKey($key)
+    public static function findKey(string $key): ?AbstractCalendarLink
     {
-        foreach (glob(app_path('CalendarLinks').'/*CalendarLink.php') as $file) {
+        foreach (glob(app_path('CalendarLinks').'/*CalendarLink.php') ?: [] as $file) {
             if (substr(pathinfo($file, PATHINFO_FILENAME), 0, 8) !== 'Abstract') {
                 $calendarLinkClass = 'App\\CalendarLinks\\'.pathinfo($file, PATHINFO_FILENAME);
                 if (class_exists($calendarLinkClass)) {
@@ -52,15 +55,19 @@ class CalendarLinks
                 }
             }
         }
+
+        return null;
     }
 
     /**
-     * @return array
+     * Collect all available calendar links as arrays for the frontend.
+     *
+     * @return array<int, array<string, mixed>> Calendar link data indexed by position.
      */
-    public static function all()
+    public static function all(): array
     {
         $calendarLinks = [];
-        foreach (glob(app_path('CalendarLinks').'/*CalendarLink.php') as $file) {
+        foreach (glob(app_path('CalendarLinks').'/*CalendarLink.php') ?: [] as $file) {
             if (substr(pathinfo($file, PATHINFO_FILENAME), 0, 8) !== 'Abstract') {
                 $calendarLinkClass = 'App\\CalendarLinks\\'.pathinfo($file, PATHINFO_FILENAME);
                 if (class_exists($calendarLinkClass)) {

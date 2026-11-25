@@ -32,6 +32,7 @@ namespace App\Services;
 
 use Carbon\Carbon;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
+use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
@@ -44,14 +45,15 @@ class QueryLogService
 {
     public const SEPARATOR = PHP_EOL;
 
+    /** @var string */
     protected static $logFile = '';
 
     /**
      * Get the path to the query log
      *
-     * @return string
+     * @param  string  $log  Optional suffix for the query log file name.
      */
-    public static function file($log = '')
+    public static function file($log = ''): string
     {
         if (self::$logFile != '') {
             $file = self::$logFile;
@@ -78,11 +80,12 @@ class QueryLogService
     /**
      * Get all stored queries
      *
-     * @return array
+     * @param  string  $log  Optional suffix for the query log file name.
+     * @return array<int, array{time: Carbon, query: string}>
      *
      * @throws FileNotFoundException
      */
-    public static function all($log = '')
+    public static function all($log = ''): array
     {
         if (! File::exists(self::file($log))) {
             return [];
@@ -106,7 +109,7 @@ class QueryLogService
     /**
      * Register the service
      */
-    public static function register()
+    public static function register(): void
     {
         // Query logging
         /**
@@ -114,20 +117,25 @@ class QueryLogService
          */
         DB::listen(
             function ($query) {
-                $bindings = $query->bindings ?? [];
+                /** @var QueryExecuted $query */
+                $bindings = $query->bindings;
                 $normalizedBindings = array_map(
                     function ($binding) {
-                        if (is_a($binding, \DateTime::class) || is_a($binding, Carbon::class)) {
+                        if (is_object($binding) && is_a($binding, \DateTime::class)) {
                             return '"'.$binding->format('Y-m-d H:i:s').'"';
                         }
                         if (is_object($binding) && method_exists($binding, '__toString')) {
-                            return '"'.$binding->__toString().'"';
+                            /** @var string $stringValue */
+                            $stringValue = $binding->__toString();
+
+                            return '"'.$stringValue.'"';
                         }
 
                         return is_string($binding) ? '"'.$binding.'"' : $binding;
                     },
                     $bindings
                 );
+                /** @var list<string> $normalizedBindings */
                 $sql = Str::replaceArray('?', $normalizedBindings, $query->sql);
                 $keyword = explode(' ', $sql)[0];
                 if ($keyword !== 'select') {
@@ -157,6 +165,6 @@ class QueryLogService
      */
     public static function date()
     {
-        return Carbon::createFromTimestamp(filemtime(self::file()));
+        return Carbon::createFromTimestamp((int) filemtime(self::file()));
     }
 }

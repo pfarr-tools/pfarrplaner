@@ -18,5 +18,10 @@ use App\Models\Rites\Wedding;
 
 interface UpdatesWeddings
 {
+    /**
+     * Aktualisiert eine Hochzeit.
+     *
+     * @param  array<string, mixed>  $input
+     */
     public function update(User $user, Wedding $wedding, array $input): Wedding;
 }

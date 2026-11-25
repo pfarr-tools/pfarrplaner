@@ -32,10 +32,15 @@ namespace App\Seating;
 
 class SeatingModels
 {
-    public static function all()
+    /**
+     * Collect all available seating models indexed by title.
+     *
+     * @return array<string, AbstractSeatingModel> Seating models indexed by title.
+     */
+    public static function all(): array
     {
         $seatingModels = [];
-        foreach (glob(app_path('Seating').'/*SeatingModel.php') as $file) {
+        foreach (glob(app_path('Seating').'/*SeatingModel.php') ?: [] as $file) {
             if (substr(pathinfo($file, PATHINFO_FILENAME), 0, 8) !== 'Abstract') {
                 $seatingModelClass = 'App\\Seating\\'.pathinfo($file, PATHINFO_FILENAME);
                 if (class_exists($seatingModelClass)) {
@@ -50,7 +55,12 @@ class SeatingModels
         return $seatingModels;
     }
 
-    public static function select()
+    /**
+     * Build a list of available seating models for select fields.
+     *
+     * @return array<string, string> Titles indexed by seating model class name.
+     */
+    public static function select(): array
     {
         $seatingModels = [];
         foreach (self::all() as $title => $class) {
@@ -60,7 +70,13 @@ class SeatingModels
         return $seatingModels;
     }
 
-    public static function byTitle($title)
+    /**
+     * Find a seating model by its title.
+     *
+     * @param  string  $title  Title of the seating model.
+     * @return AbstractSeatingModel|null Matching seating model, or null if none was found.
+     */
+    public static function byTitle(string $title): ?AbstractSeatingModel
     {
         /** @var AbstractSeatingModel $class */
         foreach (self::all() as $class) {

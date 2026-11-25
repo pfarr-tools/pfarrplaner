@@ -34,6 +34,7 @@ class CorrelatePasskeyRegistration
         $suppliedId = $request->header('X-Passkey-Request-ID');
         $id = is_string($suppliedId) && Str::isUuid($suppliedId) ? $suppliedId : (string) Str::uuid();
         $response = $next($request);
+        /** @var Response $response */
         $response->headers->set('X-Passkey-Request-ID', $id);
         if ($response->getStatusCode() >= 400) {
             Log::warning('Passkey registration server failure', [

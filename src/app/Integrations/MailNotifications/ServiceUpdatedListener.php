@@ -37,7 +37,7 @@ use Illuminate\Support\Collection;
 
 class ServiceUpdatedListener
 {
-    public function handle(ServiceUpdated $event)
+    public function handle(ServiceUpdated $event): void
     {
         // don't send notifications for past services
         if ($event->service->date < Carbon::now()) {

@@ -57,6 +57,7 @@ class UpdateLocation extends AbstractUpdateAction implements UpdatesLocations
     /**
      * Update a location
      *
+     * @param  array<string, mixed>  $input
      * @return Location
      *
      * @throws AuthorizationException
@@ -65,7 +66,10 @@ class UpdateLocation extends AbstractUpdateAction implements UpdatesLocations
     public function update(User $user, Location $location, array $input)
     {
         Gate::forUser($user)->authorize('update', $location);
-        $this->city = $location->city;
+        $city = $location->city;
+        abort_unless($city instanceof City, 404);
+        $this->city = $city;
+        /** @var array<string, mixed> $input Validierte Eingabedaten. */
         $input = Validator::make($input, Location::$validationRules)->validateWithBag('updateLocation');
         $location->update($input);
         UpdatedLocation::dispatch($user, $location);

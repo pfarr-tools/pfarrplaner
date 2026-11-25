@@ -32,39 +32,60 @@ class AttachmentUploadService
     /** Calculate the number of chunks for a byte size. */
     public static function chunkCount(int $size): int
     {
-        return (int) ceil($size / max(1, (int) config('attachments.upload.chunk_size')));
+        /** @var int $chunkSize */
+        $chunkSize = config('attachments.upload.chunk_size');
+
+        return (int) ceil($size / max(1, $chunkSize));
     }
 
-    /** Start an authorized upload session. */
+    /**
+     * Startet eine autorisierte Upload-Sitzung für das angegebene Ziel.
+     *
+     * @param  array<string, mixed>  $input  Upload-Parameter wie Ziel, Dateiname, Größe und Chunk-Anzahl
+     * @return AttachmentUploadSession Neu angelegte Upload-Sitzung
+     */
     public function start(User $user, array $input): AttachmentUploadSession
     {
-        $targetClass = self::TARGETS[$input['target_type'] ?? ''] ?? null;
-        $target = $targetClass ? $targetClass::findOrFail($input['target_id']) : null;
+        $targetType = $input['target_type'] ?? '';
+        $targetClass = is_string($targetType) ? (self::TARGETS[$targetType] ?? null) : null;
+        $target = $targetClass ? $targetClass::query()->whereKey($input['target_id'])->firstOrFail() : null;
         if (! $target) {
             throw ValidationException::withMessages(['target_type' => 'Ungültiges Uploadziel.']);
         }
         Gate::forUser($user)->authorize('update', $target);
 
-        $size = (int) $input['size'];
-        $chunkSize = (int) config('attachments.upload.chunk_size');
-        $totalChunks = (int) ($input['total_chunks'] ?? self::chunkCount($size));
+        /** @var int|numeric-string $rawSize */
+        $rawSize = $input['size'];
+        $size = (int) $rawSize;
+        /** @var int $chunkSize */
+        $chunkSize = config('attachments.upload.chunk_size');
+        /** @var int|numeric-string $rawTotalChunks */
+        $rawTotalChunks = $input['total_chunks'] ?? self::chunkCount($size);
+        $totalChunks = (int) $rawTotalChunks;
         if ($totalChunks !== self::chunkCount($size)) {
             throw ValidationException::withMessages(['total_chunks' => 'Die Chunk-Anzahl passt nicht zur Dateigröße.']);
         }
+
+        /** @var string $filename */
+        $filename = $input['filename'];
+        /** @var string $title */
+        $title = $input['title'];
+        /** @var int $expiryMinutes */
+        $expiryMinutes = config('attachments.upload.expiry_minutes');
 
         return AttachmentUploadSession::create([
             'user_id' => $user->id,
             'attachable_type' => $target->getMorphClass(),
             'attachable_id' => $target->getKey(),
-            'filename' => basename((string) $input['filename']),
+            'filename' => basename($filename),
             'mime_type' => $input['mime_type'] ?? null,
             'size' => $size,
             'chunk_size' => $chunkSize,
             'total_chunks' => $totalChunks,
             'received_chunks' => [],
-            'title' => (string) $input['title'],
+            'title' => $title,
             'cut' => $input['cut'] ?? null,
-            'expires_at' => now()->addMinutes((int) config('attachments.upload.expiry_minutes')),
+            'expires_at' => now()->addMinutes($expiryMinutes),
         ]);
     }
 

@@ -38,7 +38,6 @@ use App\Services\FileNameService;
 use App\Services\LiturgyService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
 use PhpOffice\PhpWord\Element\Section;
@@ -61,6 +60,8 @@ class EventListReport extends AbstractWordDocumentReport
     protected const DEFAULT = 'Gottesdienste';
 
     protected const LIST2 = 'Termine';
+
+    protected const NO_INDENT = 'Bekanntgaben ohne Einrückung';
 
     public const FILE_SIGNATURE = '91.8';
 
@@ -91,7 +92,8 @@ class EventListReport extends AbstractWordDocumentReport
      */
     public function setup()
     {
-        $cities = Auth::user()->cities;
+        $user = $this->authenticatedUser();
+        $cities = $user->cities;
 
         return Inertia::render('Report/EventList/Setup', compact('cities'));
     }
@@ -101,6 +103,7 @@ class EventListReport extends AbstractWordDocumentReport
      */
     public function render(Request $request)
     {
+        /** @var array<string, mixed> $data */
         $data = $request->validate(
             [
                 'city' => 'required|int',
@@ -111,9 +114,15 @@ class EventListReport extends AbstractWordDocumentReport
             ]
         );
 
-        $start = Carbon::parse($data['start']);
-        $end = Carbon::parse($data['end']);
-        $city = City::findOrFail($request->get('city'));
+        /** @var string $startDate */
+        $startDate = $data['start'];
+        /** @var string $endDate */
+        $endDate = $data['end'];
+        /** @var int|string $cityId */
+        $cityId = $data['city'];
+        $start = Carbon::parse($startDate);
+        $end = Carbon::parse($endDate);
+        $city = City::findOrFail((int) $cityId);
 
         $services = Service::with(['location'])
             ->regularForCity($city)
@@ -126,7 +135,7 @@ class EventListReport extends AbstractWordDocumentReport
 
         if ($data['mixOutlook'] ?? false) {
             $calendar = new EventCalendarImport($city->public_events_calendar_url);
-            $events = $calendar->mix($events, $start, $end->copy()->subDay(1), true);
+            $events = $calendar->mix($events, $start, $end->copy()->subDay(), true);
         }
 
         $events = Service::mix($events, $services, $start, $end);
@@ -157,10 +166,10 @@ class EventListReport extends AbstractWordDocumentReport
                     'hanging' => Converter::cmToTwip(0),
                 ],
                 'tabs' => [
-                    new Tab('left', Converter::cmToTwip(1.3)),
-                    new Tab('right', Converter::cmToTwip(4.76)),
-                    new Tab('left', Converter::cmToTwip(5.5)),
-                    new Tab('left', Converter::cmToTwip(15.0)),
+                    new Tab('left', (int) Converter::cmToTwip(1.3)),
+                    new Tab('right', (int) Converter::cmToTwip(4.76)),
+                    new Tab('left', (int) Converter::cmToTwip(5.5)),
+                    new Tab('left', (int) Converter::cmToTwip(15.0)),
                 ],
                 'spaceAfter' => 0,
             ]
@@ -174,10 +183,10 @@ class EventListReport extends AbstractWordDocumentReport
                     'hanging' => Converter::cmToTwip(0),
                 ],
                 'tabs' => [
-                    new Tab('left', Converter::cmToTwip(1.3)),
-                    new Tab('left', Converter::cmToTwip(2)),
-                    new Tab('right', Converter::cmToTwip(4.44)),
-                    new Tab('left', Converter::cmToTwip(5.4)),
+                    new Tab('left', (int) Converter::cmToTwip(1.3)),
+                    new Tab('left', (int) Converter::cmToTwip(2)),
+                    new Tab('right', (int) Converter::cmToTwip(4.44)),
+                    new Tab('left', (int) Converter::cmToTwip(5.4)),
                 ],
                 'spaceAfter' => 0,
             ]
@@ -193,17 +202,29 @@ class EventListReport extends AbstractWordDocumentReport
 
         // render services
         foreach ($events as $theseEvents) {
+            if (! is_array($theseEvents)) {
+                continue;
+            }
             foreach ($theseEvents as $event) {
                 if (is_object(($event))) {
-                    /* @var Service $event */
+                    /** @var Service $event */
                     // only services this time
 
-                    $liturgy = LiturgyService::getLiturgyInfoByDate($event->day)[0] ?? [];
-                    $pericope = (isset($liturgy['perikope']) ? $liturgy['litTextsPerikope'.$liturgy['perikope']] : '');
+                    /** @var array<int, array<string, mixed>> $liturgyDays */
+                    $liturgyDays = LiturgyService::getLiturgyInfoByDate($event->trueDate());
+                    /** @var array<string, mixed> $liturgy */
+                    $liturgy = $liturgyDays[0] ?? [];
+                    $pericope = '';
+                    if (isset($liturgy['perikope']) && is_string($liturgy['perikope'])) {
+                        $pericopeText = $liturgy['litTextsPerikope'.$liturgy['perikope']] ?? '';
+                        $pericope = is_string($pericopeText) ? $pericopeText : '';
+                    }
+                    $liturgyName = $liturgy['Bezeichnung'] ?? null;
+                    $liturgyName = is_string($liturgyName) ? $liturgyName : null;
 
                     // remove optional verses
                     if ($pericope) {
-                        $pericope = preg_replace('/\([\d–]*\)/', '+', $pericope);
+                        $pericope = (string) preg_replace('/\([\d–]*\)/', '+', $pericope);
                         if (substr($pericope, -1) == '+') {
                             $pericope = substr($pericope, 0, -1);
                         }
@@ -213,17 +234,17 @@ class EventListReport extends AbstractWordDocumentReport
                     $run = $this->renderParagraph(
                         self::DEFAULT,
                         [
-                            [$event->date->format('d.m.Y')."\t", []],
+                            [$event->trueDate()->format('d.m.Y')."\t", []],
                             [$event->timeText(true)."\t", []],
                         ],
                         0
                     );
 
-                    if (isset($liturgy['Bezeichnung'])) {
+                    if ($liturgyName !== null) {
                         $this->renderParagraph(
                             self::DEFAULT,
                             [
-                                [$liturgy['Bezeichnung'].' – ', []],
+                                [$liturgyName.' – ', []],
                             ],
                             0,
                             $run
@@ -263,7 +284,7 @@ class EventListReport extends AbstractWordDocumentReport
                             $description = str_replace('; ', ';<w:br />', $description);
                         }
                         // take care of ampersands
-                        $description = trim(preg_replace('/&(?![A-Za-z0-9#]{1,7};)/', '&amp;', $description));
+                        $description = trim((string) preg_replace('/&(?![A-Za-z0-9#]{1,7};)/', '&amp;', $description));
                         $this->renderParagraph(
                             self::DEFAULT,
                             [
@@ -272,11 +293,11 @@ class EventListReport extends AbstractWordDocumentReport
                             0,
                             $run
                         );
-                    } elseif (isset($liturgy['Bezeichnung'])) {
+                    } elseif ($liturgyName !== null) {
                         $this->renderParagraph(
                             self::DEFAULT,
                             [
-                                ["<w:br />\t\t".$liturgy['Bezeichnung'], []],
+                                ["<w:br />\t\t".$liturgyName, []],
                             ],
                             0,
                             $run
@@ -295,13 +316,15 @@ class EventListReport extends AbstractWordDocumentReport
                     }
 
                     if ($event->cc) {
+                        $ccLocation = $event->ccLocationText();
+                        $ccLocation = is_string($ccLocation) ? $ccLocation : '';
                         $this->renderParagraph(
                             self::DEFAULT,
                             [
                                 [
                                     "<w:br />\t\tKinderkirche: ".$event->ccTimeText(
                                         false
-                                    ).', '.$event->ccLocationText(),
+                                    ).', '.$ccLocation,
                                     [],
                                 ],
                             ],
@@ -334,24 +357,36 @@ class EventListReport extends AbstractWordDocumentReport
 
         // render other events
         foreach ($events as $theseEvents) {
+            if (! is_array($theseEvents)) {
+                continue;
+            }
             foreach ($theseEvents as $event) {
-                if (! is_object(($event))) {
+                if (! is_object(($event)) && is_array($event)) {
+                    $eventStart = $event['start'] ?? null;
+                    $eventTitle = $event['title'] ?? '';
+                    if (! $eventStart instanceof Carbon) {
+                        continue;
+                    }
+                    $eventTitle = is_string($eventTitle) ? $eventTitle : '';
                     $run = $this->renderParagraph(
                         self::LIST2,
                         [
-                            [$event['start']->isoFormat('dd.'), []],
-                            ["\t".$event['start']->format('d.m.'), []],
-                            ["\t".$event['start']->format('H:i').' Uhr', []],
-                            ["\t".$event['title'], []],
+                            [$eventStart->isoFormat('dd.'), []],
+                            ["\t".$eventStart->format('d.m.'), []],
+                            ["\t".$eventStart->format('H:i').' Uhr', []],
+                            ["\t".$eventTitle, []],
                         ]
                     );
                 }
             }
         }
 
+        $cityName = $city->name;
+        $cityName = is_string($cityName) ? $cityName : '';
+
         return $this->sendToBrowser(
             FileNameService::make(
-                static::FILE_TITLE.' '.$city->name,
+                self::FILE_TITLE.' '.$cityName,
                 '.docx',
                 static::FILE_SIGNATURE,
                 Carbon::now())
@@ -359,9 +394,10 @@ class EventListReport extends AbstractWordDocumentReport
     }
 
     /**
-     * @param  string  $template
-     * @param  int  $emptyParagraphsAfter
-     * @param  null  $existingTextRun
+     * @param  string  $template  Name des zu verwendenden Absatzstils.
+     * @param  array<int, array{0: string, 1: array<string, mixed>}>  $blocks  Textblöcke mit ihren Formatierungsoptionen.
+     * @param  int  $emptyParagraphsAfter  Anzahl der anzuhängenden leeren Absätze.
+     * @param  TextRun|null  $existingTextRun  Optionaler bestehender Textlauf, der ergänzt wird.
      * @return TextRun|null
      */
     protected function renderParagraph(
@@ -381,6 +417,10 @@ class EventListReport extends AbstractWordDocumentReport
         return $textRun;
     }
 
+    /**
+     * @param  string|array<int, string>  $text  Zu rendernder Text oder Absätze.
+     * @return void
+     */
     protected function renderLiteral($text)
     {
         if (! is_array($text)) {

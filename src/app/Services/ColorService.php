@@ -37,13 +37,13 @@ class ColorService
     /**
      * Get an evenly spaced rainbow spectrum of colors
      *
-     * @param  $a  Array with keys
+     * @param  array<int|string>  $a  Array whose values are used as keys in the result
      *
      * @source https://stackoverflow.com/a/7419630
      *
-     * @return array Array with colors, keys from $a
+     * @return array<int|string, string> Array with colors, keys from $a
      */
-    public static function rainbowArray($a)
+    public static function rainbowArray($a): array
     {
         $rainbow = [];
         $numberOfSteps = is_numeric($a) ? $a : count($a);
@@ -54,6 +54,9 @@ class ColorService
             $i = ~~($h * 6);
             $f = $h * 6 - $i;
             $q = 1 - $f;
+            $r = 0;
+            $g = 0;
+            $b = 0;
             switch ($i % 6) {
                 case 0: $r = 1;
                     $g = $f;
@@ -81,15 +84,21 @@ class ColorService
                     break;
             }
             $rainbow[$key] = '#'
-                .str_pad(dechex(round($r * 255)), 2, '0', STR_PAD_LEFT)
-                .str_pad(dechex(round($g * 255)), 2, '0', STR_PAD_LEFT)
-                .str_pad(dechex(round($b * 255)), 2, '0', STR_PAD_LEFT);
+                .str_pad(dechex((int) round($r * 255)), 2, '0', STR_PAD_LEFT)
+                .str_pad(dechex((int) round($g * 255)), 2, '0', STR_PAD_LEFT)
+                .str_pad(dechex((int) round($b * 255)), 2, '0', STR_PAD_LEFT);
         }
 
         return $rainbow;
     }
 
-    public static function rainbowTextArray($text)
+    /**
+     * Get an evenly spaced rainbow spectrum of colors for each character of a text
+     *
+     * @param  string  $text  Text to generate the colors for
+     * @return array<int|string, string> Array with colors, keyed by character position
+     */
+    public static function rainbowTextArray($text): array
     {
         $a = range(0, Str::length($text));
 
@@ -99,13 +108,13 @@ class ColorService
     /**
      * Find the best contrasting text color
      *
-     * @param  $color  base color, #rrggbb notation
+     * @param  string  $color  Base color, #rrggbb notation
      *
      * @source https://stackoverflow.com/questions/3942878/how-to-decide-font-color-in-white-or-black-depending-on-background-color
      *
      * @return string contrast color, #rrggbb notation
      */
-    public static function contrastColor($color)
+    public static function contrastColor($color): string
     {
         $r = hexdec(substr($color, 1, 2));
         $g = hexdec(substr($color, 3, 2));

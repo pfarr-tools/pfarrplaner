@@ -34,6 +34,6 @@ use App\Models\Comment;
 use App\Models\People\User;
 
 /**
- * @method Comment create(User $user, array $input)
+ * @method Comment create(User $user, array<string, mixed> $input)
  */
 interface CreatesComments {}

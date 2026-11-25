@@ -2,7 +2,7 @@
 
 /*
  * Pfarrplaner
- *
+  *
  * @package Pfarrplaner
  * @author Christoph Fischer <chris@toph.de>
  * @copyright (c) Christoph Fischer, https://christoph-fischer.org
@@ -51,6 +51,8 @@ class TokenController extends Controller
 {
     /**
      * Require an authenticated web session for token management routes.
+    *
+    * @return void
      */
     public function __construct()
     {
@@ -64,8 +66,8 @@ class TokenController extends Controller
      */
     public function index(): Response
     {
-        /** @var User $user */
         $user = Auth::user();
+        abort_unless($user instanceof User, 401);
         Gate::authorize('update', $user);
 
         return $this->renderTokensPage($user, null);
@@ -79,8 +81,8 @@ class TokenController extends Controller
      */
     public function create(StorePersonalTokenRequest $request): Response
     {
-        /** @var User $user */
         $user = $request->user();
+        abort_unless($user instanceof User, 401);
         $validated = $request->validated();
         $title = (string) $validated['title'];
         $cityId = isset($validated['city_id']) && $validated['city_id'] !== ''
@@ -105,8 +107,8 @@ class TokenController extends Controller
      */
     public function destroy(Request $request, PersonalAccessToken $token): RedirectResponse
     {
-        /** @var User $user */
         $user = Auth::user();
+        abort_unless($user instanceof User, 401);
         Gate::authorize('update', $user);
         $user->tokens()->where('id', $token->id)->delete();
 

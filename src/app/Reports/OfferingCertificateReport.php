@@ -18,7 +18,6 @@ use App\Models\Service;
 use App\Services\FileNameService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -67,6 +66,7 @@ class OfferingCertificateReport extends AbstractPDFDocumentReport
      */
     public function render(Request $request)
     {
+        /** @var array{service: int} $data */
         $data = $request->validate(['service' => ['required', 'integer']]);
         $service = $this->accessibleServices()->whereKey($data['service'])->firstOrFail();
         /** @var City $city */
@@ -77,9 +77,9 @@ class OfferingCertificateReport extends AbstractPDFDocumentReport
                 self::FILE_TITLE.' '.$city->name,
                 'pdf',
                 self::FILE_SIGNATURE,
-                $service->date,
+                $service->trueDate(),
                 false,
-                Auth::user(),
+                $this->authenticatedUser(),
             ),
             ['service' => $service],
             ['format' => 'A4']
@@ -94,8 +94,8 @@ class OfferingCertificateReport extends AbstractPDFDocumentReport
     private function accessibleServices()
     {
         $query = Service::query();
-        if (! Auth::user()->isAdmin) {
-            $query->whereIn('city_id', Auth::user()->cities->pluck('id'));
+        if (! $this->authenticatedUser()->isAdmin) {
+            $query->whereIn('city_id', $this->authenticatedUser()->cities->pluck('id'));
         }
 
         return $query;

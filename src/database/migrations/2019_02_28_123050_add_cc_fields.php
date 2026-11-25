@@ -29,6 +29,7 @@
  */
 
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 /**
@@ -45,13 +46,13 @@ class AddCcFields extends Migration
     {
         Schema::table(
             'locations',
-            function ($table) {
+            function (Blueprint $table) {
                 $table->string('cc_default_location')->nullable()->default('');
             }
         );
         Schema::table(
             'services',
-            function ($table) {
+            function (Blueprint $table) {
                 $table->string('others')->nullable()->default('');
                 $table->integer('cc')->nullable()->default(0);
                 $table->string('cc_location')->nullable()->default('');
@@ -70,13 +71,13 @@ class AddCcFields extends Migration
     {
         Schema::table(
             'locations',
-            function ($table) {
+            function (Blueprint $table) {
                 $table->dropColumn('cc_default_location');
             }
         );
         Schema::table(
             'services',
-            function ($table) {
+            function (Blueprint $table) {
                 $table->dropColumn(['others', 'cc', 'cc_location', 'cc_lesson', 'cc_staff']);
             }
         );

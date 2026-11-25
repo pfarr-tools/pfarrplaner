@@ -48,7 +48,7 @@ Route::name('api.')->group(function () {
         'auth:sanctum,api',
         RejectCalendarFeedToken::class,
     ])->group(function () {
-        foreach (glob(base_path('routes/api/*.php')) as $file) {
+        foreach (glob(base_path('routes/api/*.php')) ?: [] as $file) {
             if (basename($file) === 'Health.php') {
                 continue;
             }

@@ -33,8 +33,10 @@ namespace App\Attachments\Baptism;
 use App\Documents\Word\DefaultAddressLabelSheetDocument;
 use App\Services\NameService;
 use Inertia\Inertia;
+use Inertia\Response;
 use PhpOffice\PhpWord\Element\Cell;
 
+/** Address labels attachment for baptism letters. */
 class BaptismLettersAddressLabelsAttachment extends AbstractBaptismAttachment
 {
     protected static $title = 'Adressetiketten für Taufbriefe';
@@ -86,18 +88,21 @@ class BaptismLettersAddressLabelsAttachment extends AbstractBaptismAttachment
         '#ff92bb',
     ];
 
+    /**
+     * @return mixed
+     */
     public function download()
     {
+        $validated = request()->validate([
+            'size' => 'nullable|numeric',
+            'years' => 'nullable|int|min:1',
+            'skipLabels' => 'nullable|int',
+        ]);
         $config = array_merge([
             'size' => 3.7,
             'years' => 9,
             'skipLabels' => 0,
-        ],
-            request()->validate([
-                'size' => 'nullable|numeric',
-                'years' => 'nullable|int|min:1',
-                'skipLabels' => 'nullable|int',
-            ]));
+        ], is_array($validated) ? $validated : []);
 
         $doc = new DefaultAddressLabelSheetDocument([
             'label' => [
@@ -109,11 +114,11 @@ class BaptismLettersAddressLabelsAttachment extends AbstractBaptismAttachment
         $data = [];
         for ($i = 1; $i <= $config['years']; $i++) {
             $data[] = [
-                'name' => NameService::fromName($this->baptism->candidate_name)->format(NameService::FIRST_LAST),
+                'name' => NameService::fromName(is_string($this->baptism->candidate_name) ? $this->baptism->candidate_name : '')->format(NameService::FIRST_LAST),
                 'address' => $this->baptism->candidate_address,
                 'zip' => $this->baptism->candidate_zip,
                 'city' => $this->baptism->candidate_city,
-                'info' => $this->baptism->service->date->copy()->addYears($i)->format('d.m.Y').' / #'.$i,
+                'info' => ($this->baptism->service->date ?? now())->copy()->addYears($i)->format('d.m.Y').' / #'.$i,
             ];
         }
 
@@ -122,12 +127,24 @@ class BaptismLettersAddressLabelsAttachment extends AbstractBaptismAttachment
         return $doc->sendToBrowser(static::getFileName());
     }
 
-    public function renderCell(Cell $cell, $record, $index)
+    /**
+     * Render a single record into one label cell.
+     *
+     * @param  Cell  $cell  Table cell receiving the text.
+     * @param  string  $record  Record text to render.
+     * @param  int  $index  Zero-based index of the label.
+     */
+    public function renderCell(Cell $cell, string $record, int $index): void
     {
         $cell->addText($record.' | '.$index);
     }
 
-    public function setup()
+    /**
+     * Render the setup page for the address labels.
+     *
+     * @return Response Inertia response with the setup page.
+     */
+    public function setup(): Response
     {
         return Inertia::render('Attachments/Baptism/BaptismLettersAddressLabels/Setup', ['baptism' => $this->baptism]);
     }

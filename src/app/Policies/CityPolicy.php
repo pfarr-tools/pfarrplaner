@@ -68,9 +68,8 @@ class CityPolicy
     }
 
     /**
-     * Determine whether the user can view the city.
+     * Determine whether the user can view any city.
      *
-     * @param  City  $city
      * @return mixed
      */
     public function viewAny(User $user)

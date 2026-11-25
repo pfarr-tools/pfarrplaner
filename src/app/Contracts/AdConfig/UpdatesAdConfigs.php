@@ -34,6 +34,6 @@ use App\Models\Ads\AdConfig;
 use App\Models\People\User;
 
 /**
- * @method AdConfig update(User $user, AdConfig $adConfig, array $input)
+ * @method AdConfig update(User $user, AdConfig $adConfig, array<string, mixed> $input)
  */
 interface UpdatesAdConfigs {}

@@ -44,10 +44,12 @@ use Sabre\DAVACL\PrincipalCollection;
 
 class DAVController extends Controller
 {
-    public function handle()
+    public function handle(): void
     {
         $authBackend = new AuthBackend;
-        $authBackend->setRealm(config('app.name').' DAV');
+        /** @var string $appName */
+        $appName = config('app.name');
+        $authBackend->setRealm($appName.' DAV');
 
         $principalBackend = new PrincipalBackend;
         $calendarBackend = new CalendarBackend;

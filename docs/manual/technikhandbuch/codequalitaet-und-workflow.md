@@ -15,7 +15,7 @@ Im Repository-Stamm stehen folgende Befehle zur Verfügung:
   CSS, SCSS und Sass mit Prettier und Blade-Templates mit `blade-formatter`.
 - `./planer dev format:check` prüft alle genannten Formate, ohne Dateien zu
   ändern. Im Quality-Lauf werden dabei nur geänderte Quellen geprüft.
-- `./planer dev analyse` führt PHPStan/Larastan auf Level 6 aus.
+- `./planer dev analyse` führt PHPStan/Larastan auf Level 10 aus.
 - `./planer dev lint` führt ESLint mit Vue-Regeln aus.
 - `./planer dev docs:check` prüft PHPDoc für den Bestand und JSDoc für
   geänderte JavaScript-/Vue-Dateien.
@@ -25,7 +25,7 @@ Im Repository-Stamm stehen folgende Befehle zur Verfügung:
 
 ## PHPStan-Baseline als Ratchet
 
-Verbindlicher Prüfmaßstab ist Level 6. Die beim Umstieg verbleibenden Altlasten
+Verbindlicher Prüfmaßstab ist Level 10. Die beim Umstieg verbleibenden Altlasten
 stehen in `src/phpstan-baseline.neon`. Die Baseline ist kein Freibrief: PHPStan
 meldet zusätzliche oder weggefallene Vorkommen eines baselined Musters als
 `ignore.count` beziehungsweise `ignore.unmatched`. Neue Befunde müssen daher im
@@ -34,7 +34,7 @@ hinzugefügt.
 
 Der aktuelle Stand lässt sich an der Anzahl der Baseline-Muster und ihrer
 Zähler ablesen. Für eine frische Messung ohne Baseline wird die Datei lokal
-vorübergehend geleert, `./planer dev analyse -- --level=6 --error-format=json
+vorübergehend geleert, `./planer dev analyse -- --level=8 --error-format=json
 --no-progress` ausgeführt und die Baseline danach wiederhergestellt. Eine solche
 Messung verändert den Prüfstand nicht dauerhaft.
 

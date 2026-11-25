@@ -46,9 +46,12 @@ class UpdateBooking extends AbstractUpdateAction implements UpdatesBookings
 
     public function redirectTo(): string
     {
-        return route('service.edit', ['service' => $this->booking->service->slug, 'tab' => 'registrations']);
+        return route('service.edit', ['service' => $this->booking->service->slug ?? '', 'tab' => 'registrations']);
     }
 
+    /**
+     * @param  array<string, mixed>  $input
+     */
     public function update(User $user, Booking $booking, array $input): Booking
     {
         $this->booking = $booking;
@@ -65,12 +68,20 @@ class UpdateBooking extends AbstractUpdateAction implements UpdatesBookings
         return $booking;
     }
 
+    /**
+     * @param  array<string, mixed>  $input
+     * @return array<string, mixed>
+     */
     protected function validateAndNormalize(array $input): array
     {
+        /** @var array<string, mixed>&array{number: array<int, mixed>, fixed_seat: array<int, mixed>} $rules */
         $rules = Booking::$validationRules;
         $rules['number'][] = new Seatable('booking_id');
         $rules['fixed_seat'][] = new SeatableFixed('booking_id');
 
+        /**
+         * @var array{fixed_seat?: string|null, override_seats?: int|string|null, override_split?: string|null, ...} $input
+         */
         $input = Validator::make($input, $rules)->validateWithBag('updateBooking');
         $input['fixed_seat'] = strtoupper($input['fixed_seat'] ?? '');
         $input['override_seats'] = strtoupper((string) ($input['override_seats'] ?? ''));

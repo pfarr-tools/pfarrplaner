@@ -45,10 +45,14 @@ class CreateSong extends AbstractCreateAction implements CreatesSongs
         return route('admin.songs.index');
     }
 
+    /**
+     * @param  array<string, mixed>  $input
+     */
     public function create(User $user, array $input): Song
     {
         Gate::forUser($user)->authorize('create', Song::class);
 
+        /** @var array<string, mixed> $validated Validierte Eingabedaten. */
         $validated = Validator::make($input, Song::$validationRules)->validateWithBag('createSong');
         $song = Song::create(collect($validated)->except(['verses', 'songbooks'])->all());
         $song->syncVersesFromRequest($validated);

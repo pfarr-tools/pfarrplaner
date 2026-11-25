@@ -35,7 +35,6 @@ use App\Models\Service;
 use App\Services\FileNameService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -70,7 +69,7 @@ class PersonReport extends AbstractPDFDocumentReport
      */
     public function setup()
     {
-        $users = User::visibleFor(Auth::user())->get();
+        $users = User::visibleFor($this->authenticatedUser())->get();
 
         return Inertia::render('Report/Person/Setup', compact('users'));
     }
@@ -80,6 +79,7 @@ class PersonReport extends AbstractPDFDocumentReport
      */
     public function render(Request $request)
     {
+        /** @var array{person: int|array<int, int>, start: string, end: string} $data */
         $data = $request->validate(
             [
                 'person' => 'required|int|exists:users,id',
@@ -90,6 +90,9 @@ class PersonReport extends AbstractPDFDocumentReport
 
         $userIds = is_array($data['person']) ? $data['person'] : [$data['person']];
         $users = User::whereIn('id', $userIds)->get();
+
+        $highlight = $request->get('highlight');
+        $highlight = is_string($highlight) ? $highlight : '';
 
         $services = Service::with(['location'])
             ->between(Carbon::parse($data['start']), Carbon::parse($data['end']))
@@ -103,7 +106,7 @@ class PersonReport extends AbstractPDFDocumentReport
 
         return $this->sendToBrowser(
             FileNameService::make(
-                static::FILE_TITLE.' '.$request->get('highlight'),
+                self::FILE_TITLE.' '.$highlight,
                 'pdf',
                 static::FILE_SIGNATURE,
                 [$data['start'], $data['end']]),

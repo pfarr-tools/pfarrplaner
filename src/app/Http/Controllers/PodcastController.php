@@ -41,9 +41,10 @@ use Illuminate\Http\Response;
 class PodcastController extends Controller
 {
     /**
+     * @param  string  $cityName  City name from the route.
      * @return Response
      */
-    public function podcast(Request $request, $cityName)
+    public function podcast(Request $request, string $cityName)
     {
         $city = City::where('name', $cityName)->first();
         if ($city === null) {

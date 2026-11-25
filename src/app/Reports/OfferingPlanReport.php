@@ -36,7 +36,6 @@ use App\Models\Places\City;
 use App\Services\FileNameService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -71,7 +70,7 @@ class OfferingPlanReport extends AbstractPDFDocumentReport
      */
     public function setup()
     {
-        $cities = Auth::user()->cities;
+        $cities = $this->authenticatedUser()->cities;
         $locations = Location::inCities($cities->pluck('id'))->get();
 
         return Inertia::render('Report/OfferingPlan/Setup', compact('cities', 'locations'));
@@ -94,16 +93,22 @@ class OfferingPlanReport extends AbstractPDFDocumentReport
                 'highlightEmpty' => 'bool',
             ]
         );
-        $data['start'] = Carbon::parse($data['start'])->startOfDay();
-        $data['end'] = Carbon::parse($data['end'])->endOfDay();
-        $data['occurences'] = Occurence::with('event')->whereHas('event', function ($query) use ($data) {
+        /** @var array{cities: array<int, int>, locations?: array<int, int>|null, start: string, end: string, includeOfferingCounters?: bool, highlightEmpty?: bool} $data */
+        $start = Carbon::parse($data['start'])->startOfDay();
+        $end = Carbon::parse($data['end'])->endOfDay();
+        $data['start'] = $start;
+        $data['end'] = $end;
+        $data['occurences'] = Occurence::with('event')->whereHas('event', function ($query) use ($data, $start, $end) {
             $query->servicesOnly()
                 ->inCitiesAndLocations($data['cities'], $data['locations'] ?? null)
                 ->whereDoesntHave('funerals')
-                ->between($data['start'], $data['end'])
+                ->between($start, $end)
                 ->ordered();
         })->orderBy('start')->get();
-        $data['cities'] = City::whereIn('id', $data['cities'])->get();
+        $cities = City::whereIn('id', $data['cities'])->get();
+        $data['cities'] = $cities;
+        /** @var string $cityNames */
+        $cityNames = $cities->pluck('name')->join(' ');
 
         $this->setHeader('');
         $this->setFooter(
@@ -115,10 +120,10 @@ class OfferingPlanReport extends AbstractPDFDocumentReport
 
         return $this->sendToFile(
             FileNameService::make(
-                static::FILE_TITLE.' '.$data['cities']->pluck('name')->join(' '),
+                self::FILE_TITLE.' '.$cityNames,
                 'pdf',
                 static::FILE_SIGNATURE,
-                [$data['start'], $data['end']],
+                [$start, $end],
                 false,
                 null,
                 'Ymd'

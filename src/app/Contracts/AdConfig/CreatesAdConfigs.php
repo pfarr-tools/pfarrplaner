@@ -35,6 +35,6 @@ use App\Models\People\User;
 use App\Models\Service;
 
 /**
- * @method AdConfig create(User $user, Service $service, array $input)
+ * @method AdConfig create(User $user, Service $service, array<string, mixed> $input)
  */
 interface CreatesAdConfigs {}

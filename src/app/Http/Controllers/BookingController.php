@@ -30,6 +30,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\AbstractAction;
 use App\Documents\PDF;
 use App\Models\Seating\Booking;
 use App\Models\Service;
@@ -88,7 +89,7 @@ class BookingController extends AbstractCRUDController
         Gate::authorize('create', [Booking::class, $service]);
         $service->setAppends([]);
         $booking = Booking::getEmptyModel();
-        $booking->service_id = $service->id;
+        $booking->setAttribute('service_id', $service->id);
 
         return Inertia::render('Service/Registrations/BookingEditor', compact('service', 'booking'));
     }
@@ -102,6 +103,11 @@ class BookingController extends AbstractCRUDController
     {
         $result = $service->getSeatFinder()->finalList();
         $viewName = $service->getSeatFinder()->viewName;
+        $view = match ($viewName) {
+            'rowBased' => 'bookings.pdf.list.rowBased',
+            'maxBased' => 'bookings.pdf.list.maxBased',
+            default => abort(404),
+        };
 
         $participants = [];
         foreach ($service->participants as $participant) {
@@ -111,7 +117,7 @@ class BookingController extends AbstractCRUDController
         $participants = array_unique($participants);
         sort($participants);
 
-        return PDF::fromView('bookings.pdf.list.'.$viewName,
+        return PDF::fromView($view,
             array_merge($result, compact('service', 'participants')))
             ->download(FileNameService::make('Sitzplan', 'pdf', '50.0', $service->date, true));
     }
@@ -124,6 +130,7 @@ class BookingController extends AbstractCRUDController
     protected function pin(Request $request, Booking $booking)
     {
         Gate::authorize('update', $booking);
+        /** @var array<string, mixed> $data */
         $data = $request->validate(['fixed_seat' => ['required', 'string', new SeatableFixed('booking_id')]]);
         $booking->update($data);
 
@@ -133,7 +140,11 @@ class BookingController extends AbstractCRUDController
     public function destroy(Request $request, $modelId)
     {
         $model = $this->getSingleModel($request, $modelId);
+        /** @var AbstractAction $deleter */
         $deleter = $model->getContractedAction('delete');
+        if (! method_exists($deleter, 'delete')) {
+            abort(500);
+        }
         $deleter->delete($request->user(), $model);
 
         return response()->json();

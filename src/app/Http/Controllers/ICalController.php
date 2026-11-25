@@ -79,7 +79,7 @@ class ICalController extends Controller
         $raw = View::make(
             'ical.ical',
             ['services' => $services, 'action' => 'private', 'token' => $token, 'key' => $name]
-        );
+        )->render();
 
         $raw = str_replace(
             "\r\n\r\n",
@@ -123,7 +123,7 @@ class ICalController extends Controller
         $raw = View::make(
             'ical.ical',
             ['services' => $services, 'action' => 'gemeinden', 'token' => $token, 'key' => $locationIds]
-        );
+        )->render();
 
         $raw = str_replace(
             "\r\n\r\n",
@@ -162,7 +162,7 @@ class ICalController extends Controller
                 }
             )->get();
 
-        $raw = View::make('ical.absences', compact('user', 'absences', 'token'));
+        $raw = View::make('ical.absences', compact('user', 'absences', 'token'))->render();
         header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
         header('Expires: 0');
         header('Content-Type: text/calendar');
@@ -180,7 +180,9 @@ class ICalController extends Controller
     public function connect()
     {
         $calendarLinks = CalendarLinks::all();
-        $cities = Auth::user()->cities;
+        $user = Auth::user();
+        abort_unless($user instanceof User, 401);
+        $cities = $user->cities;
 
         return Inertia::render('OutlookExport/Connect', compact('calendarLinks', 'cities'));
     }
@@ -202,19 +204,29 @@ class ICalController extends Controller
     }
 
     /**
-     * @return mixed
+     * Render the setup page for a calendar link.
+     *
+     * @param  string  $key  Calendar link key from the route.
+     * @return mixed The setup view of the matching calendar link.
      */
-    public function setup($key)
+    public function setup(string $key)
     {
         $calendarLink = CalendarLinks::findKey($key);
+        abort_unless($calendarLink !== null, 404);
 
         return $calendarLink->setupView();
     }
 
     /**
+     * Stream the calendar export for a user after validating the API token.
+     *
+     * @param  Request  $request  Current request carrying export options.
+     * @param  User  $user  User whose calendar is exported.
+     * @param  string  $token  API token from the route.
+     * @param  string  $key  Calendar link key from the route.
      * @return Application|ResponseFactory|StreamedResponse|void
      */
-    public function export(Request $request, User $user, $token, $key)
+    public function export(Request $request, User $user, string $token, string $key)
     {
         $tokenUser = ApiTokenAuthenticator::findUser((string) $token);
         if (! $tokenUser
@@ -225,12 +237,13 @@ class ICalController extends Controller
 
         /** @var AbstractCalendarLink $calendarLink */
         $calendarLink = CalendarLinks::findKey($key);
+        abort_unless($calendarLink !== null, 404);
 
         $expires = 0;
         $data = $calendarLink->export($request, $user);
 
         return response()->streamDownload(function () use ($data) {
-            echo $data;
+            echo is_string($data) ? $data : '';
         }, $calendarLink->filename(), [
             'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
             'Expires' => $expires,

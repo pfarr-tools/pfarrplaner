@@ -36,7 +36,6 @@ use App\Models\Rites\Funeral;
 use App\Models\Rites\Wedding;
 use App\Models\Service;
 use App\Services\NameService;
-use Carbon\Carbon;
 use Illuminate\Database\Migrations\Migration;
 
 return new class extends Migration
@@ -53,6 +52,7 @@ return new class extends Migration
         /** @var Item $item */
         foreach ($items as $item) {
             // fix wrong marker
+            /** @var array{text: string} $data */
             $data = $item->data;
             $data['text'] = str_replace('[taufe:taeufling_', '[taufe:', $data['text']);
             $item->data = $data;
@@ -96,8 +96,16 @@ return new class extends Migration
      */
     public function down() {}
 
-    private function getReplacedText(Item $item, Service $service)
+    /**
+     * Replace liturgical markers in the item text with concrete names and dates.
+     *
+     * @param  Item  $item  Liturgy item whose text is converted.
+     * @param  Service  $service  Service the item belongs to.
+     * @return string Text with all applicable markers replaced.
+     */
+    private function getReplacedText(Item $item, Service $service): string
     {
+        /** @var string $text Text of the liturgy item. */
         $text = $item->data['text'];
         if (($item->data['needs_replacement'] ?? '') == '') {
             return $text;
@@ -107,10 +115,16 @@ return new class extends Migration
         }
         switch ($item->data['needs_replacement']) {
             case 'funeral':
-                $funeralId = $item->data['replacement'] ?? $service->funerals->first()->id;
+                $funeralId = $item->data['replacement'] ?? $service->funerals->first()?->id;
                 if ($service->funerals->pluck('id')->contains($funeralId)) {
                     $funeral = Funeral::find($funeralId);
-                    [$lastName, $firstName] = NameService::fromName($funeral->buried_name)->format(NameService::LAST_FIRST_ARRAY);
+                    if (! $funeral instanceof Funeral) {
+                        break;
+                    }
+                    $buriedName = is_string($funeral->buried_name) ? $funeral->buried_name : '';
+                    /** @var list<string> $nameParts Last and first name of the buried person. */
+                    $nameParts = NameService::fromName($buriedName)->format(NameService::LAST_FIRST_ARRAY);
+                    [$lastName, $firstName] = $nameParts;
                     foreach (
                         [
                             'bestattung:vorname' => trim($firstName),
@@ -135,10 +149,16 @@ return new class extends Migration
                 }
                 break;
             case 'baptism':
-                $baptismId = $item->data['replacement'] ?? $service->baptisms->first()->id;
+                $baptismId = $item->data['replacement'] ?? $service->baptisms->first()?->id;
                 if ($service->baptisms->pluck('id')->contains($baptismId)) {
                     $baptism = Baptism::find($baptismId);
-                    [$lastName, $firstName] = NameService::fromName($baptism->candidate_name)->format(NameService::LAST_FIRST_ARRAY);
+                    if (! $baptism instanceof Baptism) {
+                        break;
+                    }
+                    $candidateName = is_string($baptism->candidate_name) ? $baptism->candidate_name : '';
+                    /** @var list<string> $nameParts Last and first name of the baptism candidate. */
+                    $nameParts = NameService::fromName($candidateName)->format(NameService::LAST_FIRST_ARRAY);
+                    [$lastName, $firstName] = $nameParts;
                     foreach (
                         [
                             'taufe:vorname' => trim($firstName),
@@ -156,11 +176,20 @@ return new class extends Migration
                 }
                 break;
             case 'wedding':
-                $weddingId = $item->data['replacement'] ?? $service->weddings->first()->id;
+                $weddingId = $item->data['replacement'] ?? $service->weddings->first()?->id;
                 if ($service->weddings->pluck('id')->contains($weddingId)) {
                     $wedding = Wedding::find($weddingId);
-                    [$lastName1, $firstName1] = NameService::fromName($wedding->spouse1_name)->format(NameService::LAST_FIRST_ARRAY);
-                    [$lastName2, $firstName2] = NameService::fromName($wedding->spouse2_name)->format(NameService::LAST_FIRST_ARRAY);
+                    if (! $wedding instanceof Wedding) {
+                        break;
+                    }
+                    $spouse1Name = is_string($wedding->spouse1_name) ? $wedding->spouse1_name : '';
+                    /** @var list<string> $nameParts1 Last and first name of the first spouse. */
+                    $nameParts1 = NameService::fromName($spouse1Name)->format(NameService::LAST_FIRST_ARRAY);
+                    [$lastName1, $firstName1] = $nameParts1;
+                    $spouse2Name = is_string($wedding->spouse2_name) ? $wedding->spouse2_name : '';
+                    /** @var list<string> $nameParts2 Last and first name of the second spouse. */
+                    $nameParts2 = NameService::fromName($spouse2Name)->format(NameService::LAST_FIRST_ARRAY);
+                    [$lastName2, $firstName2] = $nameParts2;
                     foreach (
                         [
                             'trauung:person1:vorname' => trim($firstName1),
@@ -174,9 +203,10 @@ return new class extends Migration
                     ) {
                         $text = str_replace('['.$marker.']', $value, $text);
                     }
-                    /** @var AbstractPronounSet $pronounSet */
+                    /** @var AbstractPronounSet $pronounSet1 */
                     $pronounSet1 = PronounSets::get($wedding->pronoun_set1);
                     $text = $pronounSet1->replacePronouns($text, 'trauung:person1');
+                    /** @var AbstractPronounSet $pronounSet2 */
                     $pronounSet2 = PronounSets::get($wedding->pronoun_set2);
                     $text = $pronounSet2->replacePronouns($text, 'trauung:person2');
                 }
@@ -184,31 +214,5 @@ return new class extends Migration
         }
 
         return $text;
-    }
-
-    private function relativeDateString(Carbon $relativeToday, Carbon $dateToDescribe)
-    {
-        $diff = $dateToDescribe->diffInDays($relativeToday);
-        if ($diff == 0) {
-            return 'heute';
-        }
-        if ($diff == 1) {
-            return 'gestern';
-        }
-        if ($diff == 2) {
-            return 'vorgestern';
-        }
-        if ($diff >= 3 && $diff <= 6) {
-            return 'am '.$dateToDescribe->isoFormat('DDDD');
-        }
-        if ($diff == 7) {
-            return 'am '.$dateToDescribe->isoFormat('DDDD').' der letzten Woche';
-        }
-        if ($diff <= 12) {
-            return 'am '.$dateToDescribe->isoFormat('DDDD').' vor einer Woche';
-        }
-        $weeks = sprintf('%d', floor(($diff + 1) / 7));
-
-        return 'am '.$dateToDescribe->isoFormat('DDDD').' vor '.$weeks.' Wochen';
     }
 };

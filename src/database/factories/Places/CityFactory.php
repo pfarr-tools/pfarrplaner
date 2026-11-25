@@ -30,12 +30,11 @@
 
 namespace Database\Factories\Places;
 
-use App\Models\Model;
 use App\Models\Places\City;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends Factory<Model>
+ * @extends Factory<City>
  */
 class CityFactory extends Factory
 {

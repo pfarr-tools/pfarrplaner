@@ -62,8 +62,10 @@ class UserController extends Controller
      */
     public function select()
     {
+        $actor = Auth::user();
+        abort_unless($actor instanceof User, 401);
         $users = ListedPerson::select(['id', 'first_name', 'last_name', 'title'])
-            ->visibleFor(Auth::user())
+            ->visibleFor($actor)
             ->orderBy('last_name')
             ->orderBy('first_name')
             ->get();
@@ -75,10 +77,12 @@ class UserController extends Controller
     /**
      * Search for people to add from other cities
      *
-     * @return JsonResponse
+     * @param  string  $searchString  Search string for the person's name.
      */
-    public function search($searchString)
+    public function search(string $searchString): JsonResponse
     {
+        $actor = Auth::user();
+        abort_unless($actor instanceof User, 401);
         if (empty($searchString)) {
             return response()->json([]);
         }
@@ -88,8 +92,8 @@ class UserController extends Controller
 
         $users = User::with('cityScopes')
             ->whereRaw($nameExpression.' LIKE ?', ['%'.$searchString.'%'])
-            ->whereDoesntHave('cityScopes', function ($q) {
-                return $q->whereIn('city_id', Auth::user()->cities->pluck('id'));
+            ->whereDoesntHave('cityScopes', function ($q) use ($actor) {
+                return $q->whereIn('city_id', $actor->cities->pluck('id'));
             })
             ->orderBy('last_name')
             ->orderBy('first_name')
@@ -106,6 +110,7 @@ class UserController extends Controller
      */
     public function email(Request $request)
     {
+        /** @var array<string, mixed> $validated */
         $validated = $request->validate([
             'email' => ['required', 'email', 'max:255'],
         ]);
@@ -119,16 +124,16 @@ class UserController extends Controller
 
     /**
      * Activate a user within a certain city scope
-     *
-     * @return void
      */
-    public function activate(User $user, City $city)
+    public function activate(User $user, City $city): JsonResponse
     {
         Gate::authorize('create', User::class);
+        $actor = Auth::user();
+        abort_unless($actor instanceof User, 401);
         abort_unless(
-            $city->administeredBy(Auth::user())
-            || Auth::user()->hasRole(AuthServiceProvider::ADMIN)
-            || Auth::user()->hasRole(AuthServiceProvider::SUPER),
+            $city->administeredBy($actor)
+            || $actor->hasRole(AuthServiceProvider::ADMIN)
+            || $actor->hasRole(AuthServiceProvider::SUPER),
             403
         );
         $user->cityScopes()->syncWithoutDetaching([$city->id]);

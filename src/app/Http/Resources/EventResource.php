@@ -15,17 +15,19 @@ class EventResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        /** @var Service $this */
+        /** @var Service $service */
+        $service = $this->resource;
+
         return [
-            'id' => $this->slug,
-            'title' => $this->titleText(false),
-            'body' => $this->description,
-            'location' => $this->locationText(),
-            'start' => $this->date,
-            'end' => $this->date->copy()->addHour(1),
-            'calendar_id' => $this->city_id,
+            'id' => $service->slug,
+            'title' => $service->titleText(false),
+            'body' => $service->description,
+            'location' => $service->locationText(),
+            'start' => $service->date,
+            'end' => $service->date?->copy()->addHour(),
+            'calendar_id' => $service->city_id,
             'state' => 'Busy',
-            'isReadOnly' => ! $this->isEditable,
+            'isReadOnly' => ! $service->isEditable,
         ];
     }
 }

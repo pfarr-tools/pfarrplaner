@@ -59,7 +59,9 @@ class GoogleApiController extends Controller
     }
 
     /**
-     * @return Application|RedirectResponse|Redirector
+     * Authorize the Google API client and redirect to the next step or the OAuth consent screen.
+     *
+     * @return Application|RedirectResponse|Redirector|null Redirect response, or null when a token is already available.
      *
      * @throws Google_Exception
      */
@@ -68,25 +70,30 @@ class GoogleApiController extends Controller
         abort_unless(YoutubeIntegration::isConfigured(), 503, 'Die Google-YouTube-Integration ist nicht konfiguriert.');
 
         if ($request->has('state')) {
-            $state = json_decode($request->get('state'), true);
-            if (! isset($state['city'])) {
-                abort(404);
-            }
-            $city = City::findOrFail($state['city']);
-            $nextStep = $state['nextStep'];
+            $stateParam = $request->get('state');
+            abort_unless(is_string($stateParam), 404);
+            $state = json_decode($stateParam, true);
+            abort_unless(is_array($state) && isset($state['city']), 404);
+            $city = City::query()->whereKey($state['city'])->firstOrFail();
+            $nextStep = $state['nextStep'] ?? '';
         } elseif ($request->has('city')) {
-            $city = City::findOrFail($request->get('city'));
+            $city = City::query()->whereKey($request->get('city'))->firstOrFail();
             $nextStep = $request->get('nextStep', '');
         } else {
             abort(404);
         }
+        abort_unless(is_string($nextStep), 404);
 
         $client = new Google_Client;
-        $client->setAuthConfig(config('google'));
+        $googleConfig = config('google');
+        abort_unless(is_array($googleConfig), 500);
+        $client->setAuthConfig($googleConfig);
         $client->addScope(Google_Service_YouTube::YOUTUBE);
         $client->setRedirectUri(route('google-auth'));
         $client->setAccessType('offline');
-        $client->setState(json_encode(['city' => $city->id, 'nextStep' => $nextStep]));
+        $oauthState = json_encode(['city' => $city->id, 'nextStep' => $nextStep]);
+        abort_unless(is_string($oauthState), 500);
+        $client->setState($oauthState);
         $client->setIncludeGrantedScopes(true);
 
         if (! $request->has('code')) {
@@ -113,8 +120,10 @@ class GoogleApiController extends Controller
             }
         } else {
             $code = $request->get('code');
+            abort_unless(is_string($code), 400);
             $client->fetchAccessTokenWithAuthCode($code);
             $token = $client->getAccessToken();
+            abort_unless(is_array($token) && isset($token['access_token']), 500);
             Session::put('google_access_token', $token);
             $data = [
                 'google_auth_code' => $code,
@@ -127,12 +136,18 @@ class GoogleApiController extends Controller
 
             return redirect($nextStep);
         }
+
+        return null;
     }
 
     /**
-     * @return JsonResponse
+     * Create a YouTube broadcast for a service and return its URLs or a redirect.
+     *
+     * @param  Request  $request  Request containing the optional json flag.
+     * @param  Service  $service  Service the broadcast is created for.
+     * @return JsonResponse|RedirectResponse Broadcast URLs as JSON or a redirect back with a status message.
      */
-    public function createBroadcast(Request $request, Service $service)
+    public function createBroadcast(Request $request, Service $service): JsonResponse|RedirectResponse
     {
         $broadcast = Broadcast::create($service);
         $service->update(['youtube_url' => $broadcast->getSharerUrl()]);
@@ -167,6 +182,7 @@ class GoogleApiController extends Controller
     public function refreshBroadcast(Service $service)
     {
         $broadcast = Broadcast::get($service);
+        abort_unless($broadcast !== null, 404);
         $broadcast->update();
 
         return redirect()->back()->with('success', 'Die Beschreibung des Gottesdiensts auf YouTube wurde angepasst.');

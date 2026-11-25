@@ -31,14 +31,19 @@
 namespace App\Models\Liturgy;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 
+/** Freetext liturgy item model. */
 class FreetextItem extends Model
 {
     protected $table = 'liturgy_items_freetext';
 
     protected $fillable = ['description'];
 
-    public function item()
+    /**
+     * @return MorphOne<Item, $this>
+     */
+    public function item(): MorphOne
     {
         return $this->morphOne(Item::class, 'data');
     }

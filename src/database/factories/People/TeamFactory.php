@@ -47,9 +47,9 @@ class TeamFactory extends Factory
     /**
      * Define the model's default state.
      *
-     * @return array
+     * @return array<string, mixed> Standardattribute eines Teams
      */
-    public function definition()
+    public function definition(): array
     {
         return [
             'name' => fake()->words(2, true),

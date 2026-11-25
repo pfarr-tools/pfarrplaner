@@ -36,6 +36,7 @@ use App\Models\Places\City;
 use App\Models\Service;
 use App\Models\Streaming\Broadcast;
 use Carbon\Carbon;
+use Google\Service\YouTube\Resource\LiveBroadcasts;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 
@@ -65,7 +66,12 @@ class UnpublishYoutubeBroadcasts extends Command
         parent::__construct();
     }
 
-    protected function output($s)
+    /**
+     * Write a message to the console output and the log.
+     *
+     * @param  string  $s  Message to write.
+     */
+    protected function output(string $s): void
     {
         $this->line($s);
         Log::info($s);
@@ -98,10 +104,10 @@ class UnpublishYoutubeBroadcasts extends Command
 
                 continue;
             }
-            $channelId = YoutubeHelper::getChannelId($city->youtube_channel_url);
+            $channelId = YoutubeHelper::getChannelId($city->youtube_channel_url ?? '');
 
             $this->output('Configured cut-off after '.$city->youtube_cutoff_days.' days');
-            $cutoffDate = Carbon::now()->subDays($city->youtube_cutoff_days);
+            $cutoffDate = Carbon::now()->subDays($city->youtube_cutoff_days ?? 0);
             $this->output('Cut-off date: '.$cutoffDate->format('Y-m-d H:i:s'));
 
             $services = Service::inCity($city)
@@ -137,7 +143,9 @@ class UnpublishYoutubeBroadcasts extends Command
                         $status->setPrivacyStatus('private');
                         $broadcast->setStatus($status);
 
-                        $youtube->getYoutube()->liveBroadcasts->update('snippet,status,contentDetails', $broadcast);
+                        /** @var LiveBroadcasts $liveBroadcasts */
+                        $liveBroadcasts = $youtube->getYoutube()->liveBroadcasts;
+                        $liveBroadcasts->update('snippet,status,contentDetails', $broadcast);
                     } else {
                         $this->output('Broadcast id '.$broadcast->getId()
                                       .' ('.$pubDate->format('Y-m-d H:i:s').') is already unpublished.'

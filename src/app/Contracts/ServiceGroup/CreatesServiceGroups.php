@@ -34,6 +34,6 @@ use App\Models\People\User;
 use App\Models\ServiceGroup;
 
 /**
- * @method ServiceGroup create(User $user, array $input)
+ * @method ServiceGroup create(User $user, array<string, mixed> $input)
  */
 interface CreatesServiceGroups {}

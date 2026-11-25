@@ -65,5 +65,8 @@ class CalendarPolicy
         return true;
     }
 
-    public function print() {}
+    /**
+     * Determine whether printing is allowed; intentionally denied.
+     */
+    public function print(): void {}
 }

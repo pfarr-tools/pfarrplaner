@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\People\User;
+
 /*
  * Pfarrplaner
  *
@@ -42,10 +44,13 @@
 Broadcast::channel(
     'App.User.{id}',
     function ($user, $id) {
+        /** @var User $user */
+        /** @var int|string $id */
         return (int) $user->id === (int) $id;
     }
 );
 
 Broadcast::channel('services.city.{cityId}', function ($user, $cityId) {
+    /** @var User $user */
     return $user->visibleCities()->whereKey($cityId)->exists();
 });

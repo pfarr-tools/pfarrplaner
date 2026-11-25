@@ -30,7 +30,10 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Contracts\Psalm\CreatesPsalms;
+use App\Contracts\Psalm\UpdatesPsalms;
 use App\Models\Liturgy\Psalm;
+use App\Models\People\User;
 use Illuminate\Http\Request;
 
 /**
@@ -57,8 +60,13 @@ class PsalmController extends AbstractApiCRUDController
 
     public function store(Request $request)
     {
+        /** @var CreatesPsalms $creator */
         $creator = app(($this->modelClass)::getContractName('create'));
-        $psalm = $creator->create($request->user(), $request->all());
+        /** @var User $user */
+        $user = $request->user();
+        /** @var array<string, mixed> $input */
+        $input = $request->all();
+        $psalm = $creator->create($user, $input);
         $psalms = Psalm::all();
 
         return response()->json(compact('psalm', 'psalms'));
@@ -67,8 +75,13 @@ class PsalmController extends AbstractApiCRUDController
     public function update(Request $request, $modelId)
     {
         $psalm = $this->getSingleModel($request, $modelId);
+        /** @var UpdatesPsalms $updater */
         $updater = $psalm->getContractedAction('update');
-        $psalm = $updater->update($request->user(), $psalm, $request->all());
+        /** @var User $user */
+        $user = $request->user();
+        /** @var array<string, mixed> $input */
+        $input = $request->all();
+        $psalm = $updater->update($user, $psalm, $input);
         $psalm->refresh();
         $psalms = Psalm::all();
 

@@ -45,10 +45,14 @@ class UpdateAdConfig extends AbstractUpdateAction implements UpdatesAdConfigs
         return '';
     }
 
+    /**
+     * @param  array<string, mixed>  $input
+     */
     public function update(User $user, AdConfig $adConfig, array $input): AdConfig
     {
         Gate::forUser($user)->authorize('update', $adConfig);
         $input['service_id'] = $adConfig->service_id;
+        /** @var array<string, mixed> $input Validierte Eingabedaten. */
         $input = Validator::make($input, AdConfig::$validationRules)->validateWithBag('updateAdConfig');
         $adConfig->update($input);
         UpdatedAdConfig::dispatch($user, $adConfig);

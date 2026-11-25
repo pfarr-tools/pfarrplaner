@@ -36,16 +36,26 @@ use App\Models\Places\City;
 use App\Models\Service;
 use App\Models\Streaming\Broadcast;
 use Carbon\Carbon;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\URL;
 use Inertia\Inertia;
+use Inertia\Response;
 
+/** Controller for diagnosing and fixing live stream settings. */
 class StreamingTroubleshooterController extends Controller
 {
-    public function index(Request $request, $city)
+    /**
+     * Show the streaming troubleshooting page with a city's broadcasts and upcoming services.
+     *
+     * @param  Request  $request  Signed request protecting the troubleshooting page.
+     * @param  string  $city  Name of the city whose streaming setup is checked.
+     * @return Response Inertia response with the city's broadcasts and services.
+     */
+    public function index(Request $request, string $city): Response
     {
-        $city = City::where('name', $city)->first();
-        if (! $city) {
+        $selectedCity = City::where('name', $city)->first();
+        if (! $selectedCity) {
             abort(404);
         }
 
@@ -53,16 +63,16 @@ class StreamingTroubleshooterController extends Controller
             abort(401);
         }
 
-        $activeBroadcasts = Broadcast::getActive($city);
-        $inactiveBroadcasts = Broadcast::getInactive($city);
+        $activeBroadcasts = Broadcast::getActive($selectedCity);
+        $inactiveBroadcasts = Broadcast::getInactive($selectedCity);
 
-        $nextServicesWithStream = Service::inCity($city)
+        $nextServicesWithStream = Service::inCity($selectedCity)
             ->startingFrom(Carbon::now()->setTime(0, 0, 0))
             ->where('youtube_url', '!=', '')
             ->ordered()
             ->get();
 
-        $nextServicesWithoutStream = Service::inCity($city)
+        $nextServicesWithoutStream = Service::inCity($selectedCity)
             ->startingFrom(Carbon::now()->setTime(0, 0, 0))
             ->where(function ($query) {
                 $query->where('youtube_url', '')
@@ -72,41 +82,77 @@ class StreamingTroubleshooterController extends Controller
             ->limit(10)
             ->get();
 
-        return Inertia::render('streaming/troubleshooter', compact('city', 'activeBroadcasts', 'inactiveBroadcasts', 'nextServicesWithStream', 'nextServicesWithoutStream'));
+        return Inertia::render('streaming/troubleshooter', [
+            'city' => $selectedCity,
+            'activeBroadcasts' => $activeBroadcasts,
+            'inactiveBroadcasts' => $inactiveBroadcasts,
+            'nextServicesWithStream' => $nextServicesWithStream,
+            'nextServicesWithoutStream' => $nextServicesWithoutStream,
+        ]);
     }
 
-    public function activateService(Service $service)
+    /**
+     * Activate the broadcast linked to a service and return to the troubleshooting page.
+     *
+     * @param  Service  $service  Service whose YouTube broadcast should be activated.
+     * @return RedirectResponse Redirect to the signed troubleshooting page of the service's city.
+     */
+    public function activateService(Service $service): RedirectResponse
     {
         $broadcast = Broadcast::get($service);
         if ($broadcast === null) {
             $broadcast = Broadcast::create($service);
             $service->update(['youtube_url' => $broadcast->getSharerUrl()]);
         }
+        abort_unless($broadcast !== null, 404);
+        abort_unless($service->city !== null, 404);
         $broadcast->activate();
 
         return redirect(URL::signedRoute('streaming.troubleshooter', strtolower($service->city->name)));
     }
 
-    public function activateBroadcast($city, $broadcast)
+    /**
+     * Activate a YouTube broadcast that is not linked to a service.
+     *
+     * @param  string  $city  Name of the city whose YouTube account owns the broadcast.
+     * @param  string  $broadcast  YouTube broadcast ID to activate.
+     * @return RedirectResponse Redirect to the signed troubleshooting page of the city.
+     */
+    public function activateBroadcast(string $city, string $broadcast): RedirectResponse
     {
-        $city = City::where('name', $city)->first();
-        if (! $city) {
+        $selectedCity = City::where('name', $city)->first();
+        if (! $selectedCity) {
             abort(404);
         }
 
-        $broadcast = Broadcast::getFromId($broadcast, $city);
-        $broadcast->activate();
+        $selectedBroadcast = Broadcast::getFromId($broadcast, $selectedCity);
+        abort_unless($selectedBroadcast !== null, 404);
+        $selectedBroadcast->activate();
 
-        return redirect(URL::signedRoute('streaming.troubleshooter', strtolower($city->name)));
+        return redirect(URL::signedRoute('streaming.troubleshooter', strtolower($selectedCity->name)));
     }
 
-    public function resetService(Service $service)
+    /**
+     * Replace the YouTube broadcast of a service with a newly created one.
+     *
+     * @param  Service  $service  Service whose YouTube broadcast should be reset.
+     * @return RedirectResponse Redirect to the signed troubleshooting page of the service's city.
+     */
+    public function resetService(Service $service): RedirectResponse
     {
-        $youtube = YoutubeIntegration::get($service->city)->getYoutube();
-        $youtube->liveBroadcasts->delete(YoutubeHelper::getCode($service->youtube_url));
+        $city = $service->city;
+        abort_unless($city !== null, 404);
+        $youtubeUrl = $service->youtube_url;
+        abort_unless(is_string($youtubeUrl), 422);
+        $youtube = YoutubeIntegration::get($city)->getYoutube();
+        $liveBroadcasts = $youtube->liveBroadcasts;
+        if (! is_object($liveBroadcasts) || ! method_exists($liveBroadcasts, 'delete')) {
+            abort(500);
+        }
+        $liveBroadcasts->delete(YoutubeHelper::getCode($youtubeUrl));
         $broadcast = Broadcast::create($service);
         $service->update(['youtube_url' => $broadcast->getSharerUrl()]);
 
-        return redirect(URL::signedRoute('streaming.troubleshooter', strtolower($service->city->name)));
+        return redirect(URL::signedRoute('streaming.troubleshooter', strtolower($city->name)));
     }
 }

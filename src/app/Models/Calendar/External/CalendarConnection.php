@@ -30,6 +30,7 @@
 
 namespace App\Models\Calendar\External;
 
+use App\DAV\DAVCalendarItem;
 use App\Models\Leave\Absence;
 use App\Models\People\User;
 use App\Models\Places\City;
@@ -43,6 +44,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
+/** External calendar connection for a user. */
 class CalendarConnection extends Model
 {
     /** @use HasFactory<CalendarConnectionFactory> */
@@ -81,16 +83,23 @@ class CalendarConnection extends Model
         return $this->belongsToMany(City::class)->withPivot('connection_type');
     }
 
-    public function getUriAttribute()
+    /**
+     * Gibt die CalDAV-URI dieser Verbindung zurück.
+     *
+     * @return string CalDAV-URI der Verbindung.
+     */
+    public function getUriAttribute(): string
     {
-        return url('/dav/calendars/'.$this->user->email.'/'.Str::slug($this->title)).'/';
+        $user = $this->user ?? throw new \LogicException('Calendar connection has no owner.');
+
+        return url('/dav/calendars/'.$user->email.'/'.Str::slug($this->title)).'/';
     }
 
     /**
      * Get all services for a city that should be synced in a full sync
      *
-     * @param  false  $countOnly
-     * @return Collection<int, Service>|int
+     * @param  bool  $countOnly  Return a count instead of models.
+     * @return ($countOnly is true ? int : Collection<int, Service>)
      */
     public function getSyncableServicesForCity(City $city, $countOnly = false)
     {
@@ -100,12 +109,15 @@ class CalendarConnection extends Model
                 $cityServices = new Collection;
 
                 return $countOnly ? 0 : $cityServices;
-                break;
             case self::CONNECTION_TYPE_ALL:
                 $cityServices = $cityServices->inCity($city);
                 break;
             case self::CONNECTION_TYPE_OWN:
-                $cityServices = $cityServices->inCity($city)->userParticipates($this->user);
+                $user = $this->user;
+                if ($user === null) {
+                    return $countOnly ? 0 : new Collection;
+                }
+                $cityServices = $cityServices->inCity($city)->userParticipates($user);
         }
 
         // exclude hidden service if necessary
@@ -123,23 +135,39 @@ class CalendarConnection extends Model
      */
     public function getSyncableServices(): Collection
     {
+        /** @var Collection<int, Service> $services */
         $services = collect();
         foreach ($this->cities as $city) {
-            $services = $services->merge($this->getSyncableServicesForCity($city));
+            /** @var Collection<int, Service> $cityServices */
+            $cityServices = $this->getSyncableServicesForCity($city);
+            $services = $services->merge($cityServices);
         }
 
         return $services;
     }
 
-    public function getCurrentSyncToken()
+    /**
+     * Gibt den aktuellen Synchronisierungs-Token der Verbindung zurück.
+     *
+     * @return string ISO-8601-Zeitstempel der letzten Änderung.
+     */
+    public function getCurrentSyncToken(): string
     {
-        return max(
+        /** @var Carbon $latest */
+        $latest = max(
             $this->getSyncableServices()->pluck('updated_at')->max(),
             $this->getSyncableAbsences()->pluck('updated_at')->max(),
-        )->toIsoString();
+        );
+
+        return $latest->toIsoString() ?? '';
     }
 
-    public function getCalendarItems()
+    /**
+     * Gibt alle CalDAV-Einträge dieser Verbindung zurück.
+     *
+     * @return DAVCalendarItem[] CalDAV-Einträge aus Abwesenheiten und Gottesdiensten.
+     */
+    public function getCalendarItems(): array
     {
         $items = [];
 
@@ -176,11 +204,16 @@ class CalendarConnection extends Model
      */
     public static function getConnectionsForService(Service $service)
     {
+        $city = $service->city;
+        if ($city === null) {
+            return collect();
+        }
+
         // get connections requiring all services of this city
         $calendarConnections = CalendarConnection::whereHas(
             'cities',
-            function ($query) use ($service) {
-                $query->where('cities.id', $service->city->id)
+            function ($query) use ($city) {
+                $query->where('cities.id', $city->id)
                     ->where('calendar_connection_city.connection_type', CalendarConnection::CONNECTION_TYPE_ALL);
             }
         )->get();
@@ -190,8 +223,8 @@ class CalendarConnection extends Model
             $calendarConnections = $calendarConnections->merge(
                 CalendarConnection::whereHas(
                     'cities',
-                    function ($query) use ($service) {
-                        $query->where('cities.id', $service->city->id)
+                    function ($query) use ($city) {
+                        $query->where('cities.id', $city->id)
                             ->where(
                                 'calendar_connection_city.connection_type',
                                 CalendarConnection::CONNECTION_TYPE_OWN
@@ -204,18 +237,30 @@ class CalendarConnection extends Model
         return $calendarConnections;
     }
 
-    public function getSyncableAbsences()
+    /**
+     * Gibt die über diese Verbindung synchronisierten Abwesenheiten zurück.
+     *
+     * @return Collection<int, Absence> Eigene Abwesenheiten und Vertretungen.
+     */
+    public function getSyncableAbsences(): Collection
     {
+        /** @var Collection<int, Absence> $absences */
+        $absences = collect([]);
+
         if (! $this->include_vacations) {
-            return collect([]);
+            return $absences;
         }
 
         switch ($this->include_vacations) {
             case 1:
-                $own = Absence::where('user_id', $this->user_id)->where('to', '>=', Carbon::now()->subYear(1))->get();
-                $replacing = Absence::userIsReplacement($this->user)->get();
+                $own = Absence::where('user_id', $this->user_id)->where('to', '>=', Carbon::now()->subYear())->get();
+                $user = $this->user;
+                /** @var Collection<int, Absence> $replacing */
+                $replacing = $user === null ? collect() : Absence::userIsReplacement($user)->get();
 
                 return $own->merge($replacing);
         }
+
+        return $absences;
     }
 }

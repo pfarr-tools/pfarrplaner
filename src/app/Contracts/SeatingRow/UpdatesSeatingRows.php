@@ -18,5 +18,10 @@ use App\Models\Seating\SeatingRow;
 
 interface UpdatesSeatingRows
 {
+    /**
+     * Aktualisiert eine Sitzreihe.
+     *
+     * @param  array<string, mixed>  $input
+     */
     public function update(User $user, SeatingRow $seatingRow, array $input): SeatingRow;
 }

@@ -35,6 +35,7 @@ use App\Traits\HasAttachedImage;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
@@ -42,6 +43,7 @@ class Sermon extends Model
 {
     use HasAttachedImage;
 
+    /** @var string Name des Bildfeldes in der Datenbank. */
     protected $imageField = 'image';
 
     protected $guarded = [];
@@ -93,11 +95,11 @@ class Sermon extends Model
     }
 
     /**
-     * Get all preachers for this sermon
+     * Gibt alle Prediger dieser Predigt nach Gottesdienst-ID gruppiert zurück.
      *
-     * @return array Preachers (by service id)
+     * @return array<int|string, array<array-key, mixed>|Collection<array-key, mixed>> Prediger je Gottesdienst-ID.
      */
-    public function getPreachersAttribute()
+    public function getPreachersAttribute(): array
     {
         $preachers = [];
         foreach ($this->services as $service) {
@@ -117,10 +119,10 @@ class Sermon extends Model
         $sermons = self::all()->filter(function ($value, $key) use ($city) {
             foreach ($value->services as $service) {
                 $user = Auth::user();
-                if ($service->city->id == $city->id) {
+                if ($service->city?->id == $city->id) {
                     return true;
                 }
-                if (collect($service->pastors->pluck('id'))->contains(Auth::user()->id)) {
+                if (collect($service->pastors->pluck('id'))->contains($user?->id)) {
                     return true;
                 }
             }
@@ -128,9 +130,9 @@ class Sermon extends Model
         $list = [];
         foreach ($sermons as $sermon) {
             foreach ($sermon->services as $service) {
-                $sermon->name = $service->oneLiner().' "'.$sermon->title
-                        .($sermon->subtitle ? ': '.$sermon->subtitle : '')
-                    .'" ('.$sermon->reference.')';
+                $sermon->setAttribute('name', $service->oneLiner().' "'.$sermon->title
+                    .($sermon->subtitle ? ': '.$sermon->subtitle : '')
+                    .'" ('.$sermon->reference.')');
                 $list[$service->dateTime()->format('YmdHi')] = $sermon;
             }
 
@@ -140,13 +142,24 @@ class Sermon extends Model
         return $list;
     }
 
-    public function getFullTitleAttribute()
+    /**
+     * Gibt den vollständigen Titel der Predigt zurück.
+     *
+     * @return string Vollständiger Titel einschließlich Untertitel.
+     */
+    public function getFullTitleAttribute(): string
     {
         return $this->title.($this->subtitle ? ': '.$this->subtitle : '');
     }
 
-    public function latestService()
+    /**
+     * Gibt den letzten Gottesdienst dieser Predigt zurück.
+     *
+     * @return string|null Datum des letzten Gottesdienstes oder null, wenn keiner vorliegt.
+     */
+    public function latestService(): ?string
     {
+        /** @var Collection<int, Carbon|string|null> $dates Termine der zugehörigen Gottesdienste. */
         $dates = $this->services->pluck('dateTime');
         $dates = $dates->reject(function ($item) {
             return (new Carbon($item)) > Carbon::now();
@@ -161,11 +174,16 @@ class Sermon extends Model
         return (string) $dates[0];
     }
 
-    public function setTitleAttribute($title)
+    /**
+     * Setzt den Titel und erzeugt daraus einen eindeutigen Slug.
+     *
+     * @param  string|null  $title  Titel der Predigt.
+     */
+    public function setTitleAttribute(?string $title): void
     {
         $this->attributes['title'] = $title;
 
-        $title = strtr($title, ['Ä' => 'Ae', 'Ö' => 'Oe', 'Ü' => 'Ue', 'ä' => 'ae', 'ö' => 'oe', 'ü' => 'ue', 'ß' => 'ss']);
+        $title = strtr($title ?? '', ['Ä' => 'Ae', 'Ö' => 'Oe', 'Ü' => 'Ue', 'ä' => 'ae', 'ö' => 'oe', 'ü' => 'ue', 'ß' => 'ss']);
 
         $slug = $originalSlug = Str::slug($title);
         $index = 1;

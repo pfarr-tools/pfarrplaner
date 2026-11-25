@@ -34,6 +34,6 @@ use App\Models\People\User;
 use App\Models\Seating\Booking;
 
 /**
- * @method Booking create(User $user, array $input)
+ * @method Booking create(User $user, array<string, mixed> $input)
  */
 interface CreatesBookings {}

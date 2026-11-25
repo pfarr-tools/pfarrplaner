@@ -34,6 +34,7 @@ use Illuminate\Support\Facades\Schema;
 
 class AddMoreStoryFieldsToFunerals extends Migration
 {
+    /** @var string[] Namen der anzulegenden Textspalten. */
     protected $fields = [
         'spoken_name',
         'professional_life',

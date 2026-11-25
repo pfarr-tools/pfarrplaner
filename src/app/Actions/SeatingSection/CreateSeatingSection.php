@@ -31,12 +31,16 @@ class CreateSeatingSection extends AbstractCreateAction implements CreatesSeatin
         return route('admin.location.edit', ['modelId' => $this->location->id, 'tab' => 'seating']);
     }
 
+    /**
+     * @param  array<string, mixed>  $input
+     */
     public function create(User $user, array $input): SeatingSection
     {
         Gate::forUser($user)->authorize('create', SeatingSection::class);
+        /** @var array{location_id: int|string, ...} $input */
         $input = Validator::make($input, SeatingSection::$validationRules)->validateWithBag('createSeatingSection');
 
-        $this->location = Location::findOrFail($input['location_id']);
+        $this->location = Location::findOrFail((int) $input['location_id']);
         Gate::forUser($user)->authorize('update', $this->location);
 
         $input = NormalizesSeatingSectionData::normalize($input);

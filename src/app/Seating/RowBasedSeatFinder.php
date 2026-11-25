@@ -32,12 +32,14 @@ namespace App\Seating;
 
 use App\Models\Location;
 use App\Models\Seating\Booking;
+use App\Models\Seating\SeatingRow;
 use App\Models\Seating\SeatingSection;
 use App\Models\Service;
 use Illuminate\Support\Collection;
 
 class RowBasedSeatFinder extends AbstractSeatFinder
 {
+    /** @var string View used to render this finder. */
     public $viewName = 'rowBased';
 
     protected const ROW_TOO_SMALL = -1;
@@ -47,20 +49,28 @@ class RowBasedSeatFinder extends AbstractSeatFinder
     /** @var Location */
     protected $location;
 
+    /** @var Service Service whose seating is planned. */
     protected $service;
 
+    /** @var int Maximum capacity. */
     protected $capacity = 0;
 
+    /** @var array<string, array{row: SeatingRow, booking: Booking|null}> */
     protected $grid = [];
 
+    /** @var array<string, array{row: SeatingRow, booking: Booking|null}> */
     protected $originalGrid = [];
 
+    /** @var array<string, string> */
     protected $errors = [];
 
+    /** @var bool Whether bookings have been loaded. */
     protected $loaded = false;
 
+    /** @var int Remaining free seats. */
     protected $remain = 0;
 
+    /** @var array<string, array{row: SeatingRow, booking: Booking|null}> */
     protected $reserved = [];
 
     /**
@@ -71,7 +81,9 @@ class RowBasedSeatFinder extends AbstractSeatFinder
     public function __construct(Service $service, $preloadExistingBookings = true)
     {
         parent::__construct($service, $preloadExistingBookings);
-        $this->location = $service->location;
+        /** @var Location $location */
+        $location = $service->location;
+        $this->location = $location;
         $this->grid = $this->originalGrid = $this->buildGrid();
         if ($preloadExistingBookings) {
             $this->loadExistingBookings();
@@ -85,7 +97,7 @@ class RowBasedSeatFinder extends AbstractSeatFinder
      * The row title is used as the array key.
      * The array is sorted by row titles
      *
-     * @return array
+     * @return array<string, array{row: SeatingRow, booking: Booking|null}>
      */
     protected function buildGrid()
     {
@@ -98,16 +110,21 @@ class RowBasedSeatFinder extends AbstractSeatFinder
         return $grid;
     }
 
+    /**
+     * @return void
+     */
     protected function dumpGrid()
     {
         ksort($this->grid);
         echo '<table>';
         foreach ($this->grid as $key => $place) {
-            echo '<tr><td>'.$key.'</td><td>['.$place['row']->seats.']</td><td>'.
-                (($place['booking'] !== null) ? $place['booking']['name'] : '')
-                .' ('
-                .(($place['booking'] !== null) ? $place['booking']['number'] : '')
-                .')</td></tr>';
+            /** @var int $seats */
+            $seats = $place['row']->seats;
+            /** @var string $name */
+            $name = $place['booking'] !== null ? $place['booking']['name'] : '';
+            /** @var string $number */
+            $number = $place['booking'] !== null ? $place['booking']['number'] : '';
+            echo '<tr><td>'.$key.'</td><td>['.$seats.']</td><td>'.$name.' ('.$number.')</td></tr>';
         }
         echo '</table><hr />';
     }
@@ -117,6 +134,7 @@ class RowBasedSeatFinder extends AbstractSeatFinder
      *
      * @param  $number  Number of people
      * @param  string  $fixedSeat  Desired fixed seating position
+     * @param  int  $number  Number of people.
      * @param  string  $overrideSeats  Override the default maximum number of seats for a fixed position
      * @param  string  $overrideSplit  Override the default splitting configuration for a fixed position
      * @param  Collection<int, Booking>  $bookings  Existing bookings used for the check
@@ -161,16 +179,20 @@ class RowBasedSeatFinder extends AbstractSeatFinder
     /**
      * Check if seating is still possible after proposed changes to a booking
      *
+     * @param  mixed  $data  Proposed booking data.
      * @return bool True if this booking can be changed
      */
-    public function checkIfBookingCanBeChanged(Booking $booking, array $data): bool
+    public function checkIfBookingCanBeChanged(Booking $booking, $data): bool
     {
         // test: remove this booking from the existing list and re-add it with changed data
         $bookings = $this->service->bookings->filter(function ($item) use ($booking) {
             return $item->id != $booking->id;
         });
         $remain = $this->remain;
-        $this->remain += $booking['number'];
+        /** @var int $bookingNumber */
+        $bookingNumber = $booking['number'];
+        $this->remain += $bookingNumber;
+        /** @var array{number: int, fixed_seat: string, override_seats: string, override_split: string} $data */
         $success = $this->find(
             $data['number'],
             $data['fixed_seat'],
@@ -186,8 +208,7 @@ class RowBasedSeatFinder extends AbstractSeatFinder
     /**
      * Find a place for all existing bookings
      *
-     * @param  Collection|array  $bookings  Optional: array or collection of bookings
-     * @param  Collection<int, Booking>  $bookings  Existing bookings.
+     * @param  Collection<int, Booking>|array<int, Booking>|null  $bookings  Existing bookings.
      * @return bool Success
      */
     protected function loadExistingBookings($bookings = null)
@@ -199,9 +220,11 @@ class RowBasedSeatFinder extends AbstractSeatFinder
         // override default grid settings with manually booked bookings
         foreach ($bookings as $booking) {
             if (($booking->override_seats != '') && ($booking->fixed_seat != '')) {
-                $rowNumber = str_pad(preg_replace('/[^0-9]/', '', $booking->fixed_seat), 2, 0, STR_PAD_LEFT);
+                $rowNumber = str_pad((string) preg_replace('/[^0-9]/', '', $booking->fixed_seat), 2, '0', STR_PAD_LEFT);
                 if (isset($this->grid[$rowNumber])) {
-                    $this->grid[$rowNumber]['row']->seats = $booking->override_seats;
+                    /** @var int<0, max> $seats */
+                    $seats = (int) $booking->override_seats;
+                    $this->grid[$rowNumber]['row']->seats = $seats;
                 }
             }
         }
@@ -248,9 +271,9 @@ class RowBasedSeatFinder extends AbstractSeatFinder
         }
         // whole row?
         if (is_numeric($booking->fixed_seat)) {
-            $rowKey = str_pad($booking->fixed_seat, 2, 0, STR_PAD_LEFT);
+            $rowKey = str_pad($booking->fixed_seat, 2, '0', STR_PAD_LEFT);
         } else {
-            $rowNumber = str_pad(preg_replace('/[^0-9]/', '', $booking->fixed_seat), 2, 0, STR_PAD_LEFT);
+            $rowNumber = str_pad((string) preg_replace('/[^0-9]/', '', $booking->fixed_seat), 2, '0', STR_PAD_LEFT);
             $placeLetter = preg_replace('/[0-9]/', '', $booking->fixed_seat);
             $rowKey = $rowNumber.$placeLetter;
             // row not yet split?
@@ -268,11 +291,17 @@ class RowBasedSeatFinder extends AbstractSeatFinder
 
                 return true;
             } else {
+                /** @var Booking $existingBooking */
+                $existingBooking = $this->grid[$rowKey]['booking'];
+                /** @var string $existingName */
+                $existingName = $existingBooking->name;
+                /** @var string $existingFirstName */
+                $existingFirstName = $existingBooking->first_name;
                 $this->setError(
                     'fixed_seat',
                     'Der gewünschte Platz '.$rowKey.' ist bereits für '
-                    .$this->grid[$rowKey]['booking']->name
-                    .($this->grid[$rowKey]['booking']->first_name ? ', '.$this->grid[$rowKey]['booking']->first_name : '')
+                    .$existingName
+                    .($existingFirstName ? ', '.$existingFirstName : '')
                     .' reserviert.'
                 );
 
@@ -289,6 +318,8 @@ class RowBasedSeatFinder extends AbstractSeatFinder
      * Optimize seating
      *
      * This will move people as far to the front as possible
+     *
+     * @return void
      */
     protected function optimize()
     {
@@ -333,8 +364,8 @@ class RowBasedSeatFinder extends AbstractSeatFinder
     /**
      * Optimize a row using the whole row as one
      *
-     * @param  $key  Grid key
-     * @param  $place  Grid element
+     * @param  string  $key  Grid key
+     * @param  array<string, mixed>  $place  Grid element
      * @param  bool  $do  Actually do this (false will only simulate optimization)
      * @return int Point gained by this move
      */
@@ -342,6 +373,10 @@ class RowBasedSeatFinder extends AbstractSeatFinder
     {
         $found = 0;
         $foundKey = null;
+        /** @var SeatingRow $row */
+        $row = $place['row'];
+        /** @var int $rowSeats */
+        $rowSeats = $row->seats;
 
         foreach ($this->grid as $searchKey => $searchPlace) {
             if (
@@ -349,7 +384,7 @@ class RowBasedSeatFinder extends AbstractSeatFinder
                 && ($searchPlace['booking']->fixed_seat == '')
                 && ($searchKey > $key)
                 && ($searchPlace['booking']->number > $found)
-                && ($searchPlace['booking']->number <= $place['row']->seats)
+                && ($searchPlace['booking']->number <= $rowSeats)
             ) {
                 $found = $searchPlace['booking']->number;
                 $foundKey = $searchKey;
@@ -357,8 +392,10 @@ class RowBasedSeatFinder extends AbstractSeatFinder
         }
         if ($foundKey !== null) {
             if ($do) {
-                $this->grid[$key]['booking'] = $this->grid[$foundKey]['booking'];
-                $this->grid[$foundKey]['booking'] = null;
+                $grid = $this->grid;
+                $grid[$key] = ['row' => $grid[$key]['row'], 'booking' => $grid[$foundKey]['booking']];
+                $grid[$foundKey] = ['row' => $grid[$foundKey]['row'], 'booking' => null];
+                $this->grid = $grid;
             }
 
             return $found;
@@ -370,8 +407,8 @@ class RowBasedSeatFinder extends AbstractSeatFinder
     /**
      * Optimize a row by splitting it into several places
      *
-     * @param  $key  Grid key
-     * @param  $place  Grid element
+     * @param  string  $key  Grid key
+     * @param  array<string, mixed>  $place  Grid element
      * @param  bool  $do  Actually do this (false will only simulate optimization)
      * @return int Point gained by this move, -1 if not possible
      */
@@ -379,7 +416,7 @@ class RowBasedSeatFinder extends AbstractSeatFinder
     {
         $pts = 0;
         $moved = [];
-        $splits = explode(',', $this->grid[$key]['row']->split ?: $this->grid[$key]['row']->seats);
+        $splits = explode(',', (string) ($this->grid[$key]['row']->split ?: $this->grid[$key]['row']->seats));
         if (count($splits) == 1) {
             return -1;
         }
@@ -387,6 +424,7 @@ class RowBasedSeatFinder extends AbstractSeatFinder
         foreach ($splits as $splitKey => $split) {
             $found = 0;
             $foundKey = null;
+            $foundBooking = null;
             foreach ($this->grid as $searchKey => $searchPlace) {
                 if (($searchPlace['booking'] !== null)
                     && ($searchPlace['booking']->fixed_seat == '')
@@ -397,20 +435,24 @@ class RowBasedSeatFinder extends AbstractSeatFinder
                 ) {
                     $found = $searchPlace['booking']->number;
                     $foundKey = $searchKey;
+                    $foundBooking = $searchPlace['booking'];
                 }
             }
-            if ($foundKey !== null) {
+            if (($foundKey !== null) && ($foundBooking !== null)) {
                 $moved[$splitKey] = $foundKey;
-                $pts += $this->grid[$foundKey]['booking']->number;
+                $pts += $foundBooking->number;
             }
         }
 
         if ($do && count($moved)) {
             $this->splitRow($key);
+            $grid = $this->grid;
             foreach ($moved as $target => $src) {
-                $this->grid[$key.chr(65 + $target)]['booking'] = $this->grid[$src]['booking'];
-                $this->grid[$src]['booking'] = null;
+                $targetKey = $key.chr(65 + $target);
+                $grid[$targetKey] = ['row' => $grid[$targetKey]['row'], 'booking' => $grid[$src]['booking']];
+                $grid[$src] = ['row' => $grid[$src]['row'], 'booking' => null];
             }
+            $this->grid = $grid;
         }
 
         return $pts;
@@ -419,7 +461,7 @@ class RowBasedSeatFinder extends AbstractSeatFinder
     /**
      * Export the seating list to an array
      *
-     * @return array|void
+     * @return array<string, mixed>|false
      */
     public function finalList()
     {
@@ -443,14 +485,18 @@ class RowBasedSeatFinder extends AbstractSeatFinder
         $number = 0;
         foreach ($this->grid as $key => $place) {
             if ($place['booking'] !== null) {
-                $sortKey = $place['booking']->name.($place['booking']->first_name ? ', '.$place['booking']->first_name : '');
+                /** @var string $bookingName */
+                $bookingName = $place['booking']->name;
+                /** @var string $bookingFirstName */
+                $bookingFirstName = $place['booking']->first_name;
+                $sortKey = $bookingName.($bookingFirstName ? ', '.$bookingFirstName : '');
                 $number += $place['booking']->number;
                 while (isset($final[$sortKey])) {
                     $sortKey .= '_';
                 }
                 $final[$sortKey] = $place;
             } else {
-                $empty[$place['row']->seatingSection->prioriy.$key] = $place;
+                $empty[$place['row']->seatingSection?->priority.$key] = $place;
             }
         }
         ksort($final);
@@ -496,11 +542,12 @@ class RowBasedSeatFinder extends AbstractSeatFinder
      *
      * @param  string  $key  Grid key
      * @param  Booking  $booking  Booking
+     * @return void
      */
     protected function seat($key, Booking $booking)
     {
         // first, test if we can split the row:
-        $splits = explode(',', $this->grid[$key]['row']->split ?: $this->grid[$key]['row']->seats);
+        $splits = explode(',', (string) ($this->grid[$key]['row']->split ?: $this->grid[$key]['row']->seats));
 
         // splitting doesn't work if there are no splits
         if (count($splits) == 1) {
@@ -538,9 +585,9 @@ class RowBasedSeatFinder extends AbstractSeatFinder
      * Split a row into its parts
      *
      * @param  string  $key  Grid key
-     * @param  array  $grid  Optional: use alternative grid array instead of $this->grid
+     * @param  array<string, array{row: SeatingRow, booking: Booking|null}>|array<string, SeatingRow>|null  $grid  Optional: use alternative grid array instead of $this->grid
      * @param  bool  $isRowGrid  Optional: Grid only contains rows, no bookings
-     * @return array Grid with split row
+     * @return array<string, array{row: SeatingRow, booking: Booking|null}>|array<string, SeatingRow> Grid with split row
      */
     protected function splitRow($key, $grid = null, $isRowGrid = false)
     {
@@ -556,8 +603,9 @@ class RowBasedSeatFinder extends AbstractSeatFinder
             return $tmpGrid;
         }
 
+        /** @var SeatingRow $targetRow */
         $targetRow = $isRowGrid ? $tmpGrid[$key] : $tmpGrid[$key]['row'];
-        $splits = explode(',', $targetRow->split ?: $targetRow->seats);
+        $splits = explode(',', (string) ($targetRow->split ?: $targetRow->seats));
 
         // only split splittable rows
         if (count($splits) == 1) {
@@ -569,7 +617,9 @@ class RowBasedSeatFinder extends AbstractSeatFinder
             $rowKey = $key.chr(65 + $splitKey);
             $row = clone $targetRow;
             $row->title = $rowKey;
-            $row->seats = $split;
+            /** @var int<0, max> $rowSeats */
+            $rowSeats = (int) $split;
+            $row->seats = $rowSeats;
             $row->split = '';
             $tmpGrid[$rowKey] = $isRowGrid ? $row : ['row' => $row, 'booking' => null];
         }
@@ -579,9 +629,11 @@ class RowBasedSeatFinder extends AbstractSeatFinder
 
         // restore target grid from $tmpGrid
         if ($grid === null) {
+            /** @var array<string, array{row: SeatingRow, booking: Booking|null}> $tmpGrid */
             $this->grid = $tmpGrid;
         }
 
+        /** @var array<string, array{row: SeatingRow, booking: Booking|null}> $tmpGrid */
         return $tmpGrid;
     }
 
@@ -603,39 +655,42 @@ class RowBasedSeatFinder extends AbstractSeatFinder
         }
 
         $row = $this->grid[$key]['row'];
+        /** @var int<0, max> $seats */
+        $seats = $row->seats;
 
         // check if the place is big enough
-        if ($number > $row->seats) {
+        if ($number > $seats) {
             return self::ROW_TOO_SMALL;
         }
 
         // try splitting the row
-        $splits = explode(',', ($row->split ?: $row->seats));
+        $splits = explode(',', (string) ($row->split ?: $row->seats));
 
         // if the row cannot be split, we need the whole row
         if (count($splits) == 1) {
-            return $row->seats;
+            return $seats;
         }
 
         // if $number is greater than the maximum split number, we need the whole row
         if ($number > max($splits)) {
-            return $row->seats;
+            return $seats;
         }
 
         // seems like a part of the row will be enough:
         // in this case, the impact is the row maximum minus the sum of the
         // other split seats
-        $possible = $row->seats;
+        $possible = $seats;
         $impact = 0;
         foreach ($splits as $split) {
-            if (($split >= $number) && ($split < $possible)) {
-                $possible = $split;
+            $splitSize = (int) $split;
+            if (($splitSize >= $number) && ($splitSize < $possible)) {
+                $possible = $splitSize;
             } else {
-                $impact += $split;
+                $impact += $splitSize;
             }
         }
 
-        return $row->seats - $impact + $possible;
+        return $seats - $impact + $possible;
     }
 
     /**
@@ -647,9 +702,10 @@ class RowBasedSeatFinder extends AbstractSeatFinder
     {
         $sections = $this->location->seatingSections->sortBy('priority');
         // take care of excluded sections
-        if (trim($this->service->exclude_sections) != '') {
+        $excludeSections = $this->service->exclude_sections ?? '';
+        if (trim($excludeSections) != '') {
             $excludedSections = [];
-            foreach (explode(',', $this->service->exclude_sections) as $e) {
+            foreach (explode(',', $excludeSections) as $e) {
                 $excludedSections[] = strtolower(trim($e));
             }
             $forgetSections = [];
@@ -670,14 +726,27 @@ class RowBasedSeatFinder extends AbstractSeatFinder
     /**
      * Get all rows available for seating
      *
-     * @return array
+     * @return array<string, SeatingRow>
      */
     public function getAllRows()
     {
         $rows = [];
-        foreach ($this->getAvailableSections() as $section) {
-            foreach ($section->seatingRows as $row) {
-                $rows[$row->title] = $row;
+        $sections = $this->getAvailableSections();
+        if ($sections instanceof Collection) {
+            foreach ($sections as $section) {
+                if (! $section instanceof SeatingSection) {
+                    continue;
+                }
+                foreach ($section->seatingRows as $row) {
+                    if (! $row instanceof SeatingRow) {
+                        continue;
+                    }
+                    $title = $row->title;
+                    if (! is_string($title)) {
+                        continue;
+                    }
+                    $rows[$title] = $row;
+                }
             }
         }
 
@@ -685,14 +754,18 @@ class RowBasedSeatFinder extends AbstractSeatFinder
         if ($this->service->reserved_places) {
             foreach (explode(',', $this->service->reserved_places) as $reservedPlace) {
                 if (! is_numeric($reservedPlace)) {
-                    $rowNumber = str_pad(preg_replace('/[^0-9]/', '', $reservedPlace), 2, 0, STR_PAD_LEFT);
+                    $rowNumber = str_pad((string) preg_replace('/[^0-9]/', '', $reservedPlace), 2, '0', STR_PAD_LEFT);
                     $placeLetter = preg_replace('/[0-9]/', '', $reservedPlace);
+                    /** @var array<string, SeatingRow> $rows */
                     $rows = $this->splitRow($rowNumber, $rows, true);
-                    $this->reserved[$rowNumber.$placeLetter] = ['row' => $rows[$rowNumber.$placeLetter], 'booking' => null];
+                    $reservedRow = $rows[$rowNumber.$placeLetter];
+                    $this->reserved[$rowNumber.$placeLetter] = ['row' => $reservedRow, 'booking' => null];
                     unset($rows[$rowNumber.$placeLetter]);
                 } else {
-                    $reservedPlace = str_pad($reservedPlace, 2, 0, STR_PAD_LEFT);
-                    $this->reserved[$reservedPlace] = ['row' => $rows[$reservedPlace], 'booking' => null];
+                    $reservedPlace = str_pad($reservedPlace, 2, '0', STR_PAD_LEFT);
+                    /** @var SeatingRow $reservedRow */
+                    $reservedRow = $rows[$reservedPlace];
+                    $this->reserved[$reservedPlace] = ['row' => $reservedRow, 'booking' => null];
                     unset($rows[$reservedPlace]);
                 }
 
@@ -700,17 +773,19 @@ class RowBasedSeatFinder extends AbstractSeatFinder
         }
 
         // unset pre-reserved rows:
-        if (trim($this->service->exclude_places) != '') {
-            $preReservedPlaces = explode(',', $this->service->exclude_places);
+        $excludePlaces = $this->service->exclude_places ?? '';
+        if (trim($excludePlaces) != '') {
+            $preReservedPlaces = explode(',', $excludePlaces);
             foreach ($preReservedPlaces as $preReservedPlace) {
                 $preReservedPlace = trim($preReservedPlace);
                 if (! is_numeric($preReservedPlace)) {
-                    $rowNumber = str_pad(preg_replace('/[^0-9]/', '', $preReservedPlace), 2, 0, STR_PAD_LEFT);
+                    $rowNumber = str_pad((string) preg_replace('/[^0-9]/', '', $preReservedPlace), 2, '0', STR_PAD_LEFT);
                     $placeLetter = preg_replace('/[0-9]/', '', $preReservedPlace);
+                    /** @var array<string, SeatingRow> $rows */
                     $rows = $this->splitRow($rowNumber, $rows, true);
                     unset($rows[$rowNumber.$placeLetter]);
                 } else {
-                    $preReservedPlace = str_pad($preReservedPlace, 2, 0, STR_PAD_LEFT);
+                    $preReservedPlace = str_pad($preReservedPlace, 2, '0', STR_PAD_LEFT);
                     unset($rows[$preReservedPlace]);
                 }
             }
@@ -737,13 +812,13 @@ class RowBasedSeatFinder extends AbstractSeatFinder
         return $capacity;
     }
 
+    /**
+     * @param  Collection<int, Booking>|null  $bookings  Bookings to use instead of the stored ones.
+     * @return int Remaining capacity.
+     */
     public function remainingCapacity($bookings = null)
     {
         $saveGrid = $this->grid;
-        if ($bookings !== null) {
-            $savedBookings = $this->service->bookings;
-            $this->bookings = $bookings;
-        }
         $this->optimize();
         $capacity = 0;
         $seated = 0;
@@ -758,9 +833,6 @@ class RowBasedSeatFinder extends AbstractSeatFinder
             $capacity = min($capacity, $this->service->registration_max - $seated);
         }
 
-        if ($bookings !== null) {
-            $this->service->bookings = $savedBookings;
-        }
         $this->grid = $saveGrid;
 
         return $capacity;
@@ -769,24 +841,26 @@ class RowBasedSeatFinder extends AbstractSeatFinder
     /**
      * Get the full row record, even for a partial row
      *
-     * @return mixed
+     * @param  string|int  $key  Grid key.
+     * @return SeatingRow|null
      */
     public function getFullRow($key)
     {
         if (is_numeric($key)) {
-            return $this->originalGrid[$key]['row'] ?? $this->reserved[$key]['row'];
+            return $this->originalGrid[$key]['row'] ?? $this->reserved[$key]['row'] ?? null;
         }
 
-        return $this->originalGrid[substr($key, 0, -1)]['row'] ?? $this->reserved[substr($key, 0, -1)]['row'];
+        return $this->originalGrid[substr($key, 0, -1)]['row'] ?? $this->reserved[substr($key, 0, -1)]['row'] ?? null;
     }
 
+    /** @return array<string, string> */
     public function getErrors(): array
     {
         return $this->errors;
     }
 
     /**
-     * @param  string  $errors
+     * @param  array<string, string>  $errors
      */
     public function setErrors(array $errors): void
     {
@@ -803,6 +877,8 @@ class RowBasedSeatFinder extends AbstractSeatFinder
 
     /**
      * Get a seating table arranged by booking codes
+     *
+     * @return array<int|string, mixed>
      */
     public function getSeatingTable(): array
     {
@@ -825,10 +901,13 @@ class RowBasedSeatFinder extends AbstractSeatFinder
 
         foreach ($this->originalGrid as $placeKey => $place) {
             $grid[$placeKey] = $place['row'];
-            if ($place['row']['split']) {
-                foreach (explode(',', $place['row']['split']) as $splitKey => $splitSeats) {
+            $split = $place['row']['split'];
+            if (is_string($split) && $split !== '') {
+                foreach (explode(',', $split) as $splitKey => $splitSeats) {
                     $row = clone $place['row'];
-                    $row->seats = $splitSeats;
+                    /** @var int<0, max> $rowSeats */
+                    $rowSeats = (int) $splitSeats;
+                    $row->seats = $rowSeats;
                     $grid[$placeKey.chr(65 + $splitKey)] = $row;
                 }
             }

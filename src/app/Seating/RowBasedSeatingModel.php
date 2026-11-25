@@ -35,8 +35,12 @@ use App\Models\Seating\SeatingRow;
 
 class RowBasedSeatingModel extends AbstractSeatingModel
 {
+    /** @var string Display name of the row-based seating model. */
     protected $title = 'Reihenbasiert';
 
+    /**
+     * @param  SeatingRow  $row  Row to inspect.\n     * @return int
+     */
     public function rowCapacity(SeatingRow $row)
     {
         // check if we still have space in this row
@@ -52,10 +56,13 @@ class RowBasedSeatingModel extends AbstractSeatingModel
 
             return ($row->divides_into - $x) * 2;
         } else {
-            return $row->seats;
+            return $row->seats ?? 0;
         }
     }
 
+    /**
+     * @param  SeatingRow  $row  Row to inspect.\n     * @param  mixed  $number  Number of seats.\n     * @return mixed
+     */
     public function impact(SeatingRow $row, $number)
     {
         if ($number > $row->seats) {
@@ -83,15 +90,21 @@ class RowBasedSeatingModel extends AbstractSeatingModel
 
             return $row->seats - $remaining;
         } else {
-            return $row->seats;
+            return $row->seats ?? 0;
         }
     }
 
+    /**
+     * @param  SeatingRow  $row  Row to book.\n     * @param  Booking  $booking  Booking to place.\n     * @return mixed
+     */
     public function book(SeatingRow $row, Booking $booking)
     {
         $row->bookings[] = $booking;
     }
 
+    /**
+     * @param  SeatingRow  $row  Row to check.\n     * @return bool
+     */
     public function isAvailable(SeatingRow $row)
     {
         if ($x = count($row->bookings)) {
@@ -106,13 +119,19 @@ class RowBasedSeatingModel extends AbstractSeatingModel
         return true;
     }
 
+    /**
+     * Determine the number of remaining seats in the given row.
+     *
+     * @param  SeatingRow  $row  Row to inspect.
+     * @return int Remaining seats, or -1 if the number cannot be determined.
+     */
     public function remainingSeats(SeatingRow $row)
     {
         if (! $this->isAvailable($row)) {
             return 0;
         }
         if (count($row->bookings) == 0) {
-            return $row->seats;
+            return $row->seats ?? 0;
         }
 
         return -1;

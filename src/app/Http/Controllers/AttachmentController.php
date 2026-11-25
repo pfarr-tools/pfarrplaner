@@ -32,6 +32,10 @@ namespace App\Http\Controllers;
 
 use App\Contracts\Attachment\UpdatesAttachments;
 use App\Models\Attachment;
+use App\Models\People\User;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 /**
@@ -39,16 +43,29 @@ use Illuminate\Http\Request;
  */
 class AttachmentController extends Controller
 {
+    /**
+     * @return void
+     */
     public function __construct()
     {
         $this->middleware('auth');
     }
 
-    public function update(Request $request, int $modelId)
+    /**
+     * Aktualisiere ein Attachment und gib alle Attachments des zugehörigen Modells zurück.
+     */
+    public function update(Request $request, int $modelId): JsonResponse
     {
+        $user = $request->user();
+        abort_unless($user instanceof User, 401);
         $attachment = Attachment::findOrFail($modelId);
-        $attachment = app(UpdatesAttachments::class)->update($request->user(), $attachment, $request->all());
+        /** @var array<string, mixed> $input */
+        $input = $request->all();
+        $attachment = app(UpdatesAttachments::class)->update($user, $attachment, $input);
 
-        return response()->json($attachment->attachable->attachments);
+        /** @var Model&object{attachments: Collection<int, Attachment>} $attachable */
+        $attachable = $attachment->attachable;
+
+        return response()->json($attachable->attachments);
     }
 }

@@ -34,6 +34,7 @@ use App\FileFormats\ODP;
 use App\FileFormats\PowerPoint;
 use App\Helpers\PPTUnitsHelper;
 use App\Helpers\StoragePath;
+use App\Liturgy\ItemHelpers\FreetextItemHelper;
 use App\Liturgy\ItemHelpers\PsalmItemHelper;
 use App\Liturgy\ItemHelpers\SongItemHelper;
 use App\Liturgy\Music\ABCMusic;
@@ -66,10 +67,63 @@ use PhpOffice\PhpPresentation\Style\Border;
 use PhpOffice\PhpPresentation\Style\Color;
 use PhpOffice\PhpPresentation\Style\Fill;
 use PhpOffice\PhpPresentation\Style\Font;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
-/** Render songs, liturgy texts and configurable separator slides. */
+/**
+ * Render songs, liturgy texts and configurable separator slides.
+ *
+ * @phpstan-type EventListLayout array{
+ *     listFontSize: int,
+ *     descriptionFontSize: int,
+ *     locationFontSize: int,
+ *     listWidth: int,
+ *     listHeight: int,
+ *     listOffsetX: int,
+ *     listOffsetY: int,
+ *     leftColumnWidthPixels: int,
+ *     rightColumnOffsetX: int,
+ *     rightColumnWidth: int,
+ *     detailsInnerPaddingPx: int,
+ *     maxTitleWidthPx: int,
+ *     titleFontTtfPath: string,
+ *     descriptionFontTtfPath: string,
+ *     locationFontTtfPath: string,
+ *     titleMarginBottom: int,
+ *     descriptionMarginBottom: int,
+ *     locationMarginBottom: int
+ * }
+ */
 class SongPPTLiturgySheet extends AbstractLiturgySheet
 {
+    /**
+     * Configuration of this sheet with the concrete value types of its defaults.
+     *
+     * @var array{
+     *     textColor: string,
+     *     backgroundColor: string,
+     *     backgroundColorEmpty: string,
+     *     slideBetweenElements: string,
+     *     titleSlideTitle: string,
+     *     titleSlideSubtitle: string,
+     *     titleSlideAttachmentId: int|string|null,
+     *     includeJingleAndIntro: bool|int,
+     *     includeCredits: bool|int,
+     *     includeSongList: bool|int,
+     *     includeSongbookReference: bool|int,
+     *     verticalAlignment: string,
+     *     fontSize: int,
+     *     renderMusic: bool,
+     *     includeAdLoopStart: bool|int,
+     *     includeAdLoopEnd: bool|int,
+     *     includeAdLoopElements: array<int, mixed>,
+     *     showAdsFromCities: array<int, int>,
+     *     adLoopDelay: int,
+     *     includeVirtualSongsheetQR: bool|int,
+     *     outputFormat: string
+     * }
+     */
+    protected $config;
+
     protected $title = 'Powerpoint mit Liedern';
 
     protected $icon = 'fa fa-file-powerpoint';
@@ -104,12 +158,14 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
         'outputFormat' => 'ppt',
     ];
 
+    /** @var array<string, string> */
     protected $counterColor = [
         'FFFFFFFF' => 'FF000000',
         'FF000000' => 'FFFFFFFF',
         'FF043b04' => 'FFFFFFFF',
     ];
 
+    /** @var array<string, int> */
     protected $musicColorSet = [
         'FFFFFFFF' => ABCMusic::COLORS_NORMAL,
         'FF000000' => ABCMusic::COLORS_INVERTED,
@@ -119,21 +175,21 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
     /**
      * Cache ad events to be listed to prevent multiple queries
      *
-     * @var array|Collection<int|string, Occurence>
+     * @var array<int|string, Occurence>|Collection<int|string, Occurence>
      */
     protected $adEventsToBeListed = [];
 
     /**
      * Cache ad events to be highlighted to prevent multiple queries
      *
-     * @var array
+     * @var array<string, mixed>|Collection<int|string, \Illuminate\Database\Eloquent\Collection<int, Occurence>>
      */
     protected $adEventsToBeHighlighted = [];
 
     /**
-     * Slide names (for slide name fix)
+     * Slide names (for slide name fix), keyed by slide index.
      *
-     * @var array
+     * @var array<int, string>
      */
     protected $slideNames = [];
 
@@ -201,7 +257,7 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
                 } elseif ($item->data_type == 'freetext') {
                     if ($lastItem && ($lastItem->data_type == 'psalm')) {
                         if (($item->title == 'Ehr sei dem Vater') && (isset($item->data['description']))) {
-                            /** @var Liturgy\ItemHelpers\FreetextItemHelper $ftHelper */
+                            /** @var FreetextItemHelper $ftHelper */
                             $ftHelper = $item->getHelper();
                             $this->renderGloriaPatriSlide($ftHelper->getText());
                         }
@@ -304,14 +360,15 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
         $pastorNames = $this->getTitleSlidePastorNames($service);
 
         if ($title === '') {
-            $title = $sermonTitle ?: 'Gottesdienst am '.$service->date->isoFormat('dddd, DD.MM.YYYY');
+            $title = $sermonTitle ?: 'Gottesdienst am '.$service->date?->isoFormat('dddd, DD.MM.YYYY');
         }
 
         $subtitle = (string) ($this->config['titleSlideSubtitle'] ?? '');
         if ($subtitle === '') {
             $subtitle = 'mit '.$pastorNames;
-            if ($sermonTitle && trim((string) ($sermon ? $sermon->reference : '')) !== '') {
-                $subtitle .= ' zu '.trim((string) $sermon->reference);
+            $sermonReference = trim((string) ($sermon ? $sermon->reference : ''));
+            if ($sermonTitle && $sermonReference !== '') {
+                $subtitle .= ' zu '.$sermonReference;
             }
         }
 
@@ -372,11 +429,10 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
 
         $overlay = $slide->createRichTextShape()
             ->setOffsetX(0)
-            ->setOffsetY(PPTUnitsHelper::convert(10.6, PPTUnitsHelper::UNIT_CENTIMETER, PPTUnitsHelper::UNIT_PIXEL))
+            ->setOffsetY($this->centimetersToPixels(10.6))
             ->setWidth(960)
-            ->setHeight(PPTUnitsHelper::convert(2.6, PPTUnitsHelper::UNIT_CENTIMETER, PPTUnitsHelper::UNIT_PIXEL));
-        $overlay->getFill()
-            ->setFillType(Fill::FILL_SOLID)
+            ->setHeight($this->centimetersToPixels(2.6));
+        $overlay->getFill()?->setFillType(Fill::FILL_SOLID)
             ->setStartColor(new Color('D9FFFFFF'))
             ->setEndColor(new Color('D9FFFFFF'));
         $overlay->getBorder()->setLineStyle(Border::LINE_NONE);
@@ -419,15 +475,14 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
         $color ??= new Color($this->config['textColor']);
         $fontSize ??= $this->config['fontSize'];
         $shape2 = $slide->createRichTextShape()
-            ->setOffsetX(PPTUnitsHelper::convert($xOffset, PPTUnitsHelper::UNIT_CENTIMETER, PPTUnitsHelper::UNIT_PIXEL))
-            ->setOffsetY(PPTUnitsHelper::convert($yOffset, PPTUnitsHelper::UNIT_CENTIMETER, PPTUnitsHelper::UNIT_PIXEL))
+            ->setOffsetX($this->centimetersToPixels($xOffset))
+            ->setOffsetY($this->centimetersToPixels($yOffset))
             ->setWidth(
-                PPTUnitsHelper::convert(25.4 - $xOffset, PPTUnitsHelper::UNIT_CENTIMETER, PPTUnitsHelper::UNIT_PIXEL)
+                $this->centimetersToPixels(25.4 - $xOffset)
             );
         $paragraph = $shape2->getActiveParagraph();
         $paragraph->getAlignment()->setHorizontal($alignment);
-        $paragraph->getFont()
-            ->setBold($bold)
+        $paragraph->getFont()?->setBold($bold)
             ->setSize($fontSize)
             ->setColor($color)
             ->setName('Sarabun');
@@ -447,7 +502,9 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
         }
         $helper = $item->getHelper();
 
-        $slides = collect(explode("\n---", $item->data['slideText']))->map(fn ($slideText) => trim($slideText));
+        /** @var string $slideText */
+        $slideText = $item->data['slideText'];
+        $slides = collect(explode("\n---", $slideText))->map(fn ($slideLine) => trim($slideLine));
         foreach ($slides as $slideText) {
             $this->slide(
                 $slideText,
@@ -477,32 +534,36 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
         foreach ($service->liturgyBlocks as $block) {
             foreach ($block->items as $item) {
                 if (($item->data_type == 'song') && (isset($item->data['song']))) {
+                    /** @var array{id?: int|string, reference?: string, songbook?: array{image?: string, code?: string}} $song */
+                    $song = $item->data['song'];
                     $refColor = '';
-                    if (isset($item->data['song']['id'])) {
-                        $songRef = SongReference::find($item->data['song']['id']);
+                    if (isset($song['id'])) {
+                        $songRef = SongReference::find($song['id']);
                         $refColor = $songRef->color ?? '';
                     }
                     $listItems[] = [
-                        'ref' => $item->data['song']['reference'] ?? '',
+                        'ref' => $song['reference'] ?? '',
                         'verses' => $item->data['verses'],
-                        'image' => isset($item->data['song']['songbook']) ? ($item->data['song']['songbook']['image'] ?? '') : '',
-                        'code' => isset($item->data['song']['songbook']) ? ($item->data['song']['songbook']['code'] ?? '') : '',
+                        'image' => isset($song['songbook']) ? ($song['songbook']['image'] ?? '') : '',
+                        'code' => isset($song['songbook']) ? ($song['songbook']['code'] ?? '') : '',
                         'color' => $refColor,
                         'psalm' => false,
                     ];
                 } elseif (($item->data_type == 'psalm') && isset($item->data['psalm'])) {
+                    /** @var array{reference?: string, title?: string, songbook_abbreviation?: string} $psalm */
+                    $psalm = $item->data['psalm'];
                     $refColor = '';
                     $songbook = null;
-                    if (isset($item->data['psalm']['songbook_abbreviation'])) {
-                        $refColor = ($item->data['psalm']['songbook_abbreviation'] == 'EG') ? '#c8baf7' : '';
-                        $songbook = Songbook::where('code', $item->data['psalm']['songbook_abbreviation'])->first();
+                    if (isset($psalm['songbook_abbreviation'])) {
+                        $refColor = ($psalm['songbook_abbreviation'] == 'EG') ? '#c8baf7' : '';
+                        $songbook = Songbook::where('code', $psalm['songbook_abbreviation'])->first();
                     }
 
                     $listItems[] = [
-                        'ref' => $item->data['psalm']['reference'] ?? '',
-                        'verses' => $item->data['psalm']['title'] ?? '',
+                        'ref' => $psalm['reference'] ?? '',
+                        'verses' => $psalm['title'] ?? '',
                         'image' => $songbook ? $songbook->image : '',
-                        'code' => $item->data['psalm']['songbook_abbreviation'] ?? '',
+                        'code' => $psalm['songbook_abbreviation'] ?? '',
                         'color' => $refColor,
                         'psalm' => true,
                     ];
@@ -510,6 +571,7 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
             }
         }
 
+        /** @var list<array{ref: string, verses: string, image: string, code: string, color: string, psalm: bool}> $listItems */
         if (count($listItems)) {
             $this->createTextBox($slide, .5, 'Singen & Beten:', $color, 1);
             $offset = 3;
@@ -539,11 +601,11 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
                 if ($listItem['color']) {
                     $shapeColor = new Color(str_replace('#', 'FF', $listItem['color']));
                     $shape = $slide->createRichTextShape()
-                        ->setOffsetY(PPTUnitsHelper::convert($offset + .4, PPTUnitsHelper::UNIT_CENTIMETER, PPTUnitsHelper::UNIT_PIXEL))
-                        ->setOffsetX(PPTUnitsHelper::convert(2.4, PPTUnitsHelper::UNIT_CENTIMETER, PPTUnitsHelper::UNIT_PIXEL))
-                        ->setWidth(PPTUnitsHelper::convert(0.2, PPTUnitsHelper::UNIT_CENTIMETER, PPTUnitsHelper::UNIT_PIXEL))
-                        ->setHeight(PPTUnitsHelper::convert(1, PPTUnitsHelper::UNIT_CENTIMETER, PPTUnitsHelper::UNIT_PIXEL));
-                    $shape->getFill()->setStartColor($shapeColor)->setEndColor($shapeColor)->setFillType(Fill::FILL_SOLID);
+                        ->setOffsetY($this->centimetersToPixels($offset + .4))
+                        ->setOffsetX($this->centimetersToPixels(2.4))
+                        ->setWidth($this->centimetersToPixels(0.2))
+                        ->setHeight($this->centimetersToPixels(1));
+                    $shape->getFill()?->setStartColor($shapeColor)->setEndColor($shapeColor)->setFillType(Fill::FILL_SOLID);
                     $shape->getBorder()->setLineStyle(Border::LINE_NONE);
                 }
                 if ($listItem['image']) {
@@ -551,9 +613,9 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
                     $shape->setName('')
                         ->setPath(StoragePath::for($listItem['image']))
                         ->setResizeProportional(true)
-                        ->setHeight(PPTUnitsHelper::convert(1, PPTUnitsHelper::UNIT_CENTIMETER, PPTUnitsHelper::UNIT_PIXEL))
-                        ->setOffsetX(PPTUnitsHelper::convert(1.5, PPTUnitsHelper::UNIT_CENTIMETER, PPTUnitsHelper::UNIT_PIXEL))
-                        ->setOffsetY(PPTUnitsHelper::convert($offset + .4, PPTUnitsHelper::UNIT_CENTIMETER, PPTUnitsHelper::UNIT_PIXEL));
+                        ->setHeight($this->centimetersToPixels(1))
+                        ->setOffsetX($this->centimetersToPixels(1.5))
+                        ->setOffsetY($this->centimetersToPixels($offset + .4));
                 }
                 $offset += 1.5;
 
@@ -569,10 +631,14 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
      */
     protected function renderSongItem(Item $item)
     {
+        /** @var array{song?: array{notation?: mixed, copyrights?: string, refrain?: string}, code?: string, reference?: string} $songData */
+        $songData = $item->data['song'] ?? [];
+        /** @var array{notation?: mixed, copyrights?: string, refrain?: string} $songDetails */
+        $songDetails = $songData['song'] ?? [];
         if ($this->config['includeSongbookReference']) {
             $this->songbookReferenceSlide($item);
         }
-        if ($this->config['renderMusic'] && (isset($item->data['song']['song']['notation']))) {
+        if ($this->config['renderMusic'] && (isset($songDetails['notation']))) {
             $this->renderSongItemWithMusic($item);
 
             return;
@@ -580,10 +646,10 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
 
         /** @var SongItemHelper $helper */
         $helper = $item->getHelper();
-        $copyrights = $item->data['song']['song']['copyrights'] ?? '';
+        $copyrights = $songDetails['copyrights'] ?? '';
         if ($copyrights) {
-            if ($item->data['song']['code']) {
-                $copyrights = $item->data['song']['code'].' '.$item->data['song']['reference'].'. '.$copyrights;
+            if ($songData['code'] ?? null) {
+                $copyrights = $songData['code'].' '.($songData['reference'] ?? '').'. '.$copyrights;
             }
         }
         $activeVerses = $helper->getActiveVerses();
@@ -592,15 +658,19 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
 
             if ($verse['refrain_before']) {
                 $this->slide(
-                    $item->data['song']['song']['refrain'],
+                    $songDetails['refrain'] ?? '',
                     $this->config['fontSize'],
                     $this->config['textColor'],
                     true,
                     $copyrights
                 );
             }
+            /** @var int|string $verseNumber */
+            $verseNumber = $verse['number'];
+            /** @var string $verseText */
+            $verseText = $verse['text'];
             $this->slide(
-                ($showVerseNumber ? $verse['number'].'. ' : '').$verse['text'],
+                ($showVerseNumber ? $verseNumber.'. ' : '').$verseText,
                 $this->config['fontSize'],
                 $this->config['textColor'],
                 true,
@@ -608,7 +678,7 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
             );
             if ($verse['refrain_after']) {
                 $this->slide(
-                    $item->data['song']['song']['refrain'],
+                    $songDetails['refrain'] ?? '',
                     $this->config['fontSize'],
                     $this->config['textColor'],
                     true,
@@ -629,14 +699,18 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
      */
     protected function renderSongItemWithMusic(Item $item)
     {
-        $song = Song::find($item->data['song']['song_id']);
+        /** @var array{song_id?: int|string, title?: string} $songData */
+        $songData = $item->data['song'] ?? [];
+        /** @var array<int, string>|string $verses */
+        $verses = $item->data['verses'] ?? '';
+        $song = Song::find($songData['song_id'] ?? null);
         $colorSet = $this->musicColorSet[$this->config['backgroundColor']];
-        $images = ABCMusic::images($song, $item->data['verses'], $colorSet);
+        $images = $song instanceof Song ? ABCMusic::images($song, $verses, $colorSet) : [];
 
         foreach ($images as $key => $image) {
             $slide = $this->createEmptySlide($this->config['backgroundColor']);
             $shape = $slide->createDrawingShape()
-                ->setName($item->data['song']['title'].' '.$key)
+                ->setName(($songData['title'] ?? '').' '.$key)
                 ->setPath($image)
                 ->setWidth(940)
                 ->setOffsetX(10);
@@ -651,6 +725,10 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
     /**
      * Render a special slide with the Gloria Patri ("Ehr sei dem Vater...")
      *
+     * @return void
+     */
+    /**
+     * @param  string  $text  Gloria patri text to render.
      * @return void
      */
     protected function renderGloriaPatriSlide($text)
@@ -694,7 +772,9 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
             $rgb = $this->config['textColor'];
         }
 
-        $color = new Color($rgb);
+        /** @var string $rgbColor */
+        $rgbColor = $rgb;
+        $color = new Color($rgbColor);
 
         $isOdp = ($this->config['outputFormat'] === 'odp');
 
@@ -747,7 +827,7 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
 
                 $copyrightParagraph = $copyrightShape->getActiveParagraph();
                 $copyrightParagraph->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
-                $copyrightParagraph->getFont()->setBold(false)->setSize(10)->setColor($color)->setName('Sarabun');
+                $copyrightParagraph->getFont()?->setBold(false)->setSize(10)->setColor($color)->setName('Sarabun');
                 $copyrightParagraph->createTextRun($copyrights);
             }
 
@@ -834,8 +914,7 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
                         }
 
                         $paragraph->getAlignment()->setVertical($this->config['verticalAlignment']);
-                        $paragraph->getFont()
-                            ->setBold($bold)
+                        $paragraph->getFont()?->setBold($bold)
                             ->setSize($size)
                             ->setColor($color)
                             ->setName('Sarabun');
@@ -857,7 +936,7 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
 
                     $copyrightParagraph = $copyrightShape->getActiveParagraph();
                     $copyrightParagraph->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
-                    $copyrightParagraph->getFont()->setBold(false)->setSize(10)->setColor($color)->setName('Sarabun');
+                    $copyrightParagraph->getFont()?->setBold(false)->setSize(10)->setColor($color)->setName('Sarabun');
                     $copyrightParagraph->createTextRun($copyrights);
                 }
 
@@ -884,29 +963,34 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
      */
     protected function songbookReferenceSlide(Item $item)
     {
-        $data = $item->data;
+        /** @var array{songbook?: array{image?: string, code?: string, name?: string}, reference?: string, title?: string, verses?: string, songbook_abbreviation?: string} $referenceData */
+        $referenceData = [];
         if ($item->data_type == 'song') {
-            $key = 'song';
             if (! isset($item->data['song'])) {
                 return;
             }
-            if (! isset($item->data['song']['songbook'])) {
+            /** @var array{songbook?: array{image?: string, code?: string, name?: string}, reference?: string, verses?: string} $song */
+            $song = $item->data['song'];
+            if (! isset($song['songbook'])) {
                 return;
             }
+            $referenceData = $song;
         } elseif ($item->data_type == 'psalm') {
-            $key = 'psalm';
             if (! isset($item->data['psalm'])) {
                 return;
             }
-            if (isset($item->data['psalm']['songbook_abbreviation'])) {
-                $songbook = Songbook::where('code', $item->data['psalm']['songbook_abbreviation'])->first();
-                $data[$key]['songbook'] = [
-                    'code' => $item->data['psalm']['songbook_abbreviation'],
+            /** @var array{reference?: string, title?: string, songbook_abbreviation?: string, songbook?: string} $psalm */
+            $psalm = $item->data['psalm'];
+            $referenceData = $psalm;
+            if (isset($psalm['songbook_abbreviation'])) {
+                $songbook = Songbook::where('code', $psalm['songbook_abbreviation'])->first();
+                $referenceData['songbook'] = [
+                    'code' => $psalm['songbook_abbreviation'],
                     'image' => $songbook ? ($songbook->image ?: '') : '',
-                    'name' => $item->data['psalm']['songbook'] ?? '',
+                    'name' => $psalm['songbook'] ?? '',
                 ];
             } else {
-                $data[$key]['songbook'] = [
+                $referenceData['songbook'] = [
                     'code' => '',
                     'image' => '',
                     'name' => '',
@@ -918,48 +1002,47 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
         $slide = $this->createEmptySlide($this->config['backgroundColor']);
         $color = new Color($this->config['textColor']);
 
-        if (! isset($data[$key]['songbook']['image'])) {
+        if (! isset($referenceData['songbook']['image'])) {
             $shape2 = $slide->createRichTextShape()
                 ->setOffsetX(0)
-                ->setOffsetY(PPTUnitsHelper::convert(7.8, PPTUnitsHelper::UNIT_CENTIMETER, PPTUnitsHelper::UNIT_PIXEL))
-                ->setWidth(PPTUnitsHelper::convert(25.4, PPTUnitsHelper::UNIT_CENTIMETER, PPTUnitsHelper::UNIT_PIXEL));
+                ->setOffsetY($this->centimetersToPixels(7.8))
+                ->setWidth($this->centimetersToPixels(25.4));
             $paragraph = $shape2->getActiveParagraph();
             $paragraph->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-            $paragraph->getFont()
-                ->setBold(false)
+            $paragraph->getFont()?->setBold(false)
                 ->setSize($this->config['fontSize'])
                 ->setColor($color)
                 ->setName('Sarabun');
-            $paragraph->createTextRun($data[$key]['songbook']['name']);
+            $paragraph->createTextRun($referenceData['songbook']['name'] ?? '');
         } else {
-            if (trim($data[$key]['songbook']['image'])) {
+            if (trim($referenceData['songbook']['image'])) {
                 $shape = $slide->createDrawingShape();
                 $shape->setName('')
-                    ->setPath(StoragePath::for($data[$key]['songbook']['image']))
+                    ->setPath(StoragePath::for($referenceData['songbook']['image']))
                     ->setResizeProportional(true)
-                    ->setWidth(PPTUnitsHelper::convert(4, PPTUnitsHelper::UNIT_CENTIMETER, PPTUnitsHelper::UNIT_PIXEL))
-                    ->setOffsetX(PPTUnitsHelper::convert(10.7, PPTUnitsHelper::UNIT_CENTIMETER, PPTUnitsHelper::UNIT_PIXEL))
-                    ->setOffsetY(PPTUnitsHelper::convert(1.7, PPTUnitsHelper::UNIT_CENTIMETER, PPTUnitsHelper::UNIT_PIXEL));
+                    ->setWidth($this->centimetersToPixels(4))
+                    ->setOffsetX($this->centimetersToPixels(10.7))
+                    ->setOffsetY($this->centimetersToPixels(1.7));
             }
         }
         $shape2 = $slide->createRichTextShape()
             ->setOffsetX(0)
-            ->setOffsetY(PPTUnitsHelper::convert(9, PPTUnitsHelper::UNIT_CENTIMETER, PPTUnitsHelper::UNIT_PIXEL))
-            ->setWidth(PPTUnitsHelper::convert(25.4, PPTUnitsHelper::UNIT_CENTIMETER, PPTUnitsHelper::UNIT_PIXEL));
+            ->setOffsetY($this->centimetersToPixels(9))
+            ->setWidth($this->centimetersToPixels(25.4));
         $paragraph = $shape2->getActiveParagraph();
         $paragraph->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-        $paragraph->getFont()
-            ->setBold(false)
+        $paragraph->getFont()?->setBold(false)
             ->setSize($this->config['fontSize'] * 2)
             ->setColor($color)
             ->setName('Sarabun');
 
-        if ($key == 'song') {
-            $refText = ($data['verses'] ? ', '.$data['verses'] : '');
-        } elseif ($key == 'psalm') {
-            $refText = ' '.$data['psalm']['title'] ?? '';
+        if ($item->data_type == 'song') {
+            $verses = $referenceData['verses'] ?? '';
+            $refText = ($verses ? ', '.$verses : '');
+        } else {
+            $refText = ' '.($referenceData['title'] ?? '');
         }
-        $paragraph->createTextRun($data[$key]['reference'].$refText);
+        $paragraph->createTextRun(($referenceData['reference'] ?? '').$refText);
     }
 
     /**
@@ -997,6 +1080,20 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
     }
 
     /**
+     * Convert centimetres to integer pixels for presentation geometry.
+     *
+     * @param  float|int  $centimeters  Length in centimetres.
+     * @return int Length in pixels.
+     */
+    protected function centimetersToPixels($centimeters): int
+    {
+        /** @var int $pixels */
+        $pixels = PPTUnitsHelper::convert($centimeters, PPTUnitsHelper::UNIT_CENTIMETER, PPTUnitsHelper::UNIT_PIXEL);
+
+        return $pixels;
+    }
+
+    /**
      * Create a rich text shape covering the entire slide
      */
     protected function createFullScreenRichTextShape(Slide $slide): RichText
@@ -1007,14 +1104,17 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
             ->setOffsetX(10)
             ->setOffsetY(0);
 
-        $shape->getFill()->setFillType(Fill::FILL_NONE);
+        $shape->getFill()?->setFillType(Fill::FILL_NONE);
         $shape->getBorder()->setLineStyle(Border::LINE_NONE);
 
         return $shape;
     }
 
     /**
-     * @throws Exception
+     * @param  string  $filename  Name for the downloaded file.
+     * @return BinaryFileResponse
+     *
+     * @throws \Exception
      */
     protected function sendToBrowser($filename)
     {
@@ -1038,6 +1138,10 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
      * @return void
      *
      * @throws \DOMException
+     */
+    /**
+     * @param  string  $tempFile  Temporary output path.
+     * @return void
      */
     protected function createPPTFile($tempFile)
     {
@@ -1064,6 +1168,10 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
      *
      * @throws \DOMException
      */
+    /**
+     * @param  string  $tempFile  Temporary output path.
+     * @return void
+     */
     protected function createODPFile($tempFile)
     {
         $objWriter = IOFactory::createWriter($this->ppt, 'ODPresentation');
@@ -1089,15 +1197,16 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
     {
         $titleLine = $service->titleText(false).' am '.$service->dateText().', '.$service->timeText(
         ).', '.$service->locationText();
+        $userName = Auth::user()?->fullName() ?? '';
         $this->ppt->getDocumentProperties()
-            ->setCreator(Auth::user()->fullName())
-            ->setLastModifiedBy(Auth::user()->fullName())
+            ->setCreator($userName)
+            ->setLastModifiedBy($userName)
             ->setTitle('Lieder und Texte')
             ->setSubject($titleLine)
             ->setDescription($titleLine)
             ->setCategory('Gottesdienst')
             ->setKeywords('Gottesdienst, Lieder, Psalm, Mitwirkende')
-            ->setCompany('Evangelische Kirchengemeinde '.$service->city->name);
+            ->setCompany('Evangelische Kirchengemeinde '.$service->city?->name);
     }
 
     /**
@@ -1112,26 +1221,32 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
             return;
         }
 
-        $start = $service->date->copy()->addHour(1);
-        $end = $service->date->copy()->addWeek(1)->startOfWeek();
-        if ($service->date->diffInDays($end) < 6) {
-            $end->addWeek(1);
+        $date = $service->date;
+        if (! $date instanceof Carbon) {
+            return;
+        }
+        $start = $date->copy()->addHour();
+        $end = $date->copy()->addWeek()->startOfWeek();
+        if ($date->diffInDays($end) < 6) {
+            $end->addWeek();
         }
 
         $announcements = new Announcements($service, $this->config['showAdsFromCities'], false, 'YYYY-MM-DD');
 
         // get the events to be listed (if not already cached)
         if (! count($this->adEventsToBeListed)) {
-            $this->adEventsToBeListed = $announcements->getEvents();
+            /** @var Collection<int|string, Occurence> $events */
+            $events = $announcements->getEvents();
+            $this->adEventsToBeListed = $events;
         }
 
         // get the events to be highlighted (if not already cached)
         if (! count($this->adEventsToBeHighlighted)) {
-            $this->adEventsToBeHighlighted = Occurence::adRunningAt('ppt', $service->date)
+            $this->adEventsToBeHighlighted = Occurence::adRunningAt('ppt', $date)
                 ->whereHas('service', function ($query) use ($service) {
                     $query->inCities($this->config['showAdsFromCities'])
                         ->notHidden()
-                        ->displayable($service->start);
+                        ->displayable($service->date);
                 })->orderBy('start')
                 ->get()
                 ->groupBy(function ($occurence) {
@@ -1141,17 +1256,17 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
 
         $renderableHighlightedEvents = collect($this->adEventsToBeHighlighted)
             ->map(function ($events) {
-                /** @var array<int, mixed> $events */
+                /** @var array<int, Occurence> $events */
                 return collect($events)
                     ->filter(function (Occurence $event) {
-                        return ! empty($event->service->getImageCutPath('bildschirm-16x9'));
+                        return ! empty($event->service?->getImageCutPath('bildschirm-16x9'));
                     })
                     ->values();
             })
             ->filter(function (Collection $events) {
                 return $events->isNotEmpty();
             });
-
+        /** @var Collection<string, Collection<int, Occurence>> $renderableHighlightedEvents */
         $eventListSlideChunks = $this->suppressHighlightedOnlyEventListSlides(
             $this->paginateEventListSlidesByDate($this->adEventsToBeListed),
             $renderableHighlightedEvents
@@ -1190,8 +1305,10 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
                     $finalAdSlideNumber,
                     $isFinalLoop);
             }
-            if (count($renderableHighlightedEvents[$cursor->format('Y-m-d')] ?? [])) {
-                foreach ($renderableHighlightedEvents[$cursor->format('Y-m-d')] as $event) {
+            /** @var Collection<int, Occurence> $highlightedEventsForDay */
+            $highlightedEventsForDay = $renderableHighlightedEvents[$cursor->format('Y-m-d')] ?? collect();
+            if (count($highlightedEventsForDay)) {
+                foreach ($highlightedEventsForDay as $event) {
                     $this->renderEventHighlightSlide($cursor,
                         $event,
                         $currentSlideNumber + 1,
@@ -1199,7 +1316,7 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
                         $isFinalLoop);
                 }
             }
-            $cursor->addDay(1);
+            $cursor->addDay();
         }
 
         // add future highlights
@@ -1221,7 +1338,8 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
     /**
      * Split event lists into slide-sized chunks per day.
      *
-     * @return array<string, array<int, Collection<int, mixed>>>
+     * @param  iterable<int|string, Occurence>  $eventsByDate  Events grouped by date.
+     * @return array<int|string, array<int, Collection<int, mixed>>>
      */
     protected function paginateEventListSlidesByDate(iterable $eventsByDate): array
     {
@@ -1238,8 +1356,9 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
     /**
      * Remove event list slides whose entries are all rendered as dedicated highlight slides.
      *
-     * @param  array<string, array<int, Collection<int, mixed>>>  $pagesByDate
-     * @return array<string, array<int, Collection<int, mixed>>>
+     * @param  array<int|string, array<int, Collection<int, mixed>>>  $pagesByDate
+     * @param  iterable<string, mixed>  $highlightedEventsByDate  Highlighted events by date.
+     * @return array<int|string, array<int, Collection<int, mixed>>>
      */
     protected function suppressHighlightedOnlyEventListSlides(array $pagesByDate, iterable $highlightedEventsByDate): array
     {
@@ -1329,16 +1448,29 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
      */
     protected function getEventListComparisonKey($event): ?string
     {
-        if (isset($event->id) && $event->id) {
-            return 'id:'.$event->id;
+        /** @var object{id?: int|string, service?: object{id?: int|string}, start?: string|int|\Stringable}|null $listEvent */
+        $listEvent = is_object($event) ? $event : null;
+        if ($listEvent === null) {
+            return null;
         }
 
-        if (method_exists($event, 'getKey') && $event->getKey()) {
-            return 'key:'.$event->getKey();
+        if (isset($listEvent->id) && $listEvent->id) {
+            return 'id:'.$listEvent->id;
         }
 
-        if (isset($event->service->id) && isset($event->start)) {
-            return 'service:'.$event->service->id.'|start:'.$event->start;
+        if (method_exists($listEvent, 'getKey') && $listEvent->getKey()) {
+            /** @var int|string $key */
+            $key = $listEvent->getKey();
+
+            return 'key:'.$key;
+        }
+
+        if (isset($listEvent->service) && isset($listEvent->start)) {
+            /** @var object{id?: int|string} $service */
+            $service = $listEvent->service;
+            if (isset($service->id)) {
+                return 'service:'.$service->id.'|start:'.$listEvent->start;
+            }
         }
 
         return null;
@@ -1347,7 +1479,7 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
     /**
      * Get the layout configuration for event list slides.
      *
-     * @return array<string, int|string>
+     * @return EventListLayout
      */
     protected function getEventsListLayout(): array
     {
@@ -1356,7 +1488,7 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
         $descriptionFontSize = $locationFontSize;
         $listWidth = 950;
         $listHeight = 500;
-        $leftColumnWidthPixels = (int) PPTUnitsHelper::convert(5.75, PPTUnitsHelper::UNIT_CENTIMETER, PPTUnitsHelper::UNIT_PIXEL);
+        $leftColumnWidthPixels = $this->centimetersToPixels(5.75);
         $rightColumnWidth = $listWidth - $leftColumnWidthPixels;
         $detailsInnerPaddingPx = 10;
 
@@ -1386,19 +1518,23 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
      * Build the wrapped text layout for a single event list entry.
      *
      * @param  mixed  $event
-     * @param  array<string, int|string>  $layout
-     * @return array<string, mixed>
+     * @param  EventListLayout  $layout
+     * @return array{titleLines: list<string>, descriptionLines: list<string>, locationText: string}
      */
     protected function getEventListEntryLayout($event, array $layout): array
     {
-        $titleText = $event->getAdText('ppt', $event->service->titleText(false));
-        $descriptionText = trim($event->event->descriptionText(['baptism']));
+        /** @var Occurence $listEvent */
+        $listEvent = $event;
+        $titleText = $listEvent->getAdText('ppt', $listEvent->service?->titleText(false) ?? '');
+        $descriptionText = trim($listEvent->event?->descriptionText(['baptism']) ?? '');
+        /** @var list<string> $titleLines */
         $titleLines = PPTUnitsHelper::wrapTextByPixelWidth(
             $titleText,
             $layout['titleFontTtfPath'],
             $layout['listFontSize'],
             $layout['maxTitleWidthPx']
         );
+        /** @var list<string> $descriptionLines */
         $descriptionLines = $descriptionText === ''
             ? []
             : PPTUnitsHelper::wrapTextByPixelWidth(
@@ -1408,10 +1544,13 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
                 $layout['maxTitleWidthPx']
             );
 
+        /** @var string $locationText */
+        $locationText = $listEvent->service ? $listEvent->service->locationTextWithCity : '';
+
         return [
             'titleLines' => $titleLines,
             'descriptionLines' => $descriptionLines,
-            'locationText' => $event->service->locationTextWithCity,
+            'locationText' => $locationText,
         ];
     }
 
@@ -1419,7 +1558,7 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
      * Estimate the vertical space needed for one event in the list slide layout.
      *
      * @param  mixed  $event
-     * @param  array<string, int|string>  $layout
+     * @param  EventListLayout  $layout
      */
     protected function estimateEventListEntryHeight($event, array $layout, int $titleLineHeight, int $descriptionLineHeight, int $locationLineHeight): int
     {
@@ -1471,7 +1610,7 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
      */
     protected function renderEventHighlightSlide(Carbon $date, Occurence $event, int $firstAdSlideNumber, int $finalAdSlideNumber, bool $isFinalLoop)
     {
-        $imageCutPath = $event->service->getImageCutPath('bildschirm-16x9');
+        $imageCutPath = $event->service?->getImageCutPath('bildschirm-16x9');
         if (empty($imageCutPath)) {
             return;
         }
@@ -1486,8 +1625,8 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
         $overlayColor = new Color($overlayARGB);
         $overlayTextColor = new Color(ImageService::blackOrWhiteForArgb($overlayARGB));
 
-        $slideWidth = Drawing::emuToPixels($this->ppt->getLayout()->getCX());
-        $slideHeight = Drawing::emuToPixels($this->ppt->getLayout()->getCY());
+        $slideWidth = (int) Drawing::emuToPixels((int) $this->ppt->getLayout()->getCX());
+        $slideHeight = (int) Drawing::emuToPixels((int) $this->ppt->getLayout()->getCY());
 
         $slide = $this->createEmptyAdSlide($firstAdSlideNumber, $finalAdSlideNumber, $isFinalLoop);
         $shape = $slide->createDrawingShape()
@@ -1502,13 +1641,12 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
             ->setHeight(130)
             ->setOffsetX(0)
             ->setOffsetY($slideHeight - 130);
-        $shape->getFill()
-            ->setFillType(Fill::FILL_SOLID)
+        $shape->getFill()?->setFillType(Fill::FILL_SOLID)
             ->setStartColor($shapeBackground);
 
         $paragraph = $shape->getActiveParagraph();
         $paragraph->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT)->setMarginLeft(150);
-        if (! $event->event->is_allday) {
+        if (! $event->event?->is_allday) {
             $run = $paragraph->createTextRun($event->start->copy()->setTimezone('Europe/Berlin')->format('H:i').' Uhr')->getFont()
                 ->setBold(false)
                 ->setSize((int) ($this->config['fontSize'] * 0.5))
@@ -1520,7 +1658,9 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
                 ->setSize((int) ($this->config['fontSize'] * 0.5))
                 ->setName('Sarabun Light');
         }
-        $run = $paragraph->createTextRun($event->service->locationTextWithCity)
+        /** @var string $locationText */
+        $locationText = $event->service->locationTextWithCity;
+        $run = $paragraph->createTextRun($locationText)
             ->getFont()
             ->setBold(false)
             ->setSize((int) ($this->config['fontSize'] * 0.5))
@@ -1528,13 +1668,13 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
             ->setName('Sarabun Light');
 
         $paragraph = $shape->createParagraph();
-        $run = $paragraph->createTextRun($event->getAdText('ppt', $event->service->titleText(false)))
+        $run = $paragraph->createTextRun($event->getAdText('ppt', $event->service?->titleText(false) ?? ''))
             ->getFont()
             ->setName('Sarabun SemiBold')
             ->setSize($this->config['fontSize'])
             ->setColor($inverseTextColor);
 
-        $multiDay = $event->event->is_allday && ($event->start->copy()->setTimeZone('Europe/Berlin')->format('Ymd') != $event->end->copy()->setTimeZone('Europe/Berlin')->format('Ymd'));
+        $multiDay = $event->event?->is_allday && ($event->start->copy()->setTimeZone('Europe/Berlin')->format('Ymd') != $event->end->copy()->setTimeZone('Europe/Berlin')->format('Ymd'));
 
         $shape = $slide->createAutoShape()
             ->setType(AutoShape::TYPE_OVAL)
@@ -1542,8 +1682,7 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
             ->setHeight(150)
             ->setOffsetX(20)
             ->setOffsetY($slideHeight - 250)
-            ->getFill()
-            ->setFillType(Fill::FILL_SOLID)
+            ->getFill()?->setFillType(Fill::FILL_SOLID)
             ->setStartColor($overlayColor);
 
         $shape = $slide->createRichTextShape()
@@ -1607,7 +1746,7 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
             ->setWidth($layout['leftColumnWidthPixels'])
             ->setHeight($layout['listHeight']);
 
-        $timeColumnShape->getFill()->setFillType(Fill::FILL_NONE);
+        $timeColumnShape->getFill()?->setFillType(Fill::FILL_NONE);
         $timeColumnShape->getBorder()->setLineStyle(Border::LINE_NONE);
 
         $detailsColumnShape = $slide->createRichTextShape()
@@ -1616,15 +1755,17 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
             ->setWidth($layout['rightColumnWidth'])
             ->setHeight($layout['listHeight']);
 
-        $detailsColumnShape->getFill()->setFillType(Fill::FILL_NONE);
+        $detailsColumnShape->getFill()?->setFillType(Fill::FILL_NONE);
         $detailsColumnShape->getBorder()->setLineStyle(Border::LINE_NONE);
 
         $isFirstTimeParagraph = true;
         $isFirstDetailsParagraph = true;
 
         foreach ($events as $event) {
-            $timeText = (! $event->event->is_allday) ? $event->service->timeText() : '';
-            $entryLayout = $this->getEventListEntryLayout($event, $layout);
+            /** @var Occurence $listEvent */
+            $listEvent = $event;
+            $timeText = (! $listEvent->event?->is_allday) ? $listEvent->service?->timeText() ?? '' : '';
+            $entryLayout = $this->getEventListEntryLayout($listEvent, $layout);
             $titleLines = $entryLayout['titleLines'];
             $descriptionLines = $entryLayout['descriptionLines'];
 
@@ -1748,7 +1889,7 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
             ->setOffsetX(10)
             ->setOffsetY(0);
 
-        $headerShape->getFill()->setFillType(Fill::FILL_NONE);
+        $headerShape->getFill()?->setFillType(Fill::FILL_NONE);
         $headerShape->getBorder()->setLineStyle(Border::LINE_NONE);
 
         $headerParagraph = $headerShape->getActiveParagraph();

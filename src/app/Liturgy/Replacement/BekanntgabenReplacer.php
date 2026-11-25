@@ -43,10 +43,17 @@ class BekanntgabenReplacer extends AbstractReplacer
     protected function getReplacementText(): string
     {
         $service = $this->service;
-        $lastWeek = Carbon::createFromTimeString($service->date->format('Y-m-d').' 0:00:00 last Sunday');
-        $nextWeek = Carbon::createFromTimeString($service->date->format('Y-m-d').' 0:00:00 next Sunday');
+        if ($service === null) {
+            return '';
+        }
+        $city = $service->city;
+        if ($city === null) {
+            return '';
+        }
+        $lastWeek = Carbon::createFromTimeString($service->trueDate()->format('Y-m-d').' 0:00:00 last Sunday');
+        $nextWeek = Carbon::createFromTimeString($service->trueDate()->format('Y-m-d').' 0:00:00 next Sunday');
         $lastServices = Service::select('*')
-            ->endingAt($service->date->copy()->subSecond(1))
+            ->endingAt($service->trueDate()->copy()->subSecond())
             ->where('offering_amount', '!=', '')
             ->orderedDesc()
             ->limit(10)
@@ -56,7 +63,7 @@ class BekanntgabenReplacer extends AbstractReplacer
         $offeringAmount = 0;
         foreach ($lastServices as $lastService) {
             if ($lastServiceDate === null) {
-                $lastServiceDate = $lastService->date;
+                $lastServiceDate = $lastService->trueDate();
             }
             if ($lastServiceDate != $lastService->date) {
                 continue;
@@ -71,10 +78,10 @@ class BekanntgabenReplacer extends AbstractReplacer
             ->displayable()
             ->whereHas(
                 'day',
-                function ($query) use ($service, $nextWeek) {
-                    $query->where('date', '>=', $service->date);
+                function ($query) use ($service, $nextWeek, $city) {
+                    $query->where('date', '>=', $service->trueDate());
                     $query->where('date', '<=', $nextWeek);
-                    $query->where('city_id', $service->city->id);
+                    $query->where('city_id', $city->id);
                     $query->where('id', '!=', $service->id);
                 }
             )
@@ -82,18 +89,18 @@ class BekanntgabenReplacer extends AbstractReplacer
 
         $events = [];
 
-        $calendar = new EventCalendarImport($service->city->public_events_calendar_url);
-        $events = $calendar->mix($events, $service->date, $nextWeek, true);
+        $calendar = new EventCalendarImport($city->public_events_calendar_url ?? '');
+        $events = $calendar->mix($events, $service->trueDate(), $nextWeek, true);
 
-        $events = Service::mix($events, $services, $service->date, $nextWeek);
+        $events = Service::mix($events, $services, $service->trueDate(), $nextWeek);
 
-        $op = new OPEventsImport($service->city);
-        $events = $op->mix($events, $service->date, $nextWeek);
+        $op = new OPEventsImport($city);
+        $events = $op->mix($events, $service->trueDate(), $nextWeek);
 
         $fmt = new \NumberFormatter('de_DE', \NumberFormatter::CURRENCY);
 
         $text = 'Herzlichen Dank für das Opfer der Gottesdienste vom '
-            .$lastServiceDate->format('d.m.Y').' in Höhe von '
+            .$lastServiceDate?->format('d.m.Y').' in Höhe von '
             .$fmt->formatCurrency($offeringAmount, 'EUR').'.'
             .PHP_EOL.PHP_EOL;
 
@@ -102,15 +109,33 @@ class BekanntgabenReplacer extends AbstractReplacer
         $ctr = 0;
         $lastDay = $nextWeek->format('Ymd');
         foreach ($events as $eventsArray) {
+            if (! is_array($eventsArray)) {
+                continue;
+            }
             foreach ($eventsArray as $event) {
-                $eventStart = is_array($event) ? $event['start'] : $event->date;
+                if (! is_array($event) && ! $event instanceof Service) {
+                    continue;
+                }
+
+                $eventStart = is_array($event) ? ($event['start'] ?? null) : $event->date;
+                if (! $eventStart instanceof \DateTimeInterface) {
+                    continue;
+                }
+                $eventTitle = '';
+                $eventPlace = '';
+                if (is_array($event)) {
+                    $title = $event['title'] ?? '';
+                    $eventTitle = is_scalar($title) ? (string) $title : '';
+                    $place = $event['place'] ?? '';
+                    $eventPlace = is_scalar($place) ? (string) $place : '';
+                }
                 $dateFormat = $ctr ? '%A, %d. %B' : '%A, %d. %B %Y';
                 $done = false;
 
                 if (is_array($event)) {
-                    if ($service->date->format('Ymd') == $eventStart->format('Ymd')) {
-                        if ($event['allDay']) {
-                            $text .= $this->renderParagraph($event['title']);
+                    if ($service->trueDate()->format('Ymd') == $eventStart->format('Ymd')) {
+                        if ($event['allDay'] ?? false) {
+                            $text .= $this->renderParagraph($eventTitle);
                             $done = true;
                         }
                     }
@@ -124,8 +149,8 @@ class BekanntgabenReplacer extends AbstractReplacer
                         }
 
                         $text .= $this->renderParagraph(
-                            ($service->date->format('Ymd') == $eventStart->format('Ymd')) ?
-                                'Heute' : strftime($dateFormat, $eventStart->getTimestamp())
+                            ($service->trueDate()->format('Ymd') == $eventStart->format('Ymd')) ?
+                                'Heute' : (string) strftime($dateFormat, $eventStart->getTimestamp())
                         );
                     }
 
@@ -135,34 +160,41 @@ class BekanntgabenReplacer extends AbstractReplacer
                                 '%H.%M Uhr',
                                 $eventStart->getTimestamp()
                             )."\t".trim(
-                                StringTool::sanitizeXMLString(
-                                    $event['title']
-                                ).' ('.StringTool::sanitizeXMLString($event['place']).')'
+                                StringTool::sanitizeXMLString($eventTitle).' ('.StringTool::sanitizeXMLString($eventPlace).')'
                             )
                         );
                     } else {
                         $description = $event->descriptionText();
+                        $description = is_scalar($description) ? (string) $description : '';
                         $description = $description ? ' mit '.$description : '';
                         // take care of ampersands
-                        $description = preg_replace('/&(?![A-Za-z0-9#]{1,7};)/', '&amp;', $description);
+                        $description = (string) preg_replace('/&(?![A-Za-z0-9#]{1,7};)/', '&amp;', $description);
+                        $timeText = $event->timeText(true, '.');
+                        $serviceTitle = $event->title;
+                        $serviceTitle = is_scalar($serviceTitle) ? (string) $serviceTitle : '';
+                        $serviceTitle = $serviceTitle ?: 'Gottesdienst';
+                        $location = $event->locationText();
                         $text .= $this->renderParagraph(
-                            $event->timeText(true, '.')."\t".trim(
-                                ($event->title ?: 'Gottesdienst').$description.' ('.$event->locationText().')'
+                            (is_scalar($timeText) ? (string) $timeText : '')."\t".trim(
+                                $serviceTitle.$description.' ('.(is_scalar($location) ? (string) $location : '').')'
                             )
                         );
 
                         // add children's church
                         if ($event->cc) {
-                            $text .= $this->renderParagraph(
-                                Carbon::createFromFormat(
-                                    'Y-m-d H:i',
-                                    $event->date->format(
-                                        'Y-m-d'
-                                    ).' '.($event->cc_alt_time ?? $event->time)
-                                )->isoFormat(
-                                    'HH.mm \U\h\r'
-                                )."\t".'Kinderkirche'.' ('.($event->cc_location ?? $event->locationText()).')'
+                            $startTime = $event->cc_alt_time ?? $event->time;
+                            $startTime = is_scalar($startTime) ? (string) $startTime : '';
+                            $childChurchStart = Carbon::createFromFormat(
+                                'Y-m-d H:i',
+                                $event->trueDate()->format('Y-m-d').' '.$startTime
                             );
+                            if ($childChurchStart !== null) {
+                                $childChurchLocation = $event->cc_location ?? $event->locationText();
+                                $childChurchLocation = is_scalar($childChurchLocation) ? (string) $childChurchLocation : '';
+                                $text .= $this->renderParagraph(
+                                    $childChurchStart->isoFormat('HH.mm \U\h\r')."\t".'Kinderkirche'.' ('.$childChurchLocation.')'
+                                );
+                            }
                         }
                     }
 

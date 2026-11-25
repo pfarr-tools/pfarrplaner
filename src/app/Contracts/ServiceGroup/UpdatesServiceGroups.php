@@ -34,6 +34,6 @@ use App\Models\People\User;
 use App\Models\ServiceGroup;
 
 /**
- * @method ServiceGroup update(User $user, ServiceGroup $serviceGroup, array $input)
+ * @method ServiceGroup update(User $user, ServiceGroup $serviceGroup, array<string, mixed> $input)
  */
 interface UpdatesServiceGroups {}

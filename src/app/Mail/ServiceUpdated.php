@@ -55,11 +55,18 @@ class ServiceUpdated extends AbstractServiceMailable
      */
     public function build()
     {
+        /** @var array<string, array{original: mixed, changed: mixed}> $changes */
+        $changes = $this->changed;
         $participants = [];
-        if (isset($this->changed['participants'])) {
+        if (isset($changes['participants'])) {
             foreach (['original', 'changed'] as $type) {
-                foreach ($this->changed['participants'][$type] ?? [] as $participant) {
-                    $category = $participant['pivot']['category'];
+                $participantsOfType = $changes['participants'][$type] ?? [];
+                foreach (is_array($participantsOfType) ? $participantsOfType : [] as $participant) {
+                    if (! is_array($participant)) {
+                        continue;
+                    }
+                    $pivot = $participant['pivot'] ?? null;
+                    $category = is_array($pivot) ? ($pivot['category'] ?? null) : null;
                     switch ($category) {
                         case 'P':
                             $category = config('labels.pastor');
@@ -74,24 +81,27 @@ class ServiceUpdated extends AbstractServiceMailable
                             $category = 'Andere Beteiligte';
                             break;
                     }
+                    if (! is_string($category)) {
+                        continue;
+                    }
                     $participants[$category][$type][] = $participant;
                 }
             }
         }
         $tmpParticipants = $participants;
         foreach ($tmpParticipants as $category => $p) {
-            if (print_r($p['original'] ?? [], 1) == print_r($p['changed'] ?? [], 1)) {
+            if (print_r($p['original'] ?? [], true) == print_r($p['changed'] ?? [], true)) {
                 unset($participants[$category]);
             }
         }
 
-        $displayChanges = ServiceChangeFormatter::format($this->service, $this->changed);
+        $displayChanges = ServiceChangeFormatter::format($this->service, $changes);
 
         $ics = view(
             'ical/ical',
             ['services' => [$this->service], 'token' => null, 'action' => null, 'key' => null]
         )->render();
-        $icsTitle = 'GD '.$this->service->date->format('Ymd').' '.$this->service->timeText(
+        $icsTitle = 'GD '.(string) $this->service->date?->format('Ymd').' '.$this->service->timeText(
             false
         ).' '.$this->service->locationText().'.ics';
 

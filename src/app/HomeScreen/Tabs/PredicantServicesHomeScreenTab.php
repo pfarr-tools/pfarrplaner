@@ -7,21 +7,23 @@ use App\Models\People\User;
 use App\Models\Service;
 use App\Services\RoleService;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 
-/**
- * Displays future services that still need a predicant.
- */
+/** Home screen tab for services by predicant. */
 class PredicantServicesHomeScreenTab extends AbstractHomeScreenTab
 {
     protected $title = 'Offene Gottesdienste';
 
     protected $description = 'Zeigt Gottesdienste mit Bedarf an Prädikant:innen';
 
+    /**
+     * @var Builder<Service>
+     */
     protected $query = null;
 
     /**
-     * Initialize the tab configuration and its service query.
+     * @param  array<string, mixed>  $config  Tab configuration.\n     * @return void
      */
     public function __construct($config = [])
     {
@@ -30,33 +32,27 @@ class PredicantServicesHomeScreenTab extends AbstractHomeScreenTab
         $this->query = $this->buildQuery();
     }
 
-    /**
-     * Check whether the open services tab is available to the user.
-     *
-     * @param  User|null  $user  User whose ministry roles should be checked
-     * @return bool Whether the user can view open services
-     */
     public function isAvailable(?User $user = null): bool
     {
         $user ??= Auth::user();
+        if ($user === null) {
+            return false;
+        }
 
-        return $user && $user->hasAnyRole([
+        return $user->hasAnyRole([
             RoleService::ROLE_PREDICANT,
             'Gottesdienstbearbeiter:in',
             RoleService::ROLE_PASTOR,
         ]);
     }
 
-    /**
-     * Count future services that need a predicant.
-     */
     public function getCount(): int
     {
         return $this->query->count();
     }
 
     /**
-     * Add matching services to the tab view data.
+     * @param  array<string, mixed>  $data  View data.\n     * @return mixed
      */
     public function getContent($data = [])
     {
@@ -66,23 +62,25 @@ class PredicantServicesHomeScreenTab extends AbstractHomeScreenTab
     }
 
     /**
-     * Serialize matching services and visible cities for the frontend.
+     * @param  array<string, mixed>  $data  Additional data.\n     * @return array<string, mixed>
      */
     public function toArray($data = [])
     {
         $data['services'] = $this->query->get();
         $data['count'] = count($data['services']);
-        $data['cities'] = Auth::user()->visibleCities()->get();
+        $data['cities'] = $this->user()->visibleCities()->get();
 
         return new PredicantServicesTabResource(parent::toArray($data));
     }
 
     /**
-     * Build the query for future services needing a predicant in visible cities.
+     * Build the query
+     *
+     * @return Builder<Service>
      */
     public function buildQuery()
     {
-        $visibleCityIds = Auth::user()->visibleCities()->pluck('cities.id');
+        $visibleCityIds = $this->user()->visibleCities()->pluck('cities.id');
         $query = Service::with(['baptisms', 'weddings', 'funerals', 'location', 'city'])
             ->startingFrom(Carbon::now())
             ->where('need_predicant', true)

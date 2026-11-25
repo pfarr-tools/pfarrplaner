@@ -30,6 +30,7 @@
 
 use App\Casts\EncryptedAttribute;
 use App\Casts\EncryptedSerializedAttribute;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Output\ConsoleOutput;
@@ -52,6 +53,13 @@ return new class extends Migration
 
         foreach ($this->getModels() as $model) {
             $ct = 1;
+            /**
+             * @var array{
+             *     class: class-string<Model>,
+             *     table: string,
+             *     encrypted: array<int, array{field: string, cast: class-string<EncryptedAttribute>}>
+             * } $model
+             */
             $records = $model['class']::all();
             foreach ($records as $record) {
                 $update = [];
@@ -65,8 +73,12 @@ return new class extends Migration
                         if (! is_string($value)) {
                             $value = '_____'.serialize($value);
                         }
-                    } else {
+                    } elseif (is_string($value)) {
                         $value = $this->unquote($value);
+                    } elseif (is_scalar($value)) {
+                        $value = $this->unquote((string) $value);
+                    } else {
+                        $value = '';
                     }
                     $update[$field] = $property['cast']::encrypt($value);
                 }
@@ -78,7 +90,13 @@ return new class extends Migration
 
     }
 
-    private function unquote($value)
+    /**
+     * Remove enclosing quotes from a legacy database value.
+     *
+     * @param  string  $value  Raw value read from the old schema.
+     * @return string Value without leading or trailing quotes.
+     */
+    private function unquote(string $value): string
     {
         while (substr($value, 0, 1) == '\'') {
             $value = substr($value, 1);
@@ -103,12 +121,18 @@ return new class extends Migration
      */
     public function down() {}
 
-    private function getModels()
+    /**
+     * Collect all application models that define encrypted attributes.
+     *
+     * @return array<int, array<string, mixed>> Model definitions with class, table and encrypted fields.
+     */
+    private function getModels(): array
     {
         $models = [];
-        foreach (glob(app_path('*.php')) as $file) {
+        foreach (glob(app_path('*.php')) ?: [] as $file) {
             $class = 'App\\'.pathinfo($file, PATHINFO_FILENAME);
             $instance = new $class;
+            /** @var class-string $class */
             $reflectionClass = new ReflectionClass($class);
             if ($reflectionClass->hasProperty('casts')) {
 
@@ -119,7 +143,8 @@ return new class extends Migration
                 ];
 
                 $model['encrypted'] = [];
-                foreach ($reflectionClass->getProperty('casts')->getValue($instance) as $field => $cast) {
+                $casts = $reflectionClass->getProperty('casts')->getValue($instance);
+                foreach (is_array($casts) ? $casts : [] as $field => $cast) {
                     if ($cast == EncryptedAttribute::class || $cast == EncryptedSerializedAttribute::class) {
                         $model['encrypted'][] = ['field' => $field, 'cast' => $cast];
                     }

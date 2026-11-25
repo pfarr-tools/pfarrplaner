@@ -51,12 +51,16 @@ class PoolmasterController extends AbstractCRUDController
             abort(404);
         }
 
-        $user = User::findOrFail($user);
+        $user = User::query()->whereKey($user)->firstOrFail();
         $pools = $user->pools;
 
         $year = $request->get('year', Carbon::now()->year);
         $month = $request->get('month', Carbon::now()->month);
-        $date = Carbon::parse($year.'-'.$month.'-01')->startOfMonth();
+        $date = Carbon::parse(sprintf(
+            '%s-%s-01',
+            is_scalar($year) ? $year : Carbon::now()->year,
+            is_scalar($month) ? $month : Carbon::now()->month,
+        ))->startOfMonth();
 
         return compact('date', 'user', 'pools');
     }

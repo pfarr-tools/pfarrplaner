@@ -17,19 +17,26 @@ class ReferenceParser extends \Peregrinus\BibleReferenceParser\ReferenceParser
 {
     public static function getInstance(): ReferenceParser
     {
-        if (static::$instance === null) {
-            static::$instance = new self;
+        $instance = static::$instance;
+        if (! $instance instanceof self) {
+            $instance = new self;
+            static::$instance = $instance;
         }
 
-        return static::$instance;
+        return $instance;
     }
 
+    /**
+     * @return void
+     */
     public function __construct()
     {
-        parent::__construct(
-            config('bible.parser.books'),
-            config('bible.versions', []),
-            config('bible.copyrights', [])
-        );
+        /** @var array<string, array<string>|string>|null $bookMap */
+        $bookMap = config('bible.parser.books');
+        /** @var array<string, string> $versions */
+        $versions = config('bible.versions', []);
+        /** @var array<string, string> $copyrights */
+        $copyrights = config('bible.copyrights', []);
+        parent::__construct($bookMap, $versions, $copyrights);
     }
 }

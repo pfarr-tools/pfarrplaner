@@ -36,7 +36,6 @@ use App\Models\Service;
 use App\Services\FileNameService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
 use PhpOffice\PhpSpreadsheet\Cell\DataType;
@@ -75,7 +74,7 @@ class OfferingAmountsReport extends AbstractExcelDocumentReport
      */
     public function setup()
     {
-        $cities = Auth::user()->cities;
+        $cities = $this->authenticatedUser()->cities;
         $locations = Location::inCities($cities->pluck('id'))->get();
 
         return Inertia::render('Report/OfferingAmounts/Setup', compact('cities', 'locations'));
@@ -97,7 +96,7 @@ class OfferingAmountsReport extends AbstractExcelDocumentReport
                 'end' => 'required|date',
             ]
         );
-
+        /** @var array{cities: array<int, int>, locations?: array<int, int>|null, start: string, end: string} $data */
         $cities = City::whereIn('id', $data['cities'])->get();
 
         $services = Service::inCitiesAndLocations($data['cities'], $data['locations'] ?? null)
@@ -117,7 +116,7 @@ class OfferingAmountsReport extends AbstractExcelDocumentReport
                 if (is_numeric($x)) {
                     $offerings[$offeringGoal]['amount'] += (float) $x;
                 }
-                if ($service->date <= Carbon::now()) {
+                if ($service->trueDate() <= Carbon::now()) {
                     $offerings[$offeringGoal]['done']++;
                 }
             }
@@ -173,9 +172,12 @@ class OfferingAmountsReport extends AbstractExcelDocumentReport
         }
 
         // output
+        /** @var string $cityNames */
+        $cityNames = $cities->pluck('name')->join(', ');
+
         return $this->sendToBrowser(
             FileNameService::make(
-                static::FILE_TITLE.' '.$cities->pluck('name')->join(', '),
+                self::FILE_TITLE.' '.$cityNames,
                 'xlsx',
                 static::FILE_SIGNATURE,
                 [$data['start'], $data['end']])

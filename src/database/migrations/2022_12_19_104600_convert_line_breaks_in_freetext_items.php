@@ -43,8 +43,12 @@ return new class extends Migration
         $items = Item::where('data_type', 'freetext')->get();
         foreach ($items as $item) {
             $data = $item->data;
-            if (str_contains($data['description'], "\n")) {
-                $data['description'] = '<p>'.str_replace("\n", '<br>', str_replace("\r\n", '</p><p>', $data['description'])).'</p>';
+            $description = $data['description'] ?? null;
+            if (! is_string($description)) {
+                continue;
+            }
+            if (str_contains($description, "\n")) {
+                $data['description'] = '<p>'.str_replace("\n", '<br>', str_replace("\r\n", '</p><p>', $description)).'</p>';
                 $item->data = $data;
                 $item->save();
             }
@@ -61,8 +65,9 @@ return new class extends Migration
         $items = Item::where('data_type', 'freetext')->get();
         foreach ($items as $item) {
             $data = $item->data;
-            if (str_contains($data['description'], '</p>')) {
-                $data['description'] = strtr($data['description'], [
+            $description = $data['description'] ?? null;
+            if (is_string($description) && str_contains($description, '</p>')) {
+                $data['description'] = strtr($description, [
                     '</p>' => "\r\n",
                     '<br>' => "\n",
                     '<br/>' => "\n",

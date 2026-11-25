@@ -36,6 +36,7 @@ use App\Models\Leave\Poolmaster;
 use App\Models\People\User;
 use App\Models\Service;
 use Carbon\Carbon;
+use Illuminate\Http\JsonResponse;
 
 /**
  * Handles CRUD requests for Pool records.
@@ -46,7 +47,14 @@ class PoolController extends AbstractApiCRUDController
 {
     protected string $modelClass = Pool::class;
 
-    public function poolmasters(Pool $pool, $date)
+    /**
+     * Return the planner payload for the pool masters of a given month.
+     *
+     * @param  Pool  $pool  Requested pool.
+     * @param  string  $date  Month in YYYY-MM format.
+     * @return JsonResponse Planner data for the requested month.
+     */
+    public function poolmasters(Pool $pool, string $date): JsonResponse
     {
         $start = Carbon::parse($date.'-01')->startOfDay();
         $end = $start->copy()->endOfMonth();
@@ -71,7 +79,14 @@ class PoolController extends AbstractApiCRUDController
         return response()->json($days);
     }
 
-    public function mastered(User $user, $date)
+    /**
+     * Return the pools mastered by a user around a given date.
+     *
+     * @param  User  $user  Requested user.
+     * @param  string  $date  Reference date in YYYY-MM-DD format.
+     * @return JsonResponse Mastered pools and the relevant period.
+     */
+    public function mastered(User $user, string $date): JsonResponse
     {
         $date = Carbon::parse($date);
         $mastered = Poolmaster::with(['pool', 'pool.users', 'pool.cities'])
@@ -86,7 +101,11 @@ class PoolController extends AbstractApiCRUDController
 
         $users = [];
         foreach ($mastered as $poolmaster) {
-            foreach ($poolmaster->pool->users as $user) {
+            $pool = $poolmaster->pool;
+            if ($pool === null) {
+                continue;
+            }
+            foreach ($pool->users as $user) {
                 if (! isset($users[$user->id])) {
                     $users[$user->id] = [
                         'absent' => Absence::where('user_id', $user->id)

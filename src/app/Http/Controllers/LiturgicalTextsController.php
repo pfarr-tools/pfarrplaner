@@ -31,27 +31,44 @@
 namespace App\Http\Controllers;
 
 use App\Models\Liturgy\Text;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Inertia\Response;
 
+/** Controller for liturgical text administration. */
 class LiturgicalTextsController extends Controller
 {
+    /**
+     * @return void
+     */
     public function __construct()
     {
         $this->middleware('auth');
         $this->authorizeResource(Text::class, 'text');
     }
 
-    public function index()
+    /**
+     * Render the administrative list of liturgical texts.
+     *
+     * @return Response Inertia response with all texts ordered by title.
+     */
+    public function index(): Response
     {
         $texts = Text::orderBy('title')->get();
 
         return Inertia::render('Admin/LiturgicalTexts/Index', compact('texts'));
     }
 
-    public function edit(Text $text)
+    /**
+     * Render the editor for an existing liturgical text.
+     *
+     * @param  Text  $text  Text to edit.
+     * @return Response Inertia response with the text and its available agenda codes.
+     */
+    public function edit(Text $text): Response
     {
-        $agendaCodes = Text::select('agenda_code')->orderBy('agenda_code')->get()->pluck('agenda_code')->unique();
+        $agendaCodes = Text::select('agenda_code')->orderBy('agenda_code')->pluck('agenda_code')->unique();
         $codes = [];
         foreach ($agendaCodes as $agendaCode) {
             $codes[] = ['id' => $agendaCode, 'name' => $agendaCode];
@@ -60,28 +77,54 @@ class LiturgicalTextsController extends Controller
         return Inertia::render('Admin/LiturgicalTexts/LiturgicalTextEditor', compact('text', 'codes'));
     }
 
-    public function create()
+    /**
+     * Render the editor for a new liturgical text.
+     *
+     * @return Response Inertia response with an empty text editor.
+     */
+    public function create(): Response
     {
         return $this->edit((new Text)->fill(['title' => '', 'text' => '', 'agenda_code' => '', 'source' => '', 'needs_replacement' => '', 'notice' => '']));
     }
 
-    public function store(Request $request)
+    /**
+     * Store a new liturgical text from the validated request.
+     *
+     * @param  Request  $request  Request containing the text data.
+     * @return RedirectResponse Redirect to the liturgical text list.
+     */
+    public function store(Request $request): RedirectResponse
     {
         Text::create($this->validateRequest($request));
 
         return redirect()->route('admin.text.index')->with('success', 'Der Text wurde gespeichert.');
     }
 
-    public function update(Request $request, Text $text)
+    /**
+     * Update an existing liturgical text from the validated request.
+     *
+     * @param  Request  $request  Request containing the updated text data.
+     * @param  Text  $text  Text to update.
+     * @return RedirectResponse Redirect to the liturgical text list.
+     */
+    public function update(Request $request, Text $text): RedirectResponse
     {
         $text->update($this->validateRequest($request));
 
         return redirect()->route('admin.text.index')->with('success', 'Der Text wurde gespeichert.');
     }
 
-    public function import(Request $request)
+    /**
+     * Import liturgical texts from a pasted text representation.
+     *
+     * @param  Request  $request  Request containing the data to import.
+     * @return RedirectResponse Redirect to the liturgical text overview.
+     */
+    public function import(Request $request): RedirectResponse
     {
-        $data = $request->validate(['data' => 'required|string'])['data'];
+        /** @var array{data: string} $validated Validierte Import-Daten. */
+        $validated = $request->validate(['data' => 'required|string']);
+        $data = $validated['data'];
         $records = [];
         $record = $newRecord = [
             'agenda_code' => '',
@@ -101,7 +144,8 @@ class LiturgicalTextsController extends Controller
             if ($line == '---') {
                 // insert line breaks
                 foreach (['text', 'notice', 'source'] as $key) {
-                    $record[$key] = implode("\n", $record[$key]);
+                    $lines = $record[$key];
+                    $record[$key] = implode("\n", is_array($lines) ? $lines : [$lines]);
                 }
                 // check if replacement is needed
                 foreach (['funeral' => 'bestattung', 'baptism' => 'taufe', 'wedding' => 'trauung'] as $keyCode => $key) {
@@ -131,11 +175,15 @@ class LiturgicalTextsController extends Controller
     }
 
     /**
-     * @return mixed
+     * Validiert die Eingaben für einen liturgischen Text.
+     *
+     * @param  Request  $request  Request mit den Textdaten.
+     * @return array<string, mixed> Validierte Textdaten.
      */
     protected function validateRequest(Request $request)
     {
-        return $request->validate(
+        /** @var array<string, mixed> $validated Validierte Textdaten. */
+        $validated = $request->validate(
             [
                 'title' => 'required|string',
                 'text' => 'required|string',
@@ -145,9 +193,17 @@ class LiturgicalTextsController extends Controller
                 'notice' => 'nullable|string',
             ]
         );
+
+        return $validated;
     }
 
-    public function destroy(Text $text)
+    /**
+     * Delete a liturgical text.
+     *
+     * @param  Text  $text  Text to delete.
+     * @return RedirectResponse Redirect to the liturgical text list.
+     */
+    public function destroy(Text $text): RedirectResponse
     {
         $text->delete();
 

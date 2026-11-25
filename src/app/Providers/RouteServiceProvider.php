@@ -106,7 +106,10 @@ class RouteServiceProvider extends ServiceProvider
             ->group(base_path('routes/web.php'));
     }
 
-    protected function mapExtranetRoutes()
+    /**
+     * Define the extranet routes for the application.
+     */
+    protected function mapExtranetRoutes(): void
     {
         Route::prefix('extranet')
             ->middleware('extranet')

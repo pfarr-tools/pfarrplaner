@@ -64,7 +64,13 @@ Route::get('/debug-glitchtip', function () {
 })->name('errors.debug-glitchtip');
 
 if (! function_exists('routeNames')) {
-    function routeNames($model)
+    /**
+     * Erzeugt die Standard-Routennamen für ein Modell.
+     *
+     * @param  string  $model  Modellname als Routenpräfix
+     * @return array<string, string> Routennamen, indiziert nach HTTP-Verb
+     */
+    function routeNames(string $model): array
     {
         $routes = [];
         foreach (['index', 'create', 'store', 'show', 'edit', 'update', 'destroy'] as $verb) {
@@ -86,13 +92,13 @@ foreach (File::allFiles(app_path('Models')) as $file) {
 }
 
 // import individual route files
-foreach (glob(base_path('routes/web/*.php')) as $file) {
+foreach (glob(base_path('routes/web/*.php')) ?: [] as $file) {
     Route::group([], $file);
 }
 
 // admin routes
 Route::prefix('admin')->group(function () {
-    foreach (glob(base_path('routes/web/admin/*.php')) as $file) {
+    foreach (glob(base_path('routes/web/admin/*.php')) ?: [] as $file) {
         Route::group([], $file);
     }
 });

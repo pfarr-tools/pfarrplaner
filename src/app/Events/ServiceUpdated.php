@@ -66,7 +66,7 @@ class ServiceUpdated
         $this->originalParticipants = $originalParticipants;
 
         // update youtube if necessary
-        if (($service->youtube_url != '') && ($service->city->google_access_token != '')
+        if (($service->youtube_url != '') && ($service->city->google_access_token ?? '') !== ''
             && YoutubeIntegration::isConfigured()) {
             $this->updateBroadcastIfAvailable(Broadcast::get($service));
         }

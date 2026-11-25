@@ -44,12 +44,17 @@ class PsalmLiturgySheet extends AbstractLiturgySheet
 
     protected $icon = 'fa fa-file-word';
 
+    /** @var Service Service currently rendered for the export. */
     protected $service = null;
 
     protected $extension = 'docx';
 
+    /** @var string Title of the rendered Psalm used as file name. */
     protected $fileName = '';
 
+    /**
+     * @param  Service  $service  Service to render.\n     * @return mixed
+     */
     public function render(Service $service)
     {
         $this->service = $service;
@@ -78,14 +83,19 @@ class PsalmLiturgySheet extends AbstractLiturgySheet
     protected function renderPsalmItem(DefaultWordDocument $doc, Item $item): void
     {
         $psalmData = $item->data['psalm'] ?? null;
-        if (! is_array($psalmData) || empty($psalmData['text'])) {
+        if (! is_array($psalmData)) {
+            return;
+        }
+        $text = $psalmData['text'] ?? null;
+        if (! is_string($text) || empty($text)) {
             return;
         }
         /** @var PsalmItemHelper $helper */
         $helper = $item->getHelper();
         $title = $psalmData['title'] ?? 'Psalm';
+        $title = is_string($title) ? $title : 'Psalm';
         $doc->getSection()->addTitle($title, 1);
-        $doc->renderNormalText($psalmData['text']);
+        $doc->renderNormalText($text);
         $this->fileName = $title;
     }
 }

@@ -29,6 +29,7 @@
  */
 
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 /**
@@ -46,6 +47,7 @@ class AddUserNewfeaturesField extends Migration
         Schema::table(
             'users',
             function ($table) {
+                /** @var Blueprint $table */
                 $table->date('new_features')->nullable();
             }
         );
@@ -61,6 +63,7 @@ class AddUserNewfeaturesField extends Migration
         Schema::table(
             'users',
             function ($table) {
+                /** @var Blueprint $table */
                 $table->dropColumn('new_features');
             }
         );

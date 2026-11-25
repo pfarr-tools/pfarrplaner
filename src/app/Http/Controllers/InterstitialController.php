@@ -30,6 +30,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\People\User;
 use App\Services\InterstitialService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -49,6 +50,7 @@ class InterstitialController extends Controller
      */
     public function update(Request $request, InterstitialService $interstitialService, string $key)
     {
+        /** @var array{action: string} $data */
         $data = $request->validate([
             'action' => 'required|string|in:'.implode(',', [
                 InterstitialService::ACTION_DISMISS,
@@ -56,7 +58,9 @@ class InterstitialController extends Controller
             ]),
         ]);
 
-        $result = $interstitialService->remember($request->user(), $key, $data['action']);
+        $user = $request->user();
+        abort_unless($user instanceof User, 401);
+        $result = $interstitialService->remember($user, $key, $data['action']);
 
         if ($request->header('x-inertia')) {
             return redirect()->back();

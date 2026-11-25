@@ -36,7 +36,8 @@ use PhpOffice\PhpWord\Shared\Converter;
 
 class DefaultAddressLabelSheetDocument extends DefaultLabelSheetDocument
 {
-    protected $fromAddress = '';
+    /** @var string Formatted sender address shown on each label. */
+    protected string $fromAddress = '';
 
     public const FONT6 = ['name' => 'Arial', 'size' => 6];
 
@@ -44,6 +45,21 @@ class DefaultAddressLabelSheetDocument extends DefaultLabelSheetDocument
 
     public const FONT10 = ['name' => 'Arial', 'size' => 10];
 
+    /**
+     * Convert a free-form configuration or address value into printable text.
+     *
+     * @param  mixed  $value  Value read from the document configuration or an address record.
+     * @return string Textual representation, or an empty string for non-scalar values.
+     */
+    private function asString(mixed $value): string
+    {
+        return is_scalar($value) ? (string) $value : '';
+    }
+
+    /**
+     * @param  array<string, mixed>  $config  Document configuration.
+     * @return void
+     */
     public function __construct($config = [])
     {
         if (! isset($config['label'])) {
@@ -52,43 +68,63 @@ class DefaultAddressLabelSheetDocument extends DefaultLabelSheetDocument
         parent::__construct($config);
     }
 
-    public function renderAddresses($addresses, $fromAddress)
+    /**
+     * Render the address records as labels on the sheet.
+     *
+     * @param  iterable<array<string, mixed>>  $addresses  Address records to render.
+     * @param  array<string, mixed>|string  $fromAddress  Sender address override or an empty string to use the current user's data.
+     */
+    public function renderAddresses(iterable $addresses, array|string $fromAddress): void
     {
 
         $user = Auth::user();
+        $fromAddressData = is_array($fromAddress) ? $fromAddress : [];
         $fromParts = collect();
-        if ($x = $fromAddress['office'] ?? $user->office) {
+        if ($x = $fromAddressData['office'] ?? $user?->office) {
             $fromParts->push($x);
         }
-        if (isset($fromAddress['address'])) {
-            $fromParts->push($fromAddress['address']);
-            if ($x = trim(($fromAddress['zip'] ?? '').' '.($fromAddress['city'] ?? ''))) {
+        if (isset($fromAddressData['address'])) {
+            $fromParts->push($fromAddressData['address']);
+            $zip = $this->asString($fromAddressData['zip'] ?? '');
+            $city = $this->asString($fromAddressData['city'] ?? '');
+            if ($x = trim($zip.' '.$city)) {
                 $fromParts->push($x);
             }
         } else {
-            if ($user->address) {
+            if ($user?->address) {
                 foreach (explode("\n", $user->address) as $x) {
                     $fromParts->push(trim($x));
                 }
             }
         }
 
-        $this->fromAddress = $fromParts->join(' · ');
+        $this->fromAddress = $this->asString($fromParts->join(' · '));
+
+        $labelConfig = $this->config['label'] ?? [];
+        $labelHeight = is_array($labelConfig) ? ($labelConfig['height'] ?? 3.7) : 3.7;
+        $skipLabels = $this->config['skipLabels'] ?? 0;
 
         $this->renderLabels(
             $addresses,
             3,
             Converter::cmToTwip(7),
-            Converter::cmToTwip($this->config['label']['height'] ?? 3.7),
+            Converter::cmToTwip(is_numeric($labelHeight) ? (float) $labelHeight : 3.7),
             [
 
             ],
             [$this, 'renderAddress'],
-            $this->config['skipLabels'] ?? 0,
+            is_numeric($skipLabels) ? (int) $skipLabels : 0,
         );
     }
 
-    public function renderAddress(Cell $cell, $address, $index)
+    /**
+     * Render a single address into one label cell.
+     *
+     * @param  Cell  $cell  Table cell receiving the address.
+     * @param  array<string, mixed>  $address  Address record with name, address, zip and city.
+     * @param  int  $index  Zero-based index of the label.
+     */
+    public function renderAddress(Cell $cell, array $address, int $index): void
     {
 
         $pStyle = [
@@ -108,7 +144,7 @@ class DefaultAddressLabelSheetDocument extends DefaultLabelSheetDocument
         }
 
         if (isset($address['info'])) {
-            $cell->addText($address['info'], static::FONT6, array_merge($pStyle, [
+            $cell->addText($this->asString($address['info']), static::FONT6, array_merge($pStyle, [
                 'align' => 'right',
                 'spaceBefore' => $this->fromAddress ? 0 : Converter::cmToTwip(0.7),
             ]));
@@ -117,10 +153,10 @@ class DefaultAddressLabelSheetDocument extends DefaultLabelSheetDocument
         $run = $cell->addTextRun(array_merge($pStyle, [
             'spaceBefore' => $this->fromAddress || isset($address['info']) ? 0 : Converter::cmToTwip(0.7),
         ]));
-        $run->addText($address['name'], static::FONT10);
+        $run->addText($this->asString($address['name']), static::FONT10);
         $run->addTextBreak();
-        $run->addText($address['address'], static::FONT10);
+        $run->addText($this->asString($address['address']), static::FONT10);
         $run->addTextBreak();
-        $run->addText(trim($address['zip'].' '.$address['city']), static::FONT10);
+        $run->addText(trim($this->asString($address['zip']).' '.$this->asString($address['city'])), static::FONT10);
     }
 }

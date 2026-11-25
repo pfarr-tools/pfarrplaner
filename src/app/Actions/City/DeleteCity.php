@@ -54,7 +54,7 @@ class DeleteCity extends AbstractDeleteAction implements DeletesCities
         DeletedCity::dispatch($user, $city);
         $this->messages = ['success' => 'Die Kirchengemeinde wurde gelöscht.'];
 
-        return $city->delete();
+        return (bool) $city->delete();
 
     }
 }

@@ -41,13 +41,15 @@ class InfoModule extends AbstractModule
     public function __construct(array $config)
     {
         parent::__construct($config);
-        $this->title = 'Über '.config('app.name');
+        $appName = config('app.name');
+        $this->title = 'Über '.(is_string($appName) ? $appName : '');
     }
 
     public function addItems(array $items): array
     {
+        $appName = config('app.name');
         $items[] = [
-            'text' => 'Über '.config('app.name'),
+            'text' => 'Über '.(is_string($appName) ? $appName : ''),
             'icon' => 'mdi mdi-information',
             'url' => route('about'),
             'active' => request()->is(['about']),

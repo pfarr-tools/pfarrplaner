@@ -43,11 +43,13 @@ class CalendarAbsenceResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        /** @var Absence $this */
+        /** @var Absence $absence */
+        $absence = $this->resource;
+
         return [
-            'id' => $this->id,
-            'name' => $this->user->last_name,
-            'label' => $this->user->fullName().': '.$this->reason.$this->replacementText(', V: '),
+            'id' => $absence->id,
+            'name' => $absence->user?->last_name,
+            'label' => ($absence->user?->fullName() ?? '').': '.$absence->reason.$absence->replacementText(', V: '),
         ];
     }
 }

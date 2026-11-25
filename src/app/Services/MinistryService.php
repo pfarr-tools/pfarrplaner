@@ -38,13 +38,14 @@ use App\Models\People\Participant;
 class MinistryService
 {
     /**
-     * Get all available ministries
+     * Get all available ministries.
      *
      * @param  bool  $includeBasicMinistries  Include P/O/M/A ?
+     * @return array<string, string> Ministry labels keyed by their identifier.
      */
     public static function all(bool $includeBasicMinistries = false): array
     {
-        $ministries = Participant::all()
+        $ministries = Participant::query()
             ->pluck('category')
             ->unique()
             ->reject(function ($item) {
@@ -55,22 +56,40 @@ class MinistryService
         $m = $includeBasicMinistries ? self::POMA() : [];
 
         foreach ($ministries as $ministry) {
+            if (! is_string($ministry)) {
+                continue;
+            }
             $m[$ministry] = $ministry;
         }
 
         return $m;
     }
 
-    public static function title($title): string
+    /**
+     * Resolve the display label for a ministry identifier.
+     *
+     * @param  string  $title  Ministry identifier or custom ministry name.
+     * @return string Display label for the given ministry.
+     */
+    public static function title(string $title): string
     {
         if ($title == 'P') {
-            return config('labels.pastor');
+            /** @var string $label */
+            $label = config('labels.pastor');
+
+            return $label;
         }
         if ($title == 'O') {
-            return config('labels.organist');
+            /** @var string $label */
+            $label = config('labels.organist');
+
+            return $label;
         }
         if ($title == 'M') {
-            return config('labels.sacristan');
+            /** @var string $label */
+            $label = config('labels.sacristan');
+
+            return $label;
         }
         if ($title == 'A') {
             return 'Weitere Beteiligte';
@@ -79,15 +98,35 @@ class MinistryService
         return $title;
     }
 
+    /**
+     * Get the labels for the four basic P/O/M/A ministries.
+     *
+     * @return array<string, string> Ministry labels keyed by their identifier.
+     */
     public static function POMA(): array
     {
-        return ['P' => config('labels.pastor'), 'O' => config('labels.organist'), 'M' => config('labels.sacristan'), 'A' => 'Weitere Beteiligte'];
+        /** @var string $pastor */
+        $pastor = config('labels.pastor');
+        /** @var string $organist */
+        $organist = config('labels.organist');
+        /** @var string $sacristan */
+        $sacristan = config('labels.sacristan');
+
+        return ['P' => $pastor, 'O' => $organist, 'M' => $sacristan, 'A' => 'Weitere Beteiligte'];
     }
 
+    /**
+     * Get all ministries as id/name pairs for selection widgets.
+     *
+     * @return array<int, array{id: string, name: string}> Ministry id/name pairs.
+     */
     public static function selectList(): array
     {
         $ministries = [];
-        foreach (Participant::all()->pluck('category')->unique() as $ministry) {
+        foreach (Participant::query()->pluck('category')->unique() as $ministry) {
+            if (! is_string($ministry)) {
+                continue;
+            }
             $ministries[] = [
                 'id' => $ministry,
                 'name' => self::POMA()[$ministry] ?? $ministry,

@@ -29,12 +29,17 @@ class AuthenticateDavApiToken
             || ! $tokenUser
             || $tokenUser->getKey() !== $user->getKey()
             || $user->two_factor_recovery_required_at) {
+            $appName = config('app.name');
+
             return response('Unauthorized', Response::HTTP_UNAUTHORIZED)
-                ->header('WWW-Authenticate', 'Basic realm="'.config('app.name').' DAV"');
+                ->header('WWW-Authenticate', 'Basic realm="'.(is_string($appName) ? $appName : '').' DAV"');
         }
 
         Auth::login($user);
 
-        return $next($request);
+        /** @var Response $response */
+        $response = $next($request);
+
+        return $response;
     }
 }

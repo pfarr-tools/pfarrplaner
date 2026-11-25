@@ -35,37 +35,67 @@ use Illuminate\Support\Str;
 
 class PMWueStudyHelper extends AbstractStudyHelper
 {
+    /** @var string */
     public $title = 'Predigtmeditation aus Württemberg';
 
+    /**
+     * Liest die Predigtlinks der Predigtmeditationen aus Württemberg.
+     *
+     * @param  array<string, mixed>  $data
+     * @return array<string, array<string, string>>
+     */
     public function read(array $data): array
     {
         return [];
     }
 
+    /**
+     * Ergänzt die Predigtlinks für das angeforderte Datum.
+     *
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
     public function getLinks(array $data): array
     {
         $myRecords = $this->getPMWueLinks($this->getDaySlug($data));
-        $data['links'] = array_merge($data['links'] ?? [], $myRecords ?? []);
+        /** @var array<string, string> $links Bereits vorhandene Links. */
+        $links = $data['links'] ?? [];
+        $data['links'] = array_merge($links, $myRecords);
 
         return $data;
     }
 
-    protected function getDaySlug($data): string
+    /**
+     * Ermittelt den URL-Slug aus dem Titel des angeforderten Tages.
+     *
+     * @param  array<string, mixed>  $data
+     */
+    protected function getDaySlug(array $data): string
     {
         if (! isset($data['title'])) {
             return '';
         }
-        $title = Str::contains($data['title'], '(') ? trim(Str::before($data['title'], '(')) : trim($data['title']);
+        /** @var string $title Titel des angeforderten Tages. */
+        $title = $data['title'];
+        $title = Str::contains($title, '(') ? trim(Str::before($title, '(')) : trim($title);
         $title = Str::replace('So.', 'Sonntag', $title);
         $title = Str::replace('. Advent', '. Sonntag im Advent', $title);
 
         return Str::slug($title);
     }
 
-    protected function getPMWueLinks($slug)
+    /**
+     * Liest die Predigtlinks für den angegebenen Slug aus dem Cache oder der Website.
+     *
+     * @return array<string, string>
+     */
+    protected function getPMWueLinks(string $slug): array
     {
         if (Cache::has('pmwue-'.$slug)) {
-            return Cache::get('pmwue-'.$slug);
+            /** @var array<string, string> $cached */
+            $cached = Cache::get('pmwue-'.$slug);
+
+            return $cached;
         } else {
             if ('' == ($content = $this->getContent('https://www.fachstelle-gottesdienst.de/predigt/predigtmeditationen-aus-wuerttemberg/'.$slug))) {
                 return [];
@@ -79,20 +109,24 @@ class PMWueStudyHelper extends AbstractStudyHelper
             $finder = new \DomXPath($doc);
             $sections = $finder->query("//*[contains(concat(' ', normalize-space(@class), ' '), ' section ')]");
             $sectionIdx = 0;
-            foreach ($sections as $section) {
-                if ($sectionIdx > 0) {
-                    foreach ($section->getElementsByTagName('h2') as $h2) {
-                        $sectionTitle = (trim($h2->nodeValue));
-                    }
-                    foreach ($section->getElementsByTagName('a') as $link) {
-                        $url = $link->getAttribute('href');
-                        if (! Str::startsWith($url, 'http')) {
-                            $url = 'https://www.fachstelle-gottesdienst.de/'.$url;
+            if ($sections !== false) {
+                /** @var \DOMElement $section */
+                foreach ($sections as $section) {
+                    if ($sectionIdx > 0) {
+                        $sectionTitle = '';
+                        foreach ($section->getElementsByTagName('h2') as $h2) {
+                            $sectionTitle = trim((string) $h2->nodeValue);
                         }
-                        $links['['.$sectionTitle.'] '.trim($link->nodeValue)] = $url;
+                        foreach ($section->getElementsByTagName('a') as $link) {
+                            $url = $link->getAttribute('href');
+                            if (! Str::startsWith($url, 'http')) {
+                                $url = 'https://www.fachstelle-gottesdienst.de/'.$url;
+                            }
+                            $links['['.$sectionTitle.'] '.trim((string) $link->nodeValue)] = $url;
+                        }
                     }
+                    $sectionIdx++;
                 }
-                $sectionIdx++;
             }
             Cache::put('pmwue-'.$slug, $links);
 

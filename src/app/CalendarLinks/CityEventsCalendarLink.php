@@ -69,19 +69,27 @@ class CityEventsCalendarLink extends AbstractCalendarLink
     protected $needs = ['cities', 'includeHidden'];
 
     /**
-     * @return array
+     * Prepare the setup data for the combined city events calendar.
+     *
+     * @return array<string, mixed> Cities available to the authenticated user.
      */
-    public function setupData()
+    public function setupData(): array
     {
-        $cities = Auth::user()->cities;
+        $user = Auth::user();
+        $cities = $user === null ? [] : $user->cities;
 
         return compact('cities');
     }
 
+    /**
+     * @param  Request  $request  Incoming request.
+     * @return void
+     */
     public function setDataFromRequest(Request $request)
     {
         if ($request->has('cities')) {
-            $this->data['cities'] = explode(',', $request->get('cities'));
+            $cities = $request->get('cities');
+            $this->data['cities'] = explode(',', is_string($cities) ? $cities : '');
         } elseif ($request->has('city')) {
             $this->data['cities'] = [$request->get('city')];
         } else {
@@ -98,7 +106,7 @@ class CityEventsCalendarLink extends AbstractCalendarLink
         $events = [];
 
         $events = Occurence::with('event')
-            ->startingFrom(Carbon::now()->subYear(1))
+            ->startingFrom(Carbon::now()->subYear())
             ->whereHas('event', function ($query) use ($hidden) {
                 $query->inCities($this->data['cities']);
                 if (! $hidden) {
@@ -111,15 +119,23 @@ class CityEventsCalendarLink extends AbstractCalendarLink
         return $events;
     }
 
-    public function setCities($cities)
+    /**
+     * Set the cities whose events are included in the calendar.
+     *
+     * @param  array<int, int|string>  $cities  City identifiers to include.
+     */
+    public function setCities(array $cities): void
     {
         $this->data['cities'] = $cities;
     }
 
+    /**
+     * @return string
+     */
     public function filename()
     {
         return 'veranstaltungen-'.City::whereIn('id', $this->data['cities'] ?? [])->pluck('name')->map(function ($item) {
-            return Str::replace('/', '_', Str::slug($item));
+            return Str::replace('/', '_', Str::slug(is_string($item) ? $item : ''));
         })->implode('-').'.ics';
     }
 }

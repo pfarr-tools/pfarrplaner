@@ -30,6 +30,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\People\User;
 use App\Models\Rites\Baptism;
 use Carbon\Carbon;
 use Illuminate\Foundation\Http\FormRequest;
@@ -46,13 +47,15 @@ class StoreBaptismRequest extends FormRequest
      */
     public function authorize()
     {
-        return $this->user()->can('update', Baptism::class);
+        $actor = $this->user();
+
+        return $actor instanceof User && $actor->can('update', Baptism::class);
     }
 
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array
+     * @return array<string, string>
      */
     public function rules()
     {
@@ -66,9 +69,9 @@ class StoreBaptismRequest extends FormRequest
             'candidate_city' => 'nullable|string',
             'candidate_phone' => 'nullable|phone_number',
             'pronoun_set' => 'nullable|string',
-            'city_id' => 'required|integer|exists:cities,id|in:'.$this->user()->writableCities->pluck('id')->implode(
+            'city_id' => 'required|integer|exists:cities,id|in:'.($this->user() instanceof User ? $this->user()->writableCities->pluck('id')->implode(
                 ','
-            ),
+            ) : ''),
             'first_contact_on' => 'nullable|date_format:d.m.Y',
             'first_contact_with' => 'nullable|string',
             'appointment' => 'nullable|date_format:d.m.Y H:i',
@@ -103,15 +106,28 @@ class StoreBaptismRequest extends FormRequest
         $data['signed'] ??= 0;
         $data['registered'] ??= 0;
 
-        $data['dob'] ? $data['dob'] = Carbon::createFromFormat('d.m.Y', $data['dob']) : $data['dob'] = null;
-        $data['first_contact_on'] ? $data['first_contact_on'] = Carbon::createFromFormat('d.m.Y', $data['first_contact_on']) : $data['first_contact_on'] = null;
-        $data['dimissorial_requested'] ? $data['dimissorial_requested'] = Carbon::createFromFormat('d.m.Y', $data['dimissorial_requested']) : $data['dimissorial_requested'] = null;
-        $data['dimissorial_received'] ? $data['dimissorial_received'] = Carbon::createFromFormat('d.m.Y', $data['dimissorial_received']) : $data['dimissorial_received'] = null;
+        if (isset($data['dob'])) {
+            $dob = $data['dob'];
+            $data['dob'] = is_string($dob) ? Carbon::createFromFormat('d.m.Y', $dob) : null;
+        }
+        if (isset($data['first_contact_on'])) {
+            $firstContactOn = $data['first_contact_on'];
+            $data['first_contact_on'] = is_string($firstContactOn) ? Carbon::createFromFormat('d.m.Y', $firstContactOn) : null;
+        }
+        if (isset($data['dimissorial_requested'])) {
+            $dimissorialRequested = $data['dimissorial_requested'];
+            $data['dimissorial_requested'] = is_string($dimissorialRequested) ? Carbon::createFromFormat('d.m.Y', $dimissorialRequested) : null;
+        }
+        if (isset($data['dimissorial_received'])) {
+            $dimissorialReceived = $data['dimissorial_received'];
+            $data['dimissorial_received'] = is_string($dimissorialReceived) ? Carbon::createFromFormat('d.m.Y', $dimissorialReceived) : null;
+        }
 
         if (isset($data['appointment'])) {
-            $data['appointment'] = Carbon::parse($data['appointment'], 'Europe/Berlin')->setTimezone('UTC')->format(
-                'd.m.Y H:i'
-            );
+            $appointment = $data['appointment'];
+            $data['appointment'] = is_string($appointment)
+                ? Carbon::parse($appointment, 'Europe/Berlin')->setTimezone('UTC')->format('d.m.Y H:i')
+                : null;
         }
 
         return $data;

@@ -72,17 +72,24 @@ class Replacement extends AbstractModel
     ];
 
     /**
-     * @var string[]
+     * Massiv zuweisbare Felder der Vertretung.
+     *
+     * @var list<string>
      */
     protected $fillable = ['absence_id', 'from', 'to', 'pool_id'];
 
     /**
-     * @var string[]
+     * Umwandlung der Datumsfelder in Carbon-Instanzen.
+     *
+     * @var array<string, string>
      */
     protected $casts = ['from' => 'datetime', 'to' => 'datetime'];
 
     protected $with = ['pool'];
 
+    /**
+     * @return void
+     */
     protected static function boot()
     {
         parent::boot();
@@ -135,15 +142,22 @@ class Replacement extends AbstractModel
             if (count($this->users)) {
                 $texts = [implode(' | ', $u).' ('.StringTool::durationText($this->from, $this->to).')'];
             }
-            if ($this->pool->contact) {
-                $texts[] = $this->pool->contact.($this->pool->office ? ', '.$this->pool->office : '').' [Kontakt für Pool "'.$this->pool->name.'"]';
+            $pool = $this->pool;
+            if ($pool !== null && $pool->contact) {
+                $texts[] = $pool->contact.($pool->office ? ', '.$pool->office : '').' [Kontakt für Pool "'.$pool->name.'"]';
             } else {
                 $poolmasters = $this->relevantPoolmasters();
                 foreach ($poolmasters as $poolmaster) {
                     $from = max(Carbon::parse($poolmaster->start)->startOfDay(), $this->from);
                     $to = min(Carbon::parse($poolmaster->end)->endOfDay(), $this->to);
+                    $poolmasterPool = $poolmaster->pool;
+                    if ($poolmasterPool === null) {
+                        continue;
+                    }
 
-                    $texts[] = $poolmaster->user->fullName().' [Poolmaster:in "'.$poolmaster->pool->name.'"]'
+                    /** @var User $user */
+                    $user = $poolmaster->getAttribute('user');
+                    $texts[] = $user->fullName().' [Poolmaster:in "'.$poolmasterPool->name.'"]'
                         .' ('.StringTool::durationText($from, $to).')';
                 }
             }
@@ -152,6 +166,11 @@ class Replacement extends AbstractModel
         }
     }
 
+    /**
+     * Gibt die Vertretungen je Person aufbereitet und nach Zeitraum sortiert zurück.
+     *
+     * @return array<string, array{from: Carbon, to: Carbon, period: string, user: User, poolmaster: mixed}>
+     */
     public function toUserArray()
     {
         $users = [];
@@ -165,33 +184,40 @@ class Replacement extends AbstractModel
             ];
         }
 
-        if ($this->pool && $this->pool->contact) {
-            $users[$this->from->format('Ymd').$this->to->format('Ymd').$this->pool->name] = [
+        $pool = $this->pool;
+        if ($pool !== null && $pool->contact) {
+            $users[$this->from->format('Ymd').$this->to->format('Ymd').$pool->name] = [
                 'from' => $this->from,
                 'to' => $this->to,
                 'period' => StringTool::durationText($this->from, $this->to),
                 'user' => new User([
-                    'name' => $this->pool->contact,
-                    'office' => $this->pool->office,
-                    'phone' => $this->pool->phone,
-                    'email' => $this->pool->email,
+                    'name' => $pool->contact,
+                    'office' => $pool->office,
+                    'phone' => $pool->phone,
+                    'email' => $pool->email,
                 ]),
-                'poolmaster' => $this->pool->name,
+                'poolmaster' => $pool->name,
             ];
         } else {
             $poolmasters = $this->relevantPoolmasters();
             foreach ($poolmasters as $poolmaster) {
                 $from = max(Carbon::parse($poolmaster->start)->startOfDay(), $this->from);
                 $to = min(Carbon::parse($poolmaster->end)->endOfDay(), $this->to);
+                $poolmasterPool = $poolmaster->pool;
+                if ($poolmasterPool === null) {
+                    continue;
+                }
 
+                /** @var User $user */
+                $user = $poolmaster->getAttribute('user');
                 $users[$from->format('Ymd').$to->format(
                     'Ymd'
-                ).$poolmaster->user->last_name.$poolmaster->user->id] = [
+                ).$user->last_name.$user->id] = [
                     'from' => $from,
                     'to' => $to,
                     'period' => StringTool::durationText($from, $to),
-                    'user' => $poolmaster->user,
-                    'poolmaster' => $poolmaster->pool->name,
+                    'user' => $user,
+                    'poolmaster' => $poolmasterPool->name,
                 ];
             }
         }
@@ -218,13 +244,20 @@ class Replacement extends AbstractModel
     }
 
     /**
+     * Ermittelt die Poolmaster, deren Zeitraum diese Vertretung schneidet.
+     *
+     * Die eager geladene Beziehung 'user' ist Poolmaster::user() und verweist auf die
+     * zugeordnete Person, 'pool' auf den Pool des Poolmasters. Beide Beziehungen werden
+     * in toText() und toUserArray() weiterverwendet.
+     *
      * @return Collection<int, Poolmaster>
      */
     protected function relevantPoolmasters()
     {
         $absentUserId = null;
         if ($this->relationLoaded('absence')) {
-            $absentUserId = $this->getRelation('absence')?->user_id;
+            $absence = $this->getRelation('absence');
+            $absentUserId = $absence instanceof Absence ? $absence->user_id : null;
         } elseif ($this->absence_id) {
             $absentUserId = Absence::query()
                 ->whereKey($this->absence_id)
@@ -247,6 +280,9 @@ class Replacement extends AbstractModel
     protected function normalizeDateAttribute($value, bool $endOfDay = false): ?string
     {
         if (! $value) {
+            return null;
+        }
+        if (! is_string($value) && ! is_int($value) && ! is_float($value) && ! $value instanceof \DateTimeInterface) {
             return null;
         }
 

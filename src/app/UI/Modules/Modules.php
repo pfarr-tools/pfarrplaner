@@ -34,11 +34,15 @@ class Modules
 {
     /**
      * Get all available modules
+     *
+     * @return array<string, list<array{key: string, title: string, icon: string, color: string, defaultRoute: string}>> Module data grouped by group title.
      */
-    public static function tree()
+    public static function tree(): array
     {
         $tree = [];
-        foreach (config('modules.groups') as $title => $group) {
+        /** @var array<string, array<int, class-string<AbstractModule>>> $groups */
+        $groups = config('modules.groups');
+        foreach ($groups as $title => $group) {
             $tree[$title] = [];
             foreach ($group as $class) {
                 /** @var AbstractModule $module */
@@ -56,10 +60,17 @@ class Modules
         return $tree;
     }
 
-    public static function defaultConfig()
+    /**
+     * Get the default module configuration
+     *
+     * @return array<string, int> Default activation state by module key.
+     */
+    public static function defaultConfig(): array
     {
         $config = [];
-        foreach (config('modules.groups') as $title => $group) {
+        /** @var array<string, array<int, class-string<AbstractModule>>> $groups */
+        $groups = config('modules.groups');
+        foreach ($groups as $title => $group) {
             foreach ($group as $class) {
                 /** @var AbstractModule $module */
                 $module = new $class([]);

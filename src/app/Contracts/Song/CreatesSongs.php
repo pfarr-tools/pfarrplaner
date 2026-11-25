@@ -34,6 +34,6 @@ use App\Models\Liturgy\Song;
 use App\Models\People\User;
 
 /**
- * @method Song create(User $user, array $input)
+ * @method Song create(User $user, array<string, mixed> $input)
  */
 interface CreatesSongs {}

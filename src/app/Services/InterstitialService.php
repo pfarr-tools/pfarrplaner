@@ -42,6 +42,8 @@ class InterstitialService
 
     /**
      * Resolve all configured interstitials that should currently be shown.
+     *
+     * @return array<int, array<string, mixed>>
      */
     public function forUser(User $user): array
     {
@@ -53,7 +55,10 @@ class InterstitialService
         $states = $this->statesForUser($user);
         $interstitials = [];
 
-        foreach (config('interstitials.items', []) as $key => $item) {
+        /** @var array<string, array<string, mixed>> $items */
+        $items = config('interstitials.items', []);
+
+        foreach ($items as $key => $item) {
             if (! $this->isEnabled($item)) {
                 continue;
             }
@@ -68,19 +73,21 @@ class InterstitialService
                 continue;
             }
 
+            $snoozedUntil = $state['snoozed_until'] ?? null;
             if (($item['repeatable'] ?? false)
                 && ($state['status'] ?? null) === self::ACTION_LATER
-                && isset($state['snoozed_until'])
-                && now()->lt($state['snoozed_until'])) {
+                && (is_string($snoozedUntil) || $snoozedUntil instanceof \DateTimeInterface)
+                && now()->lt($snoozedUntil)) {
                 continue;
             }
 
+            $details = $item['details'] ?? [];
             $interstitials[] = [
                 'key' => $key,
                 'level' => $item['level'] ?? 'info',
                 'title' => $item['title'] ?? $key,
                 'text' => $item['text'] ?? '',
-                'details' => array_values($item['details'] ?? []),
+                'details' => array_values(is_array($details) ? $details : []),
                 'repeatable' => (bool) ($item['repeatable'] ?? false),
                 'dismissible' => (bool) ($item['dismissible'] ?? true),
                 'action_label' => $item['action_label'] ?? null,
@@ -94,10 +101,13 @@ class InterstitialService
     /**
      * Persist the user's reaction to an interstitial.
      *
+     * @return array<string, mixed>
+     *
      * @throws ValidationException
      */
     public function remember(User $user, string $key, string $action): array
     {
+        /** @var array<string, array<string, mixed>> $items */
         $items = config('interstitials.items', []);
         if (! isset($items[$key])) {
             throw ValidationException::withMessages([
@@ -123,26 +133,39 @@ class InterstitialService
             'updated_at' => now()->toIso8601String(),
         ];
         if ($action === self::ACTION_LATER && ($items[$key]['repeatable'] ?? false)) {
-            $snoozeDays = max(1, (int) ($items[$key]['snooze_days'] ?? 21));
-            $states[$key]['snoozed_until'] = now()->addDays($snoozeDays)->toIso8601String();
+            /** @var int $snoozeDays */
+            $snoozeDays = $items[$key]['snooze_days'] ?? 21;
+            $states[$key]['snoozed_until'] = now()->addDays(max(1, (int) $snoozeDays))->toIso8601String();
         }
-        Settings::set($user, config('interstitials.setting_key', 'interstitials'), $states);
+        /** @var string $settingKey */
+        $settingKey = config('interstitials.setting_key', 'interstitials');
+        Settings::set($user, $settingKey, $states);
 
         return $states[$key];
     }
 
     /**
      * Get the stored interstitial state array for the user.
+     *
+     * @return array<string, array<string, mixed>>
      */
     public function statesForUser(User $user): array
     {
-        $states = Settings::get($user, config('interstitials.setting_key', 'interstitials'), []);
+        /** @var string $settingKey */
+        $settingKey = config('interstitials.setting_key', 'interstitials');
+        $states = Settings::get($user, $settingKey);
+        if (! is_array($states)) {
+            return [];
+        }
+        /** @var array<string, array<string, mixed>> $states */
 
-        return is_array($states) ? $states : [];
+        return $states;
     }
 
     /**
      * Determine whether a configured interstitial is enabled.
+     *
+     * @param  array<string, mixed>  $item  Configured interstitial.
      */
     public function isEnabled(array $item): bool
     {
@@ -151,6 +174,9 @@ class InterstitialService
 
     /**
      * Check whether the current user belongs to the configured audience.
+     *
+     * @param  User  $user  User to check.
+     * @param  array<string, mixed>  $item  Configured interstitial.
      */
     public function matchesAudience(User $user, array $item): bool
     {

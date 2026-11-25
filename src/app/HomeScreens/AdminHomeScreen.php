@@ -59,7 +59,7 @@ class AdminHomeScreen extends AbstractHomeScreen
         $name = $user->lastName();
 
         $start = Carbon::now();
-        $end = Carbon::now()->addMonth(2);
+        $end = Carbon::now()->addMonth();
 
         $services = Service::with(['baptisms', 'weddings', 'funerals', 'location'])
             ->between($start, $end)
@@ -67,8 +67,8 @@ class AdminHomeScreen extends AbstractHomeScreen
             ->ordered()
             ->get();
 
-        $end = Carbon::now()->addYear(1);
+        $end = Carbon::now()->addYear();
 
-        return $this->renderView('homescreen.admin', compact('user', 'logs', 'levels'));
+        return $this->renderView('homescreen.admin', compact('user'));
     }
 }

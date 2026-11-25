@@ -31,6 +31,7 @@
 namespace App\Http\Requests;
 
 use App\Models\Location;
+use App\Models\People\User;
 use App\Models\Service;
 use Carbon\Carbon;
 use Illuminate\Foundation\Http\FormRequest;
@@ -48,19 +49,24 @@ class ServiceRequest extends FormRequest
      */
     public function authorize()
     {
+        $actor = $this->user();
+        if (! $actor instanceof User) {
+            return false;
+        }
+
         if ($service = $this->route('service')) {
-            return $this->user()->can('update', $service);
+            return $actor->can('update', $service);
         } else {
-            return $this->user()->can('create', Service::class);
+            return $actor->can('create', Service::class);
         }
     }
 
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array
+     * @return array<string, mixed>
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             'day_id' => 'nullable|integer|exists:days,id',
@@ -130,9 +136,11 @@ class ServiceRequest extends FormRequest
     /**
      * Return validated data with sensible defaults set
      *
-     * @return array|void
+     * @param  string|null  $key  Optional validated value key.
+     * @param  mixed  $default  Fallback value kept for FormRequest compatibility.
+     * @return array<string, mixed>
      */
-    public function validated($key = null, $default = null)
+    public function validated($key = null, $default = null): array
     {
         $data = parent::validated();
 
@@ -141,7 +149,7 @@ class ServiceRequest extends FormRequest
             if ($data['special_location'] ?? false) {
                 $data['location_id'] = null;
             } else {
-                $location = Location::find($data['location_id']);
+                $location = Location::query()->whereKey($data['location_id'])->first();
                 if ($location === null) {
                     $data['special_location'] = $data['location_id'];
                     $data['location_id'] = null;
@@ -154,9 +162,18 @@ class ServiceRequest extends FormRequest
                 $data['time'] = $data['time'] ?: '';
                 $data['cc_location'] = $data['cc_location'] ?: '';
             } elseif (isset($data['location_id'])) {
+                /** @var int|string $locationId */
                 $locationId = $data['location_id'] ?: 0;
                 if ($locationId) {
-                    $location = Location::find($locationId);
+                    $location = Location::query()->whereKey($locationId)->first();
+                    if ($location === null) {
+                        $data['special_location'] = (string) $locationId;
+                        $data['location_id'] = null;
+                        $data['time'] = $data['time'] ?: '';
+                        $data['cc_location'] = $data['cc_location'] ?: '';
+
+                        return $data;
+                    }
                     $data['location_id'] = $locationId;
                     $data['time'] = $data['time'] ?: $location->default_time;
                     $data['cc_location'] = $data['cc_location'] ?? ($data['cc'] ? $location->cc_default_location : '');
@@ -171,8 +188,12 @@ class ServiceRequest extends FormRequest
         $data['needs_reservations'] = $data['needs_reservations'] ?? 0;
         $data['registration_active'] = $data['registration_active'] ?? 0;
 
-        $data['exclude_places'] = strtoupper($data['exclude_places'] ?? '');
-        $data['reserved_places'] = strtoupper($data['reserved_places'] ?? '');
+        /** @var string $excludePlaces */
+        $excludePlaces = $data['exclude_places'] ?? '';
+        $data['exclude_places'] = strtoupper($excludePlaces);
+        /** @var string $reservedPlaces */
+        $reservedPlaces = $data['reserved_places'] ?? '';
+        $data['reserved_places'] = strtoupper($reservedPlaces);
 
         if (isset($data['registration_online_start'])) {
             $data['registration_online_start'] = $this->getDateTime($data['registration_online_start']);
@@ -182,11 +203,15 @@ class ServiceRequest extends FormRequest
         }
 
         if (isset($data['date'])) {
-            $data['time'] = Carbon::parse($data['date'])->setTimezone('Europe/Berlin')->format('H:i:s');
+            /** @var string $date */
+            $date = $data['date'];
+            $data['time'] = Carbon::parse($date)->setTimezone('Europe/Berlin')->format('H:i:s');
         }
 
         if (($data['event_class'] ?? null) == 'service') {
-            $data['end'] = Carbon::parse($data['date'])->addHour(1);
+            /** @var string $date */
+            $date = $data['date'];
+            $data['end'] = Carbon::parse($date)->addHour();
         }
 
         if (($data['location_id'] ?? null) === 0) {
@@ -196,8 +221,12 @@ class ServiceRequest extends FormRequest
         return $data;
     }
 
-    protected function getDateTime($data)
+    /**
+     * Parse a request date value given in Berlin local time as UTC.
+     */
+    protected function getDateTime(mixed $data): Carbon
     {
+        /** @var string|int|float|\DateTimeInterface|null $data */
         return Carbon::parse($data, 'Europe/Berlin')->setTimezone('UTC');
     }
 }

@@ -34,21 +34,43 @@ use ZipArchive;
 
 abstract class AbstractFile
 {
+    /** @var string Path of the file inside the ZIP archive */
     protected $pathInZip = '';
 
-    public function __construct($pathInZip)
+    /**
+     * @param  string  $pathInZip  Path of the file inside the ZIP archive
+     * @return void
+     */
+    public function __construct(string $pathInZip)
     {
         $this->pathInZip = $pathInZip;
     }
 
-    protected function line($text, $indent = 0)
+    /**
+     * Formats a single line with the given indentation depth.
+     *
+     * @param  string  $text  Line content to format
+     * @param  int  $indent  Indentation depth (two spaces per level)
+     * @return string Formatted line including the line break
+     */
+    protected function line(string $text, int $indent = 0): string
     {
         return str_repeat(' ', $indent * 2).$text."\r\n";
     }
 
+    /**
+     * Renders the file content as text.
+     *
+     * @return string Rendered file content
+     */
     abstract public function toText();
 
-    public function addToZipFile(ZipArchive &$zipArchive)
+    /**
+     * Adds the rendered file to the given ZIP archive.
+     *
+     * @param  ZipArchive  $zipArchive  Archive to add the file to
+     */
+    public function addToZipFile(ZipArchive &$zipArchive): void
     {
         $zipArchive->addFromString($this->pathInZip, $this->toText(), ZipArchive::FL_OVERWRITE);
     }
@@ -58,6 +80,9 @@ abstract class AbstractFile
         return $this->pathInZip;
     }
 
+    /**
+     * @param  string  $pathInZip  Path inside the archive.
+     */
     public function setPathInZip(string $pathInZip): void
     {
         $this->pathInZip = $pathInZip;

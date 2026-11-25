@@ -36,7 +36,7 @@ use Illuminate\Support\Facades\Log;
 
 class ServiceCreatedListener
 {
-    public function handle(ServiceCreated $event)
+    public function handle(ServiceCreated $event): void
     {
         Log::debug('Preparing to send ServiceCreated notifications for service #'.$event->service->id);
         Subscription::send($event->service, \App\Mail\ServiceCreated::class, [], null, true);

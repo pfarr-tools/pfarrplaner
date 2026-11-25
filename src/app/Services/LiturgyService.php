@@ -40,15 +40,17 @@ use Throwable;
  */
 class LiturgyService
 {
-    /** @var Liturgy|null Instance */
+    /** @var self|null Instance */
     protected static $instance = null;
 
+    /** @var array<int|string, mixed> Liturgical calendars keyed by year. */
     protected static $calendars = [];
 
+    /** @var array<int|string, array<string, mixed>> Lectionary data keyed by year. */
     protected static $lectionaryYears = [];
 
     /**
-     * @return Liturgy|null
+     * @return self
      */
     public static function getInstance()
     {
@@ -62,14 +64,17 @@ class LiturgyService
     /**
      * Get a specific liturgical item by code
      *
-     * @param  $year  Year
-     * @param  $code  Code
+     * @param  int|string  $year  Year
+     * @param  string  $code  Code
      * @return array|mixed
      */
     public static function getLiturgyByCode($year, $code)
     {
         $year = static::getYear($year);
-        foreach ($year['Tage'] as $date => $items) {
+        /** @var array{Tage?: array<string, mixed>} $year */
+        $days = $year['Tage'] ?? [];
+        /** @var array<string, array<int, array<string, mixed>>> $days */
+        foreach ($days as $date => $items) {
             foreach ($items as $item) {
                 if ($item['Code'] == $code) {
                     $item['Datum'] = $date;
@@ -85,13 +90,14 @@ class LiturgyService
     /**
      * Get the date for a proprium by code
      *
-     * @param  $year  Year
-     * @param  $code  Code
+     * @param  int|string  $year  Year
+     * @param  string  $code  Code
      * @return Carbon|null
      */
     public static function getPropriumDateByCode($year, $code)
     {
         $proprium = static::getLiturgyByCode($year, $code);
+        /** @var array{Datum?: string} $proprium */
         if (isset($proprium['Datum'])) {
             return Carbon::parse($proprium['Datum']);
         }
@@ -102,6 +108,7 @@ class LiturgyService
     /**
      * Get all the propria for a specific date
      *
+     * @param  Carbon|string  $date  Date as a Carbon instance or formatted string
      * @return array|mixed
      */
     public static function getLiturgyInfoByDate($date)
@@ -110,12 +117,16 @@ class LiturgyService
             $date = $date->format('Y-m-d');
         }
 
-        return (static::getYear(substr($date, 0, 4))['Tage'] ?? [])[$date] ?? [];
+        $year = static::getYear(substr($date, 0, 4));
+        /** @var array{Tage?: array<string, mixed>} $year */
+
+        return ($year['Tage'] ?? [])[$date] ?? [];
     }
 
     /**
      * Get the liturgical calendar for a specific year
      *
+     * @param  int|string  $year  Liturgical year
      * @return mixed
      */
     public static function getYear($year)
@@ -127,7 +138,7 @@ class LiturgyService
             Storage::put('liturgy/'.$year.'.json', static::fetchCalendarJson('https://kirchenjahr.pfarr.tools/api/jahr/'.$year));
         }
 
-        return static::$calendars[$year] = json_decode(Storage::get('liturgy/'.$year.'.json'), true);
+        return static::$calendars[$year] = json_decode(Storage::get('liturgy/'.$year.'.json') ?? '', true);
     }
 
     /**
@@ -145,7 +156,10 @@ class LiturgyService
             Storage::put('liturgy/lesejahr-'.$year.'.json', static::fetchCalendarJson('https://kirchenjahr.pfarr.tools/api/lesejahr/'.$year));
         }
 
-        return static::$lectionaryYears[$year] = json_decode(Storage::get('liturgy/lesejahr-'.$year.'.json'), true);
+        /** @var array<string, mixed> $lectionaryYear */
+        $lectionaryYear = json_decode(Storage::get('liturgy/lesejahr-'.$year.'.json') ?? '', true);
+
+        return static::$lectionaryYears[$year] = $lectionaryYear;
     }
 
     /**
@@ -164,7 +178,10 @@ class LiturgyService
             return [];
         }
         if ($lectionaryYear = static::getLectionaryYear($year)) {
-            return $lectionaryYear[$subCode] ?? [];
+            /** @var array<string, mixed> $lectionaryData */
+            $lectionaryData = $lectionaryYear[$subCode] ?? [];
+
+            return $lectionaryData;
         }
 
         return [];

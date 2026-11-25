@@ -48,8 +48,10 @@ class OccurenceController extends Controller
      */
     public function editDecoupled(Occurence $occurence)
     {
-        Gate::authorize('update', $occurence->event);
-        $newEvent = $occurence->event->replicate()->fill([
+        $event = $occurence->event;
+        abort_unless($event !== null, 404);
+        Gate::authorize('update', $event);
+        $newEvent = $event->replicate()->fill([
             'rrule' => '',
             'date' => $occurence->start,
         ]);
@@ -66,8 +68,10 @@ class OccurenceController extends Controller
      */
     public function destroy(Occurence $occurence)
     {
-        Gate::authorize('update', $occurence->event);
-        $date = $occurence->event->date;
+        $event = $occurence->event;
+        abort_unless($event !== null && $event->date !== null, 404);
+        Gate::authorize('update', $event);
+        $date = $event->date;
         $occurence->delete();
 
         return redirect(route('calendar', $date->format('Y-m')));

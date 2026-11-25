@@ -31,7 +31,9 @@
 namespace App\Reports;
 
 use Illuminate\Support\Facades\Response;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
+/** Base class for CSV exports. */
 abstract class AbstractCSVReport extends AbstractReport
 {
     /**
@@ -44,13 +46,19 @@ abstract class AbstractCSVReport extends AbstractReport
      */
     public $icon = 'fa fa-file-lines';
 
-    protected function csv($fileName, $data, $options)
+    /**
+     * Create a CSV download from the given records and column definitions.
+     *
+     * @param  iterable<object|array<array-key, mixed>>  $data
+     * @param  array<array-key, string|\Closure>  $options
+     */
+    protected function csv(string $fileName, iterable $data, array $options): BinaryFileResponse
     {
         $records = [];
         foreach ($data as $key => $item) {
             $record = [];
             foreach ($options as $recordKey => $option) {
-                if (is_numeric($recordKey)) {
+                if (is_numeric($recordKey) && is_string($option)) {
                     $recordKey = $option;
                 }
                 $record[$recordKey] = $option instanceof \Closure ? $option($item, $key) : $this->getPropertyByKey($option, $item);
@@ -64,14 +72,23 @@ abstract class AbstractCSVReport extends AbstractReport
         ];
 
         $tempFile = tempnam(sys_get_temp_dir(), $fileName);
+        if ($tempFile === false) {
+            throw new \RuntimeException('Temporäre CSV-Datei konnte nicht erstellt werden.');
+        }
 
         $handle = fopen($tempFile, 'w');
+        if ($handle === false) {
+            throw new \RuntimeException('Temporäre CSV-Datei konnte nicht geöffnet werden.');
+        }
         if (isset($records[0])) {
             fputcsv($handle, array_keys($records[0]));
         }
 
         foreach ($records as $record) {
-            fputcsv($handle, array_values($record));
+            fputcsv($handle, array_map(
+                static fn ($value): bool|float|int|string|null => is_scalar($value) || $value === null ? $value : null,
+                array_values($record)
+            ));
         }
         fclose($handle);
 
@@ -79,7 +96,12 @@ abstract class AbstractCSVReport extends AbstractReport
 
     }
 
-    protected function getPropertyByKey($recordKey, $item)
+    /**
+     * Read a column value from an object property or an array key.
+     *
+     * @param  object|array<array-key, mixed>  $item
+     */
+    protected function getPropertyByKey(string $recordKey, object|array $item): mixed
     {
         if (is_object($item)) {
             return $item->{$recordKey};

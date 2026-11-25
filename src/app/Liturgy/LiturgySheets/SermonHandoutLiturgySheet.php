@@ -38,6 +38,7 @@ use App\Liturgy\ItemHelpers\PsalmItemHelper;
 use App\Liturgy\ItemHelpers\SongItemHelper;
 use App\Liturgy\Replacement\Replacement;
 use App\Models\Liturgy\Item;
+use App\Models\People\User;
 use App\Models\Service;
 use Illuminate\Support\Facades\Auth;
 use PhpOffice\PhpWord\Element\TextRun;
@@ -76,32 +77,50 @@ class SermonHandoutLiturgySheet extends AbstractLiturgySheet
 
     }
 
+    /**
+     * @return void
+     */
     protected function setProperties(FoldedFlyerWordDocument $doc)
     {
         $properties = $doc->getPhpWord()->getDocInfo();
-        $properties->setCreator(Auth::user()->fullName());
-        $properties->setCompany(Auth::user()->office ?? '');
+        if ($properties === null) {
+            return;
+        }
+        $user = Auth::user();
+        $userName = $user?->fullName() ?? '';
+        $properties->setCreator($userName);
+        $properties->setCompany($user->office ?? '');
         $properties->setTitle($this->getFileTitle());
         $properties->setDescription($this->getFileTitle().' ('.$this->title.')');
         $properties->setCategory('Gottesdienste');
-        $properties->setLastModifiedBy(Auth::user()->fullName());
+        $properties->setLastModifiedBy($userName);
         $properties->setSubject('Begleitzettel zur Predigt');
     }
 
+    /**
+     * @param  string  $text  Heading text.
+     * @param  int  $level  Heading level.
+     * @return void
+     */
     protected function title(FoldedFlyerWordDocument $doc, $text, $level = 0)
     {
-        $run = new TextRun($doc->getConfig()['styles']['paragraphs']['titles'][$level + 1]);
-        $run->addText($text, $doc->getConfig()['styles']['fonts']['titles'][$level + 1]);
+        /** @var array{styles: array{paragraphs: array{titles: array<int, array<string, mixed>|string>}, fonts: array{titles: array<int, array<string, mixed>>}}} $config */
+        $config = $doc->getConfig();
+        $run = new TextRun($config['styles']['paragraphs']['titles'][$level + 1]);
+        $run->addText($text, $config['styles']['fonts']['titles'][$level + 1]);
         $doc->getSection()->addTitle($run, 0);
     }
 
+    /**
+     * @return void
+     */
     protected function renderColumn1(FoldedFlyerWordDocument $doc)
     {
         $this->title($doc, 'Aus unserer Gemeinde');
         $doc->renderText(Replacement::replaceAll('[termine]', $this->service),
             [
                 'tabs' => [
-                    new Tab('left', Converter::cmToTwip(1.5)),
+                    new Tab('left', (int) Converter::cmToTwip(1.5)),
                 ],
             ],
             ['size' => 9]);
@@ -113,13 +132,19 @@ class SermonHandoutLiturgySheet extends AbstractLiturgySheet
      * @param  FoldedFlyerWordDocument  $doc  Document receiving the contact column.
      * @return void
      */
+    /**
+     * @return void
+     */
     protected function renderColumn2(FoldedFlyerWordDocument $doc)
     {
+        $phpWord = $doc->getPhpWord();
+        $section = $doc->getSection();
+        $city = $this->service->city;
 
-        $doc->getPhpWord()->addTableStyle('col2TableStyle', ['afterSpacing' => 0, 'Spacing' => 0, 'cellMargin' => 0]);
-        $table = $doc->getSection()->addTable('col2TableStyle');
-        $table->addRow(Converter::cmToTwip(8.87));
-        $cell = $table->addCell(Converter::cmToTwip(8), ['valign' => 'top']);
+        $phpWord->addTableStyle('col2TableStyle', ['afterSpacing' => 0, 'Spacing' => 0, 'cellMargin' => 0]);
+        $table = $section->addTable('col2TableStyle');
+        $table->addRow((int) Converter::cmToTwip(8.87));
+        $cell = $table->addCell((int) Converter::cmToTwip(8), ['valign' => 'top']);
         $run = $cell->addTextRun();
 
         $urls = [];
@@ -159,12 +184,12 @@ class SermonHandoutLiturgySheet extends AbstractLiturgySheet
             }
         }
 
-        $table->addRow(Converter::cmToTwip(8.87));
-        $cell = $table->addCell(Converter::cmToTwip(8), ['valign' => 'bottom']);
+        $table->addRow((int) Converter::cmToTwip(8.87));
+        $cell = $table->addCell((int) Converter::cmToTwip(8), ['valign' => 'bottom']);
         $run = $cell->addTextRun(['align' => 'center']);
-        $run->addImage(resource_path('img/logo/ELKW.png'), ['width' => Converter::cmToPoint(5)]);
+        $run->addImage(resource_path('img/logo/ELKW.png'), ['width' => (int) Converter::cmToPoint(5)]);
         $run->addTextBreak(2);
-        $run->addText('Kirchengemeinde '.$this->service->city->name, ['bold' => true, 'size' => 9]);
+        $run->addText('Kirchengemeinde '.$city?->name, ['bold' => true, 'size' => 9]);
 
         foreach ($this->service->pastors as $pastor) {
             $run->addTextBreak(2);
@@ -177,7 +202,7 @@ class SermonHandoutLiturgySheet extends AbstractLiturgySheet
                 $run->addTextBreak();
                 $run->addText($pastor->address, ['size' => 9]);
             }
-            if ($pastor->phone || $pastor->email || $this->service->city->homepage) {
+            if ($pastor->phone || $pastor->email || $city?->homepage) {
                 $run->addTextBreak();
                 $parts = [];
                 if ($pastor->phone) {
@@ -188,43 +213,53 @@ class SermonHandoutLiturgySheet extends AbstractLiturgySheet
                 }
                 $run->addText(implode(' | ', $parts), ['size' => 9]);
             }
-            if ($this->service->city->homepage) {
+            if ($city !== null && $city->homepage) {
                 $run->addTextBreak();
-                $run->addText(parse_url($this->service->city->homepage)['host'], ['size' => 9]);
+                $parsedUrl = parse_url($city->homepage);
+                if (is_array($parsedUrl) && isset($parsedUrl['host'])) {
+                    $run->addText($parsedUrl['host'], ['size' => 9]);
+                }
             }
 
         }
 
     }
 
+    /**
+     * @return void
+     */
     protected function renderColumn3(FoldedFlyerWordDocument $doc)
     {
-        $doc->getPhpWord()->addTableStyle('col3TableStyle', ['afterSpacing' => 0, 'Spacing' => 0, 'cellMargin' => 0]);
-        $table = $doc->getSection()->addTable('col3TableStyle');
+        $phpWord = $doc->getPhpWord();
+        $section = $doc->getSection();
+        $phpWord->addTableStyle('col3TableStyle', ['afterSpacing' => 0, 'Spacing' => 0, 'cellMargin' => 0]);
+        $table = $section->addTable('col3TableStyle');
         $table->addRow(100);
-        $table->addCell(Converter::cmToTwip(5.69));
-        $cell = $table->addCell(Converter::cmToTwip(3.75), ['top' => 'bottom', 'borderLeftSize' => Converter::pointToTwip(1), 'borderLeftColor' => '951981']);
+        $table->addCell((int) Converter::cmToTwip(5.69));
+        $cell = $table->addCell((int) Converter::cmToTwip(3.75), ['top' => 'bottom', 'borderLeftSize' => (int) Converter::pointToTwip(1), 'borderLeftColor' => '951981']);
 
         $centerHeight = 15.5;
-        if ($this->service->city->logo) {
+        $city = $this->service->city;
+        if ($city?->logo) {
             $cell->addTextRun(['align' => 'right'])
-                ->addImage(StoragePath::for($this->service->city->logo), ['width' => Converter::cmToPoint(3)]);
+                ->addImage(StoragePath::for($city->logo), ['width' => (int) Converter::cmToPoint(3)]);
 
-            $centerHeight -= ImageHelper::getProportionalHeight(StoragePath::for($this->service->city->logo), 3);
+            $centerHeight -= ImageHelper::getProportionalHeight(StoragePath::for($city->logo), 3);
         }
-        $table->addRow(Converter::cmToTwip($centerHeight));
-        $cell = $table->addCell(Converter::cmToTwip(9.75), ['gridSpan' => 2, 'valign' => 'center']);
+        $table->addRow((int) Converter::cmToTwip($centerHeight));
+        $cell = $table->addCell((int) Converter::cmToTwip(9.75), ['gridSpan' => 2, 'valign' => 'center']);
         $run = $cell->addTextRun([]);
-        $run->addText($this->service->sermon->title ?? 'Predigttitel', ['name' => 'Sarabun Semibold', 'size' => 20, 'bold' => false, 'color' => '951981']);
-        if ($this->service->sermon->subtitle) {
+        $sermon = $this->service->sermon;
+        $run->addText($sermon->title ?? 'Predigttitel', ['name' => 'Sarabun Semibold', 'size' => 20, 'bold' => false, 'color' => '951981']);
+        if ($sermon?->subtitle) {
             $run->addTextBreak();
-            $run->addText($this->service->sermon->subtitle, ['name' => 'Sarabun Light', 'size' => 20, 'bold' => false, 'color' => '951981']);
+            $run->addText($sermon->subtitle, ['name' => 'Sarabun Light', 'size' => 20, 'bold' => false, 'color' => '951981']);
         }
-        if ($this->service->sermon->image) {
+        if ($sermon?->image) {
             $run->addTextBreak();
-            $run->addImage(StoragePath::for($this->service->sermon->image), ['width' => Converter::cmToPoint(8)]);
+            $run->addImage(StoragePath::for($sermon->image), ['width' => (int) Converter::cmToPoint(8)]);
 
-            $license = ImageHelper::getEmbeddedLicenseString(StoragePath::for($this->service->sermon->image));
+            $license = ImageHelper::getEmbeddedLicenseString(StoragePath::for($sermon->image));
             if ($license) {
                 $run->addTextBreak();
                 $run->addText('Bild: '.$license, ['size' => 6, 'color' => '777777']);
@@ -235,16 +270,19 @@ class SermonHandoutLiturgySheet extends AbstractLiturgySheet
         $run->addTextBreak();
         $run->addText($this->service->participantsText('P', true));
         $run->addTextBreak();
-        $run->addText($this->service->date->format('d.m.Y').', '.$this->service->locationText());
-        $table->addRow(Converter::cmToTwip(0.66));
-        $table->addCell(Converter::cmToTwip(6));
-        $textRun = $table->addCell(Converter::cmToTwip(3.75), ['valign' => 'bottom', 'borderLeftSize' => Converter::pointToTwip(1), 'borderLeftColor' => '951981'])
+        $run->addText($this->service->date?->format('d.m.Y').', '.$this->service->locationText());
+        $table->addRow((int) Converter::cmToTwip(0.66));
+        $table->addCell((int) Converter::cmToTwip(6));
+        $textRun = $table->addCell((int) Converter::cmToTwip(3.75), ['valign' => 'bottom', 'borderLeftSize' => (int) Converter::pointToTwip(1), 'borderLeftColor' => '951981'])
             ->addTextRun(['align' => 'right']);
-        $textRun->addImage(resource_path('img/logo/ELKW.png'), ['width' => Converter::cmToPoint(3)]);
+        $textRun->addImage(resource_path('img/logo/ELKW.png'), ['width' => (int) Converter::cmToPoint(3)]);
 
-        $doc->getSection()->addColumnBreak();
+        $section->addPageBreak();
     }
 
+    /**
+     * @return void
+     */
     protected function renderColumn4(FoldedFlyerWordDocument $doc)
     {
         $this->title($doc, 'Lieder & Texte');
@@ -259,12 +297,24 @@ class SermonHandoutLiturgySheet extends AbstractLiturgySheet
 
     }
 
+    /**
+     * @return void
+     */
     protected function renderColumn5(FoldedFlyerWordDocument $doc) {}
 
+    /**
+     * @return void
+     */
     protected function renderColumn6(FoldedFlyerWordDocument $doc) {}
 
+    /**
+     * @param  mixed  $podcast  Podcast data.
+     * @param  bool  $fullText  Whether the full text is rendered.
+     * @return string
+     */
     protected function podcastText($podcast, $fullText = false)
     {
+        /** @var User $podcast */
         $sites = [];
         if ($podcast->own_podcast_itunes) {
             $sites[] = 'iTunes';
@@ -277,7 +327,8 @@ class SermonHandoutLiturgySheet extends AbstractLiturgySheet
         if (count($sites)) {
             $text .= implode(' und ', $sites).' unter ';
         }
-        $text .= '"'.$podcast->own_podcast_title.'"';
+        $podcastTitle = $podcast->own_podcast_title;
+        $text .= '"'.(is_scalar($podcastTitle) ? (string) $podcastTitle : '').'"';
         if ($fullText) {
             $text .= ' veröffentlicht.';
         }
@@ -285,53 +336,67 @@ class SermonHandoutLiturgySheet extends AbstractLiturgySheet
         return $text;
     }
 
+    /**
+     * @return void
+     */
     protected function renderPsalmItem(DefaultWordDocument $doc, Item $item)
     {
-        if (! isset($item->data['psalm'])) {
-            return;
-        }
-        if (! $item->data['psalm']['text']) {
+        /** @var array{psalm?: array{text?: mixed}} $data */
+        $data = $item->data;
+        $psalmText = $data['psalm']['text'] ?? null;
+        if (! $psalmText) {
             return;
         }
         /** @var PsalmItemHelper $helper */
         $helper = $item->getHelper();
         $doc->renderNormalText($helper->getTitleText(), ['size' => 9, 'bold' => true]);
-        $doc->renderNormalText($item->data['psalm']['text'], ['size' => 9]);
+        $doc->renderNormalText(is_scalar($psalmText) ? (string) $psalmText : '', ['size' => 9]);
     }
 
+    /**
+     * @return void
+     */
     protected function renderSongItem(DefaultWordDocument $doc, Item $item)
     {
-        if (! isset($item->data['song'])) {
-            return;
-        }
-        if ($item->data['song'] === null) {
+        /** @var array{song?: array{song?: array{copyrights?: mixed, refrain?: mixed}}} $data */
+        $data = $item->data;
+        $songDetails = $data['song']['song'] ?? null;
+        if (! is_array($songDetails)) {
             return;
         }
         /** @var SongItemHelper $helper */
         $helper = $item->getHelper();
         $doc->renderNormalText($helper->getTitleText(), ['size' => 9, 'bold' => true]);
-        if ($item->data['song']['song']['copyrights']) {
-            $doc->renderNormalText($item->data['song']['song']['copyrights'], ['size' => 7]);
+        $copyrights = $songDetails['copyrights'] ?? null;
+        if ($copyrights) {
+            $doc->renderNormalText(is_scalar($copyrights) ? (string) $copyrights : '', ['size' => 7]);
         }
 
+        $refrain = $songDetails['refrain'] ?? null;
+        $refrainText = is_scalar($refrain) ? (string) $refrain : '';
         foreach ($helper->getActiveVerses() as $verse) {
             if ($verse['refrain_before']) {
-                $doc->renderNormalText($item->data['song']['song']['refrain'], ['italic' => true, 'size' => 9]);
+                $doc->renderNormalText($refrainText, ['italic' => true, 'size' => 9]);
             }
-            $doc->renderNormalText($verse['number'].'. '.$verse['text'], ['size' => 9]);
+            $verseNumber = $verse['number'] ?? '';
+            $verseText = $verse['text'] ?? '';
+            $doc->renderNormalText((is_scalar($verseNumber) ? (string) $verseNumber : '').'. '.(is_scalar($verseText) ? (string) $verseText : ''), ['size' => 9]);
             if ($verse['refrain_after']) {
-                $doc->renderNormalText($item->data['song']['song']['refrain'], ['italic' => true, 'size' => 9]);
+                $doc->renderNormalText($refrainText, ['italic' => true, 'size' => 9]);
             }
         }
     }
 
+    /**
+     * @return void
+     */
     protected function renderSermonItem(DefaultWordDocument $doc, Item $item)
     {
         if (! $this->service->sermon) {
             return;
         }
         $doc->renderNormalText('Predigt: '.$this->service->sermon->title, ['size' => 9, 'bold' => true]);
-        $doc->renderNormalText($this->service->sermon->reference, ['size' => 8, 'italic' => true]);
-        $doc->renderNormalText($this->service->sermon->summary, ['size' => 9]);
+        $doc->renderNormalText($this->service->sermon->reference ?? '', ['size' => 8, 'italic' => true]);
+        $doc->renderNormalText($this->service->sermon->summary ?? '', ['size' => 9]);
     }
 }

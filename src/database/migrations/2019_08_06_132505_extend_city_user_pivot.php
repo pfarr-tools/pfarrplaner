@@ -28,8 +28,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-use Doctrine\DBAL\Schema\Table;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 /**
@@ -47,6 +47,7 @@ class ExtendCityUserPivot extends Migration
         Schema::table(
             'city_user',
             function ($table) {
+                /** @var Blueprint $table */
                 $table->char('permission')->nullable()->default('w');
                 $table->integer('sorting')->nullable()->default(0);
             }
@@ -63,7 +64,7 @@ class ExtendCityUserPivot extends Migration
         Schema::table(
             'city_user',
             function ($table) {
-                /** @var Table $table */
+                /** @var Blueprint $table */
                 $table->dropColumn(['permission', 'sorting']);
             }
         );

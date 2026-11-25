@@ -45,9 +45,13 @@ class UpdatePsalm extends AbstractUpdateAction implements UpdatesPsalms
         return route('admin.psalms.index');
     }
 
+    /**
+     * @param  array<string, mixed>  $input
+     */
     public function update(User $user, Psalm $psalm, array $input): Psalm
     {
         Gate::forUser($user)->authorize('update', $psalm);
+        /** @var array<string, mixed> $input Validierte Eingabedaten. */
         $input = Validator::make($input, Psalm::$validationRules)->validateWithBag('updatePsalm');
         $psalm->update($input);
         UpdatedPsalm::dispatch($user, $psalm);

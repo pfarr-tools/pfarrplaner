@@ -31,13 +31,16 @@
 namespace App\Mail;
 
 use App\Models\People\User;
+use App\Models\Service;
 use App\Services\MinistryService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\URL;
 
+/** Mailable requesting a minister for a service. */
 class MinistryRequest extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
@@ -48,15 +51,23 @@ class MinistryRequest extends Mailable implements ShouldQueue
     /** @var User */
     protected $sender;
 
+    /** @var Collection<int, Service> */
     protected $services;
 
+    /** @var string */
     protected $ministry;
 
+    /** @var string|null */
     protected $text = '';
 
     /**
      * Create a new message instance.
      *
+     * @param  User  $user  Recipient of the ministry request.
+     * @param  User  $sender  Sender of the ministry request.
+     * @param  string  $ministry  Ministry category key.
+     * @param  Collection<int, Service>  $services  Requested services.
+     * @param  string|null  $text  Additional text of the request.
      * @return void
      */
     public function __construct($user, $sender, $ministry, $services, $text)

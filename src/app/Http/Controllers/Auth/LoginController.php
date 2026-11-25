@@ -32,6 +32,8 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\People\User;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -81,10 +83,17 @@ class LoginController extends Controller
         }
     }
 
-    /** Sign in as a selected sample account in demo mode only. */
-    public function demoLogin(Request $request)
+    /**
+     * Sign in as a selected sample account in demo mode only.
+     *
+     * @return RedirectResponse Redirect to the originally intended page.
+     */
+    public function demoLogin(Request $request): RedirectResponse
     {
-        abort_unless(config('app.demo_mode'), 404);
+        /** @var bool $demoMode */
+        $demoMode = config('app.demo_mode');
+        abort_unless($demoMode, 404);
+        /** @var array{email: string} $validated */
         $validated = $request->validate(['email' => ['required', 'email']]);
         $user = User::where('email', mb_strtolower(trim($validated['email'])))
             ->where('is_official_user', true)
@@ -95,8 +104,12 @@ class LoginController extends Controller
         return redirect()->intended('/');
     }
 
-    /** Return a current CSRF token for the login client. */
-    public function keepTokenAlive()
+    /**
+     * Return a current CSRF token for the login client.
+     *
+     * @return JsonResponse JSON response containing the CSRF token.
+     */
+    public function keepTokenAlive(): JsonResponse
     {
         return response()->json(['token' => csrf_token()]);
     }
@@ -111,7 +124,7 @@ class LoginController extends Controller
         }
 
         $userId = $challenge['user_id'] ?? null;
-        $user = $userId ? User::find($userId) : null;
+        $user = $userId ? User::query()->whereKey($userId)->first() : null;
 
         abort_unless($user && $user->isOfficialUser && ! $user->isLocked && $user->hasTwoFactorEnabled(), 404);
 
@@ -125,22 +138,29 @@ class LoginController extends Controller
         return $response;
     }
 
-    /** Verify an authenticator or recovery code for a pending login. */
-    public function verifyChallenge(Request $request)
+    /**
+     * Verify an authenticator or recovery code for a pending login.
+     *
+     * @return RedirectResponse Redirect to the challenge, login form or intended page.
+     */
+    public function verifyChallenge(Request $request): RedirectResponse
     {
         $challenge = $this->activeChallenge($request);
         if (! $challenge) {
             return redirect()->route('login');
         }
 
+        /** @var array{code: string} $validated */
         $validated = $request->validate(['code' => ['required', 'string', 'max:128']]);
         $result = DB::transaction(function () use ($challenge, $validated, $request): array {
-            $user = User::query()->lockForUpdate()->find($challenge['user_id']);
+            $user = User::query()->lockForUpdate()->whereKey($challenge['user_id'])->first();
             if (! $user || ! $user->isOfficialUser || $user->isLocked || ! $user->hasTwoFactorEnabled()) {
                 return ['state' => 'inactive'];
             }
 
-            $key = 'two-factor-login:'.$user->getKey().':'.$request->ip();
+            /** @var int|string $userId */
+            $userId = $user->getKey();
+            $key = 'two-factor-login:'.$userId.':'.$request->ip();
             if (RateLimiter::tooManyAttempts($key, 5)) {
                 return ['state' => 'limited', 'key' => $key, 'user' => $user];
             }
@@ -175,7 +195,7 @@ class LoginController extends Controller
         }
 
         RateLimiter::clear($key);
-        if (isset($challenge['throttle_key'])) {
+        if (isset($challenge['throttle_key']) && is_string($challenge['throttle_key'])) {
             RateLimiter::clear($challenge['throttle_key']);
         }
         $request->session()->forget('login.challenge');
@@ -185,17 +205,26 @@ class LoginController extends Controller
         return redirect()->intended('/');
     }
 
-    /** Cancel a pending challenge and return to the regular login form. */
-    public function cancelChallenge(Request $request)
+    /**
+     * Cancel a pending challenge and return to the regular login form.
+     *
+     * @return RedirectResponse Redirect to the login form.
+     */
+    public function cancelChallenge(Request $request): RedirectResponse
     {
         $request->session()->forget('login.challenge');
 
         return redirect()->route('login');
     }
 
-    /** Return pending login state only while its five-minute window is open. */
+    /**
+     * Return pending login state only while its five-minute window is open.
+     *
+     * @return array<string, mixed>|null Pending challenge data or null when expired.
+     */
     private function activeChallenge(Request $request): ?array
     {
+        /** @var array<string, mixed>|null $challenge */
         $challenge = $request->session()->get('login.challenge');
         if (! is_array($challenge) || ($challenge['expires_at'] ?? 0) <= now()->timestamp) {
             $request->session()->forget('login.challenge');

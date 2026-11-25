@@ -30,28 +30,50 @@
 
 namespace App\Services;
 
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Session;
 
+/** Service for storing and restoring the current route. */
 class RedirectorService
 {
-    public static function saveCurrentRoute()
+    /**
+     * Store the current URL as the route to return to.
+     */
+    public static function saveCurrentRoute(): void
     {
         self::setReturnRoute(Request::url());
     }
 
-    public static function setReturnRoute($route)
+    /**
+     * Store the URL to return to.
+     *
+     * @param  string  $route  URL that later redirects should use.
+     */
+    public static function setReturnRoute(string $route): void
     {
         Session::put('returnRoute', $route);
     }
 
-    public static function back()
+    /**
+     * Redirect to the stored return route.
+     *
+     * @return RedirectResponse Redirect response to the stored route.
+     */
+    public static function back(): RedirectResponse
     {
         return redirect(self::backRoute());
     }
 
-    public static function backRoute()
+    /**
+     * Get the stored return route.
+     *
+     * @return string URL to return to, falling back to the home route.
+     */
+    public static function backRoute(): string
     {
-        return Session::get('returnRoute', route('home'));
+        $route = Session::get('returnRoute', route('home'));
+
+        return is_string($route) ? $route : route('home');
     }
 }

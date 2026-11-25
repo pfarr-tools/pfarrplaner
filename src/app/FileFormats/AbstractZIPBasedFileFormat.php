@@ -34,11 +34,17 @@ use Closure;
 use DOMDocument;
 use ZipArchive;
 
+/**
+ * @phpstan-consistent-constructor
+ */
 class AbstractZIPBasedFileFormat
 {
     /** @var ZipArchive Output file stream */
     protected $zip = null;
 
+    /**
+     * @return void
+     */
     public function __construct()
     {
         $this->zip = new ZipArchive;
@@ -65,15 +71,17 @@ class AbstractZIPBasedFileFormat
         if ($this->zip->locateName($path) !== false) {
             $this->zip->deleteName($path);
         }
-        $this->zip->addFromString($path, $doc->saveXML());
+        $this->zip->addFromString($path, (string) $doc->saveXML());
     }
 
-    protected $documentFilePath = '';
+    /** @var string Path to the document file */
+    protected string $documentFilePath = '';
 
     /**
+     * @param  string  $documentFilePath  Path to the document file
      * @return static
      */
-    public static function fromFile($documentFilePath)
+    public static function fromFile(string $documentFilePath)
     {
         $instance = new static;
         $instance->setDocumentFilePath($documentFilePath);

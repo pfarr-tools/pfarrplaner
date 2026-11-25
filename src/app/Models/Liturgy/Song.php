@@ -121,8 +121,8 @@ class Song extends AbstractModel
     {
         /** @var Song $model */
         $model = parent::getEmptyModel();
-        $model->verses = new Collection;
-        $model->songbooks = new Collection;
+        $model->setRelation('verses', new Collection);
+        $model->setRelation('songbooks', new Collection);
 
         return $model;
     }
@@ -165,15 +165,23 @@ class Song extends AbstractModel
         return $this->belongsToMany(Songbook::class)->withPivot(['id', 'reference', 'code', 'color']);
     }
 
+    /**
+     * @param  array<string, mixed>  $data
+     */
     public function syncVersesFromRequest(array $data): void
     {
         $this->verses()->delete();
-        foreach ($data['verses'] ?? [] as $verse) {
+        /** @var array<int, array<string, mixed>> $verses */
+        $verses = $data['verses'] ?? [];
+        foreach ($verses as $verse) {
             $verse['song_id'] = $this->id;
             SongVerse::create($verse);
         }
     }
 
+    /**
+     * @param  array<string, mixed>  $data
+     */
     public function syncSongbooksFromRequest(array $data): void
     {
         if (! isset($data['songbooks'])) {
@@ -181,7 +189,9 @@ class Song extends AbstractModel
         }
 
         $sync = [];
-        foreach ($data['songbooks'] as $item) {
+        /** @var array<int, array{code?: mixed, pivot?: array{songbook_id?: int|string|null, reference?: mixed, color?: mixed}}> $songbooks */
+        $songbooks = $data['songbooks'];
+        foreach ($songbooks as $item) {
             $songbookId = $item['pivot']['songbook_id'] ?? null;
             if (! $songbookId) {
                 continue;

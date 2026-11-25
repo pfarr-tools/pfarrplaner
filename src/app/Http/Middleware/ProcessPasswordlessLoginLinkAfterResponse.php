@@ -13,7 +13,10 @@ class ProcessPasswordlessLoginLinkAfterResponse
     /** Continue the request without doing account-dependent work. */
     public function handle(Request $request, Closure $next): Response
     {
-        return $next($request);
+        /** @var Response $response */
+        $response = $next($request);
+
+        return $response;
     }
 
     /** Process a validated login-link request after the HTTP response is sent. */

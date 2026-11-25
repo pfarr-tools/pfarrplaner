@@ -114,12 +114,12 @@ class Booking extends AbstractModel
         });
     }
 
-    /**
-     * @return BelongsTo
-     */
     public function getLabelAttribute(): string
     {
-        return trim(($this->name ?? '').(($this->first_name ?? '') ? ', '.$this->first_name : ''));
+        $name = is_scalar($this->name) ? (string) $this->name : '';
+        $firstName = is_scalar($this->first_name) ? (string) $this->first_name : '';
+
+        return trim($name.($firstName ? ', '.$firstName : ''));
     }
 
     public function fillDefaults(): array
@@ -154,6 +154,6 @@ class Booking extends AbstractModel
 
     public static function createCode(): string
     {
-        return str_pad(dechex(rand(0x100000, 0xFFFFFF)), 6, 0, STR_PAD_LEFT);
+        return str_pad(dechex(rand(0x100000, 0xFFFFFF)), 6, '0', STR_PAD_LEFT);
     }
 }

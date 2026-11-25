@@ -39,6 +39,7 @@ namespace App\Traits;
 
 use App\Models\Comment;
 use App\Models\People\User;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Facades\Auth;
 
 /**
@@ -55,7 +56,7 @@ trait HasCommentsTrait
     }
 
     /**
-     * @return mixed
+     * @return MorphMany<Comment, $this>
      */
     public function comments()
     {
@@ -67,7 +68,12 @@ trait HasCommentsTrait
      */
     public function commentsForCurrentUser()
     {
-        return $this->commentsForUser(Auth::user());
+        $user = Auth::user();
+        if ($user === null) {
+            return null;
+        }
+
+        return $this->commentsForUser($user);
     }
 
     /**

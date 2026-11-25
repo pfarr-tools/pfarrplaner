@@ -35,7 +35,6 @@ use App\Models\Service;
 use App\Services\FileNameService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -71,7 +70,7 @@ class ChildrensChurchReport extends AbstractPDFDocumentReport
      */
     public function setup()
     {
-        $cities = Auth::user()->cities;
+        $cities = $this->authenticatedUser()->cities;
 
         return Inertia::render('Report/ChildrensChurch/Setup', compact('cities'));
     }
@@ -88,7 +87,7 @@ class ChildrensChurchReport extends AbstractPDFDocumentReport
                 'end' => 'required|date',
             ]
         );
-
+        /** @var array{city: int|string, start: string, end: string} $data */
         $serviceList = Service::between(Carbon::parse($data['start']), Carbon::parse($data['end']))
             ->displayable()
             ->where('city_id', $data['city'])
@@ -98,15 +97,18 @@ class ChildrensChurchReport extends AbstractPDFDocumentReport
             ->groupBy('key_date');
 
         $dates = Service::select(DB::raw('DISTINCT DATE(date) as day'))
-            ->between(Carbon::createFromFormat('d.m.Y', $data['start'])->subWeek(1), Carbon::createFromFormat('d.m.Y', $data['end']))
+            ->between(
+                $this->requireParsedDate(Carbon::createFromFormat('d.m.Y', $data['start']))->subWeek(),
+                $this->requireParsedDate(Carbon::createFromFormat('d.m.Y', $data['end']))
+            )
             ->displayable()
             ->where('city_id', $data['city'])
             ->where('cc', 1)
-            ->orderBy('day', 'ASC')
+            ->orderBy('day', 'asc')
             ->get()
             ->pluck('day');
 
-        $city = City::findOrFail($data['city']);
+        $city = City::findOrFail((int) $data['city']);
 
         if (count($dates)) {
             $minDate = $dates->min();
@@ -115,9 +117,12 @@ class ChildrensChurchReport extends AbstractPDFDocumentReport
             return redirect()->back()->with('error', 'In der gewählten Zeit findet kein Kindergottesdienst statt.');
         }
 
+        /** @var string $cityName */
+        $cityName = $city->name;
+
         return $this->sendToBrowser(
             FileNameService::make(
-                static::FILE_TITLE.' '.$city->name,
+                self::FILE_TITLE.' '.$cityName,
                 'pdf',
                 static::FILE_SIGNATURE,
                 now()),

@@ -44,8 +44,9 @@ class ServiceUpdatedListener
         if (! $event->service->konfiapp_event_type) {
             return;
         }
-        if (KonfiAppIntegration::isActive($event->service->city)) {
-            KonfiAppIntegration::get($event->service->city)->handleServiceUpdate(
+        $city = $event->service->city;
+        if ($city !== null && KonfiAppIntegration::isActive($city)) {
+            KonfiAppIntegration::get($city)->handleServiceUpdate(
                 $event->service,
                 $event->service->konfiapp_event_type ?? ''
             );

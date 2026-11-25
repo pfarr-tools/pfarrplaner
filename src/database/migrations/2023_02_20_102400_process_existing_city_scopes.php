@@ -44,7 +44,7 @@ return new class extends Migration
         foreach (User::all() as $user) {
             $cityIds = City::whereHas('services', function ($q) use ($user) {
                 $q->userParticipates($user);
-            })->get()->pluck('id');
+            })->pluck('id');
             $user->cityScopes()->sync($cityIds);
         }
     }

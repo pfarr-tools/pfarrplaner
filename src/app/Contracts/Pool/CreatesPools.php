@@ -34,6 +34,6 @@ use App\Models\Leave\Pool;
 use App\Models\People\User;
 
 /**
- * @method Pool create (User $user, array $input)
+ * @method Pool create (User $user, array<string, mixed> $input)
  */
 interface CreatesPools {}

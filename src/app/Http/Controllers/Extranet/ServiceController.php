@@ -73,6 +73,7 @@ class ServiceController extends Controller
     public function next(): JsonResponse
     {
         $user = Auth::user();
+        abort_unless($user instanceof User, 401);
         $services = Service::startingFrom(Carbon::now())
             ->userParticipates($user, 'P')
             ->notHidden()
@@ -90,6 +91,7 @@ class ServiceController extends Controller
     public function past(): JsonResponse
     {
         $user = Auth::user();
+        abort_unless($user instanceof User, 401);
         $services = Service::endingAt(Carbon::now())
             ->userParticipates($user, 'P')
             ->orderedDesc()
@@ -107,6 +109,7 @@ class ServiceController extends Controller
     {
         /** @var User $user */
         $user = Auth::user();
+        abort_unless($user instanceof User, 401);
         $query = Service::orderedDesc()
             ->whereHas('participants', function ($query) use ($user) {
                 $query->where('user_id', $user->id);

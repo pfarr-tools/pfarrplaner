@@ -32,6 +32,7 @@ namespace App\Http\Controllers\Api;
 
 use App\HomeScreen\Tabs\HomeScreenTabFactory;
 use App\Http\Controllers\Controller;
+use App\Models\People\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Auth;
@@ -46,29 +47,35 @@ class TabController extends Controller
     /**
      * Retrieve data for a single tab
      *
-     * @param  $tab  Tab key
+     * @param  string  $tab  Tab key
      * @return JsonResponse|JsonResource
      */
     public function tab($tab)
     {
-        $config = Auth::user()->getSetting('homeScreenTabsConfig') ?? [];
+        $user = Auth::user();
+        abort_unless($user instanceof User, 401);
+        /** @var array{tabs: array<int, array<string, mixed>>} $config */
+        $config = $user->getSetting('homeScreenTabsConfig') ?? [];
         $tabIndex = filter_var($tab, FILTER_SANITIZE_NUMBER_INT);
-        $tab = HomeScreenTabFactory::getOne($config['tabs'][$tabIndex], $tabIndex);
+        $tab = HomeScreenTabFactory::getOne($config['tabs'][(int) $tabIndex], (int) $tabIndex);
 
-        return is_a($tab, JsonResource::class) ? $tab : response()->json(['data' => $tab]);
+        return $tab instanceof JsonResource ? $tab : response()->json(['data' => $tab]);
     }
 
     /**
      * Retrieve item count for a single tab
      *
-     * @param  $tab  Tab key
+     * @param  string  $tab  Tab key
      * @return JsonResponse
      */
     public function tabCount($tab)
     {
-        $config = Auth::user()->getSetting('homeScreenTabsConfig') ?? [];
+        $user = Auth::user();
+        abort_unless($user instanceof User, 401);
+        /** @var array{tabs: array<int, array<string, mixed>>} $config */
+        $config = $user->getSetting('homeScreenTabsConfig') ?? [];
         $tabIndex = filter_var($tab, FILTER_SANITIZE_NUMBER_INT);
 
-        return response()->json(['key' => $tab, 'count' => HomeScreenTabFactory::getCount($config['tabs'][$tabIndex], $tabIndex)]);
+        return response()->json(['key' => $tab, 'count' => HomeScreenTabFactory::getCount($config['tabs'][(int) $tabIndex], (int) $tabIndex)]);
     }
 }

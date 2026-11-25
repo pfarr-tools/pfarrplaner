@@ -38,7 +38,6 @@ use App\Services\FileNameService;
 use App\Services\NameService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
 use PhpOffice\PhpSpreadsheet\Exception;
@@ -70,8 +69,8 @@ class ServicesByWTCCategoryReport extends AbstractExcelDocumentReport
      */
     public function setup()
     {
-        $cities = Auth::user()->cities;
-        $people = User::visibleFor(Auth::user())->get();
+        $cities = $this->authenticatedUser()->cities;
+        $people = User::visibleFor($this->authenticatedUser())->get();
 
         return Inertia::render('Report/ServicesByWTCCategory/Setup', compact('cities', 'people'));
     }
@@ -91,42 +90,50 @@ class ServicesByWTCCategoryReport extends AbstractExcelDocumentReport
                 'end' => 'required|date',
             ]
         );
-
-        $data['start'] = Carbon::createFromFormat('d.m.Y', $data['start'], 'Europe/Berlin')->setTime(0, 0, 0);
-        $data['end'] = Carbon::createFromFormat('d.m.Y', $data['end'], 'Europe/Berlin')->setTime(23, 59, 59);
+        /** @var array{cities: array<int, int>, people: array<int, int>, start: string, end: string} $data */
+        $start = $this->requireParsedDate(Carbon::createFromFormat('d.m.Y', $data['start'], 'Europe/Berlin'))->setTime(0, 0, 0);
+        $end = $this->requireParsedDate(Carbon::createFromFormat('d.m.Y', $data['end'], 'Europe/Berlin'))->setTime(23, 59, 59);
 
         $cities = City::whereIn('id', $data['cities'])->get();
+        /** @var string $cityNames */
+        $cityNames = $cities->pluck('name')->join(', ');
 
         $records = [];
         foreach ($data['people'] as $userId) {
-            $user = User::find($userId);
-            if ($user) {
-                $record = ['user' => $user];
+            $user = User::findOrFail((int) $userId);
+            $record = ['user' => $user, 'categories' => []];
 
-                // get all the user's services for a year
-                $serviceIds = Service::select('services.id')
-                    ->startingFrom($data['start'])
-                    ->endingAt($data['end'])
-                    ->inCities($data['cities'])
-                    ->userParticipates($user)
-                    ->get()->pluck('id');
+            // get all the user's services for a year
+            $serviceIds = Service::select('services.id')
+                ->startingFrom($start)
+                ->endingAt($end)
+                ->inCities($data['cities'])
+                ->userParticipates($user)
+                ->pluck('id');
 
-                $ptcCategories = Participant::where('user_id', $user->id)
-                    ->whereIn('service_id', $serviceIds)
-                    ->get()
-                    ->pluck('category')
-                    ->unique();
+            $ptcCategories = Participant::where('user_id', $user->id)
+                ->whereIn('service_id', $serviceIds)
+                ->pluck('category')
+                ->unique();
 
-                foreach ($ptcCategories as $ptcCategory) {
-                    foreach (['HG', 'WG', null] as $wtcCategory) {
-                        $record['categories'][$ptcCategory][($wtcCategory ?? 'ohne')] = Service::whereIn('services.id', $serviceIds)
-                            ->userParticipates($user, $ptcCategory)
-                            ->where('wtc_category', $wtcCategory)
-                            ->count();
-                    }
-                }
-                $records[] = $record;
+            foreach ($ptcCategories as $ptcCategory) {
+                /** @var string $ptcCategory */
+                $record['categories'][$ptcCategory] = [
+                    'HG' => Service::whereIn('services.id', $serviceIds)
+                        ->userParticipates($user, $ptcCategory)
+                        ->where('wtc_category', 'HG')
+                        ->count(),
+                    'WG' => Service::whereIn('services.id', $serviceIds)
+                        ->userParticipates($user, $ptcCategory)
+                        ->where('wtc_category', 'WG')
+                        ->count(),
+                    'ohne' => Service::whereIn('services.id', $serviceIds)
+                        ->userParticipates($user, $ptcCategory)
+                        ->whereNull('wtc_category')
+                        ->count(),
+                ];
             }
+            $records[] = $record;
         }
 
         Settings::setLocale('de');
@@ -173,7 +180,7 @@ class ServicesByWTCCategoryReport extends AbstractExcelDocumentReport
             'Summe',
         ];
 
-        $sheet->setCellValue('A1', 'AZE-Statistik vom '.$data['start']->format('d.m.Y').' bis '.$data['end']->format('d.m.Y'));
+        $sheet->setCellValue('A1', 'AZE-Statistik vom '.$start->format('d.m.Y').' bis '.$end->format('d.m.Y'));
         $sheet->getStyle('A1')->getFont()->setBold(true);
         $sheet->getStyle('A1')->getFont()->setSize(16);
 
@@ -240,16 +247,16 @@ class ServicesByWTCCategoryReport extends AbstractExcelDocumentReport
         }
 
         // output
-        $filename = 'AZE-Statistik von '.Carbon::parse($data['start'])->format('Y-m-d').' bis '.Carbon::parse($data['end'])->format(
+        $filename = 'AZE-Statistik von '.Carbon::parse($start)->format('Y-m-d').' bis '.Carbon::parse($end)->format(
             'Y-m-d'
-        ).' -- '.$cities->pluck('name')->join(', ');
+        ).' -- '.$cityNames;
 
         return $this->sendToBrowser(
             FileNameService::make(
-                static::FILE_TITLE.' '.$cities->pluck('name')->join(', '),
+                self::FILE_TITLE.' '.$cityNames,
                 'xlsx',
                 static::FILE_SIGNATURE,
-                [$data['start'], $data['end']]),
+                [$start, $end]),
         );
 
     }

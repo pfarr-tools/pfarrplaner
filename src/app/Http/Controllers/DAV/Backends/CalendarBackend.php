@@ -41,15 +41,31 @@ use Sabre\CalDAV\Xml\Property\SupportedCalendarComponentSet;
 
 class CalendarBackend extends AbstractBackend implements SyncSupport
 {
-    protected function getUser($principalUri)
+    /**
+     * Find the user identified by a DAV principal URI.
+     *
+     * @param  string  $principalUri  Principal URI whose e-mail address identifies the user.
+     * @return User|null The matching user, or null if the principal has no user.
+     */
+    protected function getUser($principalUri): ?User
     {
         return User::where('email', Str::after($principalUri, PrincipalBackend::PRINCIPAL_PREFIX))->first();
     }
 
-    public function getCalendarsForUser($principalUri)
+    /**
+     * List the calendars owned by a DAV principal.
+     *
+     * @param  string  $principalUri  Principal URI whose calendars are requested.
+     * @return list<array<string, mixed>> Calendar descriptions in Sabre's CalDAV backend format.
+     */
+    public function getCalendarsForUser($principalUri): array
     {
         $calendars = [];
-        foreach ($this->getUser($principalUri)->calendarConnections as $calendarConnection) {
+        $user = $this->getUser($principalUri);
+        if ($user === null) {
+            return [];
+        }
+        foreach ($user->calendarConnections as $calendarConnection) {
             $calendars[] = [
                 'id' => $calendarConnection->id,
                 'uri' => Str::slug($calendarConnection->title),
@@ -64,17 +80,36 @@ class CalendarBackend extends AbstractBackend implements SyncSupport
         return $calendars;
     }
 
+    /**
+     * Handle a calendar creation request, which is not implemented for external calendars.
+     *
+     * @param  string  $principalUri  Principal URI the new calendar would belong to.
+     * @param  string  $calendarUri  Requested URI of the new calendar.
+     * @param  array<string, mixed>  $properties  WebDAV properties supplied with the request.
+     * @return mixed No calendar identifier is produced because nothing is created.
+     */
     public function createCalendar($principalUri, $calendarUri, array $properties)
     {
         // not implemented
     }
 
-    public function deleteCalendar($calendarId)
+    /**
+     * Handle a calendar deletion request, which is not implemented for external calendars.
+     *
+     * @param  mixed  $calendarId  Identifier of the calendar to delete.
+     */
+    public function deleteCalendar($calendarId): void
     {
         // not implemented
     }
 
-    public function getCalendarObjects($calendarId)
+    /**
+     * List all objects of an external calendar.
+     *
+     * @param  mixed  $calendarId  Identifier of the calendar to read.
+     * @return list<array<string, mixed>> Calendar objects in Sabre's backend format.
+     */
+    public function getCalendarObjects($calendarId): array
     {
         /** @var CalendarConnection $calendarConnection */
         $calendarConnection = CalendarConnection::findOrFail($calendarId);
@@ -87,30 +122,78 @@ class CalendarBackend extends AbstractBackend implements SyncSupport
         return $objects;
     }
 
-    public function getCalendarObject($calendarId, $objectUri)
+    /**
+     * Return a single calendar object identified by its URI.
+     *
+     * @param  mixed  $calendarId  Identifier of the containing calendar.
+     * @param  string  $objectUri  Basename of the requested calendar object.
+     * @return array<string, mixed> Calendar object data including its iCalendar payload.
+     */
+    public function getCalendarObject($calendarId, $objectUri): array
     {
-        return DAVCalendarItem::fromUri($objectUri)->toCalendarObject();
+        $item = DAVCalendarItem::fromUri($objectUri);
+        abort_unless($item !== null, 404);
+
+        return $item->toCalendarObject();
     }
 
-    public function createCalendarObject($calendarId, $objectUri, $calendarData)
+    /**
+     * Handle an object creation request, which is not implemented for external calendars.
+     *
+     * @param  mixed  $calendarId  Identifier of the target calendar.
+     * @param  string  $objectUri  Basename requested for the new object.
+     * @param  string  $calendarData  iCalendar payload supplied by the client.
+     * @return string|null No ETag is returned because the object is not stored.
+     */
+    public function createCalendarObject($calendarId, $objectUri, $calendarData): ?string
+    {
+        // not implemented
+
+        return null;
+    }
+
+    /**
+     * Handle an object update request, which is not implemented for external calendars.
+     *
+     * @param  mixed  $calendarId  Identifier of the target calendar.
+     * @param  string  $objectUri  Basename of the object to update.
+     * @param  string  $calendarData  Updated iCalendar payload supplied by the client.
+     * @return string|null No ETag is returned because the object is not changed.
+     */
+    public function updateCalendarObject($calendarId, $objectUri, $calendarData): ?string
+    {
+        // not implemented
+
+        return null;
+    }
+
+    /**
+     * Handle an object deletion request, which is not implemented for external calendars.
+     *
+     * @param  mixed  $calendarId  Identifier of the target calendar.
+     * @param  string  $objectUri  Basename of the object to delete.
+     */
+    public function deleteCalendarObject($calendarId, $objectUri): void
     {
         // not implemented
     }
 
-    public function updateCalendarObject($calendarId, $objectUri, $calendarData)
-    {
-        // not implemented
-    }
-
-    public function deleteCalendarObject($calendarId, $objectUri)
-    {
-        // not implemented
-    }
-
-    public function getChangesForCalendar($calendarId, $syncToken, $syncLevel, $limit = null)
+    /**
+     * Report the current sync token because incremental changes are not tracked.
+     *
+     * The returned array contains the keys syncToken, added, modified and deleted;
+     * the three change lists are always empty for external calendars.
+     *
+     * @param  mixed  $calendarId  Identifier of the calendar to synchronize.
+     * @param  string|null  $syncToken  Sync token supplied by the client; ignored here.
+     * @param  int  $syncLevel  Requested sync depth; ignored here.
+     * @param  int|null  $limit  Suggested maximum number of changes; ignored here.
+     * @return array<string, mixed> Current sync token together with empty change lists.
+     */
+    public function getChangesForCalendar($calendarId, $syncToken, $syncLevel, $limit = null): array
     {
         return [
-            'syncToken' => CalendarConnection::findOrFail($calendarId)->getCurrentSyncToken(),
+            'syncToken' => CalendarConnection::query()->whereKey($calendarId)->firstOrFail()->getCurrentSyncToken(),
             'added' => [],
             'modified' => [],
             'deleted' => [],

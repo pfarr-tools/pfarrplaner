@@ -34,6 +34,6 @@ use App\Models\Leave\Replacement;
 use App\Models\People\User;
 
 /**
- * @method Replacement update(User $user, Replacement $replacement, array $input)
+ * @method Replacement update(User $user, Replacement $replacement, array<string, mixed> $input)
  */
 interface UpdatesReplacements {}

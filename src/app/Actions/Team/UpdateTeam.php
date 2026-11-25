@@ -47,15 +47,20 @@ class UpdateTeam extends AbstractUpdateAction implements UpdatesTeams
         return route('admin.teams.index');
     }
 
+    /**
+     * @param  array<string, mixed>  $input
+     */
     public function update(User $user, Team $team, array $input): Team
     {
         Gate::forUser($user)->authorize('update', $team);
 
         $input = $this->normalizeInput($input);
+        /** @var array<string, mixed> $validated */
         $validated = Validator::make($input, Team::$validationRules)->validateWithBag('updateTeam');
 
         $team->update(collect($validated)->except('users')->all());
-        $team->users()->sync($validated['users'] ?? []);
+        $users = $validated['users'] ?? [];
+        $team->users()->sync(is_array($users) ? $users : []);
         $team->load(Team::$relationsForEditor);
 
         UpdatedTeam::dispatch($user, $team);

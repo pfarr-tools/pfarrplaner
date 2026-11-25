@@ -37,6 +37,7 @@ use App\Models\Liturgy\Text;
 use App\Models\People\Team;
 use App\Models\People\User;
 use App\Models\Service;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
@@ -70,7 +71,7 @@ class AdminModule extends AbstractModule
     public static function modules()
     {
         $adminMenu = [];
-        $user = Auth::user();
+        $user = Auth::user() ?? throw new AuthenticationException;
         $route = Route::currentRouteName();
 
         // auto-register model routes
@@ -149,7 +150,10 @@ class AdminModule extends AbstractModule
             $adminMenu[] = $config;
         }
 
-        /** @var array<int, mixed> $adminMenu */
-        return array_values(collect($adminMenu)->sortBy('text')->toArray());
+        /** @var array<int, array<string, mixed>> $adminMenu */
+        $modules = array_values(collect($adminMenu)->sortBy('text')->toArray());
+        /** @var array<int, array<string, mixed>> $modules */
+
+        return $modules;
     }
 }

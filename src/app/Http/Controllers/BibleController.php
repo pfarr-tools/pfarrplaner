@@ -40,15 +40,17 @@ class BibleController extends Controller
     /**
      * Get a bible text from a reference
      *
-     * @param  $reference  Reference
+     * @param  string  $reference  Reference
      * @param  string  $version  Optional: Translation to be used
      * @return JsonResponse
      */
-    public function text(Request $request, $reference, $version = 'LUT17')
+    public function text(Request $request, string $reference, $version = 'LUT17')
     {
         $reference = str_replace('–', '-', $reference);
+        /** @var array{originalReference: string, correctedReference: string, version: string, versionCopyrights: string, parsed: array<int, array<string, mixed>>} $ref */
         $ref = ReferenceParser::getInstance()->parse($reference);
         $text = '';
+        /** @var array<int, array{text: array<int, array{verse: string, text: string}>}> $bibleText */
         $bibleText = (new BibleText($version))->get($ref);
 
         $showVerseNumbers = $request->get('showVerseNumbers', true);

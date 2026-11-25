@@ -37,8 +37,12 @@ class LiturgischerWegweiserStudyHelper extends AbstractStudyHelper
 {
     public $title = 'Liturgischer Wegweiser';
 
+    /** @var array<string, array<string, string>> */
     protected $records = [];
 
+    /**
+     * @param  array<string, mixed>  $data  Study helper input data.\n     * @return array<string, array<string, string>>
+     */
     public function read(array $data): array
     {
         // "Weitere Sonntage in der Trinitatiszeit
@@ -75,7 +79,13 @@ class LiturgischerWegweiserStudyHelper extends AbstractStudyHelper
         return $this->records;
     }
 
-    protected function translateTitle($title)
+    /**
+     * Übersetzt einen Titel aus der Quelle in die im Kalender verwendete Bezeichnung.
+     *
+     * @param  string  $title  Titel aus der Quelle
+     * @return string Übersetzter Titel
+     */
+    protected function translateTitle(string $title): string
     {
         $translations = [
             '10.' => 'Zehnter',
@@ -127,10 +137,19 @@ class LiturgischerWegweiserStudyHelper extends AbstractStudyHelper
         return $title;
     }
 
+    /**
+     * @param  string  $date  Reference date.\n     * @return string
+     */
     protected function findSecondToLastSunday(string $date): string
     {
         $year = substr($date, -4);
-        $list = json_decode(Storage::get('liturgy.json'), true)['content']['days'];
+        $json = Storage::get('liturgy.json');
+        if ($json === null) {
+            return '';
+        }
+        /** @var array{content?: array{days?: array<int, array{date: string, title: string}>}} $decoded */
+        $decoded = json_decode($json, true);
+        $list = $decoded['content']['days'] ?? [];
         $lastInTrinityPeriod = '';
         foreach ($list as $item) {
             if (substr($item['date'], -4) == $year) {
@@ -143,13 +162,21 @@ class LiturgischerWegweiserStudyHelper extends AbstractStudyHelper
         return $this->translateTitle((((int) Str::before($lastInTrinityPeriod, '.')) + 1).'. So. n. Trinitatis');
     }
 
+    /**
+     * @param  array<string, mixed>  $data  Input data.\n     * @return array<string, string>
+     */
     public function getLinks(array $data): array
     {
-        $title = $this->translateTitle($data['title']);
+        /** @var string $title */
+        $title = $data['title'];
+        $title = $this->translateTitle($title);
         if ($title == 'Vorletzter Sonntag d. Kj.') {
-            $title = $this->findSecondToLastSunday($data['date']);
+            /** @var string $date */
+            $date = $data['date'];
+            $title = $this->findSecondToLastSunday($date);
         }
-        $data['links'] = array_merge($data['links'] ?? [], $this->records[$title] ?? []);
+        $links = $data['links'] ?? [];
+        $data['links'] = array_merge(is_array($links) ? $links : [], $this->records[$title] ?? []);
 
         return $data;
     }

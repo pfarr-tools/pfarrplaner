@@ -46,10 +46,14 @@ class CreateStreetRange extends AbstractCreateAction implements CreatesStreetRan
         return '';
     }
 
+    /**
+     * @param  array<string, mixed>  $input
+     */
     public function create(User $user, Parish $parish, array $input): StreetRange
     {
         Gate::forUser($user)->authorize('create', [StreetRange::class, $parish]);
         $input['parish_id'] = $parish->id;
+        /** @var array<string, mixed> $input */
         $input = Validator::make($input, StreetRange::$validationRules)->validateWithBag('createStreetRange');
         $streetRange = StreetRange::create($input);
         CreatedStreetRange::dispatch($user, $streetRange);

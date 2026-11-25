@@ -33,11 +33,17 @@ namespace App\Http\Controllers;
 use App\Models\Calendar\Occurence;
 use App\Models\Scopes\ServicesOnlyScope;
 use Carbon\Carbon;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 
 class AdCentralController extends Controller
 {
-    public function stories(Request $request)
+    /**
+     * Show the story ads that are currently running.
+     *
+     * @param  Request  $request  Current HTTP request.
+     */
+    public function stories(Request $request): View
     {
         $userId = null;
         if (! $request->user()) {
@@ -54,8 +60,17 @@ class AdCentralController extends Controller
             ->get();
 
         $events->map(function ($item) {
-            $item->service->adConfigs->filter(fn ($item) => $item->slug == 'story');
-            $item->adStart = $item->start->copy()->subDays($item->service->adConfigs[0]->offset)->startOfDay();
+            $service = $item->service;
+            if ($service === null) {
+                return $item;
+            }
+            $adConfig = $service->adConfigs->first(fn ($config) => $config->slug == 'story');
+            if ($adConfig === null) {
+                return $item;
+            }
+            // Das Attribut wird zur Laufzeit dynamisch am Modell ergänzt und im View genutzt.
+            /** @var Occurence&object{adStart: Carbon} $item */
+            $item->setAttribute('adStart', $item->start->copy()->subDays($adConfig->offset)->startOfDay());
 
             return $item;
         });

@@ -37,18 +37,30 @@ abstract class AbstractReplacer
     /** @var Service */
     protected $service;
 
+    /** @var string Beschreibung des Replacers */
     protected $description = '';
 
+    /**
+     * @param  Service  $service  Service to replace text for.\n     * @return void
+     */
     public function __construct(Service $service)
     {
         $this->service = $service;
     }
 
-    public function getKey()
+    /**
+     * Ermittelt den aus dem Klassennamen abgeleiteten Schlüssel des Replacers.
+     *
+     * @return string Schlüssel des Replacers
+     */
+    public function getKey(): string
     {
         return lcfirst(strtr(get_called_class(), ['App\\Liturgy\\Replacement\\' => '', 'Replacer' => '']));
     }
 
+    /**
+     * @param  string  $text  Input text.\n     * @return string
+     */
     public function replace(string $text): string
     {
         return str_replace('['.$this->getKey().']', $this->getReplacementText(), $text);
@@ -61,12 +73,21 @@ abstract class AbstractReplacer
         return $this->service;
     }
 
+    /**
+     * @param  Service  $service  Service to use.\n     * @return void
+     */
     public function setService(Service $service): void
     {
         $this->service = $service;
     }
 
-    protected function renderParagraph($text = '')
+    /**
+     * Rendert einen Absatz mit abschließendem Zeilenumbruch.
+     *
+     * @param  string  $text  Text des Absatzes
+     * @return string Absatz inklusive Zeilenumbruch
+     */
+    protected function renderParagraph(string $text = ''): string
     {
         return $text.PHP_EOL;
     }
@@ -76,6 +97,9 @@ abstract class AbstractReplacer
         return $this->description;
     }
 
+    /**
+     * @param  string  $description  Description text.\n     * @return void
+     */
     public function setDescription(string $description): void
     {
         $this->description = $description;

@@ -30,6 +30,7 @@
 
 namespace App\UI\Modules;
 
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Support\Facades\Auth;
 
 class ProfileModule extends AbstractModule
@@ -42,8 +43,9 @@ class ProfileModule extends AbstractModule
 
     public function addItems(array $items): array
     {
+        $user = Auth::user() ?? throw new AuthenticationException;
         $items[] = [
-            'text' => Auth::user()->fullName(),
+            'text' => $user->fullName(),
             'icon' => 'mdi mdi-account-settings',
             'url' => route('user.profile'),
             'active' => request()->is(['user.profile']),

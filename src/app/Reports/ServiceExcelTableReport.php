@@ -22,7 +22,6 @@ use App\Services\MinistryService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
 use PhpOffice\PhpSpreadsheet\Shared\Date as ExcelDate;
@@ -65,11 +64,12 @@ class ServiceExcelTableReport extends AbstractExcelDocumentReport
      */
     public function setup()
     {
-        $user = Auth::user();
+        $user = $this->authenticatedUser();
         $cities = $user->cities;
         $locations = Location::inCities($cities->pluck('id'))->get();
         $ministries = MinistryService::selectList();
-        $settings = $user->getSetting(static::SETTINGS_KEY, []);
+        $settings = $user->getSetting(self::SETTINGS_KEY, []);
+        /** @var array{ministries?: array<int, string>|null, readable_headers?: int|string|null, services_only?: int|string|null} $settings */
         $savedMinistries = is_array($settings['ministries'] ?? null) ? $settings['ministries'] : [];
         $readableHeaders = (int) ($settings['readable_headers'] ?? 0);
         $servicesOnly = (int) ($settings['services_only'] ?? 1);
@@ -112,13 +112,13 @@ class ServiceExcelTableReport extends AbstractExcelDocumentReport
                 'services_only' => 'nullable|boolean',
             ]
         );
-
-        $user = Auth::user();
+        /** @var array{cities: array<int, int>, locations?: array<int, int>|null, start: string, end: string, ministries?: array<int, string>|null, readable_headers?: bool|null, services_only?: bool|null} $data */
+        $user = $this->authenticatedUser();
         $ministries = array_values(array_unique($data['ministries'] ?? []));
         $readableHeaders = (bool) ($data['readable_headers'] ?? false);
         $servicesOnly = (bool) ($data['services_only'] ?? true);
         $user->setSetting(
-            static::SETTINGS_KEY,
+            self::SETTINGS_KEY,
             [
                 'ministries' => $ministries,
                 'readable_headers' => $readableHeaders ? 1 : 0,
@@ -129,6 +129,8 @@ class ServiceExcelTableReport extends AbstractExcelDocumentReport
         $start = Carbon::parse($data['start'])->startOfDay();
         $end = Carbon::parse($data['end'])->endOfDay();
         $cities = City::whereIn('id', $data['cities'])->get();
+        /** @var string $cityNames */
+        $cityNames = $cities->pluck('name')->join(', ');
 
         $query = Service::with(['city', 'location'])->between($start, $end)
             ->inCitiesAndLocations($data['cities'], $data['locations'] ?? null)
@@ -189,7 +191,7 @@ class ServiceExcelTableReport extends AbstractExcelDocumentReport
 
         $row = 2;
         foreach ($services as $service) {
-            $localDate = $service->date->copy()->setTimezone('Europe/Berlin');
+            $localDate = $service->trueDate()->copy()->setTimezone('Europe/Berlin');
             $liturgy = $service->liturgicalInfo;
 
             foreach ($columns as $index => $column) {
@@ -232,7 +234,7 @@ class ServiceExcelTableReport extends AbstractExcelDocumentReport
 
         return $this->sendToBrowser(
             FileNameService::make(
-                static::FILE_TITLE.' '.$cities->pluck('name')->join(', '),
+                self::FILE_TITLE.' '.$cityNames,
                 'xlsx',
                 static::FILE_SIGNATURE,
                 [$data['start'], $data['end']]
@@ -240,6 +242,14 @@ class ServiceExcelTableReport extends AbstractExcelDocumentReport
         );
     }
 
+    /**
+     * Build the spreadsheet column definitions for the selected ministries.
+     *
+     * @param  array<int, string>  $ministries  Ministry identifiers to include as extra columns.
+     * @param  bool  $readableHeaders  Whether the human readable labels are used.
+     * @param  bool  $servicesOnly  Whether only services instead of all event types are listed.
+     * @return array<int, array{key: string, label: string, width: int}> Column definitions with key, label and width.
+     */
     protected function buildColumns(array $ministries, bool $readableHeaders, bool $servicesOnly): array
     {
         $pastorLabel = MinistryService::title('P');
@@ -306,11 +316,19 @@ class ServiceExcelTableReport extends AbstractExcelDocumentReport
         );
     }
 
+    /**
+     * @param  string  $pascalCaseLabel  Column key in PascalCase.
+     * @param  string  $readableLabel  Human readable label.
+     * @param  bool  $readableHeaders  Whether to use readable headers.
+     */
     protected function headerLabel(string $pascalCaseLabel, string $readableLabel, bool $readableHeaders): string
     {
         return $readableHeaders ? $readableLabel : $pascalCaseLabel;
     }
 
+    /**
+     * @param  string  $value  Heading text.
+     */
     protected function toPascalCaseHeading(string $value): string
     {
         $words = preg_split('/[^[:alnum:]]+/u', $value) ?: [];
@@ -320,7 +338,13 @@ class ServiceExcelTableReport extends AbstractExcelDocumentReport
     }
 
     /**
-     * @return mixed
+     * Resolve the value rendered in a single spreadsheet column.
+     *
+     * @param  Service  $service  Service whose data is rendered.
+     * @param  string  $key  Column key identifying the requested value.
+     * @param  array<int, string>  $ministries  Ministry identifiers selected for the report.
+     * @param  Carbon  $localDate  Service date converted to the local timezone.
+     * @return mixed Value for the requested column.
      */
     protected function resolveColumnValue(
         Service $service,
@@ -365,6 +389,13 @@ class ServiceExcelTableReport extends AbstractExcelDocumentReport
         };
     }
 
+    /**
+     * Resolve the fill color for the liturgical season of a service.
+     *
+     * @param  Service  $service  Service whose color is resolved.
+     * @param  array<string, mixed>  $liturgy  Liturgical information for the service.
+     * @return string ARGB color code used for the cell fill.
+     */
     protected function resolveLiturgicalColor(Service $service, array $liturgy): string
     {
         $colors = [
@@ -379,9 +410,14 @@ class ServiceExcelTableReport extends AbstractExcelDocumentReport
             return $colors['red'];
         }
 
-        return $colors[$liturgy['CSS-Farbe'] ?? 'white'] ?? $colors['white'];
+        $color = $liturgy['CSS-Farbe'] ?? 'white';
+
+        return is_string($color) ? ($colors[$color] ?? $colors['white']) : $colors['white'];
     }
 
+    /**
+     * @param  string|null  $eventClass  Event class name.
+     */
     protected function eventClassLabel(?string $eventClass): string
     {
         return match ($eventClass) {
@@ -406,6 +442,9 @@ class ServiceExcelTableReport extends AbstractExcelDocumentReport
         return implode(', ', $recs);
     }
 
+    /**
+     * @param  int  $index  Zero-based column index.
+     */
     protected function columnLetter(int $index): string
     {
         $letter = '';
@@ -418,6 +457,13 @@ class ServiceExcelTableReport extends AbstractExcelDocumentReport
         return $letter;
     }
 
+    /**
+     * Find the one-based index of a column definition by its key.
+     *
+     * @param  array<int, array{key: string, label: string, width: int}>  $columns  Spreadsheet column definitions.
+     * @param  string  $key  Key of the column to look up.
+     * @return int One-based column index, falling back to the first column.
+     */
     protected function findColumnIndex(array $columns, string $key): int
     {
         foreach ($columns as $index => $column) {

@@ -40,10 +40,7 @@ namespace App\Imports;
 use App\Models\Places\City;
 use Carbon\Carbon;
 use Exception;
-use GuzzleHttp\Client;
-use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Facades\Cache;
-use Psr\Http\Message\StreamInterface;
 
 /**
  * Class OPEventsImport
@@ -62,40 +59,67 @@ class OPEventsImport
     }
 
     /**
-     * @param  bool  $removeMatching
-     * @return mixed
+     * Merge events from the online-planned backend into an existing event list.
+     *
+     * @param  array<array-key, mixed>  $events  Events grouped by their start timestamp.
+     * @param  Carbon  $start  First day of the period to include.
+     * @param  Carbon  $end  Last day of the period to include.
+     * @param  bool  $removeMatching  Whether existing events with a matching title are removed.
+     * @return array<array-key, mixed> Events grouped by their start timestamp.
      */
-    public function mix($events, Carbon $start, Carbon $end, $removeMatching = false)
+    public function mix(array $events, Carbon $start, Carbon $end, bool $removeMatching = false): array
     {
         if (empty($this->city->op_customer_token.$this->city->op_customer_key)) {
             return $events;
         }
 
         $myEvents = $this->getEvents();
+        if (! is_array($myEvents)) {
+            return $events;
+        }
         foreach ($myEvents as $myEvent) {
+            if (! is_array($myEvent)) {
+                continue;
+            }
             $myEvent['record_type'] = 'OP_Event';
             $this->fixTimeAndDates($myEvent);
-            if (($myEvent['start']) <= $end && ((! isset($myEvent['end']) || ($myEvent['end'] >= $start)))) {
-                foreach ($myEvent['event_dates'] as $key => $date) {
-                    $this->fixTimeAndDates($myEvent['event_dates'][$key]);
-                }
-                $myEvent['place'] = $myEvent['locationtitle'].($myEvent['locationlocation'] ? ', '.$myEvent['locationlocation'] : '');
-
-                // check for existing events
-                if ($removeMatching) {
-                    $matches = [];
-                    if (isset($events[$myEvent['start']->format('YmdHis')])) {
-                        foreach ($events[$myEvent['start']->format('YmdHis')] as $matchKey => $existingEvent) {
-                            if ($existingEvent['title'] == $myEvent['title']) {
-                                $matches[] = $matchKey;
-                            }
+            $eventStart = $myEvent['start'] ?? null;
+            if (! $eventStart instanceof Carbon) {
+                continue;
+            }
+            if (($eventStart <= $end && ((! isset($myEvent['end']) || ($myEvent['end'] >= $eventStart))))) {
+                if (isset($myEvent['event_dates']) && is_array($myEvent['event_dates'])) {
+                    foreach ($myEvent['event_dates'] as $key => $date) {
+                        if (! is_array($myEvent['event_dates'][$key])) {
+                            continue;
                         }
-                        foreach ($matches as $match) {
-                            unset($events[$myEvent['start']->format('YmdHis')][$match]);
-                        }
+                        $this->fixTimeAndDates($myEvent['event_dates'][$key]);
                     }
                 }
-                $events[$myEvent['start']->format('YmdHis')][] = $myEvent;
+                $locationTitle = $myEvent['locationtitle'] ?? '';
+                $locationLocation = $myEvent['locationlocation'] ?? null;
+                $myEvent['place'] = (is_scalar($locationTitle) ? (string) $locationTitle : '')
+                    .(is_scalar($locationLocation) && $locationLocation ? ', '.(string) $locationLocation : '');
+
+                // check for existing events
+                $startKey = $eventStart->format('YmdHis');
+                $existingGroup = $events[$startKey] ?? [];
+                if (! is_array($existingGroup)) {
+                    $existingGroup = [];
+                }
+                if ($removeMatching) {
+                    $matches = [];
+                    foreach ($existingGroup as $matchKey => $existingEvent) {
+                        if (is_array($existingEvent) && ($existingEvent['title'] ?? null) == $myEvent['title']) {
+                            $matches[] = $matchKey;
+                        }
+                    }
+                    foreach ($matches as $match) {
+                        unset($existingGroup[$match]);
+                    }
+                }
+                $existingGroup[] = $myEvent;
+                $events[$startKey] = $existingGroup;
             }
         }
 
@@ -105,9 +129,9 @@ class OPEventsImport
     }
 
     /**
-     * @return mixed
+     * Load the events from the online-planned backend or the cache.
      *
-     * @throws GuzzleException
+     * @return mixed Events grouped by their start timestamp.
      */
     public function getEvents()
     {
@@ -127,49 +151,47 @@ class OPEventsImport
     }
 
     /**
-     * @return StreamInterface
+     * Fetch the event data from the given backend URL.
      *
-     * @throws GuzzleException
+     * The request is currently disabled, so an empty list is returned.
+     *
+     * @param  string  $url  Backend URL to request.
+     * @return array<array-key, mixed> Fetched event data, currently always empty.
      */
-    public function getUrl($url)
+    public function getUrl(string $url): array
     {
         // temporarily disabled:
         return [];
-        $client = new Client;
-        $response = $client->request(
-            'GET',
-            $url,
-            [
-                'headers' => [
-                    'Origin' => 'https://'.$this->city->op_domain,
-                    'Referer' => 'https://'.$this->city->op_domain,
-                ],
-            ]
-        );
-        $body = json_decode($response->getBody(), true);
-
-        return $body['data'] ?? [];
     }
 
     /**
+     * Normalize the start and end timestamps of an event.
+     *
+     * @param  array<array-key, mixed>  $event  Event data to normalize in place.
+     *
      * @throws Exception
      */
-    protected function fixTimeAndDates(&$event)
+    protected function fixTimeAndDates(array &$event): void
     {
-        $event['start'] = new Carbon($event['startdate'], 'Europe/Berlin');
-        if ($event['timestart'] !== null) {
-            $event['start']->setTimeFromTimeString($event['timestart']);
+        /** @var string|int|float|\DateTimeInterface|null $startDate */
+        $startDate = $event['startdate'] ?? null;
+        $event['start'] = new Carbon($startDate, 'Europe/Berlin');
+        $timeStart = $event['timestart'] ?? null;
+        if (is_scalar($timeStart)) {
+            $event['start']->setTimeFromTimeString((string) $timeStart);
         }
-        if ($event['enddate']) {
-            $event['end'] = new Carbon($event['enddate'], 'Europe/Berlin');
+        $endDate = $event['enddate'] ?? null;
+        if ($endDate && is_scalar($endDate)) {
+            $event['end'] = new Carbon((string) $endDate, 'Europe/Berlin');
         }
-        if ($event['timeend'] !== null) {
-            $event['end']->setTimeFromTimeString($event['timeend']);
+        $timeEnd = $event['timeend'] ?? null;
+        if (is_scalar($timeEnd) && isset($event['end']) && $event['end'] instanceof Carbon) {
+            $event['end']->setTimeFromTimeString((string) $timeEnd);
         } else {
             unset($event['end']);
         }
         if (isset($event['end']) && ($event['end'] <= $event['start'])) {
-            $event['end'] = $event['start']->copy()->addHour(1);
+            $event['end'] = $event['start']->copy()->addHour();
         }
     }
 }

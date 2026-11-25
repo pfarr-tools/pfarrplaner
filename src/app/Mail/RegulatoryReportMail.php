@@ -30,6 +30,7 @@
 
 namespace App\Mail;
 
+use App\Models\People\User;
 use App\Models\Service;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -37,17 +38,22 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Auth;
 
+/** Mailable for regulatory reports. */
 class RegulatoryReportMail extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
+    /** @var array<string, mixed> */
     protected $data = [];
 
+    /** @var User|null */
     protected $user = null;
 
     /**
      * Create a new message instance.
      *
+     * @param  array<string, mixed>  $data  Daten der Gottesdienstmeldung.
+     * @param  User|null  $user  Absender der Meldung, standardmäßig der angemeldete Benutzer.
      * @return void
      */
     public function __construct($data, $user = null)
@@ -64,15 +70,22 @@ class RegulatoryReportMail extends Mailable implements ShouldQueue
     public function build()
     {
         $service = Service::find($this->data['service']);
-        $sender = 'Evangelische Kirchengemeinde '.$service->city->name.'';
+        if (! $service instanceof Service) {
+            return $this;
+        }
+        $city = $service->city;
+        $cityName = $city !== null ? $city->name : '';
+        $sender = 'Evangelische Kirchengemeinde '.$cityName.'';
+        $template = $this->data['template'] ?? '';
+        $template = is_scalar($template) ? (string) $template : '';
         $text = strtr(
-            $this->data['template'],
+            $template,
             [
                 '###GOTTESDIENST###' => implode(', ',
                     [
-                        $service->date->format('d.m.Y'),
+                        $service->date?->format('d.m.Y') ?? '',
                         $service->timeText(),
-                        $service->city->name,
+                        $cityName,
                         $service->locationText(),
                     ]
                 ).($service->titleText() != 'GD' ? ', '.$service->titleText() : ''),
@@ -83,8 +96,12 @@ class RegulatoryReportMail extends Mailable implements ShouldQueue
 
         $user = $this->user;
 
-        return $this->from('noreply@pfarrplaner.de', $sender)
-            ->replyTo($user)
+        $message = $this->from('noreply@pfarrplaner.de', $sender);
+        if ($user !== null) {
+            $message->replyTo($user);
+        }
+
+        return $message
             ->subject('Gottesdienstmeldung nach §1g Abs. 3 CoronaVO')
             ->markdown('reports.regulatory.mail', compact('text', 'user', 'sender'));
     }

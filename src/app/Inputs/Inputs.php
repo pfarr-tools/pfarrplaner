@@ -31,6 +31,7 @@
 namespace App\Inputs;
 
 use Exception;
+use Illuminate\Support\Collection;
 
 /**
  * Class Inputs
@@ -38,15 +39,18 @@ use Exception;
 class Inputs
 {
     /**
-     * @return array
+     * Collect the metadata of all editable input assistants, sorted by name.
+     *
+     * @return Collection<array-key, mixed> Editable input metadata.
      */
-    public static function all()
+    public static function all(): Collection
     {
         $inputs = collect();
-        foreach (glob(app_path('Inputs').'/*Input.php') as $file) {
+        foreach (glob(app_path('Inputs').'/*Input.php') ?: [] as $file) {
             if (substr(pathinfo($file, PATHINFO_FILENAME), 0, 8) !== 'Abstract') {
                 $inputClass = 'App\\Inputs\\'.pathinfo($file, PATHINFO_FILENAME);
                 if (class_exists($inputClass)) {
+                    /** @var AbstractInput $input */
                     $input = new $inputClass;
                     if ($input->canEdit()) {
                         $inputs->push([
@@ -63,15 +67,23 @@ class Inputs
     }
 
     /**
-     * @throws Exception
+     * Resolve the input assistant matching the given key.
+     *
+     * @param  string  $input  Input key used to build the handler class name.
+     * @return AbstractInput Resolved input assistant.
+     *
+     * @throws Exception If no input class exists for the given key.
      */
-    public static function get($input): AbstractInput
+    public static function get(string $input): AbstractInput
     {
         $inputClass = 'App\\Inputs\\'.ucfirst($input).'Input';
         if (! class_exists($inputClass)) {
             throw new Exception('Input class '.$inputClass.' does not exist.');
         }
 
-        return new $inputClass;
+        /** @var AbstractInput $instance */
+        $instance = new $inputClass;
+
+        return $instance;
     }
 }

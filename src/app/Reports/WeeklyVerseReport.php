@@ -67,6 +67,7 @@ class WeeklyVerseReport extends AbstractCSVReport
 
     public function render(Request $request)
     {
+        /** @var array{start: string, end: string} $data */
         $data = $request->validate(
             [
                 'start' => 'required|date',
@@ -80,18 +81,23 @@ class WeeklyVerseReport extends AbstractCSVReport
         $records = [];
         $currentDate = $start->copy();
         do {
-            $dayData = LiturgyService::getLiturgyInfoByDate($currentDate)[0] ?? [];
+            /** @var array<int, array<string, mixed>> $liturgyInfo */
+            $liturgyInfo = LiturgyService::getLiturgyInfoByDate($currentDate);
+            $dayData = $liturgyInfo[0] ?? [];
             if (count($dayData)) {
                 $records[$currentDate->format('Y-m-d')] = $dayData;
             }
-            $currentDate->addDay(1);
+            $currentDate->addDay();
         } while ($currentDate <= $end);
 
         $bible = new BibleText;
 
+        /** @var string $title */
+        $title = static::FILE_TITLE;
+
         return $this->csv(
             FileNameService::make(
-                static::FILE_TITLE,
+                $title,
                 'csv',
                 static::FILE_SIGNATURE,
                 [$start, $end],
@@ -102,7 +108,10 @@ class WeeklyVerseReport extends AbstractCSVReport
                     return $key;
                 },
                 'Titel des Tages' => function ($item, $key) {
-                    return strtr($item['Bezeichnung'], [
+                    /** @var array{Bezeichnung: string} $entry */
+                    $entry = $item;
+
+                    return strtr($entry['Bezeichnung'], [
                         'So. n.' => 'Sonntag nach',
                         'So n.' => 'Sonntag nach',
                         'Drittl.S.d.Kj.' => 'Drittletzter Sonntag des Kirchenjahres',
@@ -111,13 +120,22 @@ class WeeklyVerseReport extends AbstractCSVReport
                     ]);
                 },
                 'Überschrift' => function ($item, $key) {
-                    return (Carbon::parse($key)->weekday()) ? 'Für diesen besonderen Tag' : 'Für die neue Woche';
+                    /** @var string $dateKey */
+                    $dateKey = $key;
+
+                    return (Carbon::parse($dateKey)->weekday()) ? 'Für diesen besonderen Tag' : 'Für die neue Woche';
                 },
                 'Wochenspruch' => function ($item, $key) {
-                    return $item['Wochenspruch']['Text'];
+                    /** @var array{Wochenspruch: array{Text: string}} $entry */
+                    $entry = $item;
+
+                    return $entry['Wochenspruch']['Text'];
                 },
                 'Bibelstelle' => function ($item, $key) {
-                    return ReferenceParser::getInstance()->beautify($item['Wochenspruch']['Bibelstelle'], []);
+                    /** @var array{Wochenspruch: array{Bibelstelle: string}} $entry */
+                    $entry = $item;
+
+                    return ReferenceParser::getInstance()->beautify($entry['Wochenspruch']['Bibelstelle']);
                 },
             ]);
 

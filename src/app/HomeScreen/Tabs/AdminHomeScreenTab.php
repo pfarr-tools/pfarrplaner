@@ -32,7 +32,6 @@ namespace App\HomeScreen\Tabs;
 
 use App\Models\People\User;
 use App\UI\Modules\AdminModule;
-use Illuminate\Support\Facades\Auth;
 
 class AdminHomeScreenTab extends AbstractHomeScreenTab
 {
@@ -42,26 +41,17 @@ class AdminHomeScreenTab extends AbstractHomeScreenTab
 
     protected $config = [];
 
-    /**
-     * Check whether the administration tab is available to the user.
-     *
-     * @param  User|null  $user  User whose administrator access should be checked
-     * @return bool Whether the user is an administrator
-     */
     public function isAvailable(?User $user = null): bool
     {
-        return ($user ?? Auth::user())->isAdmin;
+        return ($user ?? $this->user())->isAdmin;
     }
 
-    /**
-     * Add people and administration modules to the serialized tab.
-     */
     public function toArray($data = [])
     {
         $data['people'] = User::select('id', 'first_name', 'last_name', 'title', 'email', 'is_official_user')
             ->whereNotNull('email')
             ->where('is_official_user', true)
-            ->where('id', '!=', Auth::user()->id)
+            ->where('id', '!=', $this->user()->id)
             ->get();
         $data['modules'] = AdminModule::modules();
 

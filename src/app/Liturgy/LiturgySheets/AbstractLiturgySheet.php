@@ -38,28 +38,42 @@ use Illuminate\Support\Facades\Auth;
 
 class AbstractLiturgySheet
 {
+    /** @var string */
     protected $title = '';
 
+    /** @var string */
     protected $icon = 'fa fa-file';
 
+    /** @var array{format: string, landscape?: bool} */
     protected $layout = ['format' => 'A4'];
 
+    /** @var string */
     protected $fileTitle = 'Liturgie';
 
+    /** @var string */
     protected $extension = 'pdf';
 
+    /** @var bool */
     protected $isNotAFile = false;
 
+    /** @var string|null */
+    /** @var string|null */
     protected $configurationPage = null;
 
+    /** @var string|null */
+    /** @var string|null */
     protected $configurationComponent = null;
 
+    /** @var bool */
     protected $configurationCloseOnly = false;
 
+    /** @var array<string, mixed> */
     protected $defaultConfig = [];
 
+    /** @var array<string, mixed> */
     protected $config = [];
 
+    /** @var bool */
     protected $privileged = false;
 
     public function __construct()
@@ -67,6 +81,7 @@ class AbstractLiturgySheet
         $this->config = $this->getConfiguration();
     }
 
+    /** @return array<string, mixed> */
     protected function getData(Service $service)
     {
         return [];
@@ -85,7 +100,9 @@ class AbstractLiturgySheet
             .Carbon::now()->setTimezone('Europe/Berlin')->format('d.m.Y H:i:s')
             .' – Seite <span class="pageNumber"></span> / <span class="totalPages"></span></div>';
 
-        $pdf = PDF::fromView($this->getRenderViewName(),
+        /** @var view-string $renderViewName */
+        $renderViewName = sprintf('liturgy.sheets.%s.render', strtolower($this->getKey()));
+        $pdf = PDF::fromView($renderViewName,
             array_merge(compact('service'), $this->getData($service)))
             ->format($this->layout['format'])
             ->margins(15, 15, 15, 15)
@@ -102,6 +119,8 @@ class AbstractLiturgySheet
 
     /**
      * Provide additional data for configuration dialogs that do not submit a download form.
+     *
+     * @return array<string, mixed>
      */
     public function getDialogData(Service $service): array
     {
@@ -111,13 +130,13 @@ class AbstractLiturgySheet
     /**
      * Return the footer content for the generated document.
      *
-     * @return mixed Footer content.
+     * @return string Footer content.
      */
     protected function getFooter()
     {
         return '<div style="width: 100%; font-size: 8pt; font-family: \'Sarabun Light\', sans-serif; display: flex; justify-content: space-between; align-items: center; padding: 0 15mm;">'
               .'<div style="text-align: left;">Stand: '.now()->setTimezone('Europe/Berlin')->format('d.m.Y, H:i').' Uhr</div>'
-              .'<div style="text-align: center;">'.(Auth::guest() ? '' : Auth::user()->fullName()).'</div>'
+              .'<div style="text-align: center;">'.(Auth::user()?->fullName() ?? '').'</div>'
               .'<div style="text-align: right;">Seite <span class="pageNumber"></span> / <span class="totalPages"></span></div>'
               .'</div>';
     }
@@ -150,6 +169,10 @@ class AbstractLiturgySheet
         return '50.0';
     }
 
+    /**
+     * @param  string|null  $title  Override for the generated file name.
+     * @return string Generated file name.
+     */
     public function getFileName(Service $service, $title = null)
     {
         return FileNameService::make(
@@ -301,17 +324,17 @@ class AbstractLiturgySheet
     }
 
     /**
-     * @return null
+     * @return string|null Configuration page component, if one is configured.
      */
-    public function getConfigurationPage()
+    public function getConfigurationPage(): ?string
     {
         return $this->configurationPage;
     }
 
     /**
-     * @param  null  $configurationPage
+     * @param  string|null  $configurationPage  Configuration page component.
      */
-    public function setConfigurationPage($configurationPage): void
+    public function setConfigurationPage(?string $configurationPage): void
     {
         $this->configurationPage = $configurationPage;
     }
@@ -319,47 +342,57 @@ class AbstractLiturgySheet
     /**
      * Get a configuration array combined from defaults and user settings
      *
-     * @return array
+     * @return array<string, mixed>
      */
     public function getConfiguration()
     {
-        if (Auth::guest()) {
+        $user = Auth::user();
+        if ($user === null) {
             return $this->defaultConfig;
         }
 
-        return $this->config = array_replace_recursive(
-            $this->defaultConfig,
-            Auth::user()->getSetting('liturgySheetConfig_'.$this->getKey()) ?: []
-        );
+        $setting = $user->getSetting('liturgySheetConfig_'.$this->getKey());
+        /** @var array<string, mixed> $setting */
+        $setting = is_array($setting) ? $setting : [];
+        /** @var array<string, mixed> $config */
+        $config = array_replace_recursive($this->defaultConfig, $setting);
+
+        return $this->config = $config;
     }
 
     /**
      * Save configuration array to user settings, merging in any missing values from defaults
+     *
+     * @param  array<string, mixed>  $data  Configuration values to save.
+     * @return void
      */
     public function setConfiguration(array $data)
     {
-        $this->config = array_replace_recursive($this->defaultConfig, $data);
-        if (Auth::guest()) {
+        /** @var array<string, mixed> $config */
+        $config = array_replace_recursive($this->defaultConfig, $data);
+        $this->config = $config;
+        $user = Auth::user();
+        if ($user === null) {
             return;
         }
-        Auth::user()->setSetting(
+        $user->setSetting(
             'liturgySheetConfig_'.$this->getKey(),
             $this->config,
         );
     }
 
     /**
-     * @return null
+     * @return string|null Configuration component, if one is configured.
      */
-    public function getConfigurationComponent()
+    public function getConfigurationComponent(): ?string
     {
         return $this->configurationComponent;
     }
 
     /**
-     * @param  null  $configurationComponent
+     * @param  string|null  $configurationComponent  Configuration component.
      */
-    public function setConfigurationComponent($configurationComponent): void
+    public function setConfigurationComponent(?string $configurationComponent): void
     {
         $this->configurationComponent = $configurationComponent;
     }

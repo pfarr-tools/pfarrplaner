@@ -32,25 +32,40 @@ namespace App\Services;
 
 use App\Models\People\User;
 use App\Models\UserSetting;
+use Illuminate\Support\Collection;
 
+/** Cache and persistence for per-user settings. */
 class SettingsService
 {
+    /** @var array<array-key, Collection<array-key, mixed>> Cached settings per user identifier. */
     protected $settings = [];
 
-    protected function cacheSettings(User $user)
+    /**
+     * Load all settings of a user into the cache if they are not cached yet.
+     *
+     * @param  User  $user  User whose settings are loaded.
+     */
+    protected function cacheSettings(User $user): void
     {
         // cache all settings, if not done yet
         if (! is_array($this->settings) || (! isset($this->settings[$user->id])) || (count($this->settings[$user->id]) == 0)) {
             $this->settings[$user->id] = UserSetting::where('user_id', $user->id)->get()->mapWithKeys(function ($item) {
-                return [$item['key'] => $item];
+                /** @var UserSetting $item */
+                /** @var string $key */
+                $key = $item['key'];
+
+                return [$key => $item];
             });
         }
     }
 
     /**
-     * @param  null  $default
-     * @param  bool  $returnObject
-     * @param  bool  $unserialize
+     * Read a single user setting or return a fallback value.
+     *
+     * @param  User  $user  User whose setting is read.
+     * @param  string  $key  Setting key.
+     * @param  null  $default  Fallback value when the setting is absent.
+     * @param  bool  $returnObject  Whether the setting model is returned instead of its value.
      * @return UserSetting|mixed
      */
     public function get(User $user, string $key, $default = null, $returnObject = false)
@@ -72,6 +87,7 @@ class SettingsService
         } else {
             $setting = $this->settings[$user->id][$key];
         }
+        /** @var UserSetting $setting */
         $return = ($returnObject ? $setting : $setting->value);
         error_reporting($err);
 
@@ -79,6 +95,12 @@ class SettingsService
 
     }
 
+    /**
+     * Determine whether a user has a stored setting.
+     *
+     * @param  User  $user  User whose setting is checked.
+     * @param  string  $key  Setting key.
+     */
     public function has(User $user, string $key): bool
     {
         $this->cacheSettings($user);
@@ -86,6 +108,14 @@ class SettingsService
         return isset($this->settings[$user->id][$key]);
     }
 
+    /**
+     * Store a setting for a user, serializing array values.
+     *
+     * @param  User  $user  User whose setting is stored.
+     * @param  string  $key  Setting key.
+     * @param  mixed  $value  Value to store; arrays are serialized before saving.
+     * @return UserSetting The persisted setting model.
+     */
     public function set(User $user, string $key, $value): UserSetting
     {
         $this->cacheSettings($user);
@@ -94,6 +124,7 @@ class SettingsService
         }
         if ($this->has($user, $key)) {
             $setting = $this->get($user, $key, null, true);
+            /** @var UserSetting $setting */
             $setting->value = $value;
             $setting->save();
         } else {
@@ -109,7 +140,14 @@ class SettingsService
         return $setting;
     }
 
-    public function all(User $user, $forceReload = false)
+    /**
+     * Return all settings of a user keyed by setting name.
+     *
+     * @param  User  $user  User whose settings are returned.
+     * @param  bool  $forceReload  Whether the cached settings are discarded first.
+     * @return Collection<array-key, mixed>|array{} Setting values keyed by setting name.
+     */
+    public function all(User $user, bool $forceReload = false): Collection|array
     {
         if ($forceReload) {
             unset($this->settings[$user->id]);
@@ -117,6 +155,7 @@ class SettingsService
         $this->cacheSettings($user);
 
         return $this->settings[$user->id] ? $this->settings[$user->id]->map(function ($item) {
+            /** @var UserSetting $item */
             return $item->value;
         }) : [];
     }

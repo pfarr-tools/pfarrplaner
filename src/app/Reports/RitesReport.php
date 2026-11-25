@@ -38,7 +38,6 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
 use PhpOffice\PhpWord\Element\Section;
@@ -70,6 +69,9 @@ class RitesReport extends AbstractWordDocumentReport
      */
     public $description = 'Freud & Leid (Kasualien) für den Gemeindebrief';
 
+    /**
+     * @var array<string, mixed> Validierte Berichtsparameter.
+     */
     protected $data = [];
 
     protected $inertia = true;
@@ -79,7 +81,7 @@ class RitesReport extends AbstractWordDocumentReport
      */
     public function setup()
     {
-        $cities = Auth::user()->cities;
+        $cities = $this->authenticatedUser()->cities;
 
         return Inertia::render('Report/Rites/Setup', compact('cities'));
     }
@@ -89,7 +91,7 @@ class RitesReport extends AbstractWordDocumentReport
      */
     public function render(Request $request)
     {
-        $this->data = $request->validate(
+        $data = $request->validate(
             [
                 'includeCities' => 'required',
                 'includeCities.*' => 'int|exists:cities,id',
@@ -99,18 +101,20 @@ class RitesReport extends AbstractWordDocumentReport
                 'baptismDatesEnd' => 'required|date',
             ]
         );
+        /** @var array{includeCities: array<int, int>, start: string, end: string, baptismDatesStart: string, baptismDatesEnd: string} $data */
+        $this->data = $data;
 
         $section = $this->commonDocumentSetup();
-        $start = Carbon::parse($this->data['start'])->startOfDay();
-        $end = Carbon::parse($this->data['end'])->endOfDay();
-        $baptismDatesStart = Carbon::parse($this->data['baptismDatesStart'])->startOfDay();
-        $baptismDatesEnd = Carbon::parse($this->data['baptismDatesEnd'])->endOfDay();
+        $start = Carbon::parse($data['start'])->startOfDay();
+        $end = Carbon::parse($data['end'])->endOfDay();
+        $baptismDatesStart = Carbon::parse($data['baptismDatesStart'])->startOfDay();
+        $baptismDatesEnd = Carbon::parse($data['baptismDatesEnd'])->endOfDay();
 
         $this->renderBaptisms(
             $section,
             Service::with('baptisms')
                 ->whereHas('baptisms')
-                ->inCities($this->data['includeCities'])
+                ->inCities($data['includeCities'])
                 ->between($start, $end)
                 ->ordered()
                 ->get()
@@ -119,7 +123,7 @@ class RitesReport extends AbstractWordDocumentReport
         $this->renderBaptismDates(
             $section,
             Service::where('baptism', 1)
-                ->inCities($this->data['includeCities'])
+                ->inCities($data['includeCities'])
                 ->between($baptismDatesStart, $baptismDatesEnd)
                 ->ordered()
                 ->get()
@@ -129,7 +133,7 @@ class RitesReport extends AbstractWordDocumentReport
             $section,
             Service::with('weddings')
                 ->whereHas('weddings')
-                ->inCities($this->data['includeCities'])
+                ->inCities($data['includeCities'])
                 ->between($start, $end)
                 ->ordered()
                 ->get()
@@ -141,7 +145,7 @@ class RitesReport extends AbstractWordDocumentReport
                 ->whereHas('funerals', function ($q) {
                     $q->where('funerals.type', '!=', 'Urnenbeisetzung');
                 })
-                ->inCities($this->data['includeCities'])
+                ->inCities($data['includeCities'])
                 ->between($start, $end)
                 ->ordered()
                 ->get()
@@ -149,7 +153,7 @@ class RitesReport extends AbstractWordDocumentReport
 
         return $this->sendToBrowser(
             FileNameService::make(
-                static::FILE_TITLE,
+                self::FILE_TITLE,
                 'docx',
                 static::FILE_SIGNATURE,
                 [$start, $end]
@@ -168,17 +172,22 @@ class RitesReport extends AbstractWordDocumentReport
         $this->wordDocument->setDefaultFontSize(10);
         $section = $this->wordDocument->addSection(
             [
-                'marginTop' => Converter::cmToTwip('1.9'),
-                'marginBottom' => Converter::cmToTwip('0.25'),
-                'marginLeft' => Converter::cmToTwip('1.59'),
-                'marginRight' => Converter::cmToTwip('0.25'),
+                'marginTop' => Converter::cmToTwip(1.9),
+                'marginBottom' => Converter::cmToTwip(0.25),
+                'marginLeft' => Converter::cmToTwip(1.59),
+                'marginRight' => Converter::cmToTwip(0.25),
             ]
         );
 
         return $section;
     }
 
-    public function heading(Section $section, $title): void
+    /**
+     * Schreibt eine Überschrift in den Bericht.
+     *
+     * @param  string  $title  Überschriftstext.
+     */
+    public function heading(Section $section, string $title): void
     {
         $run = $section->addTextRun();
         $run->addText($title, ['name' => 'Yanone Kaffeesatz', 'size' => 20, 'bold' => true]);
@@ -188,22 +197,30 @@ class RitesReport extends AbstractWordDocumentReport
     {
         return $section->addTextRun([
             'tabs' => [
-                new Tab('right', Converter::cmToTwip(6)),
-                new Tab('left', Converter::cmToTwip(6.7)),
-                new Tab('left', Converter::cmToTwip(7)),
+                new Tab('right', (int) Converter::cmToTwip(6)),
+                new Tab('left', (int) Converter::cmToTwip(6.7)),
+                new Tab('left', (int) Converter::cmToTwip(7)),
             ],
         ]);
     }
 
-    public function renderDateColumn(TextRun $run, $service, &$lastDate): void
+    /**
+     * Schreibt die Datumsspalte für einen Gottesdienst.
+     *
+     * @param  Service  $service  Gottesdienst, dessen Datum dargestellt wird.
+     * @param  Carbon|null  $lastDate  Zuletzt dargestelltes Datum.
+     */
+    public function renderDateColumn(TextRun $run, Service $service, ?Carbon &$lastDate): void
     {
         $run->addText("\t");
-        if ($service->date->format('Ymd') != $lastDate->format('Ymd')) {
-            $run->addText($service->date->isoFormat('LL'));
+        if ($lastDate === null || $service->trueDate()->format('Ymd') != $lastDate->format('Ymd')) {
+            $run->addText($service->trueDate()->isoFormat('LL'));
         }
-        $lastDate = $service->date;
+        $lastDate = $service->trueDate();
         $run->addText("\t");
-        if (count($this->data['includeCities']) > 1) {
+        /** @var array{includeCities: array<int, int>} $data */
+        $data = $this->data;
+        if (count($data['includeCities']) > 1 && $service->city !== null) {
             $run->addText('('.substr(utf8_decode($service->city->name), 0, 1).')');
         }
         $run->addText("\t");
@@ -224,7 +241,9 @@ class RitesReport extends AbstractWordDocumentReport
         foreach ($baptisms as $service) {
             foreach ($service->baptisms as $baptism) {
                 $this->renderDateColumn($run, $service, $lastDate);
-                $run->addText(NameService::fromName($baptism->candidate_name)->format(NameService::FIRST_LAST));
+                /** @var string $candidateName */
+                $candidateName = $baptism->candidate_name;
+                $run->addText(NameService::fromName($candidateName)->format(NameService::FIRST_LAST));
                 $run->addTextBreak();
             }
         }
@@ -249,8 +268,11 @@ class RitesReport extends AbstractWordDocumentReport
                 $partners = [];
                 foreach ([1, 2] as $index) {
                     $nameField = 'spouse'.$index.'_name';
-                    $name = NameService::fromName($wedding->$nameField);
+                    /** @var string $spouseName */
+                    $spouseName = $wedding->$nameField;
+                    $name = NameService::fromName($spouseName);
                     $nameField = 'spouse'.$index.'_birth_name';
+                    /** @var string|null $birthName */
                     $birthName = $wedding->$nameField;
 
                     $partners[] = $name->format(NameService::FIRST_LAST).($birthName ? ', geb. '.$birthName : '');
@@ -272,15 +294,17 @@ class RitesReport extends AbstractWordDocumentReport
         $this->heading($section, 'Nächste Tauftermine:');
         $baptismalServices = $baptismalServices->groupBy('city_id');
         $run = $this->getListRun($section);
-        foreach ($this->data['includeCities'] as $cityId) {
-            $city = City::find($cityId);
+        /** @var array{includeCities: array<int, int>} $data */
+        $data = $this->data;
+        foreach ($data['includeCities'] as $cityId) {
+            $city = City::findOrFail((int) $cityId);
             $run->addText("\t");
             $run->addText($city->name."\t\t");
 
             $dates = [];
-            foreach ($baptismalServices[$cityId] as $baptismalService) {
+            foreach ($baptismalServices->get($cityId, collect()) as $baptismalService) {
                 /** @var Service $baptismalService */
-                $dates[] = $baptismalService->date->isoFormat('D. MMMM');
+                $dates[] = $baptismalService->trueDate()->isoFormat('D. MMMM');
             }
             $run->addText(implode(', ', $dates));
             $run->addTextBreak();
@@ -302,7 +326,9 @@ class RitesReport extends AbstractWordDocumentReport
         foreach ($funerals as $service) {
             foreach ($service->funerals as $funeral) {
                 $this->renderDateColumn($run, $service, $lastDate);
-                $name = NameService::fromName($funeral->buried_name);
+                /** @var string $buriedName */
+                $buriedName = $funeral->buried_name;
+                $name = NameService::fromName($buriedName);
                 $run->addText(
                     $name->format(NameService::FIRST_LAST)
                     .($funeral->birthName ? ', geb. '.$funeral->birthName : '')

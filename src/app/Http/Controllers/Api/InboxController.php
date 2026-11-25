@@ -32,6 +32,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Carbon\Carbon;
+use Illuminate\Http\JsonResponse;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 /** Provides access to the authenticated upload Inbox. */
@@ -40,26 +41,31 @@ class InboxController extends Controller
     public const ALLOWED_EXTENSIONS = ['pdf', 'jpg', 'jpeg', 'png'];
 
     /** Return the list of allowed Inbox files. */
-    public function index()
+    public function index(): JsonResponse
     {
         $inboxPath = config('inbox.path');
-        if (! $inboxPath) {
+        if (! is_string($inboxPath) || $inboxPath === '') {
             return response()->json(false);
         }
 
-        $files = collect(glob(storage_path($inboxPath.'/*')))->filter(function ($item) {
-            return in_array(pathinfo($item, PATHINFO_EXTENSION), static::ALLOWED_EXTENSIONS);
+        $files = collect(glob(storage_path($inboxPath.'/*')) ?: [])->filter(function (string $item) {
+            return is_file($item) && in_array(pathinfo($item, PATHINFO_EXTENSION), self::ALLOWED_EXTENSIONS);
         })->map(function ($item) {
             $extension = strtolower(pathinfo($item, PATHINFO_EXTENSION));
+            $size = filesize($item);
+            $createdAt = filectime($item);
+            if ($size === false || $createdAt === false) {
+                return null;
+            }
 
             return [
                 'name' => basename($item),
                 'extension' => $extension,
-                'filesize' => filesize($item),
+                'filesize' => $size,
                 'icon' => $extension == 'pdf' ? 'mdi mdi-file-pdf-box' : 'fa fa-file-image',
-                'date' => Carbon::createFromTimestamp(filectime($item))->toIso8601String(),
+                'date' => Carbon::createFromTimestamp($createdAt)->toIso8601String(),
             ];
-        });
+        })->filter();
 
         return response()->json($files->values()->all());
     }
@@ -68,14 +74,14 @@ class InboxController extends Controller
     public function download(string $filename): BinaryFileResponse
     {
         $inboxPath = config('inbox.path');
-        $directory = $inboxPath ? realpath(storage_path($inboxPath)) : false;
+        $directory = is_string($inboxPath) && $inboxPath !== '' ? realpath(storage_path($inboxPath)) : false;
         $basename = basename($filename);
         $extension = strtolower(pathinfo($basename, PATHINFO_EXTENSION));
         $path = $directory ? realpath($directory.'/'.$basename) : false;
 
         abort_unless(
             $directory && $path && str_starts_with($path, $directory.DIRECTORY_SEPARATOR)
-                && in_array($extension, static::ALLOWED_EXTENSIONS, true),
+                && in_array($extension, self::ALLOWED_EXTENSIONS, true),
             404
         );
 

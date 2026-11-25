@@ -30,13 +30,25 @@
 
 namespace App\Services;
 
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 
+/** Service for attaching authorization information to model collections. */
 class ResourcePolicyService
 {
-    public static function attachPermissions($models)
+    /**
+     * Attach the current user's abilities to every model in the collection.
+     *
+     * @param  Collection<int, Model>  $models  Models to enrich with permission information.
+     * @return Collection<int, Model> Models with an added "can" attribute.
+     */
+    public static function attachPermissions(Collection $models): Collection
     {
         $user = Auth::user();
+        if ($user === null) {
+            return $models;
+        }
         foreach ($models as $index => $model) {
             $can = [];
             foreach (['view', 'viewAny', 'create', 'update', 'delete', 'restore', 'forceDelete'] as $capacity) {

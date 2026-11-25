@@ -34,6 +34,6 @@ use App\Models\Leave\Poolmaster;
 use App\Models\People\User;
 
 /**
- * @method Poolmaster update(User $user, Poolmaster $poolmaster, array $input)
+ * @method Poolmaster update(User $user, Poolmaster $poolmaster, array<string, mixed> $input)
  */
 interface UpdatesPoolmasters {}

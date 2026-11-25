@@ -36,15 +36,25 @@ use Illuminate\Support\Str;
 
 abstract class AbstractLocalEventCalendar
 {
+    /** @var string Calendar group label. */
     protected static $group = '';
 
+    /** @var string Calendar identifier. */
     protected $id;
 
+    /**
+     * @param  string  $id  Calendar identifier.
+     */
     public function __construct($id)
     {
         $this->id = $id;
     }
 
+    /**
+     * Get all calendars of this type.
+     *
+     * @return array<int, array{id: string, name: string, group: string}> Calendar entries.
+     */
     abstract public static function list(): array;
 
     /**
@@ -53,18 +63,31 @@ abstract class AbstractLocalEventCalendar
      */
     abstract public function adjustQuery(Builder $query): Builder;
 
-    public static function getKey()
+    /**
+     * Get the key identifying this calendar type.
+     */
+    public static function getKey(): string
     {
         return Str::lcfirst(Str::replace(['App\\Calendars\\LocalEventCalendars\\', 'LocalEventCalendar'], ['', ''], get_called_class()));
     }
 
-    public static function getEntry($id, $name)
+    /**
+     * Build the entry describing a single local calendar.
+     *
+     * @param  int|string  $id  Calendar identifier.
+     * @param  string  $name  Calendar name.
+     * @return array{id: string, name: string, group: string} Calendar entry.
+     */
+    public static function getEntry($id, $name): array
     {
         return ['id' => static::getKey().':'.$id, 'name' => $name, 'group' => static::$group];
     }
 
     /**
      * Preset the data from the chosen local calendar for a new event
+     *
+     * @param  array<string, mixed>  $data  Service attributes.
+     * @return array<string, mixed> Preset service attributes.
      */
     public function presetData(array $data): array
     {

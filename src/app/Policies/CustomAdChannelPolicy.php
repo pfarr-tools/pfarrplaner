@@ -2,9 +2,9 @@
 
 namespace App\Policies;
 
-use App\Models\CustomAdChannel;
 use App\Models\People\User;
 
+/** Policy for custom advertisement channels. */
 class CustomAdChannelPolicy
 {
     /**
@@ -18,7 +18,7 @@ class CustomAdChannelPolicy
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, CustomAdChannel $customAdChannel): bool
+    public function view(User $user, mixed $customAdChannel): bool
     {
         return false;
     }
@@ -34,7 +34,7 @@ class CustomAdChannelPolicy
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, CustomAdChannel $customAdChannel): bool
+    public function update(User $user, mixed $customAdChannel): bool
     {
         return false;
     }
@@ -42,7 +42,7 @@ class CustomAdChannelPolicy
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, CustomAdChannel $customAdChannel): bool
+    public function delete(User $user, mixed $customAdChannel): bool
     {
         return false;
     }
@@ -50,7 +50,7 @@ class CustomAdChannelPolicy
     /**
      * Determine whether the user can restore the model.
      */
-    public function restore(User $user, CustomAdChannel $customAdChannel): bool
+    public function restore(User $user, mixed $customAdChannel): bool
     {
         return false;
     }
@@ -58,7 +58,7 @@ class CustomAdChannelPolicy
     /**
      * Determine whether the user can permanently delete the model.
      */
-    public function forceDelete(User $user, CustomAdChannel $customAdChannel): bool
+    public function forceDelete(User $user, mixed $customAdChannel): bool
     {
         return false;
     }

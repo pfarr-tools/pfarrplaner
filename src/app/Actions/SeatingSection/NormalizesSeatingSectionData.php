@@ -18,9 +18,13 @@ use App\Seating\SeatingModels;
 
 class NormalizesSeatingSectionData
 {
+    /**
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
     public static function normalize(array $data): array
     {
-        if (isset($data['seating_model']) && ($model = SeatingModels::byTitle($data['seating_model']))) {
+        if (isset($data['seating_model']) && is_string($data['seating_model']) && ($model = SeatingModels::byTitle($data['seating_model']))) {
             $data['seating_model'] = get_class($model);
         }
 

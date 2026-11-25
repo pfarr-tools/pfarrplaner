@@ -42,7 +42,11 @@ class LocationLocalEventCalendar extends AbstractLocalEventCalendar
     public static function list(): array
     {
         $calendars = [];
-        foreach (Location::inCities(Auth::user()->cities->pluck('id'))->get() as $location) {
+        $user = Auth::user();
+        if ($user === null) {
+            return $calendars;
+        }
+        foreach (Location::inCities($user->cities->pluck('id'))->get() as $location) {
             $calendars[] = static::getEntry($location->id, $location->name);
         }
 
@@ -65,6 +69,7 @@ class LocationLocalEventCalendar extends AbstractLocalEventCalendar
         $data['city_id'] = $location->city_id;
         $data['location_id'] = $location->id;
 
+        /** @var Carbon $date */
         $date = $data['date'] ?? Carbon::parse('next Sunday');
         if ($location->default_time) {
             $data['date'] ??= Carbon::parse($date->format('Y-m-d').' '.$location->default_time, 'Europe/Berlin');

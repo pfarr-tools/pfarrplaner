@@ -29,6 +29,7 @@
  */
 
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 /**
@@ -46,6 +47,7 @@ class AddBaptismCityField extends Migration
         Schema::table(
             'baptisms',
             function ($table) {
+                /** @var Blueprint $table */
                 $table->integer('city_id')->nullable();
             }
         );
@@ -61,6 +63,7 @@ class AddBaptismCityField extends Migration
         Schema::table(
             'baptisms',
             function ($table) {
+                /** @var Blueprint $table */
                 $table->dropColumn('city_id');
             }
         );

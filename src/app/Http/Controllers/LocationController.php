@@ -68,7 +68,7 @@ class LocationController extends AbstractCRUDController
     protected function getResourcesForEditor(Request $request, $model = null): array
     {
         $data = parent::getResourcesForEditor($request, $model);
-        $data['alternateLocations'] = $model ? $model->city->locations->where('id', '!=', $model->id) : [];
+        $data['alternateLocations'] = $model ? ($model->city->locations ?? collect())->where('id', '!=', $model->id) : [];
         $data['seatingRows'] = $model ? SeatingRow::with('seatingSection')
             ->whereHas('seatingSection', function ($q) use ($model) {
                 $q->where('location_id', $model->id);

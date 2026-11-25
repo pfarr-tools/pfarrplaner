@@ -60,7 +60,9 @@ class LiturgyItemController extends Controller
 
         $item = Item::create($data);
         if (isset($data['data'])) {
-            $item->data = $data['data'];
+            /** @var array<string, mixed> $itemData */
+            $itemData = $data['data'];
+            $item->data = $itemData;
             $item->performTypeSpecificActionsOnCreate();
             $item->save();
         }
@@ -79,7 +81,9 @@ class LiturgyItemController extends Controller
         $data = $this->validateRequest($request);
         $item->update($data);
         if ($data['data']) {
-            $item->data = $data['data'];
+            /** @var array<string, mixed> $itemData */
+            $itemData = $data['data'];
+            $item->data = $itemData;
             $item->performTypeSpecificActionsOnUpdate();
             $item->save();
         }
@@ -101,11 +105,14 @@ class LiturgyItemController extends Controller
     }
 
     /**
-     * Validate the request
+     * Validate the request.
+     *
+     * @return array<string, mixed>
      */
     protected function validateRequest(Request $request): array
     {
-        return $request->validate(
+        /** @var array<string, mixed> $validated */
+        $validated = $request->validate(
             [
                 'title' => 'required|string',
                 'instructions' => 'nullable|string',
@@ -114,5 +121,7 @@ class LiturgyItemController extends Controller
                 'data' => 'nullable',
             ]
         );
+
+        return $validated;
     }
 }

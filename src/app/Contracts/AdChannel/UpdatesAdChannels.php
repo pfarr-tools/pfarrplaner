@@ -34,6 +34,6 @@ use App\Models\Ads\AdChannel;
 use App\Models\People\User;
 
 /**
- * @method AdChannel update(User $user, AdChannel $adChannel, array $input)
+ * @method AdChannel update(User $user, AdChannel $adChannel, array<string, mixed> $input)
  */
 interface UpdatesAdChannels {}

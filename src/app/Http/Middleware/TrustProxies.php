@@ -41,7 +41,7 @@ class TrustProxies extends Middleware
     /**
      * The trusted proxies for this application.
      *
-     * @var array
+     * @var array<int, string>|string|null
      */
     protected $proxies = '*';
 
@@ -58,6 +58,8 @@ class TrustProxies extends Middleware
 
     public function __construct()
     {
-        $this->proxies = config('octane.trust_proxies', ['127.0.0.1']);
+        /** @var array<int, string>|string|null $proxies */
+        $proxies = config('octane.trust_proxies', ['127.0.0.1']);
+        $this->proxies = $proxies;
     }
 }

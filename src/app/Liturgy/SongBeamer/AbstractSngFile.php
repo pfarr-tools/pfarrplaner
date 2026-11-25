@@ -35,12 +35,19 @@ use Illuminate\Support\Str;
 
 abstract class AbstractSngFile extends AbstractFile
 {
+    /** @var array<string, string|int> SNG header key/value pairs */
     protected $headers = [];
 
+    /** @var string Name of the generated SNG file */
     protected $fileName = '';
 
+    /** @var string Song or slide title */
     protected $title = '';
 
+    /**
+     * @param  string  $title  Song title.
+     * @return void
+     */
     public function __construct(string $title)
     {
         $this->setTitle($title);
@@ -51,9 +58,10 @@ abstract class AbstractSngFile extends AbstractFile
     /**
      * Wrap song text after 40 characters
      *
-     * @return string
+     * @param  string  $line  Line to wrap
+     * @param  int  $indent  Indentation depth
      */
-    protected function wordWrap($line, $indent = 0)
+    protected function wordWrap(string $line, int $indent = 0): string
     {
         $lineLength = 40 - $indent;
         $pad = str_repeat(' ', $indent);
@@ -72,6 +80,8 @@ abstract class AbstractSngFile extends AbstractFile
 
     /**
      * Get the data for the schedule file
+     *
+     * @return array<string, mixed> Schedule item data
      */
     public function toScheduleItem(): array
     {
@@ -87,6 +97,8 @@ abstract class AbstractSngFile extends AbstractFile
 
     /**
      * Get the data for the song profile
+     *
+     * @return array<string, mixed> Song profile data
      */
     public function toProfile(): array
     {
@@ -95,11 +107,21 @@ abstract class AbstractSngFile extends AbstractFile
         ];
     }
 
+    /**
+     * Get the SNG headers
+     *
+     * @return array<string, string|int> Header key/value pairs
+     */
     public function getHeaders(): array
     {
         return $this->headers;
     }
 
+    /**
+     * Set the SNG headers
+     *
+     * @param  array<string, string|int>  $headers  Header key/value pairs
+     */
     public function setHeaders(array $headers): void
     {
         $this->headers = $headers;
@@ -120,10 +142,12 @@ abstract class AbstractSngFile extends AbstractFile
     {
         if (! isset($this->headers['Editor'])) {
             $package = PackageService::info();
-            $this->addHeader('Editor', config('app.name').' '.$package['versionString']);
+            $appName = config('app.name');
+            $versionString = $package['versionString'] ?? null;
+            $this->addHeader('Editor', (is_string($appName) ? $appName : '').' '.(is_string($versionString) ? $versionString : ''));
         }
         if (! isset($this->headers['Version'])) {
-            $this->addHeader('Version', 3);
+            $this->addHeader('Version', '3');
         }
 
         $text = '';
@@ -139,6 +163,9 @@ abstract class AbstractSngFile extends AbstractFile
         return $this->fileName;
     }
 
+    /**
+     * @param  string  $fileName  File name.
+     */
     public function setFileName(string $fileName): void
     {
         $this->fileName = $fileName;
@@ -149,11 +176,19 @@ abstract class AbstractSngFile extends AbstractFile
         return $this->title;
     }
 
+    /**
+     * @param  string  $title  Song title.
+     */
     public function setTitle(string $title): void
     {
         $this->title = $title;
     }
 
+    /**
+     * Get the caption used in the schedule file
+     *
+     * @return string
+     */
     public function getCaption()
     {
         return $this->getTitle();

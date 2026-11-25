@@ -34,8 +34,13 @@ use App\Models\Liturgy\Item;
 
 class AbstractItemHelper
 {
-    protected $item;
+    /** @var Item Liturgy item handled by this helper. */
+    protected Item $item;
 
+    /**
+     * @param  Item  $item  Liturgy item.
+     *                      * @return void
+     */
     public function __construct(Item $item)
     {
         $this->item = $item;
@@ -46,6 +51,9 @@ class AbstractItemHelper
         return $this->item;
     }
 
+    /**
+     * @param  Item  $item  Liturgy item.
+     */
     public function setItem(Item $item): void
     {
         $this->item = $item;

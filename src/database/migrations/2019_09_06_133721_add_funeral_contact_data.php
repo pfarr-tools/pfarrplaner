@@ -29,6 +29,7 @@
  */
 
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 /**
@@ -46,6 +47,7 @@ class AddFuneralContactData extends Migration
         Schema::table(
             'funerals',
             function ($table) {
+                /** @var Blueprint $table */
                 $table->text('relative_contact_data')->nullable();
             }
         );
@@ -61,6 +63,7 @@ class AddFuneralContactData extends Migration
         Schema::table(
             'funerals',
             function ($table) {
+                /** @var Blueprint $table */
                 $table->dropColumn('relative_contact_data');
             }
         );

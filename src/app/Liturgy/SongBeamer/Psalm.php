@@ -47,15 +47,17 @@ class Psalm extends AbstractSngFile
     public function __construct(Item $item)
     {
         $this->item = $item;
-        $this->helper = $item->getHelper();
+        $this->helper = new PsalmItemHelper($item);
         parent::__construct($this->helper->getTitleText());
     }
 
     public function toText()
     {
+        $psalmData = $this->item->data['psalm'] ?? null;
+        $title = is_array($psalmData) && is_string($psalmData['title'] ?? null) ? $psalmData['title'] : '';
         $this->setHeaders([
             'LangCount' => 1,
-            'Title' => $this->item->data['psalm']['title'],
+            'Title' => $title,
             'ChurchSongID' => $this->helper->getCodeText(),
             'Songbook' => $this->helper->getCodeText(),
             'CCLI' => '-',

@@ -32,6 +32,7 @@ namespace App\Integrations\KonfiApp;
 
 use App\Events\ServiceBeforeUpdate;
 use App\Models\Places\City;
+use Carbon\Carbon;
 
 class ServiceBeforeUpdateListener
 {
@@ -45,14 +46,18 @@ class ServiceBeforeUpdateListener
         if (! isset($event->data['konfiapp_event_type'])) {
             return;
         }
-        if (! $this->isIntegrationActive($event->service->city)) {
+        $city = $event->service->city;
+        if ($city === null || ! $this->isIntegrationActive($city)) {
             return;
         }
         if (isset($event->data['date'])) {
-            $event->service->date = $event->data['date'];
+            $date = $event->data['date'];
+            if ($date instanceof Carbon || is_string($date)) {
+                $event->service->date = $date instanceof Carbon ? $date : Carbon::parse($date);
+            }
         }
 
-        $this->resolveIntegration($event->service->city)->handleServiceUpdate(
+        $this->resolveIntegration($city)->handleServiceUpdate(
             $event->service,
             $event->data['konfiapp_event_type'] ?? ''
         );

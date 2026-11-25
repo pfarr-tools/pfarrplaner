@@ -36,8 +36,12 @@ class DasKirchenjahrStudyHelper extends AbstractStudyHelper
 {
     public $title = 'Das Kirchenjahr';
 
+    /** @var array<string, array<string, string>> */
     protected $records = [];
 
+    /**
+     * @param  array<string, mixed>  $data  Study helper input data.\n     * @return array<string, array<string, string>>
+     */
     public function read(array $data): array
     {
         if ('' == ($content = $this->getContent(
@@ -58,6 +62,11 @@ class DasKirchenjahrStudyHelper extends AbstractStudyHelper
         return $this->records;
     }
 
+    /**
+     * Liest die Predigtlinks einer Einführungsseite.
+     *
+     * @return array<string, array<string, string>> Predigtlinks, gruppiert nach Titel
+     */
     public function readPage(string $page): array
     {
         $records = [];
@@ -80,7 +89,13 @@ class DasKirchenjahrStudyHelper extends AbstractStudyHelper
         return $records;
     }
 
-    protected function translateTitle($title)
+    /**
+     * Übersetzt einen Titel aus der Quelle in die im Kalender verwendete Bezeichnung.
+     *
+     * @param  string  $title  Titel aus der Quelle
+     * @return string Übersetzter Titel
+     */
+    protected function translateTitle(string $title): string
     {
         $translations = [
             '. Advent' => '. Sonntag im Advent',
@@ -123,10 +138,17 @@ class DasKirchenjahrStudyHelper extends AbstractStudyHelper
         return $title;
     }
 
+    /**
+     * @param  array<string, mixed>  $data  Input data.\n     * @return array<string, string>
+     */
     public function getLinks(array $data): array
     {
-        $title = $this->translateTitle($data['title']);
-        $data['links'] = array_merge($data['links'] ?? [], $this->records[$title] ?? []);
+        /** @var string $title Titel des angeforderten Tages. */
+        $title = $data['title'];
+        $title = $this->translateTitle($title);
+        /** @var array<string, string> $links Bereits vorhandene Links. */
+        $links = $data['links'] ?? [];
+        $data['links'] = array_merge($links, $this->records[$title] ?? []);
 
         return $data;
     }

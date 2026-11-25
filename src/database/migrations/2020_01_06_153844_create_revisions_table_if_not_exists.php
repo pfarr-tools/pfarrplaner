@@ -29,6 +29,7 @@
  */
 
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 /**
@@ -36,12 +37,15 @@ use Illuminate\Support\Facades\Schema;
  */
 class CreateRevisionsTableIfNotExists extends Migration
 {
-    public function up()
+    /**
+     * Legt die Tabelle revisions an, sofern sie noch nicht existiert.
+     */
+    public function up(): void
     {
         if (! Schema::hasTable('revisions')) {
             Schema::create(
                 'revisions',
-                function ($table) {
+                function (Blueprint $table) {
                     $table->increments('id');
                     $table->string('revisionable_type');
                     $table->integer('revisionable_id');

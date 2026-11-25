@@ -32,13 +32,21 @@ class CreateSeatingRow extends AbstractCreateAction implements CreatesSeatingRow
         return route('admin.location.edit', ['modelId' => $this->location->id, 'tab' => 'seating']);
     }
 
+    /**
+     * Create a new SeatingRow
+     *
+     * @param  array<string, mixed>  $input
+     */
     public function create(User $user, array $input): SeatingRow
     {
         Gate::forUser($user)->authorize('create', SeatingRow::class);
+        /** @var array{seating_section_id: int|string, ...} $input */
         $input = Validator::make($input, SeatingRow::$validationRules)->validateWithBag('createSeatingRow');
 
-        $section = SeatingSection::findOrFail($input['seating_section_id']);
-        $this->location = $section->location;
+        $section = SeatingSection::findOrFail((int) $input['seating_section_id']);
+        $location = $section->location;
+        abort_unless($location instanceof Location, 404);
+        $this->location = $location;
         Gate::forUser($user)->authorize('update', $this->location);
 
         $seatingRow = SeatingRow::create(NormalizesSeatingRowData::normalize($input));

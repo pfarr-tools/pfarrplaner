@@ -80,9 +80,16 @@ class InstallCommand extends Command
         }
 
         $template = file_get_contents($templatePath);
+        if ($template === false) {
+            $this->components->error('Die Vorlage .env.example konnte nicht gelesen werden.');
+
+            return Command::FAILURE;
+        }
         $defaults = $this->extractDefaults($template);
         $values = $this->collectEnvironmentValues($defaults);
-        $adminData = $this->collectAdminData($values['APP_ADMINISTRATOR']);
+        /** @var string $administratorEmail */
+        $administratorEmail = $values['APP_ADMINISTRATOR'];
+        $adminData = $this->collectAdminData($administratorEmail);
         $environment = $this->installer->buildEnvironmentFile($template, $values);
 
         $this->line('');
@@ -105,7 +112,9 @@ class InstallCommand extends Command
         $this->installer->applyRuntimeConfiguration($values);
 
         if ($values['DB_CONNECTION'] === 'sqlite') {
-            $this->installer->ensureSqliteDatabaseExists($values['DB_DATABASE']);
+            /** @var string $databasePath */
+            $databasePath = $values['DB_DATABASE'];
+            $this->installer->ensureSqliteDatabaseExists($databasePath);
         }
 
         $this->components->info('Migrationen werden jetzt mit der konfigurierten Datenbank ausgefuehrt.');
@@ -166,18 +175,20 @@ class InstallCommand extends Command
         $mailFromAddress = $this->askRequiredOption('mail-from-address', 'Absenderadresse fuer Systemmails', $defaults['MAIL_FROM_ADDRESS'] ?? $this->defaultMailFromAddress($appUrl));
         $mailFromName = $this->askRequiredOption('mail-from-name', 'Anzeigename fuer Systemmails', $defaults['MAIL_FROM_NAME'] ?? $appName);
         $administratorEmail = $this->askRequiredOption('admin-email', 'E-Mail-Adresse fuer APP_ADMINISTRATOR', $defaults['APP_ADMINISTRATOR'] ?? $mailFromAddress);
+        $appCipher = config('app.cipher');
+        $databaseCipher = config('database.cipher');
 
         return array_merge([
             'APP_NAME' => $appName,
             'APP_ENV' => $appEnv,
-            'APP_KEY' => $this->generateKey(config('app.cipher')),
+            'APP_KEY' => $this->generateKey(is_string($appCipher) ? $appCipher : 'AES-256-CBC'),
             'APP_DEBUG' => $appDebug,
             'APP_URL' => $appUrl,
             'TOKEN_SALT' => Str::random(64),
             'APP_ADMINISTRATOR' => $administratorEmail,
             'MAIL_FROM_ADDRESS' => $mailFromAddress,
             'MAIL_FROM_NAME' => $mailFromName,
-            'DATABASE_KEY' => $this->generateKey(config('database.cipher')),
+            'DATABASE_KEY' => $this->generateKey(is_string($databaseCipher) ? $databaseCipher : 'AES-256-CBC'),
         ], $databaseValues);
     }
 
@@ -247,7 +258,9 @@ class InstallCommand extends Command
             return $default;
         }
 
-        return (string) $this->ask($question, $default);
+        $answer = $this->ask($question, $default);
+
+        return is_scalar($answer) ? (string) $answer : $default;
     }
 
     /**
@@ -295,7 +308,14 @@ class InstallCommand extends Command
             return $default;
         }
 
-        return (string) $this->choice($question, $choices, $default);
+        $answer = $this->choice($question, $choices, $default);
+        if (is_array($answer)) {
+            $selected = $answer[0] ?? null;
+
+            return is_string($selected) ? $selected : $default;
+        }
+
+        return $answer;
     }
 
     /**
@@ -363,7 +383,7 @@ class InstallCommand extends Command
     {
         $defaults = [];
 
-        foreach (preg_split('/\r\n|\r|\n/', $template) as $line) {
+        foreach (preg_split('/\r\n|\r|\n/', $template) ?: [] as $line) {
             if ((! $line) || Str::startsWith(trim($line), '#') || ! str_contains($line, '=')) {
                 continue;
             }

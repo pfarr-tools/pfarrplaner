@@ -41,6 +41,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Collection;
 
 /**
  * Class Day
@@ -55,17 +56,17 @@ class Day extends Model
     public const DAY_TYPE_LIMITED = 1;
 
     /**
-     * @var string[]
+     * @var list<string>
      */
     protected $fillable = ['date', 'name', 'description', 'day_type'];
 
     /**
-     * @var string[]
+     * @var array<string, string>
      */
     protected $casts = ['date' => 'datetime'];
 
     /**
-     * @var string[]
+     * @var list<string>
      */
     protected $appends = ['liturgy'];
 
@@ -73,10 +74,15 @@ class Day extends Model
 
     /**
      * Add liturgy attribute
+     *
+     * @return array<string, mixed> Liturgy information for the day.
      */
     public function getLiturgyAttribute(): array
     {
-        return LiturgyService::getLiturgyInfoByDate($this->date);
+        /** @var array<string, mixed> $liturgy */
+        $liturgy = LiturgyService::getLiturgyInfoByDate($this->date);
+
+        return is_array($liturgy) ? $liturgy : [];
     }
     // END ACCESSORS
 
@@ -84,11 +90,11 @@ class Day extends Model
     /**
      * Accept a d.m.Y-formatted string as date attribute
      *
-     * @param  string  $date
+     * @param  Carbon|string  $date  Date to set.
      */
-    public function setDateAttribute($date)
+    public function setDateAttribute($date): void
     {
-        if (is_a($date, Carbon::class)) {
+        if ($date instanceof Carbon) {
             $this->attributes['date'] = $date;
         } else {
             $this->attributes['date'] = Carbon::createFromFormat('d.m.Y', $date);
@@ -106,16 +112,20 @@ class Day extends Model
         $date->setTime(0, 0, 0)->setDay(1);
 
         return $query->where('date', '>=', $date)
-            ->where('date', '<=', $date->copy()->addMonth(1)->subSecond(1));
+            ->where('date', '<=', $date->copy()->addMonth()->subSecond());
     }
 
     /**
+     * Restrict days to those visible for the given cities.
+     *
      * @param  Builder<static>  $query  Query being filtered.
+     * @param  Collection<array-key, mixed>  $cities  Cities to filter for.
      * @return Builder<static>
      */
     public function scopeVisibleForCities(Builder $query, $cities)
     {
-        if (count($cities) && isset($cities->first()->id)) {
+        $firstCity = $cities->first();
+        if (count($cities) && is_object($firstCity) && isset($firstCity->id)) {
             $cities = $cities->pluck('id');
         }
 
@@ -134,6 +144,7 @@ class Day extends Model
 
     /**
      * @param  Builder<static>  $query  Query being filtered.
+     * @param  Carbon|string  $date  Lower date bound.
      * @return Builder<static>
      */
     public function scopeStartingFrom(Builder $query, $date)
@@ -143,6 +154,7 @@ class Day extends Model
 
     /**
      * @param  Builder<static>  $query  Query being filtered.
+     * @param  Carbon|string  $date  Upper date bound.
      * @return Builder<static>
      */
     public function scopeEndingAt(Builder $query, $date)
@@ -191,6 +203,9 @@ class Day extends Model
         return $day;
     }
 
+    /**
+     * @return void
+     */
     protected static function boot()
     {
         parent::boot();

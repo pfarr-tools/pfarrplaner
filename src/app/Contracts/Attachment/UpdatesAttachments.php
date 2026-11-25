@@ -34,6 +34,6 @@ use App\Models\Attachment;
 use App\Models\People\User;
 
 /**
- * @method Attachment update(User $user, Attachment $attachment, array $input)
+ * @method Attachment update(User $user, Attachment $attachment, array<string, mixed> $input)
  */
 interface UpdatesAttachments {}

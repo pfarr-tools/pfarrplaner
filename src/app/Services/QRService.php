@@ -70,7 +70,7 @@ class QRService
         @unlink($tmp);
 
         if ($code !== 0) {
-            throw new RuntimeException("qrencode failed with exit code $code");
+            throw new \RuntimeException("qrencode failed with exit code $code");
         }
 
         return $file;

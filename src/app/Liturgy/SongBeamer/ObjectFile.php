@@ -30,14 +30,29 @@
 
 namespace App\Liturgy\SongBeamer;
 
+/**
+ * Represents a configurable SongBeamer object file.
+ */
 class ObjectFile extends AbstractFile
 {
+    /** @var string Class name used in the object declaration. */
     protected $class = '';
 
+    /** @var string Type name used in the object declaration. */
     protected $type = '';
 
+    /**
+     * Configuration blocks or raw text lines of the object.
+     *
+     * @var array<array-key, array<string, mixed>|string>
+     */
     protected $items = [];
 
+    /**
+     * @param  string  $class  Class name used in the object declaration
+     * @param  string  $type  Type name used in the object declaration
+     * @param  array<array-key, array<string, mixed>|string>  $items  Configuration blocks or raw text lines
+     */
     public function __construct($class, $type, $items)
     {
         $this->class = $class;
@@ -45,6 +60,12 @@ class ObjectFile extends AbstractFile
         $this->items = $items;
     }
 
+    /**
+     * Formats a single configuration value for the SongBeamer object syntax.
+     *
+     * @param  mixed  $value  Configuration value to format
+     * @return string Formatted value
+     */
     protected function valueToString($value)
     {
         if (is_numeric($value)) {
@@ -64,6 +85,12 @@ class ObjectFile extends AbstractFile
         return "''";
     }
 
+    /**
+     * Renders a single configuration block as object file text.
+     *
+     * @param  array<string, mixed>  $config  Configuration key-value pairs
+     * @return string Rendered configuration block
+     */
     public function itemToText($config)
     {
         $item = $this->line('item', 2);
@@ -75,6 +102,12 @@ class ObjectFile extends AbstractFile
         return $item;
     }
 
+    /**
+     * Renders all items of the object as object file text.
+     *
+     * @param  array<array-key, array<string, mixed>|string>  $items  Configuration blocks or raw text lines
+     * @return string Rendered items section
+     */
     public function itemsToText($items)
     {
         $text = $this->line('items = <', 1);
@@ -86,6 +119,11 @@ class ObjectFile extends AbstractFile
         return $text;
     }
 
+    /**
+     * Renders the complete object file.
+     *
+     * @return string Complete object file text
+     */
     public function toText()
     {
         return $this->line('object '.$this->class.': '.$this->type)
@@ -98,6 +136,9 @@ class ObjectFile extends AbstractFile
         return $this->class;
     }
 
+    /**
+     * @param  string  $class  Object class.
+     */
     public function setClass(string $class): void
     {
         $this->class = $class;
@@ -108,21 +149,33 @@ class ObjectFile extends AbstractFile
         return $this->type;
     }
 
+    /**
+     * @param  string  $type  Object type.
+     */
     public function setType(string $type): void
     {
         $this->type = $type;
     }
 
+    /**
+     * @return array<array-key, array<string, mixed>|string> Configuration blocks or raw text lines
+     */
     public function getItems(): array
     {
         return $this->items;
     }
 
+    /**
+     * @param  array<array-key, array<string, mixed>|string>  $items  Configuration blocks or raw text lines
+     */
     public function setItems(array $items): void
     {
         $this->items = $items;
     }
 
+    /**
+     * @param  array<string, mixed>|string  $item  Configuration block or raw text line
+     */
     public function addItem($item): void
     {
         $this->items[] = $item;

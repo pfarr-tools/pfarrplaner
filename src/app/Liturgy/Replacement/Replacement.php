@@ -34,7 +34,14 @@ use App\Models\Service;
 
 class Replacement
 {
-    public static function replaceAll($text, Service $service)
+    /**
+     * Replace all known markers in the given text.
+     *
+     * @param  string  $text  Text containing liturgy replacement markers.
+     * @param  Service  $service  Service used to determine the replacement values.
+     * @return string Text with all known markers replaced.
+     */
+    public static function replaceAll(string $text, Service $service): string
     {
         preg_match_all('/\[(\w*)\]/', $text, $replacers);
         if (! isset($replacers[1])) {
@@ -42,19 +49,25 @@ class Replacement
         }
         foreach ($replacers[1] as $replacer) {
             $replacerClass = 'App\\Liturgy\\Replacement\\'.ucfirst($replacer).'Replacer';
-            if (class_exists($replacerClass)) {
-                $replacer = new $replacerClass($service);
-                $text = $replacer->replace($text);
+            if (class_exists($replacerClass) && is_subclass_of($replacerClass, AbstractReplacer::class)) {
+                /** @var AbstractReplacer $replacement */
+                $replacement = new $replacerClass($service);
+                $text = $replacement->replace($text);
             }
         }
 
         return $text;
     }
 
-    public static function factory()
+    /**
+     * Instantiate all available replacements.
+     *
+     * @return array<string, AbstractReplacer> Replacements indexed by their marker key.
+     */
+    public static function factory(): array
     {
         $classes = [];
-        foreach (glob(app_path('Liturgy/Replacement/*Replacer.php')) as $file) {
+        foreach (glob(app_path('Liturgy/Replacement/*Replacer.php')) ?: [] as $file) {
             if (substr(basename($file), 0, 8) != 'Abstract') {
                 $className = 'App\\Liturgy\\Replacement\\'.str_replace('.php', '', basename($file));
                 /** @var AbstractReplacer $object */
@@ -66,7 +79,12 @@ class Replacement
         return $classes;
     }
 
-    public static function getList()
+    /**
+     * List the descriptions of all available replacements.
+     *
+     * @return array<string, string> Descriptions indexed by their marker key.
+     */
+    public static function getList(): array
     {
         $records = [];
         /**

@@ -39,6 +39,8 @@ namespace App\HomeScreens;
 
 use App\Models\Leave\Absence;
 use App\Models\Leave\Replacement;
+use App\Models\People\User;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -62,34 +64,53 @@ abstract class AbstractHomeScreen
     abstract public function render();
 
     /**
+     * Return the authenticated user required to render a home screen.
+     *
+     * @return User Authenticated user.
+     *
+     * @throws AuthenticationException When no user is authenticated.
+     */
+    protected function user(): User
+    {
+        $user = Auth::user();
+        if (! $user instanceof User) {
+            throw new AuthenticationException;
+        }
+
+        return $user;
+    }
+
+    /**
      * Called to render a specific blade view
      *
-     * @param  $viewName  Name of the view to render
-     * @param  $data  Data passed to the view (absence data will be added)
+     * @param  string  $viewName  Name of the view to render
+     * @param  array<string, mixed>  $data  Data passed to the view (absence data will be added)
      * @return Factory|View
      */
-    public function renderView($viewName, $data)
+    public function renderView(string $viewName, array $data)
     {
-        if (Auth::user()->manage_absences) {
+        if ($this->user()->manage_absences) {
             $data = array_merge($data, $this->getAbsences());
         }
 
+        /** @var view-string $viewName */
         return view($viewName, $data);
     }
 
     /**
      * Get absence data for view
      *
-     * @return array Absence data
+     * @return array<string, mixed> Absence data
      */
     protected function getAbsences()
     {
-        $absences = Absence::where('user_id', Auth::user()->id)->where('to', '>=', now())->get();
+        $userId = $this->user()->id;
+        $absences = Absence::where('user_id', $userId)->where('to', '>=', now())->get();
         $replacements = Replacement::with('absence')
             ->whereHas(
                 'users',
-                function ($query) {
-                    $query->where('users.id', Auth::user()->id);
+                function ($query) use ($userId) {
+                    $query->where('users.id', $userId);
                 }
             )
             ->where('to', '>=', now())
@@ -115,5 +136,5 @@ abstract class AbstractHomeScreen
      *
      * @param  Request  $request  Request
      */
-    public function setConfiguration(Request $request) {}
+    public function setConfiguration(Request $request): void {}
 }

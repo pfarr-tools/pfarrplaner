@@ -51,16 +51,23 @@ class CreatePool extends AbstractCreateAction implements CreatesPools
     }
 
     /**
+     * @param  array<string, mixed>  $input
+     *
      * @throws AuthorizationException
      * @throws ValidationException
      */
     public function create(User $user, array $input): Pool
     {
         Gate::forUser($user)->authorize('create', Pool::class);
+        /** @var array<string, mixed> $input Validierte Eingabedaten. */
         $input = Validator::make($input, Pool::$validationRules)->validateWithBag('createPool');
         $pool = Pool::create($input);
-        $pool->cities()->sync($input['cities'] ?? []);
-        $pool->users()->sync($input['users'] ?? []);
+        /** @var array<int, int|string> $cities Validierte Städte-IDs. */
+        $cities = $input['cities'] ?? [];
+        $pool->cities()->sync($cities);
+        /** @var array<int, int|string> $users Validierte Benutzer-IDs. */
+        $users = $input['users'] ?? [];
+        $pool->users()->sync($users);
         CreatedPool::dispatch($user, $pool);
         $this->messages = ['success' => 'Der neue Pool wurde gespeichert.'];
 

@@ -86,5 +86,7 @@ class SkeletonMakeCommand extends AbstractSkeletonBuilder
         $this->call('make:create-action', ['name' => 'Create'.$basename]);
         $this->call('make:update-action', ['name' => 'Update'.$basename]);
         $this->call('make:delete-action', ['name' => 'Delete'.$basename]);
+
+        return null;
     }
 }

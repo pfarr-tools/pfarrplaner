@@ -35,17 +35,23 @@ use App\Models\Streaming\Broadcast;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\URL;
 
+/** Home screen tab for streaming services. */
 class StreamingHomeScreenTab extends AbstractHomeScreenTab
 {
     protected $title = 'Streaming';
 
     protected $description = 'Zeigt Gottesdienste mit Streamingfunktionen';
 
+    /**
+     * @var Builder<Service>
+     */
     protected $query = null;
 
+    /**
+     * @param  array<string, mixed>  $config  Tab configuration.\n     * @return void
+     */
     public function __construct($config = [])
     {
         // preset default config
@@ -54,11 +60,17 @@ class StreamingHomeScreenTab extends AbstractHomeScreenTab
         $this->query = $this->buildQuery();
     }
 
+    /**
+     * @return int
+     */
     public function getCount()
     {
         return $this->buildQuery(false)->count();
     }
 
+    /**
+     * @param  array<string, mixed>  $data  View data.\n     * @return mixed
+     */
     public function getContent($data = [])
     {
         $data['services'] = $this->query->get();
@@ -66,13 +78,16 @@ class StreamingHomeScreenTab extends AbstractHomeScreenTab
         return parent::getContent($data);
     }
 
+    /**
+     * @param  array<string, mixed>  $data  Additional data.\n     * @return array<string, mixed>
+     */
     public function toArray($data = [])
     {
         $data['services'] = $this->query->get();
         $data['count'] = count($data['services']);
         $data['streams'] = [];
 
-        foreach (Auth::user()->cities as $city) {
+        foreach ($this->user()->cities as $city) {
             if ($city->youtube_active_stream_id) {
                 $data['streams'][] = [
                     'city' => $city->name,
@@ -88,16 +103,17 @@ class StreamingHomeScreenTab extends AbstractHomeScreenTab
     /**
      * Build the query
      *
+     * @param  bool  $includeNew  Gibt an, ob Gottesdienste in konfigurierten Orten zusätzlich einbezogen werden.
      * @return Builder<Service>
      */
-    public function buildQuery($includeNew = true)
+    public function buildQuery(bool $includeNew = true)
     {
         $start = Carbon::now()->setTime(0, 0, 0);
-        $end = Carbon::now()->addMonth(2);
+        $end = Carbon::now()->addMonth();
 
         $query = Service::with(['baptisms', 'weddings', 'funerals', 'location'])
             ->between($start, $end)
-            ->inCities(Auth::user()->cities->pluck('id'))
+            ->inCities($this->user()->cities->pluck('id'))
             ->where(function ($query) use ($includeNew) {
                 $query->where('youtube_url', '!=', '');
                 if ($includeNew) {
@@ -109,11 +125,14 @@ class StreamingHomeScreenTab extends AbstractHomeScreenTab
         return $query;
     }
 
+    /**
+     * @param  string  $viewName  View name.\n     * @param  array<string, mixed>  $data  View data.\n     * @return mixed
+     */
     public function view($viewName, $data = [])
     {
         if ($viewName == 'config') {
             $locations = new Collection;
-            foreach (Auth::user()->cities as $city) {
+            foreach ($this->user()->cities as $city) {
                 foreach ($city->locations as $location) {
                     $locations->push($location);
                 }

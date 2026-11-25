@@ -31,6 +31,7 @@
 namespace App\Liturgy\LiturgySheets;
 
 use App\Documents\Word\DefaultWordDocument;
+use App\Liturgy\ItemHelpers\FreetextItemHelper;
 use App\Liturgy\ItemHelpers\PsalmItemHelper;
 use App\Liturgy\ItemHelpers\ReadingItemHelper;
 use App\Liturgy\ItemHelpers\SongItemHelper;
@@ -42,12 +43,14 @@ use App\Models\Service;
 use Illuminate\Support\Facades\Auth;
 use PhpOffice\PhpWord\Shared\Converter;
 
+/** Liturgy sheet rendering the song sheet. */
 class SongSheetLiturgySheet extends AbstractLiturgySheet
 {
     protected $title = 'Liedblatt';
 
     protected $icon = 'fa fa-file-word';
 
+    /** @var Service */
     protected $service = null;
 
     protected $extension = 'docx';
@@ -61,11 +64,17 @@ class SongSheetLiturgySheet extends AbstractLiturgySheet
         'mergeVerses' => false,
     ];
 
+    /**
+     * @return void
+     */
     public function __construct()
     {
         parent::__construct();
     }
 
+    /**
+     * @return mixed
+     */
     public function render(Service $service)
     {
         $this->service = $service;
@@ -86,15 +95,22 @@ class SongSheetLiturgySheet extends AbstractLiturgySheet
         return $doc->sendToBrowser($this->getFileName($service));
     }
 
-    protected function setProperties(DefaultWordDocument $doc)
+    /**
+     * Set the metadata of the generated Word document.
+     *
+     * @param  DefaultWordDocument  $doc  Document whose properties are set.
+     */
+    protected function setProperties(DefaultWordDocument $doc): void
     {
         $properties = $doc->getPhpWord()->getDocInfo();
-        $properties->setCreator(Auth::user()->fullName());
-        $properties->setCompany(Auth::user()->office ?? '');
+        $user = Auth::user();
+        $userName = $user?->fullName() ?? '';
+        $properties->setCreator($userName);
+        $properties->setCompany($user->office ?? '');
         $properties->setTitle($this->getFileTitle());
         $properties->setDescription($this->getFileTitle());
         $properties->setCategory('Gottesdienste');
-        $properties->setLastModifiedBy(Auth::user()->fullName());
+        $properties->setLastModifiedBy($userName);
         $properties->setSubject('Liedblatt');
     }
 
@@ -103,11 +119,18 @@ class SongSheetLiturgySheet extends AbstractLiturgySheet
         return 'Liedblatt';
     }
 
-    protected function renderFreeTextItem(DefaultWordDocument $doc, Item $item)
+    /**
+     * Render the handout text of a free text item into the document.
+     *
+     * @param  DefaultWordDocument  $doc  Document receiving the rendered item.
+     * @param  Item  $item  Liturgy item to render.
+     */
+    protected function renderFreeTextItem(DefaultWordDocument $doc, Item $item): void
     {
         if (! ($item->data['handoutText'] ?? false)) {
             return;
         }
+        /** @var FreetextItemHelper $helper */
         $helper = $item->getHelper();
         $helper->setField('handoutText');
         if (! ($item->data['handoutSuppressTitle'] ?? false)) {
@@ -116,7 +139,13 @@ class SongSheetLiturgySheet extends AbstractLiturgySheet
         $doc->renderNormalText(Replacement::replaceAll($helper->getText(), $this->service));
     }
 
-    protected function renderReadingItem(DefaultWordDocument $doc, Item $item)
+    /**
+     * Render a reading item into the document when it is marked for handouts.
+     *
+     * @param  DefaultWordDocument  $doc  Document receiving the rendered item.
+     * @param  Item  $item  Liturgy item to render.
+     */
+    protected function renderReadingItem(DefaultWordDocument $doc, Item $item): void
     {
         if (! isset($item->data['reference'])) {
             return;
@@ -128,52 +157,80 @@ class SongSheetLiturgySheet extends AbstractLiturgySheet
         $helper->renderToWordDocument($doc, true);
     }
 
-    protected function renderPsalmItem(DefaultWordDocument $doc, Item $item)
+    /**
+     * Render a Psalm item into the document when a Psalm text is available.
+     *
+     * @param  DefaultWordDocument  $doc  Document receiving the rendered item.
+     * @param  Item  $item  Liturgy item to render.
+     */
+    protected function renderPsalmItem(DefaultWordDocument $doc, Item $item): void
     {
-        if (! isset($item->data['psalm'])) {
-            return;
-        }
-        if (! $item->data['psalm']['text']) {
+        $psalm = $item->data['psalm'] ?? null;
+        $text = is_array($psalm) ? ($psalm['text'] ?? null) : null;
+        if (! is_scalar($text) || ! $text) {
             return;
         }
         /** @var PsalmItemHelper $helper */
         $helper = $item->getHelper();
         $doc->getSection()->addTitle($helper->getTitleText(), 3);
-        $doc->renderNormalText($item->data['psalm']['text']);
+        $doc->renderNormalText((string) $text);
     }
 
-    protected function renderSongItem(DefaultWordDocument $doc, Item $item)
+    /**
+     * Render a song item, including its verses or music notation, into the document.
+     *
+     * @param  DefaultWordDocument  $doc  Document receiving the rendered item.
+     * @param  Item  $item  Liturgy item to render.
+     */
+    protected function renderSongItem(DefaultWordDocument $doc, Item $item): void
     {
-        if (! isset($item->data['song'])) {
+        $songData = $item->data['song'] ?? null;
+        if (! is_array($songData)) {
             return;
         }
-        if ($item->data['song'] === null) {
-            return;
-        }
-        if ($item->data['song']['id'] == -1) {
+        if (($songData['id'] ?? null) == -1) {
             return;
         }
         /** @var SongItemHelper $helper */
         $helper = $item->getHelper();
         $doc->getSection()->addTitle($helper->getTitleText(), 3);
-        if ($item->data['song']['song']['copyrights'] ?? '') {
-            $doc->renderNormalText($item->data['song']['song']['copyrights'], ['size' => 8]);
+        $songDetails = $songData['song'] ?? null;
+        $songDetails = is_array($songDetails) ? $songDetails : [];
+        $copyrights = $songDetails['copyrights'] ?? null;
+        if (is_scalar($copyrights) && $copyrights) {
+            $doc->renderNormalText((string) $copyrights, ['size' => 8]);
         }
 
-        if ($this->config['renderMusic'] && isset($item->data['song']['song']['notation'])) {
-            $song = Song::find($item->data['song']['song_id']);
-            $images = ABCMusic::images($song, $item->data['verses'], ABCMusic::COLORS_NORMAL, $this->config['mergeVerses']);
+        if ($this->config['renderMusic'] && isset($songDetails['notation'])) {
+            $songId = $songData['song_id'] ?? null;
+            $song = Song::findOrFail(is_scalar($songId) ? (int) $songId : 0);
+            /** @var array<int, string>|string $verses */
+            $verses = $item->data['verses'] ?? '';
+            $mergeVerses = $this->config['mergeVerses'] ?? false;
+            $images = ABCMusic::images(
+                $song,
+                $verses,
+                ABCMusic::COLORS_NORMAL,
+                is_scalar($mergeVerses) && (bool) $mergeVerses
+            );
             foreach ($images as $image) {
                 $doc->getSection()->addImage($image, ['width' => Converter::cmToPoint(17.5)]);
             }
         } else {
+            $refrain = $songDetails['refrain'] ?? '';
+            $refrain = is_scalar($refrain) ? (string) $refrain : '';
             foreach ($helper->getActiveVerses() as $verse) {
                 if ($verse['refrain_before']) {
-                    $doc->renderNormalText($item->data['song']['song']['refrain'], ['italic' => true]);
+                    $doc->renderNormalText($refrain, ['italic' => true]);
                 }
-                $doc->renderNormalText($verse['number'].'. '.$verse['text']);
+                $number = $verse['number'] ?? '';
+                $verseText = $verse['text'] ?? '';
+                $doc->renderNormalText(
+                    (is_scalar($number) ? (string) $number : '').'. '
+                    .(is_scalar($verseText) ? (string) $verseText : '')
+                );
                 if ($verse['refrain_after']) {
-                    $doc->renderNormalText($item->data['song']['song']['refrain'], ['italic' => true]);
+                    $doc->renderNormalText($refrain, ['italic' => true]);
                 }
             }
         }

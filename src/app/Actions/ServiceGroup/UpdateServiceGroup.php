@@ -45,9 +45,13 @@ class UpdateServiceGroup extends AbstractUpdateAction implements UpdatesServiceG
         return '';
     }
 
+    /**
+     * @param  array<string, mixed>  $input
+     */
     public function update(User $user, ServiceGroup $serviceGroup, array $input): ServiceGroup
     {
         Gate::forUser($user)->authorize('update', $serviceGroup);
+        /** @var array<string, mixed> $input */
         $input = Validator::make($input, ServiceGroup::$validationRules)->validateWithBag('updateServiceGroup');
         $serviceGroup->update($input);
         UpdatedServiceGroup::dispatch($user, $serviceGroup);

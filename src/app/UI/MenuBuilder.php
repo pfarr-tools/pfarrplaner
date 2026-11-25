@@ -37,7 +37,9 @@
 
 namespace App\UI;
 
+use App\UI\Modules\AbstractModule;
 use App\UI\Modules\Modules;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -49,31 +51,36 @@ class MenuBuilder
     /**
      * Build the sidebar configuration
      *
-     * @return array
+     * @return array<int, string|array<string, mixed>>
      */
-    public static function sidebar()
+    public static function sidebar(): array
     {
         return self::configure();
     }
 
     /**
      * Build the menu configuration from module config
+     *
+     * @return array<int, string|array<string, mixed>>
      */
     protected static function configure(): array
     {
         $request = request();
         $route = Route::currentRouteName();
 
+        /** @var array<string, list<class-string<AbstractModule>>> $modulesGroups */
         $modulesGroups = config('modules.groups');
-        $modulesConfig = array_merge(
-            Modules::defaultConfig(),
-            Auth::user()->getSetting('modules', [])
-        );
+        $user = Auth::user() ?? throw new AuthenticationException;
+        /** @var array<string, mixed> $moduleSettings */
+        $moduleSettings = $user->getSetting('modules', []);
+        /** @var array<string, mixed> $modulesConfig */
+        $modulesConfig = array_merge(Modules::defaultConfig(), $moduleSettings);
 
         $menu = [];
         foreach ($modulesGroups as $groupTitle => $modulesGroup) {
             $items = [];
             foreach ($modulesGroup as $moduleClass) {
+                /** @var AbstractModule $module */
                 $module = new $moduleClass($modulesConfig);
                 if ($module->isActive()) {
                     $items = $module->addItems($items);
@@ -89,6 +96,7 @@ class MenuBuilder
             }
         }
 
+        /** @var array<int, string|array<string, mixed>> $menu */
         return $menu;
     }
 }

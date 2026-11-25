@@ -44,7 +44,12 @@ class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
-    public static function defaultRoutes($prefix = '')
+    /**
+     * Registriert die Standardrouten des aufgerufenen Controllers.
+     *
+     * @param  string  $prefix  Präfix für die Namen und Übersetzungen der Routen
+     */
+    public static function defaultRoutes(string $prefix = ''): void
     {
         $class = get_called_class();
         $className = str_replace('App\\Http\\Controllers\\', '', $class);

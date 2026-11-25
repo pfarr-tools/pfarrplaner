@@ -43,14 +43,18 @@ class KasualienReplacer extends AbstractReplacer
     protected function getReplacementText(): string
     {
         $service = $this->service;
-        $lastWeek = Carbon::createFromTimeString($service->date->format('Y-m-d').' 0:00:00 last Sunday');
-        $nextWeek = Carbon::createFromTimeString($service->date->format('Y-m-d').' 0:00:00 next Sunday');
+        $date = $service->date;
+        if ($date === null) {
+            return '';
+        }
+        $lastWeek = Carbon::createFromTimeString($date->format('Y-m-d').' 0:00:00 last Sunday');
+        $nextWeek = Carbon::createFromTimeString($date->format('Y-m-d').' 0:00:00 next Sunday');
 
-        $funerals = Funeral::where('announcement', $service->date->format('Y-m-d'))
+        $funerals = Funeral::where('announcement', $date->format('Y-m-d'))
             ->whereHas(
                 'service',
                 function ($query) use ($service) {
-                    $query->where('city_id', $service->city->id);
+                    $query->where('city_id', $service->city?->id);
                 }
             )
             ->get();
@@ -64,7 +68,7 @@ class KasualienReplacer extends AbstractReplacer
                         function ($query2) use ($service, $nextWeek) {
                             $query2->where('date', '>=', $service->date);
                             $query2->where('date', '<=', $nextWeek);
-                            $query2->where('city_id', $service->city->id);
+                            $query2->where('city_id', $service->city?->id);
                         }
                     );
                 }
@@ -80,7 +84,7 @@ class KasualienReplacer extends AbstractReplacer
                             function ($query2) use ($service, $nextWeek) {
                                 $query2->where('date', '>=', $service->date);
                                 $query2->where('date', '<=', $nextWeek);
-                                $query2->where('city_id', $service->city->id);
+                                $query2->where('city_id', $service->city?->id);
                             }
                         );
                 }
@@ -92,12 +96,18 @@ class KasualienReplacer extends AbstractReplacer
         if (count($baptisms)) {
             $baptismArray = [];
             foreach ($baptisms as $baptism) {
+                if ($baptism->service === null) {
+                    continue;
+                }
                 $baptismArray[$baptism->service->trueDate()->format('YmdHis')][] = $baptism;
             }
             ksort($baptismArray);
 
             foreach ($baptismArray as $baptisms) {
                 $baptism = $baptisms[array_key_first($baptisms)];
+                if ($baptism->service === null) {
+                    continue;
+                }
                 if ($baptism->service->id != $service->id) {
                     $text .= $this->renderParagraph();
                     if ($baptism->service->trueDate() == $service->trueDate()) {
@@ -105,14 +115,18 @@ class KasualienReplacer extends AbstractReplacer
                             $baptisms
                         ) > 1 ? 'werden' : 'wird').' getauft:');
                     } else {
-                        $text .= $this->renderParagraph('Im Gottesdienst am '.$baptism->service->date->format(
+                        $text .= $this->renderParagraph('Im Gottesdienst am '.$baptism->service->trueDate()->format(
                             'd.m.Y'
                         ).' '.$baptism->service->atText().' '.(count(
                             $baptisms
                         ) > 1 ? 'werden' : 'wird').' getauft:');
                     }
                     foreach ($baptisms as $baptism) {
-                        $text .= $this->renderParagraph($this->renderName($baptism->candidate_name).', '.$baptism->candidate_address);
+                        /** @var string $candidateName */
+                        $candidateName = $baptism->candidate_name;
+                        /** @var string $candidateAddress */
+                        $candidateAddress = $baptism->candidate_address;
+                        $text .= $this->renderParagraph($this->renderName($candidateName).', '.$candidateAddress);
                     }
                 }
             }
@@ -124,25 +138,35 @@ class KasualienReplacer extends AbstractReplacer
         if (count($weddings)) {
             $weddingArray = [];
             foreach ($weddings as $wedding) {
+                if ($wedding->service === null) {
+                    continue;
+                }
                 $weddingArray[$wedding->service->trueDate()->format('YmdHis')][] = $wedding;
             }
             ksort($weddingArray);
 
             foreach ($weddingArray as $weddings) {
                 $wedding = $weddings[array_key_first($weddings)];
+                if ($wedding->service === null) {
+                    continue;
+                }
                 if ($wedding->service->id != $service->id) {
                     $text .= $this->renderParagraph();
                     if ($wedding->service->trueDate() == $service->trueDate()) {
                         $text .= $this->renderParagraph('Im Gottesdienst heute '.$wedding->service->atText(
                         ).' werden kirchlich getraut:');
                     } else {
-                        $text .= $this->renderParagraph('Im Gottesdienst am '.$wedding->service->date->format(
+                        $text .= $this->renderParagraph('Im Gottesdienst am '.$wedding->service->trueDate()->format(
                             'd.m.Y'
                         ).' '.$wedding->service->atText().' werden kirchlich getraut:');
                     }
                     foreach ($weddings as $wedding) {
-                        $text .= $this->renderParagraph($this->renderName($wedding->spouse1_name).' &amp; '.$this->renderName(
-                            $wedding->spouse2_name));
+                        /** @var string $spouse1Name */
+                        $spouse1Name = $wedding->spouse1_name;
+                        /** @var string $spouse2Name */
+                        $spouse2Name = $wedding->spouse2_name;
+                        $text .= $this->renderParagraph($this->renderName($spouse1Name).' &amp; '.$this->renderName(
+                            $spouse2Name));
                     }
                 }
             }
@@ -155,6 +179,9 @@ class KasualienReplacer extends AbstractReplacer
         if (count($funerals)) {
             $funeralArray = ['past' => [], 'future' => []];
             foreach ($funerals as $funeral) {
+                if ($funeral->service === null) {
+                    continue;
+                }
                 $key = ($funeral->service->trueDate() < $service->trueDate()) ? 'past' : 'future';
                 $funeralArray[$key][] = $funeral;
             }
@@ -172,8 +199,12 @@ class KasualienReplacer extends AbstractReplacer
                                 'wurden'
                             ).' kirchlich bestattet:', );
                 foreach ($funeralArray['past'] as $funeral) {
-                    $text .= $this->renderParagraph($this->renderName($funeral->buried_name).', '.$funeral->buried_address
-                                .($funeral->age() ? ', '.$funeral->age().' Jahre' : '').'.');
+                    /** @var string $buriedName */
+                    $buriedName = $funeral->buried_name;
+                    /** @var string $buriedAddress */
+                    $buriedAddress = $funeral->buried_address;
+                    $text .= $this->renderParagraph($this->renderName($buriedName).', '.$buriedAddress
+                                .($funeral->age ? ', '.$funeral->age.' Jahre' : '').'.');
                 }
                 if (count($funeralArray['future'])) {
                     $text .= $this->renderParagraph();
@@ -188,14 +219,21 @@ class KasualienReplacer extends AbstractReplacer
                     'sind'
                 ).' verstorben:');
                 foreach ($funeralArray['future'] as $funeral) {
+                    if ($funeral->service === null) {
+                        continue;
+                    }
                     $mode = $funeral->type;
                     if ($mode == 'Erdbestattung') {
                         $mode = 'Bestattung';
                     }
-                    $text .= $this->renderParagraph($this->renderName($funeral->buried_name).', '
-                                .$funeral->buried_address
-                                .($funeral->age() ? ', '.$funeral->age().' Jahre' : '')
-                                .'. Die '.$mode.' findet am '.$funeral->service->date->isoFormat(
+                    /** @var string $buriedName */
+                    $buriedName = $funeral->buried_name;
+                    /** @var string $buriedAddress */
+                    $buriedAddress = $funeral->buried_address;
+                    $text .= $this->renderParagraph($this->renderName($buriedName).', '
+                                .$buriedAddress
+                                .($funeral->age ? ', '.$funeral->age.' Jahre' : '')
+                                .'. Die '.$mode.' findet am '.$funeral->service->trueDate()->isoFormat(
                                     'dddd, DD. MMMM'
                                 )
                                 .' um '.$funeral->service->timeText(true, '.')
@@ -220,9 +258,10 @@ class KasualienReplacer extends AbstractReplacer
     }
 
     /**
+     * @param  string  $s  Name to format.
      * @return string
      */
-    protected function renderName($s)
+    protected function renderName(string $s)
     {
         if (strpos($s, ',') !== false) {
             $t = explode(',', $s);

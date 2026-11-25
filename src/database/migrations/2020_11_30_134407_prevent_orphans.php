@@ -34,7 +34,13 @@ use Illuminate\Support\Facades\Schema;
 
 class PreventOrphans extends Migration
 {
-    protected function getColumnType($table, $column)
+    /**
+     * Ermittelt den Spaltentyp einer Tabelle einschließlich der Vorzeichen-Eigenschaft.
+     *
+     * @param  string  $table  Tabellenname
+     * @param  string  $column  Spaltenname
+     */
+    protected function getColumnType(string $table, string $column): string
     {
         $columns = Schema::getColumns($table);
 
@@ -49,7 +55,14 @@ class PreventOrphans extends Migration
         return $col['type_name'].($isUnsigned ? 'Unsigned' : 'Signed');
     }
 
-    public function createCascadingDelete($tableName, $foreignKey, $foreignTableName)
+    /**
+     * Ersetzt einen bestehenden Fremdschlüssel durch eine kaskadierende Löschung.
+     *
+     * @param  string  $tableName  Name der Tabelle, die den Fremdschlüssel enthält
+     * @param  string  $foreignKey  Name der Fremdschlüsselspalte
+     * @param  string  $foreignTableName  Name der referenzierten Tabelle
+     */
+    public function createCascadingDelete(string $tableName, string $foreignKey, string $foreignTableName): void
     {
         $existingConstraints = $this->listTableForeignKeys($tableName);
         $constraint = $tableName.'_'.$foreignKey.'_foreign';
@@ -77,10 +90,17 @@ class PreventOrphans extends Migration
         });
     }
 
-    public function listTableForeignKeys($table)
+    /**
+     * Gibt die Namen der Fremdschlüssel-Constraints einer Tabelle zurück.
+     *
+     * @param  string  $table  Tabellenname
+     * @return array<int, mixed>
+     */
+    public function listTableForeignKeys(string $table): array
     {
         return collect(Schema::getForeignKeys($table))
             ->pluck('name')
+            ->values()
             ->all();
     }
 

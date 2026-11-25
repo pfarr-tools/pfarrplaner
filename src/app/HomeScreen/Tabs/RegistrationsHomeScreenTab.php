@@ -33,27 +33,39 @@ namespace App\HomeScreen\Tabs;
 use App\Models\Service;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\Auth;
 
+/** Home screen tab showing registrations. */
 class RegistrationsHomeScreenTab extends AbstractHomeScreenTab
 {
     protected $title = 'Anmeldungen';
 
     protected $description = 'Zeigt Gottesdienste mit Anmeldefunktionen';
 
+    /**
+     * @var Builder<Service>
+     */
     protected $query = null;
 
+    /**
+     * @param  array<string, mixed>  $config  Tab configuration.\n     * @return void
+     */
     public function __construct($config = [])
     {
         parent::__construct($config);
         $this->query = $this->buildQuery();
     }
 
+    /**
+     * @return int
+     */
     public function getCount()
     {
         return $this->query->count();
     }
 
+    /**
+     * @param  array<string, mixed>  $data  View data.\n     * @return mixed
+     */
     public function getContent($data = [])
     {
         $data['registrable'] = $this->query->get();
@@ -61,6 +73,9 @@ class RegistrationsHomeScreenTab extends AbstractHomeScreenTab
         return parent::getContent($data);
     }
 
+    /**
+     * @param  array<string, mixed>  $data  Additional data.\n     * @return array<string, mixed>
+     */
     public function toArray($data = [])
     {
         $data['services'] = $this->query->get()->map(function ($item) {
@@ -100,9 +115,9 @@ class RegistrationsHomeScreenTab extends AbstractHomeScreenTab
     public function buildQuery()
     {
         $start = Carbon::now()->setTime(0, 0, 0);
-        $end = Carbon::now()->addMonth(2);
+        $end = Carbon::now()->addMonths(2);
 
-        $cities = Auth::user()->writableCities->pluck('id');
+        $cities = $this->user()->writableCities->pluck('id');
 
         $query = Service::where('needs_reservations', 1)
             ->between($start, $end)

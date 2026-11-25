@@ -30,6 +30,8 @@
 
 namespace App\Models;
 
+use App\Contracts\StreetRange\CreatesStreetRanges;
+use App\Contracts\StreetRange\DeletesStreetRanges;
 use App\Models\People\User;
 use App\Models\Places\City;
 use App\Models\Places\StreetRange;
@@ -72,7 +74,7 @@ class Parish extends AbstractModel
     ];
 
     /**
-     * @var string[]
+     * @var list<string>
      */
     protected $fillable = [
         'name',
@@ -118,11 +120,13 @@ class Parish extends AbstractModel
      *
      * @throws Exception
      */
-    public function importStreetsFromCSV(User $user, $csv)
+    public function importStreetsFromCSV(User $user, string $csv)
     {
-        /** @var StreetRange $streetRange */
         foreach ($this->streetRanges as $streetRange) {
-            app(StreetRange::getContractName('delete'))->delete($user, $streetRange);
+            /** @var DeletesStreetRanges $deleter */
+            $deleter = app(StreetRange::getContractName('delete'));
+            /** @var StreetRange $streetRange */
+            $deleter->delete($user, $streetRange);
         }
 
         $ctr = 0;
@@ -134,11 +138,13 @@ class Parish extends AbstractModel
         unset($records[0]);
         array_walk(
             $records,
-            function (&$record) use (&$ctr) {
+            function (&$record) use (&$ctr, $user) {
                 if ($record[4] == $this->code) {
-                    $record[5] = explode(' bis ', $record[5]);
-                    $record[6] = explode(' bis ', $record[6]);
-                    app(StreetRange::getContractName('create'))->create($user, $this, [
+                    $record[5] = array_pad(explode(' bis ', (is_string($record[5] ?? null) ? $record[5] : ''), 2), 2, '');
+                    $record[6] = array_pad(explode(' bis ', (is_string($record[6] ?? null) ? $record[6] : ''), 2), 2, '');
+                    /** @var CreatesStreetRanges $creator */
+                    $creator = app(StreetRange::getContractName('create'));
+                    $creator->create($user, $this, [
                         'parish_id' => $this->id,
                         'name' => $record[0],
                         'odd_start' => $record[5][0],

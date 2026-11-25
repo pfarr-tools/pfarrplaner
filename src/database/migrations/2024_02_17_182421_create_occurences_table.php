@@ -55,7 +55,7 @@ return new class extends Migration
             Occurence::create([
                 'service_id' => $service->id,
                 'start' => $service->date,
-                'end' => $service->date->copy()->addMinutes(60),
+                'end' => $service->date?->copy()->addMinutes(60) ?? now(),
             ]);
         }
     }

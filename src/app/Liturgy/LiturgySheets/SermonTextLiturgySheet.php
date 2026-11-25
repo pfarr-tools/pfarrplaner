@@ -63,7 +63,7 @@ class SermonTextLiturgySheet extends AbstractLiturgySheet
 
         // heading
 
-        if (($this->service) && ($this->service->sermon)) {
+        if ($this->service->sermon) {
             $doc->getSection()->addTitle($this->service->sermon->title, 1);
             if ($this->service->sermon->subtitle) {
                 $doc->getSection()->addTitle($this->service->sermon->subtitle, 2);
@@ -79,22 +79,35 @@ class SermonTextLiturgySheet extends AbstractLiturgySheet
             }
         }
 
-        return $doc->sendToBrowser($this->getFileName($service, (($this->service) && ($this->service->sermon) ? ' - '.$this->service->sermon->title : '')));
+        return $doc->sendToBrowser($this->getFileName($service, ($this->service->sermon ? ' - '.$this->service->sermon->title : '')));
     }
 
-    protected function setProperties(DefaultWordDocument $doc)
+    /**
+     * Set the metadata of the generated Word document.
+     *
+     * @param  DefaultWordDocument  $doc  Document whose properties are set.
+     */
+    protected function setProperties(DefaultWordDocument $doc): void
     {
         $properties = $doc->getPhpWord()->getDocInfo();
-        $properties->setCreator(Auth::user()->fullName());
-        $properties->setCompany(Auth::user()->office ?? '');
-        $properties->setTitle($this->service->date->setTimeZone('Europe/Berlin')->format('Ymd-Hi').' '.$this->getFileTitle());
+        $user = Auth::user();
+        $userName = $user?->fullName() ?? '';
+        $properties->setCreator($userName);
+        $properties->setCompany($user->office ?? '');
+        $properties->setTitle($this->service->trueDate()->setTimeZone('Europe/Berlin')->format('Ymd-Hi').' '.$this->getFileTitle());
         $properties->setDescription($this->getFileTitle().' ('.$this->title.')');
         $properties->setCategory('Gottesdienste');
-        $properties->setLastModifiedBy(Auth::user()->fullName());
+        $properties->setLastModifiedBy($userName);
         $properties->setSubject('Komplette Liturgie');
     }
 
-    protected function renderSermonItem(DefaultWordDocument $doc, Item $item)
+    /**
+     * Render the sermon text of a liturgy item into the document.
+     *
+     * @param  DefaultWordDocument  $doc  Document receiving the sermon text.
+     * @param  Item  $item  Liturgy item identifying the sermon to render.
+     */
+    protected function renderSermonItem(DefaultWordDocument $doc, Item $item): void
     {
         if ($this->service->sermon === null) {
             $doc->renderNormalText('Für diesen Gottesdienst wurde noch keine Predigt angelegt.', ['italic' => true]);
@@ -121,12 +134,12 @@ class SermonTextLiturgySheet extends AbstractLiturgySheet
                         if (trim($paragraph) === '') {
                             continue;
                         }
-                        $doc->renderText($paragraph, $doc::BLOCKQUOTE, ['size' => 10]);
+                        $doc->renderText($paragraph, DefaultWordDocument::BLOCKQUOTE, ['size' => 10]);
                     }
                 } else {
                     Html::addHtml(
                         $doc->getSection(),
-                        '<body>'.str_replace('<br>', '<br />', $dom->saveHTML($node)).'</body>'
+                        '<body>'.str_replace('<br>', '<br />', (string) $dom->saveHTML($node)).'</body>'
                     );
                 }
                 $nodes[] = $node->nodeName.' -> '.$node->nodeValue;

@@ -97,8 +97,16 @@ class SecurityOnboardingService
      */
     public function isDeferredForSession(User $user): bool
     {
-        return request()->hasSession()
-            && (int) request()->session()->get(self::SESSION_DEFERRED_KEY, 0) === (int) $user->getKey();
+        if (! request()->hasSession()) {
+            return false;
+        }
+
+        /** @var int|string|null $deferred Früher gespeicherte Benutzerkennung. */
+        $deferred = request()->session()->get(self::SESSION_DEFERRED_KEY, 0);
+        /** @var int|string|null $userId Kennung des angefragten Benutzers. */
+        $userId = $user->getKey();
+
+        return (int) $deferred === (int) $userId;
     }
 
     /**

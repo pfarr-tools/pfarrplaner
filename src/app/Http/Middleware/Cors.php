@@ -31,7 +31,9 @@
 namespace App\Http\Middleware;
 
 use Closure;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 /**
  * Class Cors
@@ -47,19 +49,23 @@ class Cors
     public function handle($request, Closure $next)
     {
         $corsOrigin = $request->get('cors-origin', $request->get('corsOrigin', false));
+        /** @var Response|JsonResponse $response */
+        $response = $next($request);
 
         if ($corsOrigin) {
-            return $next($request)
+            abort_unless(is_string($corsOrigin), 400);
+
+            return $response
                 ->header('Access-Control-Allow-Origin', \App\Http\CORS::formatUrl($corsOrigin))
                 ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
                 ->header('Access-Control-Allow-Headers', '*')
-                ->header('X-CORS-MIDDLEWARE-ADDED', 1);
+                ->header('X-CORS-MIDDLEWARE-ADDED', '1');
         } else {
-            return $next($request)
+            return $response
                 ->header('Access-Control-Allow-Origin', '*')
                 ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
                 ->header('Access-Control-Allow-Headers', '*')
-                ->header('X-CORS-MIDDLEWARE-ADDED', 2);
+                ->header('X-CORS-MIDDLEWARE-ADDED', '2');
         }
     }
 }

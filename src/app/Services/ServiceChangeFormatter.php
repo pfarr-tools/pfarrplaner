@@ -15,6 +15,7 @@ namespace App\Services;
 use App\Models\Places\City;
 use App\Models\Service;
 use DateTimeInterface;
+use Stringable;
 
 /**
  * Formats structural service diffs for the service update email.
@@ -60,9 +61,14 @@ class ServiceChangeFormatter
     private static function formatAttributeValue(Service $service, string $path, mixed $value): string
     {
         if ($path === 'city_id' && $value !== null) {
-            $city = City::find($value);
+            $city = City::query()->find(is_scalar($value) ? (int) $value : 0);
+            if ($city !== null) {
+                $name = $city->name;
 
-            return (string) ($city ? $city->name : $value);
+                return is_scalar($name) || $name instanceof Stringable ? (string) $name : '';
+            }
+
+            return is_scalar($value) || $value instanceof Stringable ? (string) $value : '';
         }
 
         return self::formatValue($value);
@@ -96,6 +102,6 @@ class ServiceChangeFormatter
             return (string) json_encode($value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         }
 
-        return (string) $value;
+        return is_scalar($value) || $value instanceof Stringable ? (string) $value : '';
     }
 }

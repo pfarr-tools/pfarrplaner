@@ -34,6 +34,6 @@ use App\Models\People\User;
 use App\Models\Rites\Baptism;
 
 /**
- * @method Baptism update(User $user, Baptism $baptism, array $input)
+ * @method Baptism update(User $user, Baptism $baptism, array<string, mixed> $input)
  */
 interface UpdatesBaptisms {}

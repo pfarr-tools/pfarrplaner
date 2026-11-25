@@ -33,11 +33,20 @@ namespace App\Seating;
 use App\Models\Seating\Booking;
 use App\Models\Seating\SeatingRow;
 
+/**
+ * Base class for the available seating models.
+ *
+ * @property string $title Display name of the seating model.
+ */
 class AbstractSeatingModel
 {
+    /** @var string Display name of the seating model. */
+    protected $title;
+
+    /** @var array<int, Booking> */
     protected $bookings = [];
 
-    public function getKey()
+    public function getKey(): string
     {
         return str_replace('App\\Seating\\', '', basename(get_called_class()));
     }
@@ -47,23 +56,35 @@ class AbstractSeatingModel
         return $this->title;
     }
 
+    /**
+     * @param  string  $title  Title.
+     */
     public function setTitle(string $title): void
     {
         $this->title = $title;
     }
 
+    /**
+     * Determine the number of seats a booking occupies in the given row.
+     *
+     * @param  int  $number  Number of people to be seated.
+     * @return int Occupied seats, or -1 if the row cannot be used.
+     */
     public function impact(SeatingRow $row, $number)
     {
         return -1;
     }
 
+    /** @return void */
     public function book(SeatingRow $row, Booking $booking) {}
 
+    /** @return bool */
     public function isAvailable(SeatingRow $row)
     {
         return true;
     }
 
+    /** @return int */
     public function rowCapacity(SeatingRow $row)
     {
         return 0;

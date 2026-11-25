@@ -31,30 +31,32 @@
 namespace App\HomeScreen\Tabs;
 
 use App\Models\People\User;
+use Illuminate\Http\Resources\Json\JsonResource;
 
-/**
- * Discovers home screen tabs and builds them for a user's permissions.
- */
 class HomeScreenTabFactory
 {
     /**
      * Get homescreen tabs
      *
-     * @param  array  $config  Saved tab configurations keyed by tab type
-     * @param  array  $filter  Optional ordered list of tab types to return
-     * @param  User|null  $user  User whose tab permissions should be checked
-     * @return array<string, AbstractHomeScreenTab> Available tab objects keyed by type
+     * @return array
+     */
+    /**
+     * @param  array<string, mixed>  $config  Tab configuration.
+     * @param  list<string>  $filter  Tab keys to include.
+     * @return array<string, AbstractHomeScreenTab>
      */
     public static function get(array $config, array $filter = [], ?User $user = null)
     {
         $homeScreenTabs = [];
-        foreach ((glob(app_path('HomeScreen/Tabs/*HomeScreenTab.php'))) as $file) {
+        $files = glob(app_path('HomeScreen/Tabs/*HomeScreenTab.php')) ?: [];
+        foreach ($files as $file) {
             if (basename($file, 'HomeScreenTab.php') != 'Abstract') {
                 $key = lcfirst(basename($file, 'HomeScreenTab.php'));
                 if (! isset($config[$key])) {
                     $config[$key] = [];
                 }
                 $class = 'App\\HomeScreen\\Tabs\\'.basename($file, '.php');
+                /** @var class-string<AbstractHomeScreenTab> $class */
                 /** @var AbstractHomeScreenTab $object */
                 $object = new $class($config);
                 if ($object->isAvailable($user)) {
@@ -85,11 +87,20 @@ class HomeScreenTabFactory
      *
      * @throws \Exception
      */
+    /**
+     * @param  array<string, mixed>  $tab  Tab definition.
+     * @param  int|string  $tabIndex  Tab index.
+     * @return array<string, mixed>|JsonResource|null
+     */
     public static function getOne($tab, $tabIndex)
     {
-        $class = 'App\\HomeScreen\\Tabs\\'.ucfirst($tab['type'].'HomeScreenTab');
-        if (class_exists($class)) {
-            $tabObject = new $class($tab['config']);
+        /** @var string $tabType */
+        $tabType = $tab['type'];
+        $class = 'App\\HomeScreen\\Tabs\\'.ucfirst($tabType.'HomeScreenTab');
+        if (class_exists($class) && is_subclass_of($class, AbstractHomeScreenTab::class)) {
+            /** @var array<string, mixed> $tabConfig */
+            $tabConfig = $tab['config'];
+            $tabObject = new $class($tabConfig);
             if (! $tabObject->isAvailable()) {
                 return null;
             }
@@ -98,8 +109,22 @@ class HomeScreenTabFactory
         }
         /** @var AbstractHomeScreenTab $tabObject */
         $result = $tabObject->toArray();
+        if ($result instanceof JsonResource) {
+            $resourceData = $result->resource;
+            if (! is_array($resourceData)) {
+                throw new \UnexpectedValueException('Home screen tab resource must contain an array.');
+            }
+            $resourceData['config'] = $tab['config'];
+            $resourceData['key'] = $tabObject->getKey().$tabIndex;
+            $resourceData['index'] = $tabIndex;
+            $result->resource = $resourceData;
+
+            return $result;
+        }
         $result['config'] = $tab['config'];
-        $result['key'] = $result['type'].$tabIndex;
+        /** @var string $resultType */
+        $resultType = $result['type'];
+        $result['key'] = $resultType.$tabIndex;
         $result['index'] = $tabIndex;
 
         return $result;
@@ -110,12 +135,21 @@ class HomeScreenTabFactory
      *
      * @throws \Exception
      */
+    /**
+     * @param  array<string, mixed>  $tab  Tab definition.
+     * @param  int|string  $tabIndex  Tab index.
+     * @return int|null
+     */
     public static function getCount($tab, $tabIndex)
     {
-        $class = 'App\\HomeScreen\\Tabs\\'.ucfirst($tab['type'].'HomeScreenTab');
-        if (class_exists($class)) {
+        /** @var string $tabType */
+        $tabType = $tab['type'];
+        $class = 'App\\HomeScreen\\Tabs\\'.ucfirst($tabType.'HomeScreenTab');
+        if (class_exists($class) && is_subclass_of($class, AbstractHomeScreenTab::class)) {
+            /** @var array<string, mixed> $tabConfig */
+            $tabConfig = $tab['config'];
             /** @var AbstractHomeScreenTab $tabObject */
-            $tabObject = new $class($tab['config']);
+            $tabObject = new $class($tabConfig);
             if (! $tabObject->isAvailable()) {
                 return null;
             }
@@ -131,49 +165,56 @@ class HomeScreenTabFactory
      *
      * @return array
      */
+    /**
+     * @param  array<string, mixed>  $config  Tab configuration.
+     * @return array<string, AbstractHomeScreenTab>
+     */
     public static function all(array $config)
     {
         return self::get($config, []);
     }
 
     /**
-     * Get available home screen tabs for a user.
-     *
-     * @param  User|null  $user  User whose available tabs should be returned
-     * @return array<string, array<string, mixed>> Available tabs keyed by type
+     * @return array<string, array<string, mixed>>
      */
     public static function available(?User $user = null): array
     {
         $tabs = self::get([], [], $user);
         $available = [];
         /**
-         * @var $key
+         * @var string $key
          * @var AbstractHomeScreenTab $tab
          */
         foreach ($tabs as $key => $tab) {
-            $available[$key] = [
-                'type' => $key,
-                'title' => $tab->getTitle(),
-                'description' => $tab->getDescription(),
-                'config' => $tab->getConfig(),
-            ];
+            if ($tab->isAvailable()) {
+                $available[$key] = [
+                    'type' => $key,
+                    'title' => $tab->getTitle(),
+                    'description' => $tab->getDescription(),
+                    'config' => $tab->getConfig(),
+                ];
+            }
         }
 
         return $available;
     }
 
     /**
-     * Get display titles for a saved home screen configuration.
-     *
-     * @throws \Exception If a configured tab class does not exist
+     * @param  array<int|string, array<string, mixed>>  $tabsConfig  Tab definitions.
+     * @return array<int|string, string>
      */
     public static function getTitles($tabsConfig)
     {
         $titles = [];
         foreach ($tabsConfig as $tabIndex => $tab) {
-            $class = 'App\\HomeScreen\\Tabs\\'.ucfirst($tab['type'].'HomeScreenTab');
-            if (class_exists($class)) {
-                $tabObject = new $class($tab['config']);
+            /** @var string $tabType */
+            $tabType = $tab['type'];
+            $class = 'App\\HomeScreen\\Tabs\\'.ucfirst($tabType.'HomeScreenTab');
+            if (class_exists($class) && is_subclass_of($class, AbstractHomeScreenTab::class)) {
+                /** @var array<string, mixed> $tabConfig */
+                $tabConfig = $tab['config'];
+                /** @var AbstractHomeScreenTab $tabObject */
+                $tabObject = new $class($tabConfig);
                 $titles[$tabIndex] = $tabObject->getTitle();
             } else {
                 throw new \Exception('Class not found: '.$class);

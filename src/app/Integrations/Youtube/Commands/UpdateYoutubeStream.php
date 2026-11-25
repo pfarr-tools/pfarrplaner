@@ -35,6 +35,7 @@ use App\Integrations\Youtube\YoutubeIntegration;
 use App\Models\Places\City;
 use App\Models\Service;
 use Carbon\Carbon;
+use Google\Service\YouTube\Resource\LiveBroadcasts;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 
@@ -64,7 +65,12 @@ class UpdateYoutubeStream extends Command
         parent::__construct();
     }
 
-    protected function output($s)
+    /**
+     * Write a message to the console output and the log.
+     *
+     * @param  string  $s  Message to write.
+     */
+    protected function output(string $s): void
     {
         $this->line($s);
         Log::info($s);
@@ -106,6 +112,7 @@ class UpdateYoutubeStream extends Command
                 ->ordered()
                 ->get();
             $current = null;
+            $last = null;
             try {
                 $youtube = YoutubeIntegration::get($city);
             } catch (\Throwable $exception) {
@@ -125,16 +132,20 @@ class UpdateYoutubeStream extends Command
                     if ($current === null) {
                         $current = $service;
 
-                        // check status
-                        /** @var \Google_Service_YouTube_Video $video */
-                        $lastVideo = $youtube->getVideo(YoutubeHelper::getCode($last->youtube_url));
-                        if ($lastVideo !== null) {
-                            if ($this->videoHasEnded($lastVideo)) {
-                                $this->output('Last service #'.$last->id.' ('.$last->formatTime('YYYY-MM-DD HH:mm').') has ended.');
-                            }
+                        if ($last !== null) {
+                            // check status
+                            /** @var string $videoId */
+                            $videoId = YoutubeHelper::getCode($last->youtube_url ?? '');
+                            /** @var \Google_Service_YouTube_Video|null $lastVideo */
+                            $lastVideo = $youtube->getVideo($videoId);
+                            if ($lastVideo !== null) {
+                                if ($this->videoHasEnded($lastVideo)) {
+                                    $this->output('Last service #'.$last->id.' ('.$last->formatTime('YYYY-MM-DD HH:mm').') has ended.');
+                                }
 
-                            $this->output('Next Service #'.$service->id.' ('.$service->formatTime('YYYY-MM-DD HH:mm').')...');
-                            $this->setBroadcastOptions($service, $youtube, true);
+                                $this->output('Next Service #'.$service->id.' ('.$service->formatTime('YYYY-MM-DD HH:mm').')...');
+                                $this->setBroadcastOptions($service, $youtube, true);
+                            }
                         }
 
                     } else {
@@ -167,32 +178,39 @@ class UpdateYoutubeStream extends Command
      * @param  YoutubeIntegration  $youtube  Authenticated YouTube integration for the service city.
      * @param  bool  $active  Set active or inactive
      */
-    private function setBroadcastOptions(Service $service, YoutubeIntegration $youtube, $active = true)
+    private function setBroadcastOptions(Service $service, YoutubeIntegration $youtube, bool $active = true): void
     {
+        $city = $service->city;
+        if ($city === null) {
+            return;
+        }
+
         $autoStartStop = $active;
-        $broadcasts = $youtube->getYoutube()->liveBroadcasts->listLiveBroadcasts(
+        /** @var LiveBroadcasts $liveBroadcasts */
+        $liveBroadcasts = $youtube->getYoutube()->liveBroadcasts;
+        $broadcasts = $liveBroadcasts->listLiveBroadcasts(
             'id,contentDetails',
-            ['id' => YoutubeHelper::getCode($service->youtube_url)]);
+            ['id' => YoutubeHelper::getCode($service->youtube_url ?? '')]);
 
         if (count($broadcasts->getItems())) {
             /** @var \Google_Service_YouTube_LiveBroadcast $broadcast */
             $broadcast = $broadcasts->getItems()[0];
             $contentDetails = $broadcast->getContentDetails();
 
-            if (($contentDetails->getBoundStreamId() == ($active ? $service->city->youtube_passive_stream_id : $service->city_youtube_active_stream_id))
+            if (($contentDetails->getBoundStreamId() == ($active ? $city->youtube_passive_stream_id : $city->youtube_active_stream_id))
                 || ($contentDetails->getBoundStreamId() === null)) {
                 $this->output('Setting '.($active ? 'active' : 'passive').' stream key for service #'.$service->id);
-                $youtube->getYoutube()->liveBroadcasts->bind($broadcast->getId(), 'id,snippet,status', ['streamId' => ($active ? $service->city->youtube_active_stream_id : $service->city_youtube_passive_stream_id)]);
+                $liveBroadcasts->bind($broadcast->getId(), 'id,snippet,status', ['streamId' => ($active ? $city->youtube_active_stream_id : $city->youtube_passive_stream_id)]);
             } else {
                 $this->output('Stream is not set to '.($active ? 'passive' : 'active').' key, but to '.$contentDetails->getBoundStreamId().' --> leaving it alone.');
             }
-            if ($service->city->youtube_auto_startstop) {
+            if ($city->youtube_auto_startstop) {
                 if (($contentDetails->getEnableAutoStart() != $autoStartStop) || ($contentDetails->getEnableAutoStop() != $autoStartStop)) {
                     $this->output('Enabling auto start/stop for service #'.$service->id);
-                    $contentDetails->setEnableAutoStart($autoStartStop ? 'true' : 'false');
-                    $contentDetails->setEnableAutoStop($autoStartStop ? 'true' : 'false');
+                    $contentDetails->setEnableAutoStart((bool) $autoStartStop);
+                    $contentDetails->setEnableAutoStop((bool) $autoStartStop);
                     $broadcast->setContentDetails($contentDetails);
-                    $youtube->getYoutube()->liveBroadcasts->update('contentDetails', $broadcast);
+                    $liveBroadcasts->update('contentDetails', $broadcast);
                 }
             }
         }

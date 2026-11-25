@@ -34,6 +34,7 @@ class RoleConfigurationSynchronizer
      */
     public function synchronize(bool $dryRun = false): RoleConfigurationSyncResult
     {
+        /** @var array{guard: string, permissions: list<string>, roles: array<string, list<string>>} $configuration */
         $configuration = config('roles');
         $guard = $configuration['guard'];
         $result = new RoleConfigurationSyncResult;

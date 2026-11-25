@@ -55,6 +55,7 @@ class OfferingsInput extends AbstractInput
     /**
      * @var string
      */
+    /** @var string */
     protected $setupView = 'inputs.offerings.setup';
 
     /**
@@ -64,7 +65,7 @@ class OfferingsInput extends AbstractInput
      */
     public function canEdit(): bool
     {
-        return Auth::user()->can('gd-opfer-bearbeiten');
+        return Auth::user()?->can('gd-opfer-bearbeiten') ?? false;
     }
 
     /**
@@ -72,7 +73,9 @@ class OfferingsInput extends AbstractInput
      */
     public function setup(Request $request)
     {
-        $cities = Auth::user()->cities;
+        $user = Auth::user();
+        abort_unless($user !== null, 403);
+        $cities = $user->cities;
         $locations = Location::inCities($cities->pluck('id'))->get();
 
         return Inertia::render('Inputs/Offerings/Setup', compact('cities', 'locations'));
@@ -83,6 +86,7 @@ class OfferingsInput extends AbstractInput
      */
     public function input(Request $request)
     {
+        /** @var array<string, mixed> $setup */
         $setup = $request->validate(
             [
                 'from' => 'required|date_format:d.m.Y',
@@ -99,6 +103,14 @@ class OfferingsInput extends AbstractInput
                 $cityIds = $cityIds->merge($city->children->pluck('id'));
             }
         }
+
+        /** @var string $fromInput */
+        $fromInput = $setup['from'];
+        /** @var string $toInput */
+        $toInput = $setup['to'];
+        $from = Carbon::createFromFormat('d.m.Y', $fromInput);
+        $to = Carbon::createFromFormat('d.m.Y', $toInput);
+        abort_unless($from !== null && $to !== null, 422);
 
         $query = Service::setEagerLoads([])
             ->with(['location:id,name', 'city:id,name'])
@@ -119,15 +131,17 @@ class OfferingsInput extends AbstractInput
                 'services.offering_amount',
             ])
             ->between(
-                Carbon::createFromFormat('d.m.Y', $setup['from']),
-                Carbon::createFromFormat('d.m.Y', $setup['to'])
+                $from,
+                $to
             )
             ->inCities($setup['cities'])
             ->whereIn('services.city_id', $cityIds->unique()->values())
             ->ordered();
 
-        if (count($setup['locations'] ?? [])) {
-            $query->whereIn('services.location_id', $setup['locations']);
+        /** @var array<int, int|string> $locations */
+        $locations = $setup['locations'] ?? [];
+        if (count($locations)) {
+            $query->whereIn('services.location_id', $locations);
         }
 
         $services = $query->get();
@@ -141,6 +155,7 @@ class OfferingsInput extends AbstractInput
      */
     public function save(Request $request)
     {
+        /** @var array<string, mixed> $data */
         $data = $request->validate([
             'id' => 'required|exists:services,id',
             'offering_goal' => 'nullable|string',
@@ -151,7 +166,7 @@ class OfferingsInput extends AbstractInput
             'offerings_counter2' => 'nullable|string',
             'offering_amount' => 'nullable|string',
         ]);
-        $service = Service::find($data['id']);
+        $service = Service::query()->whereKey($data['id'])->first();
         if (! $service) {
             abort(404);
         }

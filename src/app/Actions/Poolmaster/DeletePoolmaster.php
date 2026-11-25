@@ -41,7 +41,7 @@ use Illuminate\Support\Facades\Gate;
 
 class DeletePoolmaster extends AbstractDeleteAction implements DeletesPoolmasters
 {
-    /** @var array|null */
+    /** @var array<string, mixed>|null */
     protected $forward = null;
 
     public function redirectTo(): string
@@ -59,7 +59,7 @@ class DeletePoolmaster extends AbstractDeleteAction implements DeletesPoolmaster
         DeletedPoolmaster::dispatch($user, $poolmaster);
         $this->messages = ['success' => 'Der Einsatz als Poolmaster:in wurde gelöscht.'];
 
-        return $poolmaster->delete();
+        return (bool) $poolmaster->delete();
 
     }
 }

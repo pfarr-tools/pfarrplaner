@@ -34,6 +34,6 @@ use App\Models\Ads\AdChannel;
 use App\Models\People\User;
 
 /**
- * @method AdChannel create(User $user, array $input)
+ * @method AdChannel create(User $user, array<string, mixed> $input)
  */
 interface CreatesAdChannels {}

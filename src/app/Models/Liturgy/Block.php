@@ -33,16 +33,21 @@ namespace App\Models\Liturgy;
 use App\Models\Service;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Block extends Model
 {
-    protected $with = 'items';
+    /** @var list<string> */
+    protected $with = ['items'];
 
     protected $table = 'liturgy_blocks';
 
     protected $fillable = ['title', 'instructions', 'service_id', 'sortable'];
 
+    /**
+     * @return void
+     */
     protected static function boot()
     {
         parent::boot();
@@ -53,6 +58,9 @@ class Block extends Model
         });
     }
 
+    /**
+     * @return BelongsTo<Service, $this>
+     */
     public function service()
     {
         return $this->belongsTo(Service::class);

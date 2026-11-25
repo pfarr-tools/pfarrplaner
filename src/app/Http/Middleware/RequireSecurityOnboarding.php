@@ -33,12 +33,18 @@ class RequireSecurityOnboarding
     {
         $user = $request->user();
         if (! $user instanceof User || $this->isAllowedRoute($request->route()?->getName())) {
-            return $next($request);
+            /** @var Response $response */
+            $response = $next($request);
+
+            return $response;
         }
 
         $onboarding = app(SecurityOnboardingService::class);
         if (! $onboarding->shouldShow($user)) {
-            return $next($request);
+            /** @var Response $response */
+            $response = $next($request);
+
+            return $response;
         }
 
         return redirect()->route('security.onboarding');

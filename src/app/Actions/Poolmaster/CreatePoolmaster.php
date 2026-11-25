@@ -55,12 +55,15 @@ class CreatePoolmaster extends AbstractCreateAction implements CreatesPoolmaster
     }
 
     /**
+     * @param  array<string, mixed>  $input
+     *
      * @throws AuthorizationException
      * @throws ValidationException
      */
     public function create(User $user, array $input): Poolmaster
     {
         Gate::forUser($user)->authorize('create', Poolmaster::class);
+        /** @var array<string, mixed> $input Validierte Eingabedaten. */
         $input = Validator::make($input, Poolmaster::$validationRules)->validateWithBag('createPoolmaster');
         $this->poolmaster = Poolmaster::create($input);
         CreatedPoolmaster::dispatch($user, $this->poolmaster);

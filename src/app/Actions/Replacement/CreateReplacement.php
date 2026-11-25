@@ -46,16 +46,23 @@ class CreateReplacement extends AbstractCreateAction implements CreatesReplaceme
         return '';
     }
 
+    /**
+     * @param  array<string, mixed>  $input
+     */
     public function create(User $user, Absence $absence, array $input): Replacement
     {
         Gate::forUser($user)->authorize('create', [Replacement::class, $absence]);
         $users = $input['users'] ?? [];
+        if (! is_array($users)) {
+            $users = [];
+        }
         foreach ($users as $id => $userData) {
-            $users[$id] = $userData['id'] ?? $userData;
+            $users[$id] = is_array($userData) ? ($userData['id'] ?? $userData) : $userData;
         }
 
         $input['absence_id'] = $absence->id;
         unset($input['users']);
+        /** @var array<string, mixed> $input */
         $input = Validator::make($input, Replacement::$validationRules)->validateWithBag('createReplacement');
         $replacement = Replacement::create($input);
         $replacement->users()->sync($users);

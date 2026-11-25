@@ -44,6 +44,7 @@ use Carbon\Carbon;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\View\View;
 
 /**
@@ -51,6 +52,9 @@ use Illuminate\View\View;
  */
 class EmbedController extends Controller
 {
+    /**
+     * @return void
+     */
     public function __construct()
     {
         $this->middleware('cors');
@@ -63,6 +67,7 @@ class EmbedController extends Controller
      * @param  Request  $request  Request
      * @param  string  $ids  comma-separated location ids
      * @param  int  $limit  Limit (optional)
+     * @return Application|Factory|View
      */
     public function embedByLocations(Request $request, $ids, $limit = 10)
     {
@@ -85,6 +90,7 @@ class EmbedController extends Controller
      * @param  Request  $request  Request
      * @param  string  $ids  comma-separated location ids
      * @param  int  $limit  Limit (optional)
+     * @return Application|Factory|View
      */
     public function embedByCities(Request $request, $ids, $limit = 10)
     {
@@ -113,6 +119,7 @@ class EmbedController extends Controller
      * @param  Request  $request  Request
      * @param  string  $ids  comma-separated location ids
      * @param  int  $limit  Limit (optional)
+     * @return Response
      */
     public function embedCCByCities(Request $request, $ids, $limit = 5)
     {
@@ -132,15 +139,19 @@ class EmbedController extends Controller
     }
 
     /**
-     * Return a table of upcoming vacations and replacements for a specific user
+     * Return a table of upcoming vacations and replacements for a specific user.
      *
-     * @param  $userId
+     * @param  Request  $request  Request
+     * @param  User  $user  User whose absences and replacements are shown.
+     * @return Response
      */
     public function embedUserVacations(Request $request, User $user)
     {
-        abort_unless($request->user()->can('editAbsences', $user), 403);
+        $actor = $request->user();
+        abort_unless($actor instanceof User, 401);
+        abort_unless($actor->can('editAbsences', $user), 403);
         $start = Carbon::now();
-        $end = (clone $start)->addWeek(2);
+        $end = (clone $start)->addWeek();
         // $vacations = Vacations::getByPeriodAndUser($start, $end, $user);
         $vacations = Absence::with('replacements')->byUserAndPeriod($user, $start, $end)->get();
 
@@ -149,6 +160,11 @@ class EmbedController extends Controller
     }
 
     /**
+     * Return a table of baptismal services for specific cities.
+     *
+     * @param  Request  $request  Request
+     * @param  User  $user  Authenticated user.
+     * @param  string  $ids  comma-separated city ids
      * @param  int  $limit
      * @param  int  $maxBaptisms
      * @return Application|Factory|View
@@ -169,6 +185,10 @@ class EmbedController extends Controller
     }
 
     /**
+     * Render the embed report selected by the given report key.
+     *
+     * @param  Request  $request  Request
+     * @param  string  $report  Report key used to resolve the embed report class.
      * @return mixed
      */
     public function embedReport(Request $request, $report)
@@ -178,6 +198,7 @@ class EmbedController extends Controller
             abort(404);
         }
         $reportObject = new $reportClass;
+        abort_unless(method_exists($reportObject, 'embed'), 404);
 
         return $reportObject->embed($request);
     }

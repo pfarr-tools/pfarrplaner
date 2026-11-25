@@ -32,6 +32,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Env;
 
 /**
  * Keep browser-test authentication helpers outside normal application environments.
@@ -47,7 +48,7 @@ class BlockDevHelperRoutes
     public function handle($request, Closure $next)
     {
         if ($request->is('_dusk') || $request->is('_dusk/*')) {
-            abort_unless(app()->environment('dusk') && (bool) env('DUSK_ENABLED', false), 404);
+            abort_unless(app()->environment('dusk') && (bool) Env::get('DUSK_ENABLED', false), 404);
         }
 
         return $next($request);

@@ -61,7 +61,9 @@ class InstallSetup extends Command
      */
     public function handle()
     {
-        $this->components->info(config('app.name').' Setup');
+        /** @var string $appName */
+        $appName = config('app.name');
+        $this->components->info($appName.' Setup');
 
         foreach (['roles', 'admin'] as $item) {
             $this->output->write(str_pad('Setting up initial '.$item.'... ', 40));
@@ -75,6 +77,8 @@ class InstallSetup extends Command
                 $result !== false ? ' <fg=green;options=bold>DONE</>' : ' <fg=red;options=bold>FAIL</>'
             );
         }
+
+        return self::SUCCESS;
     }
 
     /**

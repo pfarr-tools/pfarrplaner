@@ -20,7 +20,7 @@ class PhoneNumber implements ValidationRule
 {
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        if (! preg_match('/^([0-9s(+][0-9\.-\/ ()]{7,})$/i', $value)) {
+        if (! is_string($value) || ! preg_match('/^([0-9s(+][0-9\.-\/ ()]{7,})$/i', $value)) {
             $fail('validation.phone_number')->translate();
         }
     }

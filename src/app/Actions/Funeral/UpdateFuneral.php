@@ -34,6 +34,11 @@ class UpdateFuneral extends AbstractUpdateAction implements UpdatesFunerals
         return $this->redirectUrl ?: route('home');
     }
 
+    /**
+     * Aktualisiert die Beerdigung und die zugehörigen Dienste.
+     *
+     * @param  array<string, mixed>  $input
+     */
     public function update(User $user, Funeral $funeral, array $input): Funeral
     {
         Gate::forUser($user)->authorize('update', $funeral);
@@ -42,7 +47,10 @@ class UpdateFuneral extends AbstractUpdateAction implements UpdatesFunerals
             'service_id' => $funeral->service_id,
             'buried_name' => $funeral->buried_name,
         ], $input));
-        $this->authorizeServiceWriteAccess($user, $input['service_id'] ?? null);
+        /** @var int|string|null $serviceId */
+        $serviceId = $input['service_id'] ?? null;
+        $this->authorizeServiceWriteAccess($user, $serviceId);
+        /** @var array<string, mixed> $validated */
         $validated = Validator::make($input, Funeral::$validationRules)->validateWithBag('updateFuneral');
 
         $funeral->update($this->normalizeValidatedInput($validated));
@@ -61,6 +69,9 @@ class UpdateFuneral extends AbstractUpdateAction implements UpdatesFunerals
         return $funeral;
     }
 
+    /**
+     * @param  Service  $service  Service to derive the slug from.\n     * @return string
+     */
     protected function getServiceSlug(Service $service): string
     {
         return $service->slug ?: $service->createSlug();

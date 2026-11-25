@@ -36,6 +36,7 @@ namespace App\Helpers;
 class PodcastHelper
 {
     /**
+     * @param  string  $url  URL of the podcast file to inspect
      * @return mixed
      */
     public static function getFileSize($url)

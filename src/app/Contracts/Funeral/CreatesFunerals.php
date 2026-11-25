@@ -18,5 +18,8 @@ use App\Models\Rites\Funeral;
 
 interface CreatesFunerals
 {
+    /**
+     * @param  array<string, mixed>  $input
+     */
     public function create(User $user, array $input): Funeral;
 }

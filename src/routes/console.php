@@ -66,7 +66,7 @@ Schedule::command('cache:prune-stale-tags')->hourly();
 Schedule::call(fn () => app(AttachmentUploadService::class)->cleanup())->hourly();
 
 // Integration schedules
-foreach (glob(app_path('Integrations/*')) as $folder) {
+foreach (glob(app_path('Integrations/*')) ?: [] as $folder) {
     if (is_dir($folder)) {
         $cls = 'App\\Integrations\\'.basename($folder).'\\'.basename($folder).'Integration';
         if (class_exists($cls) && method_exists($cls, 'schedule')) {

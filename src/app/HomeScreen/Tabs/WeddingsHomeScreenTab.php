@@ -33,7 +33,6 @@ namespace App\HomeScreen\Tabs;
 use App\Models\Rites\Wedding;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\Auth;
 
 class WeddingsHomeScreenTab extends AbstractHomeScreenTab
 {
@@ -41,8 +40,14 @@ class WeddingsHomeScreenTab extends AbstractHomeScreenTab
 
     protected $description = 'Zeigt die anstehenden Trauungen';
 
+    /**
+     * @var Builder<Wedding>
+     */
     protected $query = null;
 
+    /**
+     * @param  array<string, mixed>  $config  Tab configuration.\n     * @return void
+     */
     public function __construct($config = [])
     {
         $this->setDefaultConfig($config, ['mine' => 0, 'newestFirst' => 0, 'excludeProcessed' => 0]);
@@ -59,11 +64,17 @@ class WeddingsHomeScreenTab extends AbstractHomeScreenTab
         return parent::getTitle();
     }
 
+    /**
+     * @return int
+     */
     public function getCount()
     {
         return $this->query->count();
     }
 
+    /**
+     * @param  array<string, mixed>  $data  View data.\n     * @return mixed
+     */
     public function getContent($data = [])
     {
         $data['weddings'] = $this->query->get();
@@ -71,6 +82,9 @@ class WeddingsHomeScreenTab extends AbstractHomeScreenTab
         return parent::getContent($data);
     }
 
+    /**
+     * @param  array<string, mixed>  $data  Additional data.\n     * @return array<string, mixed>
+     */
     public function toArray($data = [])
     {
         $data['weddings'] = $this->query->get();
@@ -87,9 +101,9 @@ class WeddingsHomeScreenTab extends AbstractHomeScreenTab
     public function buildQuery()
     {
         $start = Carbon::now()->setTime(0, 0, 0);
-        $end = Carbon::now()->addMonth(2);
+        $end = Carbon::now()->addMonths(2);
 
-        $order = $this->config['newestFirst'] ? 'DESC' : 'ASC';
+        $order = $this->config['newestFirst'] ? 'desc' : 'asc';
 
         $query = Wedding::with(['service'])
             ->select('weddings.*')
@@ -107,11 +121,11 @@ class WeddingsHomeScreenTab extends AbstractHomeScreenTab
                     $service->whereHas(
                         'participants',
                         function ($query) {
-                            $query->where('user_id', Auth::user()->id);
+                            $query->where('user_id', $this->user()->id);
                         }
                     );
                 } else {
-                    $service->inCities(Auth::user()->writableCities->pluck('id'));
+                    $service->inCities($this->user()->writableCities->pluck('id'));
                 }
             })->orderBy('services.date', $order);
 

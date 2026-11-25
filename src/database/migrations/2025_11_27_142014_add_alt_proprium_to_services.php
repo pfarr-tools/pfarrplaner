@@ -8,6 +8,12 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    /**
+     * Translate a liturgical title into its proprium code.
+     *
+     * @param  string  $title  Liturgical title to translate.
+     * @return string Proprium code, or an empty string for unknown titles.
+     */
     private function translateToCode($title): string
     {
         $table = [
@@ -103,10 +109,15 @@ return new class extends Migration
             $table->string('alt_proprium')->nullable()->default(null);
         });
 
-        $migrateIds = Service::select(['id', 'liturgy_info_id'])->whereNotNull('liturgy_info_id')->get()->pluck('liturgy_info_id', 'id');
+        $migrateIds = Service::select(['id', 'liturgy_info_id'])->whereNotNull('liturgy_info_id')->pluck('liturgy_info_id', 'id');
         foreach ($migrateIds as $serviceId => $liturgyInfoId) {
             $lit = LiturgyInfo::find($liturgyInfoId);
-            Service::find($serviceId)->update(['alt_proprium' => $this->translateToCode($lit->title).'-'.$lit->perikope]);
+            $service = Service::find($serviceId);
+            if (! $lit instanceof LiturgyInfo || ! $service instanceof Service) {
+                continue;
+            }
+
+            $service->update(['alt_proprium' => $this->translateToCode($lit->title ?? '').'-'.$lit->perikope]);
         }
 
     }

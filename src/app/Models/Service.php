@@ -30,6 +30,8 @@
 
 namespace App\Models;
 
+use App\Contracts\AdConfig\CreatesAdConfigs;
+use App\Contracts\AdConfig\DeletesAdConfigs;
 use App\DAV\DAVCalendarItem;
 use App\DAV\HasDAVCalendarItems;
 use App\Helpers\StoragePath;
@@ -51,6 +53,7 @@ use App\Seating\AbstractSeatFinder;
 use App\Seating\MaximumBasedSeatFinder;
 use App\Seating\RowBasedSeatFinder;
 use App\Services\LiturgyService;
+use App\Services\MinistryService;
 use App\Services\NameService;
 use App\Tools\StringTool;
 use App\Traits\HasAttachmentsTrait;
@@ -86,6 +89,15 @@ use Throwable;
  * @property-read Carbon $datetime Copy of the service date exposed by the legacy accessor.
  * @property-read Carbon $dateTime Legacy camel-case alias, distinct from the dateTime() formatting method.
  * @property-read \Illuminate\Database\Eloquent\Collection<int, User&object{pivot: Pivot&object{category: string}}> $participants Participants with their service-specific category.
+ *
+ * @method string baptismsText(bool $includeCount = false, bool $includeText = false) Format attached baptisms.
+ * @method string dateText(string $format = 'DD.MM.YYYY') Format the service date.
+ * @method Carbon dateTime() Return the service date in Europe/Berlin.
+ * @method string descriptionText(list<string> $exclude = [], bool $excludeBaptismIfNoCandidates = false) Format the description.
+ * @method string locationText() Format the service location.
+ * @method string timeText(bool $uhr = true, string $separator = ':', bool $skipMinutes = false, bool $nbsp = false, bool $leadingZero = false) Format the service time.
+ * @method string titleText(bool $short = true, bool $skipRites = false) Format the service title.
+ * @method bool isTemplate() Determine whether this service is the template.
  */
 class Service extends Model implements HasDAVCalendarItems
 {
@@ -103,12 +115,12 @@ class Service extends Model implements HasDAVCalendarItems
     use TracksDeletedByTrait;
 
     /**
-     * @var array
+     * @var array<string, mixed>
      */
     public $liturgy = [];
 
     /**
-     * @var string[]
+     * @var list<string>
      */
     protected $with = [
         'participants',
@@ -126,7 +138,7 @@ class Service extends Model implements HasDAVCalendarItems
     ];
 
     /**
-     * @var string[]
+     * @var array<string, string>
      */
     protected $casts = [
         'need_predicant' => 'boolean',
@@ -142,7 +154,7 @@ class Service extends Model implements HasDAVCalendarItems
     ];
 
     /**
-     * @var string[]
+     * @var list<string>
      */
     protected $fillable = [
         'day_id',
@@ -212,20 +224,15 @@ class Service extends Model implements HasDAVCalendarItems
     ];
 
     /**
-     * @var string[]
+     * @var list<string>
      */
     protected $appends = [
-        'pastors',
-        'organists',
-        'sacristans',
-        'otherParticipants',
         'descriptionText',
         'locationText',
         'locationTextWithCity',
         'dateText',
         'timeText',
         'baptismsText',
-        'descriptionText',
         'liturgy',
         'ministriesByCategory',
         'isShowable',
@@ -256,7 +263,7 @@ class Service extends Model implements HasDAVCalendarItems
     protected $relationsToTrack = ['participants'];
 
     /**
-     * @var string[]
+     * @var array<string, mixed>
      */
     protected $attributes = [
         'offering_type' => 'eO',
@@ -265,10 +272,85 @@ class Service extends Model implements HasDAVCalendarItems
     /** @var AbstractSeatFinder */
     protected $seatFinder = null;
 
-    /**
-     * @var array
+    /*
+     * Trait accessors are overridden here so the nullable authenticated user and
+     * the nullable service attributes are handled without losing type safety.
      */
-    private $auditData = [];
+
+    /**
+     * Determines whether the authenticated user may show this model.
+     *
+     * @return bool True when the user is allowed to show the model.
+     */
+    public function getIsShowableAttribute(): bool
+    {
+        $user = Auth::user();
+
+        return $user instanceof User && $user->can('show', $this);
+    }
+
+    /**
+     * Determines whether the authenticated user may edit this model.
+     *
+     * @return bool True when the user is allowed to update the model.
+     */
+    public function getIsEditableAttribute(): bool
+    {
+        $user = Auth::user();
+
+        return $user instanceof User && $user->can('update', $this);
+    }
+
+    /**
+     * Determines whether the authenticated user may delete this model.
+     *
+     * @return bool True when the user is allowed to delete the model.
+     */
+    public function getIsDeletableAttribute(): bool
+    {
+        $user = Auth::user();
+
+        return $user instanceof User && $user->can('delete', $this);
+    }
+
+    /**
+     * Return the comments visible to the authenticated user.
+     *
+     * @return mixed
+     */
+    public function commentsForCurrentUser()
+    {
+        $user = Auth::user();
+        if (! $user instanceof User) {
+            return $this->comments()->where('private', 0);
+        }
+
+        return $this->commentsForUser($user);
+    }
+
+    /**
+     * Resolve the liturgical information for this service.
+     *
+     * @return array<string, mixed>
+     */
+    public function getLiturgicalInfoAttribute(): array
+    {
+        if ($this->cachedLiturgicalInfo !== null) {
+            return $this->cachedLiturgicalInfo;
+        }
+        if (! $this->isAlternateProprium) {
+            $liturgyInfo = LiturgyService::getLiturgyInfoByDate($this->serviceDate());
+            /** @var array<string, mixed> $litInfo */
+            $litInfo = is_array($liturgyInfo) ? ($liturgyInfo[0] ?? []) : [];
+        } else {
+            $litInfo = (LiturgyService::getLiturgyByAltPropriumCode((string) $this->alt_proprium) ?? []);
+        }
+        if ($litInfo) {
+            $this->cachedLiturgicalInfo = $litInfo;
+        }
+
+        return $litInfo;
+    }
 
     // ACCESSORS
 
@@ -277,7 +359,7 @@ class Service extends Model implements HasDAVCalendarItems
      */
     public function getBaptismsTextAttribute()
     {
-        return $this->baptismsText(true);
+        return $this->formatBaptismsText(true);
     }
 
     /**
@@ -295,8 +377,9 @@ class Service extends Model implements HasDAVCalendarItems
      */
     public function ensureKonfiAppQrCode($value = null)
     {
-        $value ??= $this->getRawOriginal('konfiapp_event_qr');
-        if (($value !== null) && ($value !== '')) {
+        /** @var string|null $value */
+        $value = $value ?? $this->getRawOriginal('konfiapp_event_qr');
+        if (is_string($value) && ($value !== '')) {
             return $value;
         }
 
@@ -312,8 +395,9 @@ class Service extends Model implements HasDAVCalendarItems
 
         try {
             $service = KonfiAppIntegration::get($city)->addQRCodeToService($this);
+            /** @var string|null $value */
             $value = $service->getRawOriginal('konfiapp_event_qr');
-            if (($value !== null) && ($value !== '')) {
+            if (is_string($value) && ($value !== '')) {
                 $this->attributes['konfiapp_event_qr'] = $value;
             }
         } catch (Throwable $exception) {
@@ -333,11 +417,13 @@ class Service extends Model implements HasDAVCalendarItems
      * @param  bool  $includeText
      * @return string
      */
-    public function baptismsText($includeCount = false, $includeText = false)
+    protected function formatBaptismsText($includeCount = false, $includeText = false)
     {
         $baptisms = [];
         foreach ($this->baptisms as $baptism) {
-            $baptisms[] = NameService::fromName($baptism->candidate_name)->format(NameService::FIRST_LAST);
+            /** @var string $name */
+            $name = NameService::fromName(self::stringify($baptism->candidate_name))->format(NameService::FIRST_LAST);
+            $baptisms[] = $name;
         }
 
         return
@@ -358,7 +444,7 @@ class Service extends Model implements HasDAVCalendarItems
     }
 
     /**
-     * @return array|string
+     * @return string Rendered description.
      *
      * @throws Throwable
      */
@@ -366,7 +452,7 @@ class Service extends Model implements HasDAVCalendarItems
     {
         return view(
             'services.youtube.snippet.description',
-            ['service' => $this, 'liturgy' => LiturgyService::getLiturgyInfoByDate($this->date->format('Y-m-d'))]
+            ['service' => $this, 'liturgy' => LiturgyService::getLiturgyInfoByDate($this->serviceDate()->format('Y-m-d'))]
         )->render();
     }
 
@@ -375,10 +461,10 @@ class Service extends Model implements HasDAVCalendarItems
      */
     public function getBroadcastTitleAttribute()
     {
-        $liturgy = LiturgyService::getLiturgyInfoByDate($this->date->format('Y-m-d'));
+        $liturgy = LiturgyService::getLiturgyInfoByDate($this->serviceDate()->format('Y-m-d'));
 
-        return $this->title ?: (isset($liturgy['Bezeichnung']) ? $liturgy['Bezeichnung']
-            .' ('.$this->date->format('d.m.Y').')'
+        return $this->title ?: (is_array($liturgy) && isset($liturgy['Bezeichnung']) ? self::stringify($liturgy['Bezeichnung'])
+            .' ('.$this->serviceDate()->format('d.m.Y').')'
             : 'Gottesdienst mit '.$this->participantsText('P', true));
     }
 
@@ -386,6 +472,7 @@ class Service extends Model implements HasDAVCalendarItems
      * @param  bool  $fullName
      * @param  bool  $withTitle
      * @param  string  $glue
+     * @param  string  $category  Participant category.
      * @return string
      */
     public function participantsText($category, $fullName = false, $withTitle = true, $glue = ', ')
@@ -400,7 +487,8 @@ class Service extends Model implements HasDAVCalendarItems
     }
 
     /**
-     * @return Collection|mixed
+     * @param  string  $category  Participant category.
+     * @return Collection<int, User>
      */
     public function participantsByCategory($category)
     {
@@ -414,7 +502,10 @@ class Service extends Model implements HasDAVCalendarItems
             case 'A':
                 return $this->otherParticipants;
             default:
-                return $this->ministries()[$category] ?? collect([]);
+                /** @var Collection<int, User> $ministries */
+                $ministries = $this->ministries()[$category] ?? collect([]);
+
+                return $ministries;
         }
     }
 
@@ -443,12 +534,12 @@ class Service extends Model implements HasDAVCalendarItems
             $credits['Orgel'] = 'Orgel: '.$t;
         }
         foreach ($this->ministries() as $ministry => $people) {
-            if ($t = $this->participantsText($ministry, true, true)) {
+            if ($t = $this->participantsText((string) $ministry, true, true)) {
                 $credits[$ministry] = $ministry.': '.$t;
             }
         }
         if ($t = $this->participantsText('M', true, true)) {
-            $credits[config('labels.sacristan')] = 'Mesnerdienst: '.$t;
+            $credits[self::stringify(config('labels.sacristan'))] = 'Mesnerdienst: '.$t;
         }
         $separator = utf8_encode(' '.chr(183).' ');
 
@@ -460,16 +551,16 @@ class Service extends Model implements HasDAVCalendarItems
      */
     public function getDateTextAttribute()
     {
-        return $this->dateText();
+        return $this->formatDateText();
     }
 
     /**
      * @param  string  $format
      * @return mixed
      */
-    public function dateText($format = 'DD.MM.YYYY')
+    protected function formatDateText($format = 'DD.MM.YYYY')
     {
-        return $this->date->isoFormat($format);
+        return $this->serviceDate()->isoFormat($format);
     }
 
     //
@@ -481,7 +572,22 @@ class Service extends Model implements HasDAVCalendarItems
      */
     public function getDatetimeAttribute()
     {
-        return $this->date->copy();
+        return $this->serviceDate()->copy();
+    }
+
+    /**
+     * Return the service date as a guaranteed Carbon instance.
+     *
+     * @return Carbon Service date.
+     */
+    protected function serviceDate(): Carbon
+    {
+        $date = $this->date;
+        if (! $date instanceof Carbon) {
+            throw new \LogicException('Der Gottesdienst hat kein Datum.');
+        }
+
+        return $date;
     }
 
     /**
@@ -489,13 +595,15 @@ class Service extends Model implements HasDAVCalendarItems
      */
     public function getDescriptionTextAttribute()
     {
-        return $this->descriptionText();
+        return $this->formatDescriptionText();
     }
 
     /**
+     * @param  list<string>  $exclude  Parts to omit.
+     * @param  bool  $excludeBaptismIfNoCandidates  Whether baptism hints are omitted.
      * @return string
      */
-    public function descriptionText($exclude = [], $excludeBaptismIfNoCandidates = false)
+    protected function formatDescriptionText($exclude = [], $excludeBaptismIfNoCandidates = false)
     {
         $desc = [];
         if ($this->needs_reservations) {
@@ -506,19 +614,19 @@ class Service extends Model implements HasDAVCalendarItems
             ).' Uhr' : 'Anmeldung nötig');
         }
         if ($this->baptism) {
-            if (! Str::contains(Str::lower($this->titleText()), 'tauf')) {
+            if (! Str::contains(Str::lower($this->formatTitleText()), 'tauf')) {
                 if ((! $excludeBaptismIfNoCandidates) || ($this->baptisms->count())) {
                     $desc['baptism'] = $this->baptisms->count() ? 'mit Taufen' : 'möglicher Taufgottesdienst';
                 }
             }
         }
         if ($this->eucharist) {
-            if (! Str::contains(Str::lower($this->titleText()), 'abendmahl')) {
+            if (! Str::contains(Str::lower($this->formatTitleText()), 'abendmahl')) {
                 $desc['eucharist'] = 'mit Abendmahl';
             }
         }
         if ($this->getAttribute('description') != '') {
-            $desc['description'] = $this->getAttribute('description');
+            $desc['description'] = self::stringify($this->getAttribute('description'));
         }
         foreach ($exclude as $key) {
             if (isset($desc[$key])) {
@@ -534,7 +642,7 @@ class Service extends Model implements HasDAVCalendarItems
      * @param  bool  $skipRites
      * @return string
      */
-    public function titleText($short = true, $skipRites = false)
+    protected function formatTitleText($short = true, $skipRites = false)
     {
         $includeDefaultServiceTitle = true;
         $elements = [];
@@ -550,7 +658,7 @@ class Service extends Model implements HasDAVCalendarItems
                 $elements[] = $x = $this->funeralsText();
                 $includeDefaultServiceTitle = false;
             }
-            if ($this->baptismsText() != '') {
+            if ($this->formatBaptismsText() != '') {
                 if (! Str::contains(Str::lower(implode(' / ', $elements)), 'tauf')) {
                     $elements[] = $x = ($this->baptisms->count() > 1 ? 'Taufen' : 'Taufe');
                 }
@@ -571,12 +679,14 @@ class Service extends Model implements HasDAVCalendarItems
         $weddings = [];
         /** @var Wedding $wedding */
         foreach ($this->weddings as $wedding) {
-            $weddings[] = 'Trauung von '.NameService::fromName($wedding->spouse1_name)->format(
-                NameService::FIRST_LAST
-            )
-                .($wedding->spouse1_birth_name ? ' ('.$wedding->spouse1_birth_name.')' : '')
-                .' und '.NameService::fromName($wedding->spouse2_name)->format(NameService::FIRST_LAST)
-                .($wedding->spouse2_birth_name ? ' ('.$wedding->spouse2_birth_name.')' : '');
+            /** @var string $spouse1 */
+            $spouse1 = NameService::fromName(self::stringify($wedding->spouse1_name))->format(NameService::FIRST_LAST);
+            /** @var string $spouse2 */
+            $spouse2 = NameService::fromName(self::stringify($wedding->spouse2_name))->format(NameService::FIRST_LAST);
+            $weddings[] = 'Trauung von '.$spouse1
+                .($wedding->spouse1_birth_name ? ' ('.self::stringify($wedding->spouse1_birth_name).')' : '')
+                .' und '.$spouse2
+                .($wedding->spouse2_birth_name ? ' ('.self::stringify($wedding->spouse2_birth_name).')' : '');
         }
 
         return implode('; ', $weddings);
@@ -591,7 +701,8 @@ class Service extends Model implements HasDAVCalendarItems
     {
         $funerals = [];
         foreach ($this->funerals as $funeral) {
-            $name = NameService::fromName($funeral->buried_name)->format(NameService::FIRST_LAST);
+            /** @var string $name */
+            $name = NameService::fromName(self::stringify($funeral->buried_name))->format(NameService::FIRST_LAST);
             $funerals[] = $funeral->type === 'Urnenbeisetzung'
                 ? 'Urnenbeisetzung von '.$name
                 : 'Trauerfeier für '.$name;
@@ -680,7 +791,12 @@ class Service extends Model implements HasDAVCalendarItems
      */
     public function getIsMineAttribute()
     {
-        return $this->participants->contains(Auth::user());
+        $user = Auth::user();
+        if ($user === null) {
+            return false;
+        }
+
+        return $this->participants->contains(fn ($participant) => $participant->id === $user->id);
     }
 
     /**
@@ -690,11 +806,11 @@ class Service extends Model implements HasDAVCalendarItems
      */
     public function getKeyDateAttribute()
     {
-        return $this->date->format('Y-m-d');
+        return $this->serviceDate()->format('Y-m-d');
     }
 
     /**
-     * @return array
+     * @return array<string, mixed>
      */
     public function getLiturgyAttribute()
     {
@@ -714,7 +830,7 @@ class Service extends Model implements HasDAVCalendarItems
 
         return $this->city->youtube_channel_url ? YoutubeHelper::getLiveDashboardUrl(
             $this->city,
-            $this->youtube_url
+            (string) $this->youtube_url
         ) : '';
     }
 
@@ -723,13 +839,13 @@ class Service extends Model implements HasDAVCalendarItems
      */
     public function getLocationTextAttribute()
     {
-        return $this->locationText();
+        return $this->formatLocationText();
     }
 
     /**
      * @return mixed|string
      */
-    public function locationText()
+    protected function formatLocationText()
     {
         return $this->special_location ?: (is_object($this->location) ? $this->location->name : '');
     }
@@ -767,7 +883,7 @@ class Service extends Model implements HasDAVCalendarItems
      */
     public function getOfferingsUrlAttribute()
     {
-        return $this->attributes['offerings_url'] ?: ($this->city ? $this->city->default_offering_url : '');
+        return self::stringify($this->attributes['offerings_url'] ?: ($this->city ? $this->city->default_offering_url : ''));
     }
 
     /**
@@ -888,7 +1004,7 @@ class Service extends Model implements HasDAVCalendarItems
     /**
      * Get seating for this service
      *
-     * @return array
+     * @return array<int|string, mixed>
      */
     public function getSeatingAttribute()
     {
@@ -903,9 +1019,9 @@ class Service extends Model implements HasDAVCalendarItems
         return route(
             'storage',
             [
-                'path' => pathinfo($this->songsheet, PATHINFO_FILENAME),
-                'prettyName' => $this->date->format('Ymd').'-Liedblatt.'.pathinfo(
-                    $this->songsheet,
+                'path' => pathinfo((string) $this->songsheet, PATHINFO_FILENAME),
+                'prettyName' => $this->serviceDate()->format('Ymd').'-Liedblatt.'.pathinfo(
+                    (string) $this->songsheet,
                     PATHINFO_EXTENSION
                 ),
             ]
@@ -917,7 +1033,7 @@ class Service extends Model implements HasDAVCalendarItems
      */
     public function getTimeAttribute()
     {
-        return isset($this->attributes['time']) ? substr($this->attributes['time'], 0, 5) : '';
+        return isset($this->attributes['time']) ? substr(self::stringify($this->attributes['time']), 0, 5) : '';
     }
 
     /**
@@ -925,7 +1041,7 @@ class Service extends Model implements HasDAVCalendarItems
      */
     public function getTimeTextAttribute()
     {
-        return $this->timeText();
+        return $this->formatTimeText();
     }
 
     /**
@@ -936,9 +1052,9 @@ class Service extends Model implements HasDAVCalendarItems
      * @param  bool  $leadingZero
      * @return string
      */
-    public function timeText($uhr = true, $separator = ':', $skipMinutes = false, $nbsp = false, $leadingZero = false)
+    protected function formatTimeText($uhr = true, $separator = ':', $skipMinutes = false, $nbsp = false, $leadingZero = false)
     {
-        return $this->date->copy()->setTimeZone('Europe/Berlin')
+        return $this->serviceDate()->copy()->setTimeZone('Europe/Berlin')
             ->format(($leadingZero ? 'H' : 'G').($skipMinutes ? '' : $separator.'i'))
             .($uhr ? ($nbsp ? '&nbsp;' : ' ').'Uhr' : '');
     }
@@ -950,7 +1066,7 @@ class Service extends Model implements HasDAVCalendarItems
      */
     public function getTitleTextAttribute()
     {
-        return $this->titleText(false, false);
+        return $this->formatTitleText(false, false);
     }
 
     /**
@@ -959,12 +1075,42 @@ class Service extends Model implements HasDAVCalendarItems
     public function getVideoTimeStringAttribute()
     {
         $thisTime = Carbon::createFromTimeString(
-            $this->date->format('Y-m-d').' '.$this->time,
+            $this->serviceDate()->format('Y-m-d').' '.$this->time,
             'Europe/Berlin'
         );
 
         return $thisTime->setTimezone('UTC')->format('Y-m-d\TH:i:s').'.000Z';
     }
+
+    /**
+     * Keep the legacy helper calls working after moving them behind accessors.
+     *
+     * @param  string  $method  Method name.
+     * @param  array<int, mixed>  $parameters  Method arguments.
+     * @return mixed
+     */
+    public function __call($method, $parameters)
+    {
+        $legacyMethods = [
+            'baptismsText' => 'formatBaptismsText',
+            'dateText' => 'formatDateText',
+            'dateTime' => 'formatDateTime',
+            'descriptionText' => 'formatDescriptionText',
+            'locationText' => 'formatLocationText',
+            'timeText' => 'formatTimeText',
+            'titleText' => 'formatTitleText',
+            'isTemplate' => 'isTemplateDate',
+        ];
+        if (isset($legacyMethods[$method])) {
+            /** @var callable(mixed...): mixed $legacyCall */
+            $legacyCall = [$this, $legacyMethods[$method]];
+
+            return $legacyCall(...$parameters);
+        }
+
+        return parent::__call($method, $parameters);
+    }
+
     // END ACCESSORS
 
     // MUTATORS
@@ -983,6 +1129,7 @@ class Service extends Model implements HasDAVCalendarItems
 
     /**
      * @param  Builder<static>  $query  Query being filtered.
+     * @param  Carbon|string  $date  Date to filter.
      * @return Builder<static>
      */
     public function scopeAtDate(Builder $query, $date)
@@ -991,8 +1138,9 @@ class Service extends Model implements HasDAVCalendarItems
     }
 
     /**
-     * @param  Carbon  $date
      * @param  Builder<static>  $query  Query being filtered.
+     * @param  Carbon  $start  Start of the range.
+     * @param  Carbon  $end  End of the range.
      * @return Builder<static>
      */
     public function scopeBetween(Builder $query, Carbon $start, Carbon $end)
@@ -1020,6 +1168,7 @@ class Service extends Model implements HasDAVCalendarItems
      * This includes notHidden() and checks for funerals which have not been announced yet
      *
      * @param  Builder<static>  $query  Query being filtered.
+     * @param  Carbon|null  $date  Reference date.
      * @return void
      */
     public function scopeDisplayable(Builder $query, $date = null)
@@ -1045,6 +1194,7 @@ class Service extends Model implements HasDAVCalendarItems
 
     /**
      * @param  Builder<static>  $query  Query being filtered.
+     * @param  list<string>  $ministries  Ministry categories.
      * @return Builder<static>
      */
     public function scopeHavingOpenMinistries(Builder $query, $ministries)
@@ -1099,6 +1249,7 @@ class Service extends Model implements HasDAVCalendarItems
             if (is_array($item)) {
                 $item = array_first($item);
             }
+            /** @var City $city */
             $city = $item instanceof City ? $item : City::query()->findOrFail($item);
             $cityIds->push($city->id);
             if ($city->is_org) {
@@ -1141,7 +1292,12 @@ class Service extends Model implements HasDAVCalendarItems
                 $item = array_first($item);
             }
 
-            return is_numeric($item) ? $item : $item->id;
+            if (is_numeric($item)) {
+                return $item;
+            }
+
+            /** @var object{id: int|string} $item */
+            return $item->id;
         })->filter()->values();
 
         if ($locationIds->isEmpty()) {
@@ -1156,7 +1312,7 @@ class Service extends Model implements HasDAVCalendarItems
      *
      * If the city has is_org=true, child cities will be included
      *
-     * @param  $city  A city object or id
+     * @param  City|int|string  $city  City or its identifier.  A city object or id
      * @param  Builder<static>  $query  Query being filtered.
      * @return Builder<static>
      */
@@ -1221,11 +1377,12 @@ class Service extends Model implements HasDAVCalendarItems
 
     /**
      * @param  Builder<static>  $query  Query being filtered.
+     * @param  string  $direction  Sort direction.
      * @return Builder<static>
      */
     public function scopeOrdered(Builder $query, $direction = 'ASC')
     {
-        return $query->orderBy('date', $direction);
+        return $query->orderBy('date', strtolower($direction) === 'desc' ? 'desc' : 'asc');
     }
 
     /**
@@ -1280,7 +1437,7 @@ class Service extends Model implements HasDAVCalendarItems
      */
     public function scopeWritable(Builder $query)
     {
-        return $query->whereIn('city_id', Auth::user()->writableCities->pluck('id'));
+        return $query->whereIn('city_id', Auth::user()?->writableCities->pluck('id') ?? []);
     }
 
     /**
@@ -1303,13 +1460,26 @@ class Service extends Model implements HasDAVCalendarItems
     /**
      * Mix a collection of services into an array of events
      *
-     * @return mixed
+     * @param  array<string, mixed>  $events  Event map to extend.
+     * @param  iterable<Service>  $services  Services to add.
+     * @return array<int|string, mixed>
      */
     public static function mix($events, $services, Carbon $start, Carbon $end)
     {
+        /** @var Service $service */
         foreach ($services as $service) {
-            if (($service->date <= $end) && ($service->date >= $start)) {
-                $events[$service->date->format('YmdHis')][] = $service;
+            $date = $service->date;
+            if (! $date instanceof Carbon) {
+                continue;
+            }
+            if (($date <= $end) && ($date >= $start)) {
+                $key = $date->format('YmdHis');
+                $target = $events[$key] ?? [];
+                if (! is_array($target)) {
+                    $target = [];
+                }
+                $target[] = $service;
+                $events[$key] = $target;
             }
         }
 
@@ -1321,8 +1491,8 @@ class Service extends Model implements HasDAVCalendarItems
     /**
      * Return services with empty entries for specific ministries
      *
-     * @param  $ministries  array
-     * @return array
+     * @param  list<string>  $ministries  Ministry categories.  array
+     * @return array<int|string, mixed>
      */
     public static function withOpenMinistries($ministries)
     {
@@ -1330,7 +1500,7 @@ class Service extends Model implements HasDAVCalendarItems
 
         foreach ($ministries as $ministry) {
             $missing2[$ministry] = Service::with(['location', 'day'])
-                ->whereIn('city_id', Auth::user()->writableCities->pluck('id'))
+                ->whereIn('city_id', Auth::user()?->writableCities->pluck('id') ?? [])
                 ->havingOpenMinistries([$ministry])
                 ->startingFrom(Carbon::now())
                 ->get();
@@ -1369,11 +1539,11 @@ class Service extends Model implements HasDAVCalendarItems
          */
         static::addGlobalScope(new ServicesOnlyScope);
 
-        static::creating(function ($service) {
+        static::creating(function (Service $service) {
             $service->slug = $service->createSlug();
         });
 
-        static::updating(function ($service) {
+        static::updating(function (Service $service) {
             $service->slug = $service->createSlug();
         });
 
@@ -1412,11 +1582,11 @@ class Service extends Model implements HasDAVCalendarItems
      */
     public function createSlug()
     {
-        if ($this->isTemplate()) {
-            return $this->id.'-'.Str::slug($this->title);
+        if ($this->isTemplateDate()) {
+            return $this->id.'-'.Str::slug((string) $this->title);
         }
 
-        return $this->date->copy()->setTimeZone('Europe/Berlin')->format('Ymd-Hi').'-'.$this->id
+        return $this->serviceDate()->copy()->setTimeZone('Europe/Berlin')->format('Ymd-Hi').'-'.$this->id
             .($this->city ? '-'.Str::slug($this->city->name) : '');
     }
 
@@ -1435,6 +1605,7 @@ class Service extends Model implements HasDAVCalendarItems
     {
         $field ??= $this->getRouteKeyName();
 
+        /** @var Builder<static> $query */
         return $query
             ->withoutGlobalScope(ServicesOnlyScope::class)
             ->where($field, $value);
@@ -1445,9 +1616,9 @@ class Service extends Model implements HasDAVCalendarItems
      *
      * @return bool Whether the service uses the template date.
      */
-    public function isTemplate(): bool
+    protected function isTemplateDate(): bool
     {
-        return $this->date->format('Y-m-d') == '1978-03-05';
+        return $this->serviceDate()->format('Y-m-d') == '1978-03-05';
     }
 
     /**
@@ -1457,11 +1628,12 @@ class Service extends Model implements HasDAVCalendarItems
      */
     public function getIsTemplateAttribute(): bool
     {
-        return $this->isTemplate();
+        return $this->isTemplateDate();
     }
 
     /**
-     * @return array
+     * @param  Request  $request  Request with participant data.
+     * @return array<string, mixed>|void
      */
     public function associateParticipants($request, Service $service)
     {
@@ -1470,7 +1642,10 @@ class Service extends Model implements HasDAVCalendarItems
         }
 
         $participants = [];
-        foreach (($request->get('participants') ?: []) as $category => $participantList) {
+        /** @var array<string, array<int, int|string>> $requestParticipants */
+        $requestParticipants = $request->get('participants') ?: [];
+        foreach ($requestParticipants as $category => $participantList) {
+            /** @var array<int, int|string> $participantList */
             foreach ($participantList as $participant) {
                 if ($participant) {
                     $participant = User::createIfNotExists($participant);
@@ -1479,6 +1654,7 @@ class Service extends Model implements HasDAVCalendarItems
             }
         }
 
+        /** @var array<int, array{people?: array<int, int|string>, description: string}> $ministries */
         $ministries = $request->get('ministries') ?: [];
         foreach ($ministries as $ministry) {
             if (isset($ministry['people'])) {
@@ -1495,8 +1671,8 @@ class Service extends Model implements HasDAVCalendarItems
     }
 
     /**
-     * @param  array  $participants
-     * @return array
+     * @param  array<string, mixed>  $participants  Participants by category.
+     * @return array<string, mixed>
      */
     public function syncParticipantsFromArray($participants)
     {
@@ -1518,17 +1694,24 @@ class Service extends Model implements HasDAVCalendarItems
     public function setAdConfigFromRequest(Request $request)
     {
         if ($request->has('ad_configs')) {
+            /** @var User $user */
+            $user = $request->user();
             foreach ($this->AdConfigs as $adConfig) {
-                app(AdConfig::getContractName('delete'))->delete($request->user(), $adConfig);
+                /** @var DeletesAdConfigs $deleter */
+                $deleter = app(AdConfig::getContractName('delete'));
+                $deleter->delete($user, $adConfig);
             }
+            /** @var array{ad_configs?: array<int|string, array{offset?: int|null, ad_text?: string}>} $data */
             $data = $request->validate([
                 'ad_configs.*.offset' => 'nullable|int|min:0',
                 'ad_configs.*.ad_text' => 'nullable|string',
             ]);
             $adConfigs = $data['ad_configs'] ?? [];
-            foreach ($this->city->getActiveAdChannels() as $key => $channel) {
+            foreach (($this->city?->getActiveAdChannels() ?? []) as $key => $channel) {
                 if (isset($adConfigs[$key]) && (($adConfigs[$key]['offset'] ?? 0) > 0)) {
-                    app(AdConfig::getContractName('create'))->create($request->user(), $this, [
+                    /** @var CreatesAdConfigs $creator */
+                    $creator = app(AdConfig::getContractName('create'));
+                    $creator->create($user, $this, [
                         'service_id' => $this->id,
                         'slug' => $key,
                         'offset' => $adConfigs[$key]['offset'],
@@ -1559,7 +1742,9 @@ class Service extends Model implements HasDAVCalendarItems
      */
     public function atText()
     {
-        return is_object($this->location) ? $this->location->atText() : '('.$this->locationText().')';
+        $locationText = $this->formatLocationText();
+
+        return $this->location instanceof Location ? self::stringify($this->location->atText()) : '('.(is_scalar($locationText) ? (string) $locationText : '').')';
     }
 
     /**
@@ -1590,7 +1775,7 @@ class Service extends Model implements HasDAVCalendarItems
      */
     public function ccLocationText()
     {
-        return $this->cc_location ?: $this->locationText();
+        return $this->cc_location ?: $this->formatLocationText();
     }
 
     /**
@@ -1637,7 +1822,7 @@ class Service extends Model implements HasDAVCalendarItems
             $t = $this->cc_alt_time;
         }
 
-        return new Carbon($this->date->format('Y-m-d').' '.$t);
+        return new Carbon($this->serviceDate()->format('Y-m-d').' '.$t);
     }
 
     /**
@@ -1685,6 +1870,8 @@ class Service extends Model implements HasDAVCalendarItems
 
     /**
      * Get total number of participants + bookings
+     *
+     * @return int
      */
     public function estimatePeoplePresent()
     {
@@ -1697,11 +1884,12 @@ class Service extends Model implements HasDAVCalendarItems
     }
 
     /**
-     * @return mixed
+     * @param  string  $s  Time format.
+     * @return string
      */
     public function formatTime($s)
     {
-        return (strpos($s, '%') !== false) ? $this->dateTime()->isoFormat($s) : $this->dateTime()->format($s);
+        return (strpos($s, '%') !== false) ? $this->formatDateTime()->isoFormat($s) : $this->formatDateTime()->format($s);
     }
 
     /**
@@ -1709,9 +1897,9 @@ class Service extends Model implements HasDAVCalendarItems
      *
      * @deprecated
      */
-    public function dateTime()
+    protected function formatDateTime()
     {
-        return $this->date->copy()->setTimeZone('Europe/Berlin');
+        return $this->serviceDate()->copy()->setTimeZone('Europe/Berlin');
     }
 
     /**
@@ -1732,7 +1920,7 @@ class Service extends Model implements HasDAVCalendarItems
     public function getBroadcastSnippet(): Google_Service_YouTube_LiveBroadcastSnippet
     {
         $broadcastSnippet = new Google_Service_YouTube_LiveBroadcastSnippet;
-        $broadcastSnippet->setTitle($this->broadcastTitle);
+        $broadcastSnippet->setTitle(self::stringify($this->broadcastTitle));
         $broadcastSnippet->setDescription($this->broadcastDescription);
         $broadcastSnippet->setScheduledStartTime($this->videoTimeString);
 
@@ -1770,9 +1958,9 @@ class Service extends Model implements HasDAVCalendarItems
         return new DAVCalendarItem(
             $this,
             $this->titleTextWithParticipants(),
-            $this->date,
-            $this->date->copy()->addHour(1),
-            $this->locationText(),
+            $this->serviceDate(),
+            $this->serviceDate()->copy()->addHour(),
+            self::stringify($this->formatLocationText()),
             'Im Pfarrplaner ansehen: '.route(
                 'service.edit',
                 $this->slug
@@ -1796,7 +1984,7 @@ class Service extends Model implements HasDAVCalendarItems
             $participants[] = $category.': '.$this->participantsText($category);
         }
 
-        return trim($this->titleText().' '.implode(' ', $participants));
+        return trim($this->formatTitleText().' '.implode(' ', $participants));
     }
 
     /**
@@ -1825,9 +2013,9 @@ class Service extends Model implements HasDAVCalendarItems
     public function getVideoSnippet(): Google_Service_YouTube_VideoSnippet
     {
         $videoSnippet = new Google_Service_YouTube_VideoSnippet;
-        $videoSnippet->setTitle($this->broadcastTitle);
+        $videoSnippet->setTitle(self::stringify($this->broadcastTitle));
         $videoSnippet->setDescription($this->broadcastDescription);
-        $videoSnippet->setCategoryId(24);
+        $videoSnippet->setCategoryId('24');
 
         return $videoSnippet;
     }
@@ -1840,7 +2028,7 @@ class Service extends Model implements HasDAVCalendarItems
      */
     public function hasDescription(string $text): bool
     {
-        return strpos(strtolower($this->descriptionText()), strtolower($text)) !== false;
+        return strpos(strtolower($this->formatDescriptionText()), strtolower($text)) !== false;
     }
 
     /**
@@ -1851,7 +2039,7 @@ class Service extends Model implements HasDAVCalendarItems
         if ($this->special_location) {
             return true;
         } else {
-            return $this->cc_location != $this->location->cc_default_location;
+            return $this->cc_location != $this->location?->cc_default_location;
         }
     }
 
@@ -1876,6 +2064,7 @@ class Service extends Model implements HasDAVCalendarItems
     }
 
     /**
+     * @param  string  $ministry  Ministry category.
      * @return BelongsToMany<User, $this>
      */
     public function ministryParticipants($ministry)
@@ -1968,9 +2157,9 @@ class Service extends Model implements HasDAVCalendarItems
      */
     public function oneLiner($title = false)
     {
-        return ($title ? $this->titleText(false).', ' : '').$this->date->format(
+        return ($title ? $this->formatTitleText(false).', ' : '').$this->serviceDate()->format(
             'd.m.Y'
-        ).', '.$this->timeText().', '.$this->locationText();
+        ).', '.$this->formatTimeText().', '.self::stringify($this->formatLocationText());
     }
 
     /**
@@ -1985,7 +2174,7 @@ class Service extends Model implements HasDAVCalendarItems
     {
         return $this->belongsToMany(User::class)
             ->withPivot('category')
-            ->wherePivotIn('category', ['P', 'O', 'M', 'A'], 'and', 'NotIn')
+            ->wherePivotIn('category', ['P', 'O', 'M', 'A'], 'and', true)
             ->withTimestamps();
     }
 
@@ -2027,7 +2216,9 @@ class Service extends Model implements HasDAVCalendarItems
     }
 
     /**
-     * @return array
+     * @param  string  $category  Participant category.
+     * @param  array<int, int>  $participantIds  User identifiers.
+     * @return array<string, mixed>
      */
     public function syncParticipantsByCategory($category, $participantIds)
     {
@@ -2045,6 +2236,8 @@ class Service extends Model implements HasDAVCalendarItems
             case 'A':
                 return $this->otherParticipants()->sync($participants);
         }
+
+        return [];
     }
 
     /**
@@ -2063,11 +2256,11 @@ class Service extends Model implements HasDAVCalendarItems
     public function titleAndDescriptionCombinedText()
     {
         $description = [];
-        $x = $this->titleText(false, false);
+        $x = $this->formatTitleText(false, false);
         if ($x != 'Gottesdienst') {
             $description[] = $x;
         }
-        $x = $this->descriptionText();
+        $x = $this->formatDescriptionText();
         if ($x != '') {
             $description[] = $x;
         }
@@ -2085,7 +2278,7 @@ class Service extends Model implements HasDAVCalendarItems
      */
     public function trueDate()
     {
-        return $this->date;
+        return $this->serviceDate();
     }
 
     /**
@@ -2110,9 +2303,10 @@ class Service extends Model implements HasDAVCalendarItems
         if (! is_array($cityIds)) {
             return;
         }
+        $userCityIds = Auth::user()?->cities->pluck('id') ?? collect();
         $existing = $this->relatedCities->pluck('id');
-        $result = $existing->filter(function ($item) use ($cityIds) {
-            if (! Auth::user()->cities->pluck('id')->contains($item)) {
+        $result = $existing->filter(function ($item) use ($cityIds, $userCityIds) {
+            if (! $userCityIds->contains($item)) {
                 return true;
             }
             if (in_array($item, $cityIds)) {
@@ -2155,5 +2349,26 @@ class Service extends Model implements HasDAVCalendarItems
     public function weddings()
     {
         return $this->hasMany(Wedding::class);
+    }
+
+    /**
+     * Convert a mixed value to a string.
+     *
+     * @param  mixed  $value  Value to convert.
+     * @return string String representation.
+     */
+    private static function stringify(mixed $value): string
+    {
+        if (is_string($value)) {
+            return $value;
+        }
+        if (is_int($value) || is_float($value)) {
+            return (string) $value;
+        }
+        if ($value instanceof \Stringable) {
+            return $value->__toString();
+        }
+
+        return '';
     }
 }

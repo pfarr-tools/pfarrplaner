@@ -33,7 +33,13 @@ use Illuminate\Database\Migrations\Migration;
 
 class MigrateHomescreentabsSetting extends Migration
 {
-    protected function migrateHomeScreenTabConfig($config)
+    /**
+     * Convert the legacy home screen tab configuration to the nested format.
+     *
+     * @param  array<string, mixed>  $config  Legacy tab configuration keyed by tab type.
+     * @return array<string, mixed> Migrated configuration containing the tabs and a migrated flag.
+     */
+    protected function migrateHomeScreenTabConfig(array $config): array
     {
         if (isset($config['migrated'])) {
             return $config;
@@ -47,13 +53,22 @@ class MigrateHomescreentabsSetting extends Migration
         return $newConfig;
     }
 
-    protected function migrateBack($config)
+    /**
+     * Convert the migrated home screen tab configuration back to the legacy format.
+     *
+     * @param  array<string, mixed>  $config  Migrated configuration containing tabs and a migrated flag.
+     * @return array<string, mixed> Legacy tab configuration keyed by tab type.
+     */
+    protected function migrateBack(array $config): array
     {
         if (! isset($config['migrated'])) {
             return $config;
         }
         $newConfig = [];
         foreach ($config as $tabKey => $tab) {
+            if (! is_array($tab) || ! isset($tab['type']) || ! is_string($tab['type'])) {
+                continue;
+            }
             $newConfig[$tab['type']] = $tab['config'];
         }
 
@@ -68,8 +83,9 @@ class MigrateHomescreentabsSetting extends Migration
     public function up()
     {
         foreach (User::all() as $user) {
+            /** @var array<string, mixed>|null $setting */
             $setting = $user->getSetting('homeScreenTabsConfig', null);
-            if ($setting) {
+            if ($setting && is_array($setting)) {
                 if (! isset($setting['migrated'])) {
                     echo 'Migrating User #'.$user->id.'... ';
                     $user->setSetting('homeScreenTabsConfig', $this->migrateHomeScreenTabConfig($setting));
@@ -87,8 +103,9 @@ class MigrateHomescreentabsSetting extends Migration
     public function down()
     {
         foreach (User::all() as $user) {
+            /** @var array<string, mixed>|null $setting */
             $setting = $user->getSetting('homeScreenTabsConfig', null);
-            if ($setting) {
+            if ($setting && is_array($setting)) {
                 if (isset($setting['migrated'])) {
                     echo 'Migrating User #'.$user->id.' back... ';
                     $user->setSetting('homeScreenTabsConfig', $this->migrateBack($setting));

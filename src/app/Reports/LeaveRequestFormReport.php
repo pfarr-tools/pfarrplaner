@@ -30,14 +30,15 @@
 
 namespace App\Reports;
 
+use App\Documents\PDF;
 use App\Models\Leave\Absence;
 use App\Services\FileNameService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
-use Mpdf\Mpdf;
+use Inertia\Response;
 
+/** PDF report for leave request forms. */
 class LeaveRequestFormReport extends AbstractPDFDocumentReport
 {
     public const FILE_SIGNATURE = '21.1';
@@ -66,12 +67,17 @@ class LeaveRequestFormReport extends AbstractPDFDocumentReport
      */
     public function isActive(): bool
     {
-        return Auth::user()->hasRole('Pfarrer:in');
+        return $this->authenticatedUser()->hasRole('Pfarrer:in');
     }
 
-    public function setup()
+    /**
+     * Show upcoming absences of the authenticated user for report setup.
+     *
+     * @return Response Inertia response with the report setup page.
+     */
+    public function setup(): Response
     {
-        $absences = Absence::where('user_id', Auth::user()->id)
+        $absences = Absence::where('user_id', $this->authenticatedUser()->id)
             ->where('from', '>', Carbon::now())
             ->orderBy('from')
             ->get();
@@ -79,33 +85,40 @@ class LeaveRequestFormReport extends AbstractPDFDocumentReport
         return Inertia::render('Report/LeaveRequestForm/Setup', compact('absences'));
     }
 
+    /**
+     * Render the absence confirmation as a downloadable PDF document.
+     *
+     * @param  Request  $request  Report request containing the absence id.
+     * @return mixed PDF download response.
+     */
     public function render(Request $request)
     {
-        $data = $request->validate(['absence' => 'int|exists:absences,id']);
-        $data['absence'] = Absence::find($data['absence']);
+        /** @var array<string, mixed> $data */
+        $data = $request->validate(['absence' => 'required|int|exists:absences,id']);
+        /** @var int|string $absenceId */
+        $absenceId = $data['absence'];
+        $absence = Absence::findOrFail((int) $absenceId);
+        $data['absence'] = $absence;
 
-        $data['duration'] = $data['absence']->to->diff($data['absence']->from)->days + 1;
+        $data['duration'] = $absence->to->diff($absence->from)->days + 1;
 
-        $packageConfig = json_decode(file_get_contents(base_path('package.json')), true);
+        $packageContents = file_get_contents(base_path('package.json'));
+        if ($packageContents === false) {
+            throw new \RuntimeException('Die Anwendungsmetadaten konnten nicht gelesen werden.');
+        }
+        /** @var array<string, mixed> $packageConfig */
+        $packageConfig = json_decode($packageContents, true);
         $data['version'] = $packageConfig['version'];
 
-        $config = [
-            'instanceConfigurator' => function ($mpdf) {
-                /** @var $mpdf Mpdf */
-                $mpdf->useActiveForms = true;
-            },
-            'format' => 'A4',
-        ];
-
-        $pdf = $this->renderPDF($data, $config);
+        $pdf = PDF::fromView($this->getRenderViewName(), $data, $this->header, $this->footer);
 
         $filename = FileNameService::make(
             self::FILE_TITLE,
             'pdf',
             self::FILE_SIGNATURE,
-            [$data['absence']->from, $data['absence']->to],
+            [$absence->from, $absence->to],
             false,
-            Auth::user(),
+            $this->authenticatedUser(),
         );
 
         $tempFile = tempnam(sys_get_temp_dir(), $filename);

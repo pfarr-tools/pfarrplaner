@@ -31,6 +31,7 @@
 namespace App\Models;
 
 use Database\Factories\AttachmentFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
@@ -63,7 +64,7 @@ class Attachment extends AbstractModel
     ];
 
     /**
-     * @var string[]
+     * @var list<string>
      */
     protected $fillable = ['title', 'file', 'attachable_id', 'attachable_type', 'cut'];
 
@@ -87,6 +88,10 @@ class Attachment extends AbstractModel
         $query = in_array(SoftDeletes::class, class_uses_recursive($modelClass), true)
             ? $modelClass::withTrashed()
             : $modelClass::query();
+
+        if (! $query instanceof Builder) {
+            return null;
+        }
 
         return $query->find($this->attachable_id);
     }
@@ -116,7 +121,7 @@ class Attachment extends AbstractModel
             return '';
         }
 
-        return Storage::mimeType($this->file);
+        return Storage::mimeType($this->file) ?: '';
     }
 
     /**

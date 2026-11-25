@@ -34,6 +34,7 @@ use App\Liturgy\LiturgySheets\AbstractLiturgySheet;
 use App\Liturgy\LiturgySheets\LiturgySheets;
 use App\Liturgy\Replacement\Replacement;
 use App\Models\People\Participant;
+use App\Models\People\User;
 use App\Models\Sermon;
 use App\Models\Service;
 use Illuminate\Http\JsonResponse;
@@ -51,7 +52,14 @@ class LiturgyEditorController extends Controller
         $this->middleware('auth')->except(['download']);
     }
 
-    public function editor(Request $request, Service $service)
+    /**
+     * Show the liturgy editor for a service.
+     *
+     * @param  Request  $request  Current request containing optional auto-focus hints.
+     * @param  Service  $service  Service whose liturgy is edited.
+     * @return Response Inertia response rendering the liturgy editor.
+     */
+    public function editor(Request $request, Service $service): Response
     {
         Gate::authorize('view', $service);
         $service->load('liturgyBlocks', 'sermon');
@@ -68,14 +76,23 @@ class LiturgyEditorController extends Controller
         );
     }
 
-    public function save(Request $request, Service $service)
+    /**
+     * Persist the order of liturgy blocks and their items.
+     *
+     * @param  Request  $request  Request containing the reordered blocks and items.
+     * @param  Service  $service  Service whose liturgy is saved.
+     * @return RedirectResponse Redirect back to the previous page.
+     */
+    public function save(Request $request, Service $service): RedirectResponse
     {
         Gate::authorize('update', $service);
-        foreach ($request->all() as $block) {
-            $currentBlock = $service->liturgyBlocks()->findOrFail($block['id']);
+        /** @var array<array{id: int|string, sortable: int, items: array<array{id: int|string, sortable: int}>}> $blocks */
+        $blocks = $request->all();
+        foreach ($blocks as $block) {
+            $currentBlock = $service->liturgyBlocks()->whereKey($block['id'])->firstOrFail();
             $currentBlock->update(['sortable' => $block['sortable']]);
             foreach ($block['items'] as $item) {
-                $currentBlock->items()->findOrFail($item['id'])->update(
+                $currentBlock->items()->whereKey($item['id'])->firstOrFail()->update(
                     [
                         'sortable' => $item['sortable'],
                         'liturgy_block_id' => $currentBlock->id,
@@ -88,11 +105,14 @@ class LiturgyEditorController extends Controller
     }
 
     /**
-     * Download a rendered LiturgySheet
+     * Download a rendered LiturgySheet.
      *
-     * @return RedirectResponse
+     * @param  Request  $request  Current request used for signature checks and sheet configuration.
+     * @param  Service  $service  Service whose liturgy is rendered.
+     * @param  string  $key  Key identifying the liturgy sheet class.
+     * @return mixed Download response produced by the sheet or a redirect to its configuration page.
      */
-    public function download(Request $request, Service $service, $key)
+    public function download(Request $request, Service $service, string $key)
     {
         if (! Auth::check() && ! $request->hasValidSignature()) {
             abort(401);
@@ -110,18 +130,24 @@ class LiturgyEditorController extends Controller
         }
 
         if ($sheet->getConfigurationPage() !== null) {
-            $sheet->setConfiguration($request->get('config', []));
+            $config = $request->get('config', []);
+            abort_unless(is_array($config), 400);
+            /** @var array<string, mixed> $config */
+            $sheet->setConfiguration($config);
         }
 
         return $sheet->render($service);
     }
 
     /**
-     * Show the configuration page for a LiturgySheet
+     * Show the configuration page for a LiturgySheet.
      *
-     * @return Response
+     * @param  Request  $request  Current request.
+     * @param  Service  $service  Service whose liturgy sheet is configured.
+     * @param  string  $key  Key identifying the liturgy sheet class.
+     * @return Response Inertia response rendering the configuration page.
      */
-    public function configureLiturgySheet(Request $request, Service $service, $key)
+    public function configureLiturgySheet(Request $request, Service $service, string $key): Response
     {
         Gate::authorize('view', $service);
         $class = 'App\\Liturgy\\LiturgySheets\\'.$key.'LiturgySheet';
@@ -138,8 +164,12 @@ class LiturgyEditorController extends Controller
         ];
 
         $config = $sheet->getConfiguration();
+        $configurationPage = $sheet->getConfigurationPage();
+        if ($configurationPage === null) {
+            abort(404);
+        }
 
-        return Inertia::render($sheet->getConfigurationPage(), compact('service', 'sheetConfig', 'config'));
+        return Inertia::render($configurationPage, compact('service', 'sheetConfig', 'config'));
     }
 
     /**
@@ -161,9 +191,17 @@ class LiturgyEditorController extends Controller
         return response()->json($sheet->getDialogData($service));
     }
 
-    public function sources(Service $service)
+    /**
+     * Return services and agendas that can be used as liturgy sources.
+     *
+     * @param  Service  $service  Service the sources are requested for.
+     * @return JsonResponse JSON response with available services and agendas.
+     */
+    public function sources(Service $service): JsonResponse
     {
         Gate::authorize('view', $service);
+        $user = Auth::user();
+        abort_unless($user instanceof User, 401);
         $services1 = Service::with([])
             ->isNotAgenda()
             ->writable()
@@ -171,17 +209,17 @@ class LiturgyEditorController extends Controller
             ->limit(50)->get(['id', 'title']);
         $services2 = Service::with([])
             ->isNotAgenda()
-            ->userParticipates(Auth::user(), 'P')
+            ->userParticipates($user, 'P')
             ->whereHas('liturgyBlocks')
             ->get();
         $services3 = $services1->merge($services2)->unique();
         $services = [];
         foreach ($services3 as $service) {
             $service->load(['day', 'location']);
-            if (! $service->day == null) {
+            if ($service->day !== null && $service->date !== null) {
                 $services[$service->dateTime->timestamp.$service->id] = [
                     'id' => $service->id,
-                    'text' => trim(($service->day ? $service->date->format('d.m.Y') : '').' '.$service->timeText().' '.$service->titleText().' ('.$service->locationText.')'),
+                    'text' => trim(($service->day ? $service->date->format('d.m.Y') : '').' '.$service->timeText().' '.$service->titleText().' ('.$service->locationText().')'),
                 ];
             }
         }
@@ -191,26 +229,40 @@ class LiturgyEditorController extends Controller
         foreach ($agendas1 as $agenda) {
             $agendas[] = [
                 'id' => $agenda->id,
-                'text' => $agenda->title.($agenda->source ? ' ('.$agenda->source.')' : ''),
+                'text' => $agenda->title,
             ];
         }
 
         return response()->json(compact('services', 'agendas'));
     }
 
-    public function sermons()
+    /**
+     * Return sermons used by services the current user participates in.
+     *
+     * @return JsonResponse JSON response with matching sermons.
+     */
+    public function sermons(): JsonResponse
     {
+        $user = Auth::user();
+        abort_unless($user instanceof User, 401);
         $sermonIds = Service::whereNotNull('sermon_id')
-            ->userParticipates(Auth::user(), 'P')
+            ->userParticipates($user, 'P')
             ->orderedDesc()
-            ->get(['sermon_id'])->pluck('sermon_id')->unique();
+            ->pluck('sermon_id')->unique();
 
         $sermons = Sermon::whereIn('id', $sermonIds)->get(['id', 'title', 'subtitle', 'reference']);
 
         return response()->json($sermons);
     }
 
-    public function import(Service $service, Service $source)
+    /**
+     * Import the liturgy blocks of another service.
+     *
+     * @param  Service  $service  Service receiving the imported blocks.
+     * @param  Service  $source  Service providing the blocks to import.
+     * @return RedirectResponse Redirect to the liturgy editor of the target service.
+     */
+    public function import(Service $service, Service $source): RedirectResponse
     {
         Gate::authorize('update', $service);
         Gate::authorize('update', $source);
@@ -235,7 +287,13 @@ class LiturgyEditorController extends Controller
         return redirect()->route('liturgy.editor', $service->slug);
     }
 
-    public function recipients(Service $service)
+    /**
+     * Return the recipients configured in the service's liturgy items.
+     *
+     * @param  Service  $service  Service whose recipients are requested.
+     * @return JsonResponse JSON response with the sorted recipients.
+     */
+    public function recipients(Service $service): JsonResponse
     {
         Gate::authorize('view', $service);
         $recipients = [];
@@ -253,13 +311,17 @@ class LiturgyEditorController extends Controller
     }
 
     /**
-     * @param  $reqMinistries
-     * @return array
+     * Collect participant ministry categories except the standard categories.
+     *
+     * @return array<string, string> Ministry categories keyed by their identifier.
      */
-    protected function getAvailableMinistries()
+    protected function getAvailableMinistries(): array
     {
         $ministries = [];
-        foreach (Participant::all()->pluck('category')->unique() as $ministry) {
+        foreach (Participant::query()->pluck('category')->unique() as $ministry) {
+            if (! is_string($ministry)) {
+                continue;
+            }
             switch ($ministry) {
                 case 'P':
                 case 'O':

@@ -49,48 +49,46 @@ class CalendarMonthServiceResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        /** @var Service $resource */
-        $resource = $this->resource;
-        /** @var Service $this */
-        $service = $this;
+        /** @var Service $service */
+        $service = $this->resource;
         $gate = Gate::forUser($request->user('api') ?? $request->user() ?? Auth::user());
         $canUpdate = $gate->allows('update', $service);
 
         return [
-            'id' => $this->id,
-            'slug' => $this->slug,
-            'city_id' => $this->city_id,
-            'titleText' => $this->titleText(false),
-            'date' => $this->date,
-            'descriptionText' => $this->descriptionText(),
-            'internal_remarks' => $this->internal_remarks,
-            'locationText' => $this->locationText(),
-            'locationTextWithCity' => $this->locationTextWithCity,
-            'timeText' => $this->timeText(),
-            'isSpecialTime' => $this->location && $this->location->default_time
-                ? $this->date->format('H:i') !== substr($this->location->default_time, 0, 5)
+            'id' => $service->id,
+            'slug' => $service->slug,
+            'city_id' => $service->city_id,
+            'titleText' => $service->titleText(false),
+            'date' => $service->date,
+            'descriptionText' => $service->descriptionText(),
+            'internal_remarks' => $service->internal_remarks,
+            'locationText' => $service->locationText(),
+            'locationTextWithCity' => $service->locationTextWithCity,
+            'timeText' => $service->timeText(),
+            'isSpecialTime' => $service->location && $service->location->default_time && $service->date
+                ? $service->date->format('H:i') !== substr($service->location->default_time, 0, 5)
                 : true,
-            'isSpecialLocation' => $this->location === null,
-            'funeral' => $this->funerals->count() > 0,
-            'funeralSummary' => $this->funeralsText(),
-            'baptismCount' => $this->baptisms->count(),
-            'baptismSummary' => $this->baptismsText(true, true),
-            'cc' => $this->cc,
-            'cc_location' => $this->cc_location,
-            'cc_lesson' => $this->cc_lesson,
-            'cc_staff' => $this->cc_staff,
-            'city' => new CalendarCityResource($this->city),
-            'controlled_access' => $this->controlled_access,
-            'youtube_url' => $this->youtube_url,
-            'liveDashboardUrl' => $this->liveDashboardUrl,
-            'isAlternateProprium' => $this->isAlternateProprium,
-            'liturgicalInfo' => $this->isAlternateProprium ? $this->liturgicalInfo : [],
-            'hidden' => $this->hidden,
-            'participantText' => $this->resource->participantText
-                ?? self::buildCompactParticipantText($resource),
-            'need_predicant' => $this->need_predicant,
-            'isMine' => $this->isMine,
-            'isEditable' => $this->isEditable,
+            'isSpecialLocation' => $service->location === null,
+            'funeral' => $service->funerals->count() > 0,
+            'funeralSummary' => $service->funeralsText(),
+            'baptismCount' => $service->baptisms->count(),
+            'baptismSummary' => $service->baptismsText(true, true),
+            'cc' => $service->cc,
+            'cc_location' => $service->cc_location,
+            'cc_lesson' => $service->cc_lesson,
+            'cc_staff' => $service->cc_staff,
+            'city' => new CalendarCityResource($service->city),
+            'controlled_access' => $service->controlled_access,
+            'youtube_url' => $service->youtube_url,
+            'liveDashboardUrl' => $service->liveDashboardUrl,
+            'isAlternateProprium' => $service->isAlternateProprium,
+            'liturgicalInfo' => $service->isAlternateProprium ? $service->liturgicalInfo : [],
+            'hidden' => $service->hidden,
+            'participantText' => $service->participantText
+                ?? self::buildCompactParticipantText($service),
+            'need_predicant' => $service->need_predicant,
+            'isMine' => $service->isMine,
+            'isEditable' => $service->isEditable,
             'canSelfAssign' => $service->getAttribute('can_self_assign') ?? $gate->allows('selfAssign', $service),
             'selfAssignViaPredicantClaim' => $service->getAttribute('self_assign_via_predicant_claim')
                 ?? (! $canUpdate && $gate->allows('claimPredicant', $service)),
@@ -107,7 +105,10 @@ class CalendarMonthServiceResource extends JsonResource
         $result = [];
 
         foreach ($service->participants->groupBy('pivot.category') as $category => $participants) {
-            $result[$category] = $participants->map(function ($participant) {
+            if (! is_int($category) && ! is_string($category)) {
+                continue;
+            }
+            $result[(string) $category] = $participants->map(function ($participant) {
                 /** @var User $participant */
                 return trim(implode(' ', array_filter([
                     $participant->title,

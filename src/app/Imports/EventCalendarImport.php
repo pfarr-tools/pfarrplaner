@@ -59,19 +59,30 @@ class EventCalendarImport
     protected $url = '';
 
     /**
-     * EventCalendarImport constructor.
+     * Initialisiert den Import mit der URL des öffentlichen Veranstaltungskalenders.
+     *
+     * @param  string|null  $url  URL des Kalenders; ein leerer Wert deaktiviert den Import.
      */
-    public function __construct($url)
+    public function __construct(?string $url)
     {
-        $this->url = $url;
+        $this->url = $url ?? '';
     }
 
-    public function getMixedEvents() {}
+    /**
+     * Platzhalter für das Zusammenführen gemischter Veranstaltungen.
+     *
+     * Die Methode ist derzeit leer und liefert kein Ergebnis.
+     */
+    public function getMixedEvents(): void {}
 
     /**
-     * Mix an array of events into another array of events
+     * Fügt die Veranstaltungen des Kalenders in eine bestehende Veranstaltungsmap ein.
      *
-     * @param  bool  $removeServices
+     * @param  array<string, mixed>  $events  Veranstaltungsmap, die erweitert wird.
+     * @param  Carbon  $weekStart  Beginn des zu berücksichtigenden Zeitraums.
+     * @param  Carbon  $weekEnd  Ende des zu berücksichtigenden Zeitraums.
+     * @param  bool  $removeServices  Gottesdienste aus dem Ergebnis entfernen.
+     * @return array<string, mixed> Veranstaltungsmap nach dem Zusammenführen.
      */
     public function mix($events, Carbon $weekStart, Carbon $weekEnd, $removeServices = false): array
     {
@@ -81,9 +92,18 @@ class EventCalendarImport
 
         $theseEvents = $this->getEvents($weekStart, $weekEnd, $removeServices);
         foreach ($theseEvents as $dateCode => $subEvents) {
-            foreach ($subEvents as $event) {
-                $events[$dateCode][] = $event;
+            if (! is_array($subEvents)) {
+                continue;
             }
+            $stringKey = (string) $dateCode;
+            $target = $events[$stringKey] ?? [];
+            if (! is_array($target)) {
+                $target = [];
+            }
+            foreach ($subEvents as $event) {
+                $target[] = $event;
+            }
+            $events[$stringKey] = $target;
         }
 
         ksort($events);
@@ -92,7 +112,12 @@ class EventCalendarImport
     }
 
     /**
-     * @param  bool  $removeServices
+     * Liest die Veranstaltungen des Kalenders für den Zeitraum aus Cache oder URL.
+     *
+     * @param  Carbon  $weekStart  Beginn des zu berücksichtigenden Zeitraums.
+     * @param  Carbon  $weekEnd  Ende des zu berücksichtigenden Zeitraums.
+     * @param  bool  $removeServices  Gottesdienste aus dem Ergebnis entfernen.
+     * @return array<int|string, mixed> Nach Datum sortierte Veranstaltungsmap; numerische Datumsschlüssel werden von PHP zu Ganzzahlen umgewandelt.
      */
     public function getEvents(Carbon $weekStart, Carbon $weekEnd, $removeServices = false): array
     {
@@ -105,7 +130,7 @@ class EventCalendarImport
             $events = Cache::get($cacheKey);
         } else {
             try {
-                $events = json_decode(file_get_contents($this->url), true);
+                $events = json_decode((string) file_get_contents($this->url), true);
                 Cache::put($cacheKey, $events, 900);
             } catch (ErrorException $e) {
                 $events = [];
@@ -117,12 +142,24 @@ class EventCalendarImport
             return [];
         }
         foreach ($events as $key => $event) {
+            if (! is_array($event)) {
+                continue;
+            }
+            /** @var array<string, mixed> $event */
+            $start = $event['start'] ?? null;
+            $end = $event['end'] ?? null;
+            $title = $event['title'] ?? null;
+            if (! is_string($start) || ! is_string($end) || ! is_string($title)) {
+                continue;
+            }
+
+            $startDate = $this->sanitizeTimeString($start);
             $event['record_type'] = 'Outlook_Event';
-            $event['start'] = $this->sanitizeTimeString($event['start']);
-            $event['end'] = $this->sanitizeTimeString($event['end']);
+            $event['start'] = $startDate;
+            $event['end'] = $this->sanitizeTimeString($end);
 
             // sanitize title
-            $lines = explode("\r\n", $event['title']);
+            $lines = explode("\r\n", $title);
             $event['title'] = $this->sanitizeTitle($lines[0], $event);
             if (isset($lines[1])) {
                 if (substr(trim($lines[1]), 0, 4) == 'Ort:') {
@@ -134,12 +171,13 @@ class EventCalendarImport
                 $event['place'] = '';
             }
 
-            if (($event['start'] >= $weekStart) and ($event['start'] <= $weekEnd)) {
+            if (($startDate >= $weekStart) and ($startDate <= $weekEnd)) {
                 if (! ($event['allDay'] && ($event['place'] == ''))) {
                     if ((! $removeServices) || ((strtoupper(substr($event['title'], 0, 2)) != 'GD')
                             && (strtoupper(substr($event['title'], 0, 13)) != 'GOTTESDIENST ')
                             && (strtoupper($event['title']) != 'GOTTESDIENST'))) {
-                        $filteredEvents[$event['start']->format('YmdHis')][] = $event;
+                        $dateCode = $startDate->format('YmdHis');
+                        $filteredEvents[$dateCode][] = $event;
                     }
                 }
             }
@@ -158,7 +196,11 @@ class EventCalendarImport
     }
 
     /**
-     * Formatiert den Titel einer Veranstaltung
+     * Formatiert den Titel einer Veranstaltung und übernimmt Zusatzangaben in das Veranstaltungsarray.
+     *
+     * @param  string  $title  Zu bereinigender Titel.
+     * @param  array<string, mixed>  $event  Veranstaltungsarray, das um Zusatzangaben ergänzt wird.
+     * @return string Bereinigter Titel.
      */
     protected function sanitizeTitle(string $title, array &$event): string
     {

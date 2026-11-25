@@ -34,24 +34,41 @@ use Illuminate\Support\Str;
 
 class FreetextItemHelper extends AbstractItemHelper
 {
+    /**
+     * Name des Datenfeldes, dessen Inhalt als Freitext ausgegeben wird.
+     *
+     * @var string
+     */
     protected $field = 'description';
 
+    /**
+     * Gibt den Namen des verwendeten Datenfeldes zurück.
+     */
     public function getField(): string
     {
         return $this->field;
     }
 
+    /**
+     * Setzt das Datenfeld, dessen Inhalt als Freitext ausgegeben wird.
+     */
     public function setField(string $field): void
     {
         $this->field = $field;
     }
 
-    public function getText($shorten = false)
+    /**
+     * Gibt den Freitext zurück, optional auf eine maximale Länge gekürzt.
+     *
+     * @param  int|false  $shorten  Maximale Zeichenzahl oder false für den vollständigen Text
+     */
+    public function getText(int|false $shorten = false): string
     {
-        if (! $this->item->data[$this->field]) {
+        $value = $this->item->data[$this->field];
+        if (! $value) {
             return '';
         }
-        $s = strtr($this->item->data[$this->field], [
+        $s = strtr(is_scalar($value) ? (string) $value : '', [
             '</p>' => "\r\n",
             '<br>' => "\n",
             '<br/>' => "\n",

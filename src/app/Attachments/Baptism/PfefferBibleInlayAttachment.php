@@ -89,39 +89,55 @@ class PfefferBibleInlayAttachment extends AbstractBaptismAttachment
             ],
             'defaultFontSize' => 20,
         ]);
-        $doc->getSection()->addText('Dieses Buch gehört', static::FONT20, static::PARAGRAPH_SPC_BOTTOM);
+        $section = $doc->getSection();
+        $service = $this->baptism->service;
+        /** @var string $candidateName */
+        $candidateName = $this->baptism->candidate_name;
+        $section->addText('Dieses Buch gehört', static::FONT20, static::PARAGRAPH_SPC_BOTTOM);
         $this->coloredText(
             $doc->getSection(),
-            "Familie\n".NameService::fromName($this->baptism->candidate_name)->getLastName(),
-            static::FONT34,
-            static::PARAGRAPH
+            "Familie\n".NameService::fromName($candidateName)->getLastName(),
+            self::FONT34,
+            self::PARAGRAPH
         );
-        $doc->getSection()->addText('Es ist ein Geschenk', static::FONT20, static::PARAGRAPH_SPC_TOP);
-        $doc->getSection()->addText('zur Tauferinnerung', static::FONT20, static::PARAGRAPH);
-        $doc->getSection()->addText('an die Taufe von', static::FONT20, static::PARAGRAPH);
-        $doc->getSection()->addTextBreak(1);
+        $section->addText('Es ist ein Geschenk', static::FONT20, static::PARAGRAPH_SPC_TOP);
+        $section->addText('zur Tauferinnerung', static::FONT20, static::PARAGRAPH);
+        $section->addText('an die Taufe von', static::FONT20, static::PARAGRAPH);
+        $section->addTextBreak(1);
         $this->coloredText(
             $doc->getSection(),
-            NameService::fromName($this->baptism->candidate_name)->getFirstName(),
-            static::FONT34,
-            static::PARAGRAPH
+            NameService::fromName($candidateName)->getFirstName(),
+            self::FONT34,
+            self::PARAGRAPH
         );
-        $doc->getSection()->addTextBreak(1);
-        $doc->getSection()->addText(
-            'am '.$this->baptism->service->date->isoFormat('DD. MMMM YYYY'),
+        $section->addTextBreak(1);
+        $section->addText(
+            'am '.($service?->trueDate()->isoFormat('DD. MMMM YYYY') ?? ''),
             static::FONT18,
             static::PARAGRAPH
         );
-        $doc->getSection()->addTextBreak(1);
-        $doc->getSection()->addText('von der', static::FONT18, static::PARAGRAPH);
-        $doc->getSection()->addText('Evang. Kirchengemeinde', static::FONT18, static::PARAGRAPH);
-        $doc->getSection()->addText($this->baptism->service->city->name, static::FONT18, static::PARAGRAPH);
+        $section->addTextBreak(1);
+        $section->addText('von der', static::FONT18, static::PARAGRAPH);
+        $section->addText('Evang. Kirchengemeinde', static::FONT18, static::PARAGRAPH);
+        $section->addText($service?->city->name ?? '', static::FONT18, static::PARAGRAPH);
 
         return $doc->sendToBrowser(static::getFileName());
     }
 
-    protected function coloredText(Section $section, $text, $fontStyle, $paragraphStyle)
-    {
+    /**
+     * Render text character by character with alternating rainbow colors.
+     *
+     * @param  Section  $section  Section receiving the colored text.
+     * @param  string  $text  Text to render in rainbow colors.
+     * @param  array<string, mixed>  $fontStyle  Font style settings applied to each character.
+     * @param  array<string, mixed>|string  $paragraphStyle  Paragraph style settings or style name.
+     */
+    protected function coloredText(
+        Section $section,
+        string $text,
+        array $fontStyle,
+        array|string $paragraphStyle
+    ): void {
         $run = $section->addTextRun($paragraphStyle);
 
         $colors = ColorService::rainbowTextArray($text);

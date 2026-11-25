@@ -36,8 +36,12 @@ class GPStudyHelper extends AbstractStudyHelper
 {
     public $title = 'Göttinger Predigten im Internet';
 
+    /** @var array<string, array<string, string>> */
     protected $records = [];
 
+    /**
+     * @param  array<string, mixed>  $data  Study helper input data.\n     * @return array<string, array<string, string>>
+     */
     public function read(array $data): array
     {
         if ('' == ($content = $this->getContent('https://www.theologie.uzh.ch/predigten/category/aktuelle/'))) {
@@ -57,14 +61,27 @@ class GPStudyHelper extends AbstractStudyHelper
         return $this->records;
     }
 
-    protected function translateDate($date)
+    /**
+     * Übersetzt ein Datum aus der Quelle in das im Kalender verwendete Format.
+     *
+     * @param  string  $date  Datum im Format der Quelle
+     * @return string Übersetztes Datum
+     */
+    protected function translateDate(string $date): string
     {
         return Str::substr($date, 0, 8).'20'.substr($date, 8, 2);
     }
 
+    /**
+     * @param  array<string, mixed>  $data  Input data.\n     * @return array<string, string>
+     */
     public function getLinks(array $data): array
     {
-        $data['links'] = array_merge($data['links'] ?? [], $this->records[$data['date']] ?? []);
+        /** @var array<string, string> $links Bereits vorhandene Links. */
+        $links = $data['links'] ?? [];
+        /** @var string $date Angefragtes Datum. */
+        $date = $data['date'];
+        $data['links'] = array_merge($links, $this->records[$date] ?? []);
 
         return $data;
     }

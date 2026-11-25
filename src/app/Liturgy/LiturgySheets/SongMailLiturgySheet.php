@@ -58,7 +58,7 @@ class SongMailLiturgySheet extends AbstractLiturgySheet
         $recipients = $dialogData['recipients'];
 
         if (count($recipients) == 0) {
-            $recipients[] = Auth::user()->email;
+            $recipients[] = (string) Auth::user()?->email;
         }
 
         if (strlen($body) > 1000) {
@@ -70,6 +70,7 @@ class SongMailLiturgySheet extends AbstractLiturgySheet
         );
     }
 
+    /** @return array{body: string, subject: string, recipients: list<string>} */
     public function getDialogData(Service $service): array
     {
         $subject = $this->buildSubject($service);
@@ -81,14 +82,14 @@ class SongMailLiturgySheet extends AbstractLiturgySheet
 
     protected function buildSubject(Service $service): string
     {
-        return $service->titleText(false).' am '.$service->date->isoFormat(
+        return $service->titleText(false).' am '.$service->trueDate()->isoFormat(
             'dddd, DD.MM.YYYY'
         ).', '.$service->timeText().', '.$service->locationText();
     }
 
     protected function buildBody(Service $service): string
     {
-        $body = 'Sehr geehrte Mitwirkende am Gottesdienst'.' am '.$service->date->isoFormat(
+        $body = 'Sehr geehrte Mitwirkende am Gottesdienst'.' am '.$service->trueDate()->isoFormat(
             'dddd, DD. MMMM YYYY'
         )
             .', '.$service->timeText().
@@ -96,14 +97,18 @@ class SongMailLiturgySheet extends AbstractLiturgySheet
             .','.PHP_EOL.PHP_EOL.'Hier der geplante Ablauf für den Gottesdienst:'.PHP_EOL.PHP_EOL;
         foreach ($service->liturgyBlocks as $block) {
             foreach ($block->items as $item) {
+                /** @var array{responsible?: mixed, song?: array{code?: mixed, reference?: mixed, altEG?: mixed, song?: array{title?: mixed}, songbook?: array{name?: mixed}}, psalm?: array{songbook_abbreviation?: mixed, songbook?: mixed, reference?: mixed, title?: mixed}, verses?: mixed, reference?: mixed} $data */
+                $data = $item->data;
+                $itemTitle = is_scalar($item->title) ? (string) $item->title : '';
 
-                if (isset($item->data['responsible'])) {
-                    $concernsOrganists = in_array('ministry:organists', $item->data['responsible']);
+                $responsible = $data['responsible'] ?? null;
+                if (is_array($responsible)) {
+                    $concernsOrganists = in_array('ministry:organists', $responsible);
                     if (! $concernsOrganists) {
                         foreach ($service->organists as $organist) {
                             $concernsOrganists = $concernsOrganists || in_array(
                                 'user:'.$organist->id,
-                                $item->data['responsible']
+                                $responsible
                             );
                         }
                     }
@@ -111,33 +116,44 @@ class SongMailLiturgySheet extends AbstractLiturgySheet
                     $concernsOrganists = false;
                 }
 
-                if (($item->data_type == 'song') && (isset($item->data['song']))) {
+                if (($item->data_type == 'song') && isset($data['song'])) {
+                    $songData = $data['song'];
                     $helper = new SongItemHelper($item);
                     $verseCount = $helper->getActiveVerseCount(true, true);
 
-                    $body .= '  -> '.$item->title.': '
-                        .($item->data[$item->data_type]['code'] ?? $item->data[$item->data_type]['songbook']['name'] ?? '')
+                    $code = $songData['code'] ?? ($songData['songbook']['name'] ?? '');
+                    $reference = $songData['reference'] ?? '';
+                    $altEg = $songData['altEG'] ?? null;
+                    $songTitle = $songData['song']['title'] ?? '';
+                    $body .= '  -> '.$itemTitle.': '
+                        .(is_scalar($code) ? (string) $code : '')
                         .' '
-                        .$item->data[$item->data_type]['reference'].' '
-                        .(isset($item->data[$item->data_type]['altEG']) ? '(EG '.$item->data[$item->data_type]['altEG'].') ' : '')
-                        .($item->data[$item->data_type]['song']['title'] ?? '')
+                        .(is_scalar($reference) ? (string) $reference : '').' '
+                        .(($altEg !== null && is_scalar($altEg)) ? '(EG '.(string) $altEg.') ' : '')
+                        .(is_scalar($songTitle) ? (string) $songTitle : '')
                         .$helper->forceVerseString(', ')
                         .($verseCount ? ' ('.$verseCount.')' : '')
                         .PHP_EOL;
                 } elseif ($item->data_type == 'psalm') {
-                    if (isset($item->data['psalm'])) {
-                        $body .= '  -> '.$item->title.': '
-                            .($item->data[$item->data_type]['songbook_abbreviation'] ?? $item->data[$item->data_type]['songbook'] ?? '')
+                    if (isset($data['psalm'])) {
+                        $psalmData = $data['psalm'];
+                        $songbook = $psalmData['songbook_abbreviation'] ?? $psalmData['songbook'] ?? '';
+                        $reference = $psalmData['reference'] ?? '';
+                        $title = $psalmData['title'] ?? '';
+                        $verses = $data['verses'] ?? null;
+                        $body .= '  -> '.$itemTitle.': '
+                            .(is_scalar($songbook) ? (string) $songbook : '')
                             .' '
-                            .$item->data[$item->data_type]['reference'].' '
-                            .($item->data[$item->data_type]['title'] ?? '')
-                            .(isset($item->data['verses']) && ($item->data['verses'] != '') ? ', '.$item->data['verses'] : '')
+                            .(is_scalar($reference) ? (string) $reference : '').' '
+                            .(is_scalar($title) ? (string) $title : '')
+                            .(is_scalar($verses) && $verses != '' ? ', '.(string) $verses : '')
                             .PHP_EOL;
                     }
                 } elseif ($item->data_type == 'reading') {
-                    $body .= ($concernsOrganists ? '  -> ' : '       ').$item->title.': '.($item->data['reference'] ?? '--').PHP_EOL;
+                    $reference = $data['reference'] ?? '--';
+                    $body .= ($concernsOrganists ? '  -> ' : '       ').$itemTitle.': '.(is_scalar($reference) ? (string) $reference : '--').PHP_EOL;
                 } else {
-                    $body .= ($concernsOrganists ? '  -> ' : '       ').$item->title.PHP_EOL;
+                    $body .= ($concernsOrganists ? '  -> ' : '       ').$itemTitle.PHP_EOL;
                 }
             }
         }
@@ -147,18 +163,21 @@ class SongMailLiturgySheet extends AbstractLiturgySheet
             .URL::temporarySignedRoute('liturgy.download', now()->addDays(14), ['service' => $service->slug, 'key' => 'A4']).PHP_EOL.PHP_EOL
             .'Außerdem gibt es den Ablauf in einem druckbaren, für Organist:innen optimierten Format hier:'.PHP_EOL
             .URL::temporarySignedRoute('liturgy.download', now()->addDays(14), ['service' => $service->slug, 'key' => 'Organist']).PHP_EOL
-            .PHP_EOL.'Freundliche Grüße, '.PHP_EOL.Auth::user()->fullName();
+            .PHP_EOL.'Freundliche Grüße, '.PHP_EOL.(Auth::user()?->fullName() ?? '');
     }
 
+    /**
+     * @return list<string> Recipient email addresses.
+     */
     protected function getRecipients(Service $service): array
     {
         $recipients = [];
         foreach ($service->organists as $organist) {
-            $recipients[] = $organist->email;
+            $recipients[] = (string) $organist->email;
         }
 
         if (count($recipients) == 0) {
-            $recipients[] = Auth::user()->email;
+            $recipients[] = (string) Auth::user()?->email;
         }
 
         return $recipients;

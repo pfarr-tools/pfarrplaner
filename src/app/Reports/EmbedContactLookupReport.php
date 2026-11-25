@@ -43,7 +43,6 @@ use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 use Inertia\Inertia;
 
@@ -79,13 +78,13 @@ class EmbedContactLookupReport extends AbstractEmbedReport
      */
     public function setup()
     {
-        $cities = Auth::user()->cities;
+        $cities = $this->authenticatedUser()->cities;
 
         return Inertia::render('Report/EmbedContactLookup/Setup', compact('cities'));
     }
 
     /**
-     * @return Application|Factory|View|string
+     * @return Application|Factory|View|\Inertia\Response|string
      */
     public function render(Request $request)
     {
@@ -96,7 +95,9 @@ class EmbedContactLookupReport extends AbstractEmbedReport
                 'includeCities.*' => 'required|exists:cities,id',
             ]
         );
-        $cities = implode(',', $request->get('includeCities'));
+        /** @var array<int, string> $includeCities */
+        $includeCities = $request->get('includeCities');
+        $cities = implode(',', $includeCities);
         $corsOrigin = $request->get('cors-origin');
         $report = $this->getKey();
 
@@ -110,7 +111,7 @@ class EmbedContactLookupReport extends AbstractEmbedReport
     }
 
     /**
-     * @return Response|Application|Factory|View|string
+     * @return Response|\Illuminate\Contracts\View\View
      */
     public function embed(Request $request)
     {
@@ -121,12 +122,14 @@ class EmbedContactLookupReport extends AbstractEmbedReport
         } else {
             $cities = $request->get('cities');
             if (! is_array($cities)) {
-                $cities = explode(',', $cities);
+                $cities = explode(',', is_string($cities) ? $cities : '');
             }
         }
 
         $street = $request->get('street', '');
+        $street = is_string($street) ? $street : '';
         $number = $request->get('number', '');
+        $number = is_string($number) ? $number : '';
 
         $streetRanges = StreetRange::whereHas(
             'parish',
@@ -149,11 +152,12 @@ class EmbedContactLookupReport extends AbstractEmbedReport
 
         $parish = false;
         if ($request->has('parish')) {
-            $parish = Parish::findOrFail($request->get('parish'));
+            $parishId = $request->get('parish');
+            $parish = Parish::findOrFail(is_numeric($parishId) ? (int) $parishId : 0);
         } elseif (($street != '') && ($number != '')) {
-            $parish = Parish::byAddress($street, $number)->inCities($cities)->first();
+            $parish = Parish::byAddress($street, (int) $number)->inCities($cities)->first();
         } elseif ($request->cookie('parish')) {
-            $parish = Parish::findOrFail($request->cookie('parish'));
+            $parish = Parish::findOrFail((int) $request->cookie('parish'));
         }
 
         $url = route('report.embed', compact('report', 'corsOrigin'));

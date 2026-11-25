@@ -43,8 +43,9 @@ class ServiceBeforeDeleteListener
     public function handle(ServiceBeforeDelete $event)
     {
         Log::debug('Calling KonfiAppIntegration on deleted service #'.$event->service->id);
-        if (KonfiAppIntegration::isActive($event->service->city)) {
-            KonfiAppIntegration::get($event->service->city)->handleServiceDelete($event->service);
+        $city = $event->service->city;
+        if ($city !== null && KonfiAppIntegration::isActive($city)) {
+            KonfiAppIntegration::get($city)->handleServiceDelete($event->service);
         }
     }
 }

@@ -33,10 +33,7 @@ namespace App\Reports;
 use App\Mail\RegulatoryReportMail;
 use App\Models\Service;
 use Carbon\Carbon;
-use Illuminate\Contracts\Foundation\Application;
-use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\View;
@@ -59,19 +56,19 @@ class RegulatoryReport extends AbstractReport
     public $icon = 'fa fa-envelope';
 
     /**
-     * @return Application|Factory|\Illuminate\View\View
+     * @return \Illuminate\Contracts\View\View
      */
     public function setup()
     {
         $preselectedService = \request()->get('service', null);
-        $services = Service::inCities(Auth::user()->writableCities->pluck('id'))
+        $services = Service::inCities($this->authenticatedUser()->writableCities->pluck('id'))
             ->startingFrom(Carbon::now())
             ->ordered()
             ->limit(20)
             ->get();
 
-        $recipient = Auth::user()->getSetting('regulatory_email_address', '');
-        $template = Auth::user()->getSetting('regulatory_email_text', '') ?: View::make('reports.regulatory.template');
+        $recipient = $this->authenticatedUser()->getSetting('regulatory_email_address', '');
+        $template = $this->authenticatedUser()->getSetting('regulatory_email_text', '') ?: View::make('reports.regulatory.template');
         Session::put('back', request()->headers->get('referer'));
 
         return $this->renderSetupView(compact('services', 'recipient', 'template', 'preselectedService'));
@@ -79,6 +76,7 @@ class RegulatoryReport extends AbstractReport
 
     public function render(Request $request)
     {
+        /** @var array{service: int, email: string, template: string, number?: int} $data */
         $data = $request->validate(
             [
                 'service' => 'required|int|exists:services,id',
@@ -87,19 +85,22 @@ class RegulatoryReport extends AbstractReport
                 'number' => 'int|min:1',
             ]
         );
-        $user = Auth::user();
+        $user = $this->authenticatedUser();
         $service = Service::findOrFail($data['service']);
         if (! $user->can('update', $service)) {
-            abort('401');
+            abort(401);
         }
         $user->setSetting('regulatory_email_address', $data['email']);
         $user->setSetting('regulatory_email_text', $data['template']);
 
         Mail::to($data['email'])
-            ->bcc(Auth::user())
+            ->bcc($this->authenticatedUser())
             ->queue(new RegulatoryReportMail($data));
 
-        return redirect()->to(Session::pull('back'))->with('success', 'Deine Gottesdienstmeldung wurde an '.$data['email'].' gesendet.');
+        /** @var string $back */
+        $back = Session::pull('back');
+
+        return redirect()->to($back)->with('success', 'Deine Gottesdienstmeldung wurde an '.$data['email'].' gesendet.');
     }
 
     public function isActive(): bool

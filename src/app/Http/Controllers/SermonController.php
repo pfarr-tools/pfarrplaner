@@ -34,23 +34,35 @@ use App\Models\Sermon;
 use App\Models\Service;
 use App\Traits\HandlesAttachedImageTrait;
 use App\Traits\HandlesAttachmentsTrait;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
+use Inertia\Response;
 
+/** Controller for sermon editing. */
 class SermonController extends Controller
 {
     use HandlesAttachedImageTrait;
     use HandlesAttachmentsTrait;
 
-    protected $model = Sermon::class;
+    /** @var class-string<Sermon> Model class used by the shared attachment traits. */
+    protected string $model = Sermon::class;
 
+    /**
+     *   construct.
+     *
+     * @return mixed
+     */
     public function __construct()
     {
         $this->middleware('auth');
     }
 
-    public function editorByService(Service $service)
+    /**
+     * Render the sermon editor for a service and its associated sermons.
+     */
+    public function editorByService(Service $service): Response
     {
         Gate::authorize('update', $service);
         $sermon = $service->sermon;
@@ -63,7 +75,10 @@ class SermonController extends Controller
         return Inertia::render('sermonEditor', compact('services', 'sermon', 'service'));
     }
 
-    public function editor(Sermon $sermon)
+    /**
+     * Render the sermon editor for an existing sermon.
+     */
+    public function editor(Sermon $sermon): Response
     {
         $this->authorizeSermonUpdate($sermon);
         $services = $sermon->services;
@@ -72,7 +87,10 @@ class SermonController extends Controller
         return Inertia::render('sermonEditor', compact('services', 'sermon', 'service'));
     }
 
-    public function store(Request $request, Service $service)
+    /**
+     * Store a sermon from the validated request and link it to the service.
+     */
+    public function store(Request $request, Service $service): RedirectResponse
     {
         Gate::authorize('update', $service);
         $data = $this->validateRequest($request);
@@ -87,7 +105,10 @@ class SermonController extends Controller
         return redirect()->back();
     }
 
-    public function update(Request $request, Sermon $sermon)
+    /**
+     * Update a sermon with the validated request data.
+     */
+    public function update(Request $request, Sermon $sermon): RedirectResponse
     {
         $this->authorizeSermonUpdate($sermon);
         $data = $this->validateRequest($request);
@@ -97,7 +118,10 @@ class SermonController extends Controller
         return redirect()->route('sermon.editor', $sermon);
     }
 
-    public function uncouple(Request $request, Service $service)
+    /**
+     * Detach a sermon from a service and delete it when no services remain.
+     */
+    public function uncouple(Request $request, Service $service): RedirectResponse
     {
         Gate::authorize('update', $service);
         if ($service->sermon === null) {
@@ -116,24 +140,40 @@ class SermonController extends Controller
         }
     }
 
-    public function reader(Sermon $sermon)
+    /**
+     * Render the reader view for a sermon.
+     */
+    public function reader(Sermon $sermon): Response
     {
         $this->authorizeSermonUpdate($sermon);
 
         return Inertia::render('Sermon/Reader', compact('sermon'));
     }
 
-    public function readerByService(Service $service)
+    /**
+     * Render the reader view for the sermon attached to a service.
+     */
+    public function readerByService(Service $service): Response
     {
         Gate::authorize('update', $service);
         if (! $service->sermon_id) {
             abort(404);
         }
 
-        return $this->reader($service->sermon);
+        $sermon = $service->sermon;
+        abort_unless($sermon !== null, 404);
+
+        return $this->reader($sermon);
     }
 
-    protected function handleCheckBoxes($data, $keys)
+    /**
+     * Normalize checkbox fields so that unchecked boxes are stored as false.
+     *
+     * @param  array<string, mixed>  $data  Validated request data.
+     * @param  list<string>  $keys  Request keys that represent checkboxes.
+     * @return array<string, mixed> The request data with normalized checkbox values.
+     */
+    protected function handleCheckBoxes(array $data, array $keys): array
     {
         foreach ($keys as $key) {
             if ($data[$key] !== null) {
@@ -144,8 +184,14 @@ class SermonController extends Controller
         return $data;
     }
 
-    protected function validateRequest(Request $request)
+    /**
+     * Validate the sermon form input and normalize checkbox values.
+     *
+     * @return array<string, mixed> The validated request data.
+     */
+    protected function validateRequest(Request $request): array
     {
+        /** @var array<string, mixed> $data */
         $data = $request->validate(
             [
                 'title' => 'nullable|string',
@@ -170,6 +216,9 @@ class SermonController extends Controller
         return $data;
     }
 
+    /**
+     * Authorizesermonupdate.
+     */
     protected function authorizeSermonUpdate(Sermon $sermon): void
     {
         $sermon->loadMissing('services');

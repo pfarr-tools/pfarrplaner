@@ -34,6 +34,6 @@ use App\Models\Liturgy\Song;
 use App\Models\People\User;
 
 /**
- * @method Song update(User $user, Song $song, array $input)
+ * @method Song update(User $user, Song $song, array<string, mixed> $input)
  */
 interface UpdatesSongs {}

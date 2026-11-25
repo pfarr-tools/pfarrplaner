@@ -38,7 +38,7 @@ use App\Services\FileNameService;
 use App\Services\MinistryService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Collection;
 use Inertia\Inertia;
 use Inertia\Response;
 use PhpOffice\PhpSpreadsheet\RichText\RichText;
@@ -81,14 +81,21 @@ class ServiceTableReport extends AbstractExcelDocumentReport
      */
     public function setup()
     {
-        $cities = Auth::user()->cities;
+        $cities = $this->authenticatedUser()->cities;
         $locations = Location::inCities($cities->pluck('id'))->get();
         $ministries = MinistryService::selectList();
 
         return Inertia::render('Report/ServiceTable/Setup', compact('cities', 'locations', 'ministries'));
     }
 
-    private function columnAddress($col, $cities)
+    /**
+     * Verschiebt einen Spaltenbuchstaben, wenn mehrere Gemeinden dargestellt werden.
+     *
+     * @param  string  $col  Spaltenbuchstabe, zum Beispiel "A"
+     * @param  Collection<int, City>  $cities  Dargestellte Gemeinden
+     * @return string Verschobener Spaltenbuchstabe
+     */
+    private function columnAddress(string $col, Collection $cities): string
     {
         if ((count($cities) > 1) && ($col != 'A')) {
             $col = chr(ord($col) + 1);
@@ -97,7 +104,15 @@ class ServiceTableReport extends AbstractExcelDocumentReport
         return $col;
     }
 
-    private function cellAddress($col, $row, $cities)
+    /**
+     * Baut eine Zelladresse aus Spaltenbuchstabe und Zeilennummer.
+     *
+     * @param  string  $col  Spaltenbuchstabe, zum Beispiel "A"
+     * @param  int  $row  Zeilennummer
+     * @param  Collection<int, City>  $cities  Dargestellte Gemeinden
+     * @return string Zelladresse, zum Beispiel "A12"
+     */
+    private function cellAddress(string $col, int $row, Collection $cities): string
     {
         return $this->columnAddress($col, $cities).$row;
     }
@@ -121,7 +136,7 @@ class ServiceTableReport extends AbstractExcelDocumentReport
                 'name_format' => 'required|int|in:1,2,3',
             ]
         );
-
+        /** @var array{year: int, cities: array<int, int>, locations?: array<int, int>|null, ministries?: array<int, string>|null, name_format: int} $data */
         $serviceList = Service::between(
             Carbon::createFromDate($data['year'], 1, 1),
             Carbon::createFromDate($data['year'], 12, 31)->setTime(23, 59, 59),
@@ -133,6 +148,8 @@ class ServiceTableReport extends AbstractExcelDocumentReport
             ->groupBy('key_date');
 
         $cities = City::whereIn('id', $data['cities'])->get();
+        /** @var string $cityNames */
+        $cityNames = $cities->pluck('name')->join(', ');
 
         $ministries = $data['ministries'] ?? [];
         $nameFormat = $data['name_format'] ?? User::NAME_FORMAT_DEFAULT;
@@ -230,14 +247,10 @@ class ServiceTableReport extends AbstractExcelDocumentReport
             ->setFooter(0);
         $sheet->getHeaderFooter()
             ->setOddHeader(
-                '&LEvangelische Kirchengemeinde'.(count($cities) > 1 ? 'n ' : ' ').$cities->pluck('name')->join(
-                    ', '
-                ).'&RPlan für Gottesdienste '.$data['year'].' - Blatt &P von &N'
+                '&LEvangelische Kirchengemeinde'.(count($cities) > 1 ? 'n ' : ' ').$cityNames.'&RPlan für Gottesdienste '.$data['year'].' - Blatt &P von &N'
             )
             ->setEvenHeader(
-                '&LEvangelische Kirchengemeinde'.(count($cities) > 1 ? 'n ' : ' ').$cities->pluck('name')->join(
-                    ', '
-                ).'&RPlan für Gottesdienste '.$data['year'].' - Blatt &P von &N'
+                '&LEvangelische Kirchengemeinde'.(count($cities) > 1 ? 'n ' : ' ').$cityNames.'&RPlan für Gottesdienste '.$data['year'].' - Blatt &P von &N'
             )
             ->setOddFooter('&CAusdruck vom &D, &T')
             ->setEvenFooter('&CAusdruck vom &D, &T');
@@ -249,7 +262,7 @@ class ServiceTableReport extends AbstractExcelDocumentReport
 
         // title row
         $sheet->mergeCells("A1:{$lastColumn}1");
-        $sheet->getRowDimension('1')->setRowHeight(21);
+        $sheet->getRowDimension(1)->setRowHeight(21);
         $style = $sheet->setCellValue(
             'A1',
             'Plan für Gottesdienste - Liturgischer Kalender für das Jahr '.$data['year']
@@ -365,6 +378,7 @@ class ServiceTableReport extends AbstractExcelDocumentReport
         $row = 3;
         foreach ($serviceList as $services) {
             foreach ($services as $service) {
+                /** @var array{Bezeichnung?: string, 'CSS-Farbe'?: string} $liturgy */
                 $liturgy = $service->liturgicalInfo;
 
                 $row += 2;
@@ -401,12 +415,16 @@ class ServiceTableReport extends AbstractExcelDocumentReport
                 }
 
                 $richtext = new RichText;
-                $textrun = $richtext->createTextRun($service->date->isoFormat('dddd, '));
-                $textrun->getFont()->setName('Arial')->setSize(8)->setBold(true);
-                $richtext->createText("\n".$service->date->format('d.m.Y'));
+                $textrun = $richtext->createTextRun($service->trueDate()->isoFormat('dddd, '));
+                $font = $textrun->getFont();
+                if ($font === null) {
+                    throw new \LogicException('Die Schriftart für die Tabellenzelle konnte nicht geladen werden.');
+                }
+                $font->setName('Arial')->setSize(8)->setBold(true);
+                $richtext->createText("\n".$service->trueDate()->format('d.m.Y'));
                 $sheet->getCell($this->cellAddress('A', $row, $cities))->setValue($richtext);
                 if (count($cities) > 1) {
-                    $sheet->setCellValue("B{$row}", $service->city->name);
+                    $sheet->setCellValue("B{$row}", $service->city->name ?? '');
                 }
                 $sheet->setCellValue($this->cellAddress('B', $row, $cities), $liturgy['Bezeichnung'] ?? '');
                 $sheet->setCellValue($this->cellAddress('C', $row, $cities), $service->descriptionText());
@@ -478,7 +496,7 @@ class ServiceTableReport extends AbstractExcelDocumentReport
 
         return $this->sendToBrowser(
             FileNameService::make(
-                static::FILE_TITLE.' '.$cities->pluck('name')->join(', '),
+                self::FILE_TITLE.' '.$cityNames,
                 'xlsx',
                 static::FILE_SIGNATURE,
                 $data['year'].'-01-01', false, null, 'Y')
@@ -486,9 +504,13 @@ class ServiceTableReport extends AbstractExcelDocumentReport
     }
 
     /**
-     * @return string
+     * Formatiert eine Liste von Personen als kommaseparierten Text.
+     *
+     * @param  Collection<int, User>  $people  Zu formatierende Personen
+     * @param  int  $format  Namensformat, einer der User::NAME_FORMAT_*-Werte
+     * @return string Namen der Personen, kommasepariert
      */
-    protected function peopleListFormatted($people, $format)
+    protected function peopleListFormatted(Collection $people, int $format): string
     {
         $recs = [];
         foreach ($people as $person) {

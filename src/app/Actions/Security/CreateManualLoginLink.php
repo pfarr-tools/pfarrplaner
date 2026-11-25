@@ -62,7 +62,7 @@ class CreateManualLoginLink
 
             return [
                 'manual_login_url' => route('login.link.open', ['token' => $nonce]),
-                'expires_at' => $expiresAt->toISOString(),
+                'expires_at' => (string) $expiresAt->toISOString(),
             ];
         });
     }

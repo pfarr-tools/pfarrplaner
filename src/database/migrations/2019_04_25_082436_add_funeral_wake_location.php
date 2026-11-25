@@ -29,6 +29,7 @@
  */
 
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 /**
@@ -45,7 +46,7 @@ class AddFuneralWakeLocation extends Migration
     {
         Schema::table(
             'funerals',
-            function ($table) {
+            function (Blueprint $table) {
                 $table->string('wake_location')->nullable()->default('');
             }
         );
@@ -60,8 +61,8 @@ class AddFuneralWakeLocation extends Migration
     {
         Schema::table(
             'funerals',
-            function ($table) {
-                $table->dropColumn('wake_location')->nullable;
+            function (Blueprint $table) {
+                $table->dropColumn('wake_location');
             }
         );
     }

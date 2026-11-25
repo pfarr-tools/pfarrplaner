@@ -41,7 +41,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class UserSetting extends Model
 {
     /**
-     * @var string[]
+     * @var list<string>
      */
     protected $fillable = [
         'user_id',
@@ -50,7 +50,7 @@ class UserSetting extends Model
     ];
 
     /**
-     * @var string[]
+     * @var array<string, string>
      */
     protected $casts = [
         'value' => EncryptedSerializedAttribute::class,

@@ -62,18 +62,29 @@ class AllServicesCalendarLink extends AbstractCalendarLink
     protected $needs = ['cities', 'includeHidden'];
 
     /**
-     * @return array
+     * Prepare the setup data for the all-services calendar.
+     *
+     * @return array<string, mixed> Cities available to the authenticated user.
      */
     public function setupData()
     {
-        $cities = Auth::user()->cities;
+        $user = Auth::user();
+        $cities = $user === null ? [] : $user->cities;
 
         return compact('cities');
     }
 
+    /**
+     * @param  Request  $request  Incoming request.
+     * @return void
+     */
     public function setDataFromRequest(Request $request)
     {
-        $this->data['cities'] = implode('-', $request->get('includeCities') ?: []);
+        $cities = $request->get('includeCities');
+        $this->data['cities'] = implode('-', array_map(
+            static fn ($city): string => is_scalar($city) ? (string) $city : '',
+            is_array($cities) ? $cities : [],
+        ));
     }
 
     /**
@@ -81,7 +92,8 @@ class AllServicesCalendarLink extends AbstractCalendarLink
      */
     public function getRenderData(Request $request, User $user)
     {
-        $cityIds = explode('-', $request->get('cities', ''));
+        $cities = $request->get('cities', '');
+        $cityIds = explode('-', is_string($cities) ? $cities : '');
         $serviceQuery = Service::with(['location'])
             ->inCities($cityIds)->startingFrom(Carbon::now()->subYears(1)->startOfYear());
         if (! $request->get('includeHidden', 0)) {

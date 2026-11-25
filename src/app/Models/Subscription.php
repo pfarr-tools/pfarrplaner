@@ -30,11 +30,14 @@
 
 namespace App\Models;
 
+use App\Mail\AbstractServiceMailable;
 use App\Models\People\User;
 use App\Models\Places\City;
 use App\Traits\HasCityScopes;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
@@ -55,7 +58,7 @@ class Subscription extends Model
     public const SUBSCRIBE_NONE = 0;
 
     /**
-     * @var string[]
+     * @var list<string>
      */
     protected $fillable = [
         'user_id',
@@ -64,11 +67,15 @@ class Subscription extends Model
     ];
 
     /**
-     * @param  array  $data
-     * @param  null  $additionalSubscribers
+     * Queue subscription notifications for the given service.
+     *
+     * @param  Service  $service  Service the notification refers to.
+     * @param  class-string<AbstractServiceMailable>  $mailClass  Mailable class used for the notification.
+     * @param  array<string, mixed>  $data  Additional data passed to the mailable.
+     * @param  Collection<array-key, mixed>|null  $additionalSubscribers  Extra subscribers to notify.
      * @param  bool  $isNew  True, if this is a newly created service
      */
-    public static function send(Service $service, $mailClass, $data = [], $additionalSubscribers = null, $isNew = false)
+    public static function send(Service $service, $mailClass, $data = [], $additionalSubscribers = null, $isNew = false): void
     {
         // do not send mail when nothing has changed.
         if (count($service->changed) == 0) {
@@ -80,25 +87,27 @@ class Subscription extends Model
         // add additional subscribers
         if (! is_null($additionalSubscribers)) {
             foreach ($additionalSubscribers as $subscriber) {
-                if (! $subscribers->contains($subscriber)) {
+                if ($subscriber instanceof User && ! $subscribers->contains($subscriber)) {
                     $subscribers->push($subscriber);
                 }
             }
         }
 
+        $originatingUser = Auth::user() ?? throw new AuthenticationException;
+
         // queue messages
         foreach ($subscribers as $subscriber) {
-            if (! env('THIS_IS_MY_DEV_HOST')) {
+            if (! config('app.dev')) {
                 if ($subscriber->email && filter_var($subscriber->email, FILTER_VALIDATE_EMAIL)) {
                     Log::debug('Sending ServiceUpdated to '.$subscriber->email);
-                    Mail::to($subscriber)->queue(new $mailClass($subscriber, $service, Auth::user(), $data));
+                    Mail::to($subscriber)->queue(new $mailClass($subscriber, $service, $originatingUser, $data));
                 } else {
                     Log::debug('User '.$subscriber->fullName().' has no valid email to send ServiceUpdated.');
                 }
             } else {
                 Log::debug('Sending ServiceUpdated to dev@toph.de instead of '.$subscriber->email);
                 $subscriber->email = 'dev@toph.de';
-                Mail::to($subscriber)->queue(new $mailClass($subscriber, $service, Auth::user(), $data));
+                Mail::to($subscriber)->queue(new $mailClass($subscriber, $service, $originatingUser, $data));
             }
         }
     }

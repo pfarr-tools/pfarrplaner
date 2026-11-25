@@ -15,10 +15,12 @@ namespace App\Http\Controllers;
 
 use App\Models\Leave\Absence;
 use App\Models\People\User;
+use App\Models\Places\City;
 use App\Models\Rites\Baptism;
 use App\Models\Rites\Funeral;
 use App\Models\Rites\Wedding;
 use App\Models\Service;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\RedirectResponse;
@@ -53,9 +55,11 @@ class PapierkorbController extends Controller
 
     public function index(Request $request): Response
     {
-        abort_unless(self::hasAdminModuleAccess($request->user()), 403);
+        $user = $request->user();
+        abort_unless($user instanceof User, 401);
+        abort_unless(self::hasAdminModuleAccess($user), 403);
 
-        $records = $this->trashedRecordsForUser($request->user());
+        $records = $this->trashedRecordsForUser($user);
         $types = collect(self::SUPPORTED_TYPES)
             ->map(fn (array $config, string $type) => ['value' => $type, 'label' => $config['label']])
             ->values();
@@ -76,14 +80,14 @@ class PapierkorbController extends Controller
 
         DB::transaction(function () use ($request, $type, $model) {
             if (in_array($type, ['baptism', 'funeral', 'wedding'], true)) {
-                $service = $model->service;
-                if ($service && method_exists($service, 'trashed') && $service->trashed()) {
+                $service = $model->getAttribute('service');
+                if ($service instanceof Model && method_exists($service, 'trashed') && method_exists($service, 'restore') && $service->trashed()) {
                     Gate::forUser($request->user())->authorize('restore', $service);
                     $service->restore();
                 }
             }
 
-            if (method_exists($model, 'trashed') && $model->trashed()) {
+            if ($model->trashed()) {
                 $model->restore();
             }
         });
@@ -101,7 +105,7 @@ class PapierkorbController extends Controller
     }
 
     /**
-     * @return array|bool
+     * @return array<string, mixed>|false
      */
     public static function getAdminModuleConfig()
     {
@@ -130,6 +134,7 @@ class PapierkorbController extends Controller
      */
     protected function trashedRecordsForUser(User $user): Collection
     {
+        /** @var Collection<int, array<string, mixed>> $records */
         $records = collect();
 
         foreach (array_keys(self::SUPPORTED_TYPES) as $type) {
@@ -143,48 +148,88 @@ class PapierkorbController extends Controller
         return $records->sortByDesc('deletedAt')->values();
     }
 
+    /**
+     * Load a single soft-deleted model of the requested type.
+     *
+     * @param  string  $type  Supported trash type identifying the model class.
+     * @param  int  $id  Primary key of the trashed record.
+     * @return Service|Absence|Baptism|Funeral|Wedding Trashed model from one of the supported trash types.
+     */
     protected function loadTrashedModel(string $type, int $id): Model
     {
         return self::baseQueryForType($type)->whereKey($id)->firstOrFail();
     }
 
     /**
-     * @return array<string, mixed>
+     * Map a trashed model to the compact record shape used by the frontend.
+     *
+     * @param  string  $type  Supported trash type identifying the model class.
+     * @param  Model  $model  Trashed model from one of the supported types.
+     * @param  User  $user  User requesting the trash overview.
+     * @return array<string, mixed> Compacted trash record.
      */
     protected function mapRecord(string $type, Model $model, User $user): array
     {
-        $cityName = match ($type) {
-            'service' => $model->city?->name,
-            'absence' => $model->user?->homeCities?->pluck('name')->implode(', '),
-            'baptism' => $model->service?->city?->name,
-            'funeral', 'wedding' => $model->service?->city?->name,
-            default => null,
-        };
-
-        $label = match ($type) {
-            'service' => trim($model->titleText(false).' ('.$model->date?->setTimezone('Europe/Berlin')->format('d.m.Y').')'),
-            'absence' => trim(($model->user?->fullName() ?: 'Abwesenheit').' ('.$model->durationText().')'),
-            default => $model->label,
-        };
-
-        $warning = null;
-        if (in_array($type, ['baptism', 'funeral', 'wedding'], true) && $model->service && $model->service->trashed()) {
-            $warning = 'Dabei wird auch der zugehörige Gottesdienst wiederhergestellt.';
+        $cityName = null;
+        if ($type === 'service') {
+            /** @var City|null $city */
+            $city = $model->getAttribute('city');
+            $cityName = $city?->name;
+        } elseif ($type === 'absence') {
+            /** @var User|null $absenceUser */
+            $absenceUser = $model->getAttribute('user');
+            /** @var Collection<int, City>|null $homeCities */
+            $homeCities = $absenceUser?->getAttribute('homeCities');
+            $cityName = $homeCities?->pluck('name')->implode(', ');
+        } elseif (in_array($type, ['baptism', 'funeral', 'wedding'], true)) {
+            /** @var Service|null $service */
+            $service = $model->getAttribute('service');
+            /** @var City|null $city */
+            $city = $service?->getAttribute('city');
+            $cityName = $city?->name;
         }
 
+        if ($type === 'service' && $model instanceof Service) {
+            /** @var Carbon|null $date */
+            $date = $model->getAttribute('date');
+            $label = trim($model->titleText(false).' ('.$date?->setTimezone('Europe/Berlin')->format('d.m.Y').')');
+        } elseif ($type === 'absence' && $model instanceof Absence) {
+            /** @var User|null $absenceUser */
+            $absenceUser = $model->getAttribute('user');
+            $label = trim(($absenceUser?->fullName() ?: 'Abwesenheit').' ('.$model->durationText().')');
+        } else {
+            $label = $model->getAttribute('label');
+        }
+
+        $warning = null;
+        if (in_array($type, ['baptism', 'funeral', 'wedding'], true)) {
+            /** @var Service|null $service */
+            $service = $model->getAttribute('service');
+            if ($service?->trashed()) {
+                $warning = 'Dabei wird auch der zugehörige Gottesdienst wiederhergestellt.';
+            }
+        }
+
+        /** @var Carbon|null $deletedAt */
+        $deletedAt = $model->getAttribute('deleted_at');
+        /** @var User|null $deletedBy */
+        $deletedBy = $model->getAttribute('deletedBy');
+        /** @var int $id */
+        $id = $model->getAttribute('id');
+
         return [
-            'id' => $model->id,
+            'id' => $id,
             'type' => $type,
             'typeLabel' => self::SUPPORTED_TYPES[$type]['label'],
             'label' => $label,
             'cityName' => $cityName,
-            'deletedAt' => optional($model->deleted_at)->toISOString(),
-            'deletedAtText' => $model->deleted_at?->setTimezone('Europe/Berlin')->format('d.m.Y, H:i').' Uhr',
-            'deletedByName' => $model->deletedBy?->fullName(),
+            'deletedAt' => $deletedAt?->toISOString(),
+            'deletedAtText' => $deletedAt?->setTimezone('Europe/Berlin')->format('d.m.Y, H:i').' Uhr',
+            'deletedByName' => $deletedBy?->fullName(),
             'canRestore' => Gate::forUser($user)->allows('restore', $model),
             'canForceDelete' => Gate::forUser($user)->allows('forceDelete', $model),
-            'restoreRoute' => self::restoreUrl($type, $model->id),
-            'deleteRoute' => self::destroyUrl($type, $model->id),
+            'restoreRoute' => self::restoreUrl($type, $id),
+            'deleteRoute' => self::destroyUrl($type, $id),
             'warning' => $warning,
         ];
     }
@@ -207,11 +252,10 @@ class PapierkorbController extends Controller
                 'deletedBy',
                 'service' => fn ($query) => $query->withTrashed()->with('city'),
             ]),
-            'wedding' => Wedding::onlyTrashed()->with([
+            default => Wedding::onlyTrashed()->with([
                 'deletedBy',
                 'service' => fn ($query) => $query->withTrashed()->with('city'),
             ]),
-            default => throw new \InvalidArgumentException('Unsupported trash type: '.$type),
         };
     }
 

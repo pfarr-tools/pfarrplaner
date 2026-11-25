@@ -9,13 +9,16 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * Run the migrations.
+     * Überträgt bestehende communiapp-Einstellungen in die AdConfigs und entfernt die alten Spalten.
      */
     public function up(): void
     {
         foreach (Service::whereNotNull('communiapp_listing_start')->get() as $service) {
             $date = is_object($service->date) ? $service->date : Carbon\Carbon::parse($service->date);
-            $listStart = is_object($service->communiapp_listing_start) ? $service->communiapp_listing_start : Carbon\Carbon::parse($service->communiapp_listing_start);
+            /** @var string|Carbon\Carbon $attribute */
+            $attribute = $service->getAttribute('communiapp_listing_start');
+            /** @var Carbon\Carbon $listStart */
+            $listStart = is_object($attribute) ? $attribute : Carbon\Carbon::parse($attribute);
             $diff = (int) ($listStart->diffInDays($date));
             if ($diff) {
                 AdConfig::updateOrCreate(['service_id' => $service->id, 'slug' => 'communiapp'], [

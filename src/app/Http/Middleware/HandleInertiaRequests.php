@@ -69,11 +69,12 @@ class HandleInertiaRequests extends Middleware
      *
      * @see https://inertiajs.com/shared-data
      *
-     * @return array
+     * @return array<string, mixed>
      */
     public function share(Request $request)
     {
-        $packageConfig = json_decode(file_get_contents(base_path('package.json')), true);
+        /** @var array{version: string} $packageConfig */
+        $packageConfig = json_decode((string) file_get_contents(base_path('package.json')), true);
         $version = $packageConfig['version'];
 
         $data = array_merge(parent::share($request), [
@@ -100,19 +101,19 @@ class HandleInertiaRequests extends Middleware
             'activeTab' => request()->get('tab', 'home'),
             'labels' => fn () => config('labels'),
             'bible' => fn () => [
-                'versions' => array_keys(config('bible.versions', [])),
+                'versions' => array_keys((array) config('bible.versions', [])),
             ],
         ]);
 
-        if (! Auth::guest()) {
+        if ($user = Auth::user()) {
             $data = array_merge($data, [
                 'currentUser' => fn () => $request->user()
                     ? new UserResource($request->user())
                     : null,
                 'sessionId' => fn () => $request->session()->getId(),
                 'menu' => fn () => MenuBuilder::sidebar(),
-                'settings' => fn () => Settings::all(Auth::user()),
-                'interstitials' => fn () => app(InterstitialService::class)->forUser(Auth::user()),
+                'settings' => fn () => Settings::all($user),
+                'interstitials' => fn () => app(InterstitialService::class)->forUser($user),
                 'adminUserSwitchBack' => Session::has('adminUserSwitchBack'),
                 'appName' => config('app.name'),
             ]);
@@ -130,13 +131,16 @@ class HandleInertiaRequests extends Middleware
         if (! $routeName) {
             return 'benutzerhandbuch';
         }
-        foreach (config('manual', []) as $chapter => $prefixes) {
+        /** @var array<string, mixed> $manualConfig */
+        $manualConfig = config('manual', []);
+        foreach ($manualConfig as $chapter => $prefixes) {
             if (! is_array($prefixes)) {
                 continue;
             }
 
             $manual = 'benutzerhandbuch';
             if (isset($prefixes['prefixes'])) {
+                /** @var string $manual */
                 $manual = $prefixes['manual'] ?? $manual;
                 $prefixes = $prefixes['prefixes'];
             }
@@ -149,6 +153,7 @@ class HandleInertiaRequests extends Middleware
                 if (is_array($prefix)) {
                     return 'benutzerhandbuch';
                 }
+                /** @var string $prefix */
                 if (str_starts_with($routeName, $prefix) || $routeName === $prefix) {
                     return trim($manual.'/'.$chapter, '/');
                 }

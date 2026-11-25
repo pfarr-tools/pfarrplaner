@@ -86,11 +86,20 @@ class GetLiturgyInfo extends Command
 
         $data = [];
 
-        $maxYear = Service::select('date')->distinct()->orderBy('date', 'desc')->first()->date->year;
+        $latestService = Service::select('date')->distinct()->orderBy('date', 'desc')->first();
+        $latestDate = $latestService?->date;
+        if ($latestDate === null) {
+            throw new \RuntimeException('Kein Gottesdienst mit einem Datum gefunden.');
+        }
+        $maxYear = (int) $latestDate->year;
         for ($year = 2018; $year <= $maxYear; $year++) {
-            if (empty($only) || in_array($year, $only)) {
+            if (empty($only) || in_array((string) $year, $only, true)) {
                 $this->processItem('Kalender für '.$year, function () use ($year, &$data) {
-                    $data[$year] = json_decode(file_get_contents('https://kirchenjahr.pfarr.tools/api/jahr/'.$year), true);
+                    $contents = file_get_contents('https://kirchenjahr.pfarr.tools/api/jahr/'.$year);
+                    if ($contents === false) {
+                        throw new \RuntimeException('Kalender für '.$year.' konnte nicht geladen werden.');
+                    }
+                    $data[$year] = json_decode($contents, true);
                     /**
                     Storage::put(
                         'liturgy/'.$year.'.json',
@@ -102,25 +111,37 @@ class GetLiturgyInfo extends Command
         }
 
         foreach ($studyHelperProviders as $key => $studyHelperProvider) {
-            if (empty($only) || in_array($key, $only)) {
+            if (empty($only) || in_array((string) $key, $only, true)) {
                 $this->processItem($studyHelperProvider->title, function () use ($studyHelperProvider, &$data) {
                     $data = $studyHelperProvider->assign($data);
                 });
             }
         }
 
-        foreach ($data ?? [] as $year => $calendar) {
-            Storage::put('liturgy/'.$year.'.json', json_encode($calendar));
+        foreach ($data as $year => $calendar) {
+            $json = json_encode($calendar);
+            if ($json === false) {
+                throw new \RuntimeException('Kalender für '.$year.' konnte nicht serialisiert werden.');
+            }
+            Storage::put('liturgy/'.$year.'.json', $json);
         }
 
         $this->newLine(2);
         $this->line('Der liturgische Kalender wurde aktualisiert.');
     }
 
-    protected function processItem($title, $callback)
+    /**
+     * Führt einen Arbeitsschritt mit Statusausgabe aus.
+     *
+     * @param  string  $title  Angezeigter Name des Arbeitsschritts
+     * @param  callable  $callback  Auszuführender Arbeitsschritt
+     * @return mixed Ergebnis des Arbeitsschritts oder null bei Fehlern
+     */
+    protected function processItem(string $title, callable $callback): mixed
     {
         $this->getOutput()->write(Str::padRight($title, 75));
         $success = true;
+        $result = null;
         try {
             $result = $callback();
         } catch (\Exception $e) {

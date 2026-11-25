@@ -41,7 +41,7 @@ use Illuminate\Support\Facades\Gate;
  */
 class CalendarServiceResource extends JsonResource
 {
-    public $preserveKeys = true;
+    public bool $preserveKeys = true;
 
     /**
      * Transform the resource into an array.
@@ -50,52 +50,52 @@ class CalendarServiceResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        /** @var Service $this */
-        $service = $this;
+        /** @var Service $service */
+        $service = $this->resource;
         $gate = Gate::forUser($request->user('api') ?? $request->user() ?? Auth::user());
         $canUpdate = $gate->allows('update', $service);
 
         return [
-            'id' => $this->id,
-            'slug' => $this->slug,
-            'title' => $this->titleText(false),
-            'titleText' => $this->titleText(false),
-            'date' => $this->date,
-            'description' => $this->description,
-            'descriptionText' => $this->descriptionText(),
-            'internal_remarks' => $this->internal_remarks,
-            'offering_goal' => $this->offeringGoal(),
-            'offering_description' => $this->offeringDescription(),
-            'locationText' => $this->locationText(),
-            'locationTextWithCity' => $this->locationTextWithCity,
-            'location' => new CalendarLocationResource($this->location),
-            'funerals' => $this->funerals,
-            'weddings' => $this->weddings,
-            'baptisms' => $this->baptisms,
-            'cc' => $this->cc,
-            'cc_location' => $this->cc_location,
-            'cc_lesson' => $this->cc_lesson,
-            'cc_staff' => $this->cc_staff,
-            'city' => new CalendarCityResource($this->city),
-            'city_id' => $this->city_id,
-            'timeText' => $this->timeText(),
-            'liveDashboardUrl' => $this->liveDashboardUrl,
-            'youtube_url' => $this->youtube_url,
-            'isAlternateProprium' => $this->isAlternateProprium,
-            'liturgicalInfo' => $this->liturgical_info,
-            'hidden' => $this->hidden,
-            'ministriesByCategory' => new CalendarMinistriesResource($this),
-            'pastors' => CalendarParticipantResource::collection($this->pastors),
-            'need_predicant' => $this->need_predicant,
-            'organists' => CalendarParticipantResource::collection($this->organists),
-            'sacristans' => CalendarParticipantResource::collection($this->sacristans),
-            'isMine' => $this->isMine,
-            'isEditable' => $this->isEditable,
+            'id' => $service->id,
+            'slug' => $service->slug,
+            'title' => $service->titleText(false),
+            'titleText' => $service->titleText(false),
+            'date' => $service->date,
+            'description' => $service->description,
+            'descriptionText' => $service->descriptionText(),
+            'internal_remarks' => $service->internal_remarks,
+            'offering_goal' => $service->offeringGoal(),
+            'offering_description' => $service->offeringDescription(),
+            'locationText' => $service->locationText(),
+            'locationTextWithCity' => $service->locationTextWithCity,
+            'location' => new CalendarLocationResource($service->location),
+            'funerals' => $service->funerals,
+            'weddings' => $service->weddings,
+            'baptisms' => $service->baptisms,
+            'cc' => $service->cc,
+            'cc_location' => $service->cc_location,
+            'cc_lesson' => $service->cc_lesson,
+            'cc_staff' => $service->cc_staff,
+            'city' => new CalendarCityResource($service->city),
+            'city_id' => $service->city_id,
+            'timeText' => $service->timeText(),
+            'liveDashboardUrl' => $service->liveDashboardUrl,
+            'youtube_url' => $service->youtube_url,
+            'isAlternateProprium' => $service->isAlternateProprium,
+            'liturgicalInfo' => $service->liturgical_info,
+            'hidden' => $service->hidden,
+            'ministriesByCategory' => new CalendarMinistriesResource($service),
+            'pastors' => CalendarParticipantResource::collection($service->pastors),
+            'need_predicant' => $service->need_predicant,
+            'organists' => CalendarParticipantResource::collection($service->organists),
+            'sacristans' => CalendarParticipantResource::collection($service->sacristans),
+            'isMine' => $service->isMine,
+            'isEditable' => $service->isEditable,
             'canSelfAssign' => $gate->allows('selfAssign', $service),
             'selfAssignViaPredicantClaim' => ! $canUpdate
                 && $gate->allows('claimPredicant', $service),
-            'hasSermon' => $this->sermon_id !== null,
-            'hasLiturgy' => $this->liturgyBlocks->count() > 0,
+            'hasSermon' => $service->sermon_id !== null,
+            'hasLiturgy' => $service->liturgyBlocks->count() > 0,
         ];
     }
 }

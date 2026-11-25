@@ -17,11 +17,17 @@ class RequireTwoFactorRecovery
             ?? $request->user('api')
             ?? $request->user('sanctum');
         if (! $user instanceof User || ! $user->two_factor_recovery_required_at) {
-            return $next($request);
+            /** @var Response $response */
+            $response = $next($request);
+
+            return $response;
         }
 
         if ($this->isAllowedRoute($request->route()?->getName())) {
-            return $next($request);
+            /** @var Response $response */
+            $response = $next($request);
+
+            return $response;
         }
 
         if ($request->expectsJson() || $request->is('api/*') || $request->is('extranet/*')) {

@@ -33,20 +33,36 @@ namespace App\Calendars\LocalEventCalendars;
 use File;
 use Illuminate\Support\Str;
 
+/** Factory zum Auffinden und Erzeugen lokaler Veranstaltungskalender. */
 class LocalEventCalendarFactory
 {
+    /**
+     * Ermittelt die Klassen aller lokalen Veranstaltungskalender.
+     *
+     * Dateien mit „Abstract“ oder „Factory“ im Pfad werden ausgeschlossen,
+     * damit nur konkrete Kalenderklassen zurückgegeben werden.
+     *
+     * @return array<int, class-string<AbstractLocalEventCalendar>> Vollqualifizierte Klassennamen der Kalender.
+     */
     public static function all(): array
     {
         $classes = [];
         foreach (File::allFiles(app_path('Calendars/LocalEventCalendars')) as $file) {
             if (($file->getExtension() == 'php') && (! Str::contains($file->getPathname(), 'Abstract')) && (! Str::contains($file->getPathname(), 'Factory'))) {
-                $classes[] = substr('App\\Calendars\\LocalEventCalendars\\'.Str::replace('/', '\\', $file->getRelativePathname()), 0, -4);
+                /** @var class-string<AbstractLocalEventCalendar> $class */
+                $class = substr('App\\Calendars\\LocalEventCalendars\\'.Str::replace('/', '\\', $file->getRelativePathname()), 0, -4);
+                $classes[] = $class;
             }
         }
 
         return $classes;
     }
 
+    /**
+     * Sammelt die Kalendereinträge aller lokalen Veranstaltungskalender.
+     *
+     * @return array<int, array{id: string, name: string, group: string}> Kalendereinträge aller Kalenderklassen.
+     */
     public static function list(): array
     {
         $calendars = [];
@@ -57,7 +73,16 @@ class LocalEventCalendarFactory
         return $calendars;
     }
 
-    public static function get($key): AbstractLocalEventCalendar
+    /**
+     * Erzeugt den lokalen Veranstaltungskalender zu einem Kalenderschlüssel.
+     *
+     * Bei einem Schlüssel ohne Doppelpunkt oder einer unbekannten Kalenderklasse
+     * wird ein 404-Fehler ausgelöst.
+     *
+     * @param  string  $key  Kalenderschlüssel in der Form „typ:kennung“.
+     * @return AbstractLocalEventCalendar Kalender zum angegebenen Schlüssel.
+     */
+    public static function get(string $key): AbstractLocalEventCalendar
     {
         if (! Str::contains($key, ':')) {
             abort(404);
@@ -68,6 +93,9 @@ class LocalEventCalendarFactory
             abort(404);
         }
 
-        return new $class($parts[1]);
+        /** @var AbstractLocalEventCalendar $calendar */
+        $calendar = new $class($parts[1]);
+
+        return $calendar;
     }
 }

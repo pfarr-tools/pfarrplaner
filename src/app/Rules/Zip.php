@@ -20,7 +20,7 @@ class Zip implements ValidationRule
 {
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        if (! preg_match('/^([0]{1}[1-9]{1}|[1-9]{1}[0-9]{1})[0-9]{3}$/i', $value)) {
+        if (! is_string($value) || ! preg_match('/^([0]{1}[1-9]{1}|[1-9]{1}[0-9]{1})[0-9]{3}$/i', $value)) {
             $fail('validation.zip')->translate();
         }
     }

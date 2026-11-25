@@ -40,9 +40,9 @@ use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 use Inertia\Inertia;
+use Inertia\Response;
 
 /**
  * Class KonfiAppQRReport
@@ -76,7 +76,7 @@ class KonfiAppQRReport extends AbstractPDFDocumentReport
     public function isActive(): bool
     {
         $isActive = false;
-        foreach (Auth::user()->cities as $city) {
+        foreach ($this->authenticatedUser()->cities as $city) {
             $isActive = $isActive || ($city->konfiapp_apikey != '');
         }
 
@@ -84,11 +84,11 @@ class KonfiAppQRReport extends AbstractPDFDocumentReport
     }
 
     /**
-     * @return Application|Factory|View
+     * @return Application|Factory|View|Response
      */
     public function setup()
     {
-        $cities = Auth::user()->writableCities->reject(function ($item) {
+        $cities = $this->authenticatedUser()->writableCities->reject(function ($item) {
             return $item->konfiapp_apikey == '';
         });
 
@@ -102,6 +102,7 @@ class KonfiAppQRReport extends AbstractPDFDocumentReport
      */
     public function render(Request $request)
     {
+        /** @var array{city: int, start: string, end: string, copies: int} $data */
         $data = $request->validate(
             [
                 'city' => 'required|int|exists:cities,id',
@@ -113,29 +114,34 @@ class KonfiAppQRReport extends AbstractPDFDocumentReport
 
         $allServices = Service::where('city_id', $data['city'])
             ->where('konfiapp_event_qr', '!=', '')
-            ->between(Carbon::createFromFormat('Y-m-d', $data['start']),
-                Carbon::createFromFormat('Y-m-d', $data['end'])
+            ->between(Carbon::parse($data['start']),
+                Carbon::parse($data['end'])
             )->ordered()->get();
 
         // group by location
         $services = [];
+        $service = null;
         foreach ($allServices as $service) {
             $services[$service->locationText()][] = $service;
         }
         ksort($services);
 
-        if (count($services) == '0') {
+        if (count($services) === 0) {
+            return redirect()->route('reports.setup', 'konfiAppQR');
+        }
+        $lastService = $allServices->last();
+        if (! $lastService instanceof Service) {
             return redirect()->route('reports.setup', 'konfiAppQR');
         }
 
-        $types = KonfiAppIntegration::get(City::find($data['city']))->listEventTypes();
+        $types = KonfiAppIntegration::get(City::findOrFail((int) $data['city']))->listEventTypes();
 
         return $this->sendToFile(
             FileNameService::make(
-                static::FILE_TITLE,
+                self::FILE_TITLE,
                 'pdf',
                 static::FILE_SIGNATURE,
-                $service->date),
+                $lastService->trueDate()),
             [
                 'services' => $services,
                 'types' => $types,
@@ -152,13 +158,19 @@ class KonfiAppQRReport extends AbstractPDFDocumentReport
      */
     public function single(Request $request)
     {
-        $service = Service::findOrFail($request->get('service'));
+        $serviceId = $request->get('service');
+        abort_unless(is_int($serviceId) || is_string($serviceId), 404);
+        $service = Service::findOrFail((int) $serviceId);
         $services[$service->locationText()][] = $service;
-        $types = KonfiAppIntegration::get($service->city)->listEventTypes();
+        $city = $service->city;
+        if ($city === null) {
+            abort(404);
+        }
+        $types = KonfiAppIntegration::get($city)->listEventTypes();
         $copies = $request->get('copies', 1);
 
         return $this->sendToFile(
-            $service->date->format('Ymd').' QR-Code.pdf',
+            $service->trueDate()->format('Ymd').' QR-Code.pdf',
             [
                 'services' => $services,
                 'types' => $types,

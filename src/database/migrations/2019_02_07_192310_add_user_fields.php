@@ -55,7 +55,7 @@ class AddUserFields extends Migration
         );
         Schema::table(
             'users',
-            function ($table) {
+            function (Blueprint $table) {
                 $table->integer('isAdmin')->nullable()->default(0);
                 $table->integer('canEditGeneral')->nullable()->default(0);
                 $table->integer('canEditChurch')->nullable()->default(0);
@@ -74,7 +74,7 @@ class AddUserFields extends Migration
         Schema::dropIfExists('city_user');
         Schema::table(
             'users',
-            function ($table) {
+            function (Blueprint $table) {
                 $table->dropColumn(['isAdmin', 'canEditGeneral', 'canEditChurch', 'canEditFields']);
             }
         );

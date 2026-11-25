@@ -54,6 +54,7 @@ class UpdateTag extends AbstractUpdateAction implements UpdatesTags
     /**
      * Update a tag
      *
+     * @param  array<string, mixed>  $input
      * @return Tag
      *
      * @throws AuthorizationException
@@ -62,6 +63,7 @@ class UpdateTag extends AbstractUpdateAction implements UpdatesTags
     public function update(User $user, Tag $tag, array $input)
     {
         Gate::forUser($user)->authorize('update', $tag);
+        /** @var array{name: string, ...} $input */
         $input = Validator::make($input, Tag::$validationRules)->validateWithBag('updateTag');
         if (empty($input['code'] ?? '')) {
             $input['code'] = Str::slug($input['name']);

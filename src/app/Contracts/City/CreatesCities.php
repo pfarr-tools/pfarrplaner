@@ -34,6 +34,6 @@ use App\Models\People\User;
 use App\Models\Places\City;
 
 /**
- * @method City create(User $user, array $input)
+ * @method City create(User $user, array<string, mixed> $input)
  */
 interface CreatesCities {}
