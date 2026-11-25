@@ -1,11 +1,14 @@
 <template>
     <div class="predicant-services-tab">
-        <div class="d-flex justify-content-between align-items-center mb-3">
+        <div
+            class="predicant-services-tab__header d-flex justify-content-between align-items-center mb-3"
+        >
             <h2>{{ title }}</h2>
             <form-selectize
                 label="Gemeinden"
                 :options="cities"
                 :multiple="true"
+                class="predicant-services-tab__city-filter"
                 v-model="selectedCities"
                 @update:model-value="updateCities"
             />
@@ -94,3 +97,15 @@ export default {
     },
 }
 </script>
+
+<style scoped>
+.predicant-services-tab__header {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.predicant-services-tab__city-filter {
+    flex: 0 1 24rem;
+    max-width: 100%;
+}
+</style>
