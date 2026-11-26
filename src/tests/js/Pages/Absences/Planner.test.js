@@ -115,4 +115,47 @@ describe('Absences Planner timezone handling', () => {
 
         expect(ctx.toggleableUsers.map(user => user.id)).toEqual([1])
     })
+
+    it('groups visible pastors by groupable pools and keeps ungrouped pastors visible', () => {
+        const groupablePool = { id: 10, name: 'Nord', groupable: true }
+        const regularPool = { id: 20, name: 'Sonstige', groupable: false }
+        const pastors = [
+            {
+                id: 1,
+                isPastor: true,
+                show_absences_with_services: true,
+                pools: [groupablePool],
+                sortName: 'A',
+            },
+            {
+                id: 2,
+                isPastor: true,
+                show_absences_with_services: true,
+                pools: [regularPool],
+                sortName: 'B',
+            },
+        ]
+        const ctx = {
+            isPastor: true,
+            pinnedPastors: null,
+            pinnedUsers: [],
+            sections: [],
+            toggleableUsers: [],
+            openSections: {},
+            $page: {
+                props: {
+                    currentUser: { data: { id: 99, isPastor: true } },
+                    labels: { pastor: 'Pfarrer' },
+                },
+            },
+            pastorPluralLabel: () => 'Pfarrer:innen',
+        }
+
+        const sorted = Planner.methods.sortUsers.call(ctx, pastors)
+
+        expect(ctx.sections).toEqual(['Nord', 'Pfarrer:innen', 'Mitarbeitende'])
+        expect(sorted.Nord.map((user) => user.id)).toEqual([1])
+        expect(sorted['Pfarrer:innen'].map((user) => user.id)).toEqual([2])
+        expect(ctx.openSections.Nord).toBe(true)
+    })
 })
