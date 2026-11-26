@@ -43,8 +43,7 @@ class AmazonService
      */
     public static function getInfoForISBN(string $isbn): ?SimpleXMLElement
     {
-        /** @var string $ItemId */
-        $ItemId = $_GET['isbn'];
+        $ItemId = $isbn;
         $ResponseGroup = 'Offers';
         $Timestamp = gmdate("Y-m-d\TH:i:s\Z");
         $amazonId = config('amazon.id');

@@ -40,7 +40,7 @@ Entwicklung:
   ./planer dev composer <Befehl>
   ./planer dev npm <Befehl>
   ./planer dev pint <Optionen>
-  ./planer dev format|format:check|analyse|docs:check|lint|quality
+  ./planer dev format|format:check|analyse|taint:check|docs:check|lint|quality
   ./planer dev fresh --force
   ./planer dev manual build|dusk|site|all|deploy|source-publish
   ./planer dev manual:build|manual:dusk|manual:site|manual:all|manual:deploy|manual:source-publish
@@ -139,6 +139,7 @@ EOF
       compose run --rm vite npm run format:blade:check
       ;;
     analyse) compose exec --user www-data app composer analyse ;;
+    taint:check) compose exec --user www-data app composer taint:check ;;
     docs:check)
       compose exec --user www-data app composer docs:check
       compose run --rm vite npm run docs:check
@@ -160,6 +161,7 @@ EOF
       js_quality_files="$(quality_js_files "$format_quality_files")"
       QUALITY_FILES="$format_quality_files" run_dev format:check
       run_dev analyse
+      run_dev taint:check
       QUALITY_FILES="$js_quality_files" run_dev docs:check
       QUALITY_FILES="$js_quality_files" run_dev lint
       run_dev complexity:check
@@ -222,7 +224,7 @@ run_production() {
       ;;
     install|bootstrap) exec "$ROOT/scripts/bootstrap.sh" "$@" ;;
     help|--help|-h) usage ;;
-  test|composer|npm|pint|format|format:check|analyse|docs:check|lint|quality|complexity:check|fresh)
+  test|composer|npm|pint|format|format:check|analyse|taint:check|docs:check|lint|quality|complexity:check|fresh)
       echo "Fehler: '$command' ist ein Entwicklungsbefehl. Verwende ./planer dev $command ..." >&2
       exit 2
       ;;
