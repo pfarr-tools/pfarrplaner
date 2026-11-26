@@ -43,6 +43,12 @@
             v-model="myPool.name"
             autofocus
         />
+        <form-check
+            class="mt-2"
+            name="groupable"
+            label="Gruppierbar im Urlaubsplaner"
+            v-model="myPool.groupable"
+        />
         <form-selectize
             label="Zugehörige Kirchengemeinden"
             v-model="myPool.cities"
@@ -81,12 +87,13 @@
 
 <script>
 import FormInput from '../../../components/Ui/forms/FormInput.vue'
+import FormCheck from '../../../components/Ui/forms/FormCheck.vue'
 import FormSelectize from '../../../components/Ui/forms/FormSelectize.vue'
 import PeopleSelect from '../../../components/Ui/elements/PeopleSelect.vue'
 
 export default {
     name: 'Editor',
-    components: { PeopleSelect, FormSelectize, FormInput },
+    components: { PeopleSelect, FormSelectize, FormInput, FormCheck },
     props: ['pool', 'cities', 'people'],
     data() {
         return {
@@ -99,6 +106,7 @@ export default {
                 : {
                       id: null,
                       name: '',
+                      groupable: false,
                       contact: '',
                       office: '',
                       phone: '',

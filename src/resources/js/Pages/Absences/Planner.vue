@@ -833,6 +833,12 @@ export default {
             if (undefined === this.userDays[user.id]) return this.calendarDays.length
             return this.userDays[user.id][day.day].duration || 1
         },
+        /**
+         * Sort visible users into the planner sections, including configured pool groups.
+         *
+         * @param {Object[]} users Users returned by the planner endpoint.
+         * @returns {Object<string, Object[]>} Users grouped by section label.
+         */
         sortUsers(users) {
             let sortedUsers = {}
             let usedIds = []
@@ -851,8 +857,27 @@ export default {
             })
 
             if (this.$page.props.currentUser.data.isPastor) {
-                sortedUsers[this.pastorPluralLabel()] = []
-                this.sections.push(this.pastorPluralLabel())
+                const groupablePools = users
+                    .filter((user) => user.isPastor)
+                    .flatMap((user) => user.pools || [])
+                    .filter((pool) => pool.groupable)
+                    .reduce((pools, pool) => {
+                        if (!pools.some((existingPool) => existingPool.id === pool.id)) {
+                            pools.push(pool)
+                        }
+                        return pools
+                    }, [])
+                    .sort((a, b) => (a.name < b.name ? -1 : 1))
+
+                groupablePools.forEach((pool) => {
+                    sortedUsers[pool.name] = []
+                    this.sections.push(pool.name)
+                    this.openSections[pool.name] = this.openSections[pool.name] ?? true
+                })
+
+                const pastorSection = this.pastorPluralLabel()
+                sortedUsers[pastorSection] = []
+                this.sections.push(pastorSection)
                 users.forEach((user) => {
                     if (usedIds.includes(user.id)) return
                     if (user.isPastor) {
@@ -862,7 +887,14 @@ export default {
                             this.pinnedPastors.includes(user.id)
                         allToggleableUsers.push(user)
                         if (user.pinned) {
-                            sortedUsers[this.pastorPluralLabel()].push(user)
+                            const userPools = groupablePools.filter((pool) =>
+                                (user.pools || []).some((userPool) => userPool.id === pool.id),
+                            )
+                            if (userPools.length) {
+                                userPools.forEach((pool) => sortedUsers[pool.name].push(user))
+                            } else {
+                                sortedUsers[pastorSection].push(user)
+                            }
                             usedIds.push(user.id)
                         }
                     }
