@@ -43,7 +43,9 @@ class Pool extends AbstractModel
     /** @use HasFactory<PoolFactory> */
     use HasFactory;
 
-    protected $fillable = ['id', 'name', 'slug', 'contact', 'office', 'phone', 'email'];
+    protected $fillable = ['id', 'name', 'groupable', 'slug', 'contact', 'office', 'phone', 'email'];
+
+    protected $casts = ['groupable' => 'boolean'];
 
     protected static string $prefix = 'pool';
 
@@ -53,6 +55,7 @@ class Pool extends AbstractModel
 
     public static array $validationRules = [
         'name' => 'required|max:255',
+        'groupable' => 'nullable|boolean',
         'contact' => 'nullable|string',
         'office' => 'nullable|string',
         'phone' => 'nullable|string',

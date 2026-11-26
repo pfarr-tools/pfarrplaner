@@ -266,6 +266,7 @@ Im Pool-Editor stehen:
 
 - **Speichern**: Übernimmt die Änderungen.
 - **Bezeichnung des Pools**: Verständlicher Name des Pools.
+- **Gruppierbar im Urlaubsplaner**: Zeigt die zugehörigen Pfarrpersonen dort in einem eigenen Bereich mit dem Poolnamen.
 - **Zugehörige Kirchengemeinden**: Gemeinden, für die der Pool gilt.
 - **Zugehörige Personen**: Personen im Pool.
 - **Ansprechperson**: Feste Kontaktperson, falls der Pool über eine zentrale Stelle laufen soll.

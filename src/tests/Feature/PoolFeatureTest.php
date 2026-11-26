@@ -29,4 +29,11 @@ class PoolFeatureTest extends AbstractModelFeatureTest
         parent::setUp();
         $this->testUser->assignRole(RoleService::ROLE_SUPER_ADMIN);
     }
+
+    public function test_groupable_flag_is_persisted(): void
+    {
+        $pool = Pool::factory()->create(['groupable' => true]);
+
+        $this->assertTrue($pool->fresh()->groupable);
+    }
 }

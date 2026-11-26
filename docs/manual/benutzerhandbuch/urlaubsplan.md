@@ -73,7 +73,8 @@ Die Monatsübersicht bleibt auch bei langen Listen gut lesbar:
 Die Benutzer:innen sind in Bereiche gegliedert:
 
 - **Eigenes Konto**: Ihr eigener Eintrag.
-- **Pfarrer:innen**: Pfarrpersonen, falls Ihre Installation diese Bezeichnung verwendet und Sie diese Personen sehen dürfen.
+- **Pfarrer:innen**: Pfarrpersonen ohne gruppierbaren Pool, falls Ihre Installation diese Bezeichnung verwendet und Sie diese Personen sehen dürfen.
+- **Gruppen mit Poolnamen**: Pfarrpersonen aus Pools, die in der Administration als **Gruppierbar im Urlaubsplaner** markiert wurden.
 - **Mitarbeitende**: Weitere Personen, deren Abwesenheiten sichtbar sind.
 
 Klicken Sie auf die Überschrift eines Bereichs, um ihn ein- oder auszuklappen. Pfarrplaner merkt sich diese Einstellung für Ihr Konto.
@@ -359,6 +360,7 @@ Oben steht:
 Felder im Pool-Editor:
 
 - **Bezeichnung des Pools**: Name des Pools, zum Beispiel **Distrikt Nord** oder **Bestattungsvertretung Bezirk**.
+- **Gruppierbar im Urlaubsplaner**: Zeigt die zugehörigen Pfarrpersonen im Urlaubsplan in einem eigenen, nach dem Pool benannten Bereich.
 - **Zugehörige Kirchengemeinden**: Gemeinden, für die dieser Pool gilt.
 - **Zugehörige Personen**: Personen, die zum Pool gehören.
 - **Ansprechperson**: Feste Kontaktperson, wenn der Pool nicht über einzelne Benutzer:innen aufgelöst werden soll.
