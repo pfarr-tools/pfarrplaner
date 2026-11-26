@@ -159,24 +159,27 @@ class UserRequest extends FormRequest
         $superAdminRole = Role::where('name', RoleService::ROLE_SUPER_ADMIN)->firstOrFail()->id;
         $adminRole = Role::where('name', RoleService::ROLE_ADMIN)->firstOrFail()->id;
         $extranetApiRole = Role::where('name', RoleService::ROLE_EXTRANET_API_MANAGER)->first()?->id;
-        $actor = $this->user();
-        $actorCanGrantExtranetRole = $actor instanceof User
-            && $actor->can(RoleService::PERMISSION_CREATE_CHURCH_API_TOKENS);
 
         $roles = collect($this->getRelationIdsForSync('roles'));
         if (! count($roles)) {
             return [];
         }
 
-        if (! $actor instanceof User || ! $this->user) {
-            if ($extranetApiRole !== null && ! $actorCanGrantExtranetRole) {
+        $actor = $this->user();
+        if (! $actor instanceof User) {
+            if ($extranetApiRole !== null) {
                 $roles = $roles->reject(function ($item) use ($extranetApiRole) {
                     return $item == $extranetApiRole;
                 });
             }
 
-            return $roles->toArray();
+            return $roles->all();
         }
+
+        $actorCanGrantExtranetRole = $actor->can(RoleService::PERMISSION_CREATE_CHURCH_API_TOKENS);
+        $target = $this->user;
+        $targetHasExtranetRole = $target instanceof User
+            && $target->hasRole(RoleService::ROLE_EXTRANET_API_MANAGER);
 
         if (! $actor->hasRole(RoleService::ROLE_SUPER_ADMIN)) {
             $roles = $roles->reject(function ($item) use ($superAdminRole) {
@@ -191,7 +194,7 @@ class UserRequest extends FormRequest
         }
         if ($extranetApiRole !== null
             && ! $actorCanGrantExtranetRole
-            && ! $this->user->hasRole(RoleService::ROLE_EXTRANET_API_MANAGER)) {
+            && ! $targetHasExtranetRole) {
             $roles = $roles->reject(function ($item) use ($extranetApiRole) {
                 return $item == $extranetApiRole;
             });

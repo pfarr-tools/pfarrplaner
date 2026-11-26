@@ -28,9 +28,9 @@
 
 <template>
     <admin-layout title="Tokens verwalten">
-        <card>
-            <card-header>API-Tokens verwalten</card-header>
-            <card-body>
+        <Card>
+            <CardHeader>API-Tokens verwalten</CardHeader>
+            <CardBody>
                 <table
                     v-if="tokens && tokens.length"
                     class="table table-striped"
@@ -91,11 +91,11 @@
                 </div>
                 <hr />
                 <h3>Neues Token hinzufügen</h3>
-                <form-input
+                <FormInput
                     v-model="newTokenTitle"
                     label="Bezeichnung"
                     name="newTokenTitle"
-                ></form-input>
+                />
                 <div
                     v-if="canCreateChurchTokens && churchTokenCities.length > 0"
                     class="mb-3"
@@ -134,8 +134,8 @@
                 >
                     Neues Token anlegen
                 </button>
-            </card-body>
-        </card>
+            </CardBody>
+        </Card>
     </admin-layout>
 </template>
 
@@ -209,7 +209,7 @@ export default {
          * @returns {void}
          */
         addToken() {
-            this.$inertia.post(route('tokens.create'), {
+            this.$inertia.post(window.route('tokens.create'), {
                 title: this.newTokenTitle,
                 city_id: this.selectedCityId ? Number(this.selectedCityId) : null,
             })
@@ -221,8 +221,8 @@ export default {
          * @returns {void}
          */
         deleteToken(item) {
-            if (!confirm('Willst du diesen Zugangsschlüssel wirklich löschen?')) return
-            this.$inertia.delete(route('tokens.destroy', { token: item.id }))
+            if (!window.confirm('Willst du diesen Zugangsschlüssel wirklich löschen?')) return
+            this.$inertia.delete(window.route('tokens.destroy', { token: item.id }))
         },
     },
 }

@@ -44,7 +44,7 @@ class EnforceExtranetTokenScope
             return $next($request);
         }
 
-        $routeName = (string) ($request->route()?->getName() ?? '');
+        $routeName = $request->route()?->getName() ?? '';
         if (! str_starts_with($routeName, 'extranet.services.manage.')) {
             return response()->json(
                 ['message' => 'Dieser API-Schlüssel ist auf die Extranet-Veranstaltungs-API beschränkt.'],

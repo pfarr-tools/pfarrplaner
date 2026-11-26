@@ -132,7 +132,7 @@ abstract class AbstractExtranetServiceWriteRequest extends FormRequest
 
         foreach (['hidden', 'needs_reservations', 'registration_active', 'is_allday'] as $intFlag) {
             if (array_key_exists($intFlag, $attributes) && $attributes[$intFlag] !== null) {
-                $attributes[$intFlag] = $attributes[$intFlag] ? 1 : 0;
+                $attributes[$intFlag] = filter_var($attributes[$intFlag], FILTER_VALIDATE_BOOLEAN) ? 1 : 0;
             }
         }
 

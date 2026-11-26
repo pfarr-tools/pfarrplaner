@@ -41,8 +41,9 @@ class UpdateExtranetServiceRequest extends AbstractExtranetServiceWriteRequest
         }
 
         $newCityId = $this->input('city_id');
-        if ($newCityId !== null && $newCityId !== '' && is_numeric($newCityId)
-            && (int) $newCityId !== (int) $service->city_id) {
+        $serviceCityId = $service->city_id !== null ? (int) $service->city_id : null;
+        if ((is_int($newCityId) || (is_string($newCityId) && is_numeric($newCityId)))
+            && (int) $newCityId !== $serviceCityId) {
             return ExtranetTokenScope::canCreateInCity($user, $token, (int) $newCityId);
         }
 
@@ -56,12 +57,11 @@ class UpdateExtranetServiceRequest extends AbstractExtranetServiceWriteRequest
      */
     public function rules(): array
     {
-        /** @var Service|null $service */
         $service = $this->route('service');
         $cityInput = $this->input('city_id');
-        $targetCityId = is_numeric($cityInput)
+        $targetCityId = is_int($cityInput) || (is_string($cityInput) && is_numeric($cityInput))
             ? (int) $cityInput
-            : ($service?->city_id !== null ? (int) $service->city_id : null);
+            : ($service instanceof Service && $service->city_id !== null ? (int) $service->city_id : null);
 
         return array_merge(
             [
@@ -84,13 +84,22 @@ class UpdateExtranetServiceRequest extends AbstractExtranetServiceWriteRequest
                 return;
             }
 
-            /** @var Service $service */
             $service = $this->route('service');
-            $effectiveStart = $this->filled('date')
-                ? $this->parseToUtc((string) $this->input('date'), '00:00:00')
-                : $service->date->copy()->setTimezone('UTC');
-            $end = $this->parseToUtc((string) $this->input('end'), '23:59:59');
+            $rawEnd = $this->input('end');
+            if (! $service instanceof Service || ! is_string($rawEnd)) {
+                return;
+            }
 
+            $rawDate = $this->input('date');
+            if ($this->filled('date') && is_string($rawDate)) {
+                $effectiveStart = $this->parseToUtc($rawDate, '00:00:00');
+            } elseif ($service->date !== null) {
+                $effectiveStart = $service->date->copy()->setTimezone('UTC');
+            } else {
+                return;
+            }
+
+            $end = $this->parseToUtc($rawEnd, '23:59:59');
             if ($end->lt($effectiveStart)) {
                 $validator->errors()->add('end', 'Das Enddatum darf nicht vor dem Startdatum liegen.');
             }
@@ -108,10 +117,14 @@ class UpdateExtranetServiceRequest extends AbstractExtranetServiceWriteRequest
         /** @var array<string, mixed> $validated */
         $validated = $this->validated();
         $attributes = $this->normalizeOptionalAttributes($validated);
-        $durationMinutes = max(1, (int) ($service->duration ?: 60));
+        $rawDuration = $service->duration;
+        $durationMinutes = is_int($rawDuration) && $rawDuration > 0 ? $rawDuration : 60;
+        $existingDate = $service->date;
 
         if (isset($validated['date']) && is_string($validated['date'])) {
-            $existingBerlinTime = $service->date->copy()->setTimezone('Europe/Berlin')->format('H:i:s');
+            $existingBerlinTime = $existingDate !== null
+                ? $existingDate->copy()->setTimezone('Europe/Berlin')->format('H:i:s')
+                : '10:00:00';
             $fallbackTime = isset($validated['time']) && is_string($validated['time']) && $validated['time'] !== ''
                 ? $validated['time'].':00'
                 : $existingBerlinTime;
@@ -122,8 +135,11 @@ class UpdateExtranetServiceRequest extends AbstractExtranetServiceWriteRequest
             if (! array_key_exists('end', $validated)) {
                 $attributes['end'] = $utcDate->copy()->addMinutes($durationMinutes);
             }
-        } elseif (isset($validated['time']) && is_string($validated['time']) && $validated['time'] !== '') {
-            $berlinDate = $service->date->copy()->setTimezone('Europe/Berlin')->format('Y-m-d');
+        } elseif ($existingDate !== null
+            && isset($validated['time'])
+            && is_string($validated['time'])
+            && $validated['time'] !== '') {
+            $berlinDate = $existingDate->copy()->setTimezone('Europe/Berlin')->format('Y-m-d');
             $utcDate = $this->parseToUtc($berlinDate, $validated['time'].':00');
             $attributes['date'] = $utcDate;
             $attributes['time'] = $validated['time'].':00';

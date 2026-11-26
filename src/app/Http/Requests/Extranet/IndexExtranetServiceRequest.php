@@ -40,7 +40,7 @@ class IndexExtranetServiceRequest extends FormRequest
         }
 
         $requestedCityId = $this->input('city_id');
-        if ($requestedCityId !== null && $requestedCityId !== '' && is_numeric($requestedCityId)) {
+        if (is_int($requestedCityId) || (is_string($requestedCityId) && is_numeric($requestedCityId))) {
             return $visibleCityIds->contains((int) $requestedCityId);
         }
 

@@ -32,7 +32,10 @@ class StoreExtranetServiceRequest extends AbstractExtranetServiceWriteRequest
             return;
         }
 
-        $tokenCityIds = ExtranetTokenScope::allowedCityIds($this->user()?->currentAccessToken());
+        $user = $this->user();
+        $tokenCityIds = ExtranetTokenScope::allowedCityIds(
+            $user instanceof User ? $user->currentAccessToken() : null
+        );
         if ($tokenCityIds !== null && count($tokenCityIds) === 1) {
             $this->merge(['city_id' => $tokenCityIds[0]]);
         }
@@ -55,7 +58,7 @@ class StoreExtranetServiceRequest extends AbstractExtranetServiceWriteRequest
             return ExtranetTokenScope::effectiveWritableCityIds($user, $user->currentAccessToken())->isNotEmpty();
         }
 
-        if (! is_numeric($cityId)) {
+        if (! is_int($cityId) && ! (is_string($cityId) && is_numeric($cityId))) {
             return true;
         }
 
@@ -70,7 +73,9 @@ class StoreExtranetServiceRequest extends AbstractExtranetServiceWriteRequest
     public function rules(): array
     {
         $cityInput = $this->input('city_id');
-        $targetCityId = is_numeric($cityInput) ? (int) $cityInput : null;
+        $targetCityId = is_int($cityInput) || (is_string($cityInput) && is_numeric($cityInput))
+            ? (int) $cityInput
+            : null;
 
         return array_merge(
             [
@@ -93,8 +98,14 @@ class StoreExtranetServiceRequest extends AbstractExtranetServiceWriteRequest
                 return;
             }
 
-            $start = $this->parseToUtc((string) $this->input('date'), '00:00:00');
-            $end = $this->parseToUtc((string) $this->input('end'), '23:59:59');
+            $rawDate = $this->input('date');
+            $rawEnd = $this->input('end');
+            if (! is_string($rawDate) || ! is_string($rawEnd)) {
+                return;
+            }
+
+            $start = $this->parseToUtc($rawDate, '00:00:00');
+            $end = $this->parseToUtc($rawEnd, '23:59:59');
             if ($end->lt($start)) {
                 $validator->errors()->add('end', 'Das Enddatum darf nicht vor dem Startdatum liegen.');
             }
@@ -110,32 +121,46 @@ class StoreExtranetServiceRequest extends AbstractExtranetServiceWriteRequest
     {
         /** @var array<string, mixed> $validated */
         $validated = $this->validated();
-        $cityId = (int) $validated['city_id'];
-        /** @var City $city */
+        $rawCityId = $validated['city_id'] ?? null;
+        $cityId = is_int($rawCityId) || (is_string($rawCityId) && is_numeric($rawCityId))
+            ? (int) $rawCityId
+            : 0;
         $city = City::query()->findOrFail($cityId);
 
         $hasSpecialLocation = ! empty($validated['special_location']);
         $location = null;
         if (! $hasSpecialLocation) {
-            $location = isset($validated['location_id'])
-                ? Location::query()->find((int) $validated['location_id'])
-                : $city->locations()->first();
+            $rawLocationId = $validated['location_id'] ?? null;
+            if (is_int($rawLocationId) || (is_string($rawLocationId) && is_numeric($rawLocationId))) {
+                $location = Location::query()->find((int) $rawLocationId);
+            } else {
+                $location = $city->locations()->first();
+            }
         }
 
-        $isAllDay = ! empty($validated['is_allday']);
-        $fallbackTime = isset($validated['time']) && is_string($validated['time']) && $validated['time'] !== ''
-            ? $validated['time'].':00'
-            : ($isAllDay ? '00:00:00' : ($location?->default_time ?: '10:00:00'));
+        $isAllDay = filter_var($validated['is_allday'] ?? false, FILTER_VALIDATE_BOOLEAN);
+        $rawTime = $validated['time'] ?? null;
+        $timeInput = is_string($rawTime) && $rawTime !== '' ? $rawTime : null;
+        $defaultLocationTime = $location instanceof Location
+            && is_string($location->default_time)
+            && $location->default_time !== ''
+            ? $location->default_time
+            : '10:00:00';
+        $fallbackTime = $timeInput !== null
+            ? $timeInput.':00'
+            : ($isAllDay ? '00:00:00' : $defaultLocationTime);
 
-        $utcDate = $this->parseToUtc((string) $validated['date'], $fallbackTime);
-        if (isset($validated['time']) && is_string($validated['time']) && $validated['time'] !== ''
-            && preg_match('/^\d{4}-\d{2}-\d{2}$/', trim((string) $validated['date'])) !== 1) {
+        $rawDate = $validated['date'] ?? '';
+        $dateInput = is_string($rawDate) ? $rawDate : '';
+        $utcDate = $this->parseToUtc($dateInput, $fallbackTime);
+        if ($timeInput !== null && preg_match('/^\d{4}-\d{2}-\d{2}$/', trim($dateInput)) !== 1) {
             $berlinDate = $utcDate->copy()->setTimezone('Europe/Berlin')->format('Y-m-d');
-            $utcDate = $this->parseToUtc($berlinDate, $validated['time'].':00');
+            $utcDate = $this->parseToUtc($berlinDate, $timeInput.':00');
         }
 
-        $utcEnd = ! empty($validated['end']) && is_string($validated['end'])
-            ? $this->parseToUtc($validated['end'], '23:59:59')
+        $rawEnd = $validated['end'] ?? null;
+        $utcEnd = is_string($rawEnd) && $rawEnd !== ''
+            ? $this->parseToUtc($rawEnd, '23:59:59')
             : $utcDate->copy()->addHour();
 
         $attributes = $this->normalizeOptionalAttributes($validated);
@@ -143,7 +168,7 @@ class StoreExtranetServiceRequest extends AbstractExtranetServiceWriteRequest
         $attributes['event_class'] = isset($validated['event_class']) && is_string($validated['event_class'])
             ? $validated['event_class']
             : 'service';
-        $attributes['location_id'] = $hasSpecialLocation ? null : $location?->id;
+        $attributes['location_id'] = $hasSpecialLocation ? null : ($location instanceof Location ? $location->id : null);
         $attributes['date'] = $utcDate;
         $attributes['end'] = $utcEnd;
         $attributes['time'] = $utcDate->copy()->setTimezone('Europe/Berlin')->format('H:i:s');

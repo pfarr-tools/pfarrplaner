@@ -43,7 +43,7 @@ class StorePersonalTokenRequest extends FormRequest
             return false;
         }
 
-        if (! is_numeric($cityId)) {
+        if (! is_int($cityId) && ! (is_string($cityId) && is_numeric($cityId))) {
             return true;
         }
 

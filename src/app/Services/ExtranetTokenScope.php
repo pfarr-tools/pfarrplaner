@@ -93,11 +93,10 @@ class ExtranetTokenScope
      */
     public static function allowedCityIds(?object $token): ?array
     {
-        if (! self::isScopedExtranetToken($token)) {
+        if (! $token instanceof PersonalAccessToken || ! self::isScopedExtranetToken($token)) {
             return null;
         }
 
-        /** @var PersonalAccessToken $token */
         $abilities = $token->abilities ?? [];
         if (! in_array(self::ABILITY_SERVICES, $abilities, true)) {
             return [];
@@ -127,16 +126,10 @@ class ExtranetTokenScope
     public static function directlyWritableCityIds(User $user): Collection
     {
         if ($user->hasRole(RoleService::ROLE_SUPER_ADMIN)) {
-            return City::query()
-                ->pluck('id')
-                ->map(static fn (mixed $id): int => (int) $id)
-                ->values();
+            return self::toIntIdCollection(City::query()->pluck('id'));
         }
 
-        return $user->writableCities()
-            ->pluck('cities.id')
-            ->map(static fn (mixed $id): int => (int) $id)
-            ->values();
+        return self::toIntIdCollection($user->writableCities()->pluck('cities.id'));
     }
 
     /**
@@ -152,22 +145,22 @@ class ExtranetTokenScope
         if ($tokenCityIds !== null) {
             $directIds = self::directlyWritableCityIds($user);
 
-            return $directIds
-                ->filter(static fn (int $id): bool => in_array($id, $tokenCityIds, true))
-                ->values();
+            /** @var array<int, int> $filtered */
+            $filtered = [];
+            foreach ($directIds as $id) {
+                if (in_array($id, $tokenCityIds, true)) {
+                    $filtered[] = $id;
+                }
+            }
+
+            return new Collection($filtered);
         }
 
         if ($user->hasRole(RoleService::ROLE_SUPER_ADMIN)) {
-            return City::query()
-                ->pluck('id')
-                ->map(static fn (mixed $id): int => (int) $id)
-                ->values();
+            return self::toIntIdCollection(City::query()->pluck('id'));
         }
 
-        return $user->writableCities
-            ->pluck('id')
-            ->map(static fn (mixed $id): int => (int) $id)
-            ->values();
+        return self::toIntIdCollection($user->writableCities->pluck('id'));
     }
 
     /**
@@ -185,18 +178,15 @@ class ExtranetTokenScope
         }
 
         if ($user->hasRole(RoleService::ROLE_SUPER_ADMIN)) {
-            return City::query()
-                ->pluck('id')
-                ->map(static fn (mixed $id): int => (int) $id)
-                ->values();
+            return self::toIntIdCollection(City::query()->pluck('id'));
         }
 
-        return $user->visibleCities()
-            ->pluck('cities.id')
-            ->merge($user->writableCities->pluck('id'))
-            ->map(static fn (mixed $id): int => (int) $id)
-            ->unique()
-            ->values();
+        return self::toIntIdCollection(
+            $user->visibleCities()
+                ->pluck('cities.id')
+                ->merge($user->writableCities->pluck('id'))
+                ->unique()
+        );
     }
 
     /**
@@ -254,10 +244,10 @@ class ExtranetTokenScope
      * Format a personal access token for the token-management UI with scope metadata.
      *
      * @param  PersonalAccessToken  $token  Persisted Sanctum token.
-     * @param  Collection<int, string>  $cityNamesById  Map of church IDs to display names.
+     * @param  array<int, string>  $cityNamesById  Map of church IDs to display names.
      * @return array<string, mixed> Serializable token metadata for the Inertia view.
      */
-    public static function describeToken(PersonalAccessToken $token, Collection $cityNamesById): array
+    public static function describeToken(PersonalAccessToken $token, array $cityNamesById): array
     {
         $scopeType = 'personal';
         $cityId = null;
@@ -271,7 +261,7 @@ class ExtranetTokenScope
             $scopeType = 'church_extranet';
             $cityIds = self::allowedCityIds($token) ?? [];
             $cityId = $cityIds[0] ?? null;
-            $cityName = $cityId !== null ? $cityNamesById->get($cityId) : null;
+            $cityName = $cityId !== null ? ($cityNamesById[$cityId] ?? null) : null;
             $scopeLabel = $cityName !== null
                 ? 'Kirchengemeinde: '.$cityName
                 : ($cityId !== null ? 'Kirchengemeinde #'.$cityId : 'Extranet-Service-API');
@@ -287,5 +277,24 @@ class ExtranetTokenScope
             'city_name' => $cityName,
             'scope_label' => $scopeLabel,
         ];
+    }
+
+    /**
+     * Normalize raw plucked identifier values into an integer collection.
+     *
+     * @param  iterable<mixed>  $values  Raw identifier values from database pluck queries.
+     * @return Collection<int, int> Normalized list of integer church IDs.
+     */
+    private static function toIntIdCollection(iterable $values): Collection
+    {
+        /** @var array<int, int> $ids */
+        $ids = [];
+        foreach ($values as $value) {
+            if (is_int($value) || (is_string($value) && is_numeric($value))) {
+                $ids[] = (int) $value;
+            }
+        }
+
+        return new Collection($ids);
     }
 }

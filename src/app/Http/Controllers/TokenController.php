@@ -2,7 +2,7 @@
 
 /*
  * Pfarrplaner
-  *
+ *
  * @package Pfarrplaner
  * @author Christoph Fischer <chris@toph.de>
  * @copyright (c) Christoph Fischer, https://christoph-fischer.org
@@ -51,8 +51,6 @@ class TokenController extends Controller
 {
     /**
      * Require an authenticated web session for token management routes.
-    *
-    * @return void
      */
     public function __construct()
     {
@@ -83,10 +81,13 @@ class TokenController extends Controller
     {
         $user = $request->user();
         abort_unless($user instanceof User, 401);
+        /** @var array<string, mixed> $validated */
         $validated = $request->validated();
-        $title = (string) $validated['title'];
-        $cityId = isset($validated['city_id']) && $validated['city_id'] !== ''
-            ? (int) $validated['city_id']
+        $rawTitle = $validated['title'] ?? '';
+        $title = is_string($rawTitle) ? $rawTitle : '';
+        $rawCityId = $validated['city_id'] ?? null;
+        $cityId = is_int($rawCityId) || (is_string($rawCityId) && is_numeric($rawCityId))
+            ? (int) $rawCityId
             : null;
 
         $abilities = $cityId !== null
@@ -126,39 +127,50 @@ class TokenController extends Controller
     {
         $canCreateChurchTokens = $user->can(RoleService::PERMISSION_CREATE_CHURCH_API_TOKENS);
         $writableCityIds = $canCreateChurchTokens
-            ? ExtranetTokenScope::directlyWritableCityIds($user)
-            : collect();
+            ? ExtranetTokenScope::directlyWritableCityIds($user)->all()
+            : [];
 
-        $churchTokenCities = $writableCityIds->isEmpty()
+        $churchTokenCities = $writableCityIds === []
             ? []
             : City::query()
-                ->whereIn('id', $writableCityIds->all())
+                ->whereIn('id', $writableCityIds)
                 ->orderBy('name')
                 ->get(['id', 'name'])
                 ->map(static fn (City $city): array => [
-                    'id' => (int) $city->id,
-                    'name' => (string) $city->name,
+                    'id' => $city->id,
+                    'name' => $city->name,
                 ])
                 ->values()
                 ->all();
 
         $rawTokens = $user->tokens()->orderByDesc('created_at')->get();
-        $referencedCityIds = $rawTokens
-            ->flatMap(static fn (PersonalAccessToken $item): array => ExtranetTokenScope::allowedCityIds($item) ?? [])
-            ->unique()
-            ->values();
+        /** @var list<PersonalAccessToken> $personalTokens */
+        $personalTokens = [];
+        /** @var list<int> $referencedCityIds */
+        $referencedCityIds = [];
+        foreach ($rawTokens as $item) {
+            if (! $item instanceof PersonalAccessToken) {
+                continue;
+            }
+            $personalTokens[] = $item;
+            foreach (ExtranetTokenScope::allowedCityIds($item) ?? [] as $referencedCityId) {
+                $referencedCityIds[] = $referencedCityId;
+            }
+        }
+        $referencedCityIds = array_values(array_unique($referencedCityIds));
 
-        $cityNamesById = $referencedCityIds->isEmpty()
-            ? collect()
-            : City::query()
-                ->whereIn('id', $referencedCityIds->all())
-                ->pluck('name', 'id')
-                ->mapWithKeys(static fn (mixed $name, mixed $id): array => [(int) $id => (string) $name]);
+        /** @var array<int, string> $cityNamesById */
+        $cityNamesById = [];
+        if ($referencedCityIds !== []) {
+            foreach (City::query()->whereIn('id', $referencedCityIds)->get(['id', 'name']) as $city) {
+                $cityNamesById[$city->id] = $city->name;
+            }
+        }
 
-        $tokens = $rawTokens
-            ->map(static fn (PersonalAccessToken $item): array => ExtranetTokenScope::describeToken($item, $cityNamesById))
-            ->values()
-            ->all();
+        $tokens = array_map(
+            static fn (PersonalAccessToken $item): array => ExtranetTokenScope::describeToken($item, $cityNamesById),
+            $personalTokens
+        );
 
         return Inertia::render('tokens', [
             'tokens' => $tokens,

@@ -107,7 +107,6 @@ class ServiceController extends Controller
      */
     public function lastWithSermon(): JsonResponse
     {
-        /** @var User $user */
         $user = Auth::user();
         abort_unless($user instanceof User, 401);
         $query = Service::orderedDesc()
@@ -129,13 +128,15 @@ class ServiceController extends Controller
      */
     public function index(IndexExtranetServiceRequest $request): JsonResponse
     {
-        /** @var User $user */
         $user = $request->user();
+        abort_unless($user instanceof User, Response::HTTP_UNAUTHORIZED);
+        /** @var array<string, mixed> $validated */
         $validated = $request->validated();
         $visibleCityIds = ExtranetTokenScope::effectiveVisibleCityIds($user, $user->currentAccessToken());
 
-        $cityIds = isset($validated['city_id'])
-            ? [(int) $validated['city_id']]
+        $rawCityId = $validated['city_id'] ?? null;
+        $cityIds = is_int($rawCityId) || (is_string($rawCityId) && is_numeric($rawCityId))
+            ? [(int) $rawCityId]
             : $visibleCityIds->all();
 
         $query = Service::includeAllEventTypes()
@@ -143,12 +144,13 @@ class ServiceController extends Controller
             ->whereIn('city_id', $cityIds)
             ->whereDate('date', '!=', '1978-03-05');
 
-        $eventClass = (string) ($validated['event_class'] ?? 'all');
+        $rawEventClass = $validated['event_class'] ?? 'all';
+        $eventClass = is_string($rawEventClass) ? $rawEventClass : 'all';
         if ($eventClass !== 'all') {
             $query->where('event_class', $eventClass);
         }
 
-        if (! ($validated['include_hidden'] ?? false)) {
+        if (! filter_var($validated['include_hidden'] ?? false, FILTER_VALIDATE_BOOLEAN)) {
             $query->notHidden();
         }
 
@@ -164,8 +166,9 @@ class ServiceController extends Controller
 
         $query->orderBy('date');
 
-        if (isset($validated['per_page'])) {
-            return response()->json($query->paginate((int) $validated['per_page']));
+        $rawPerPage = $validated['per_page'] ?? null;
+        if (is_int($rawPerPage) || (is_string($rawPerPage) && is_numeric($rawPerPage))) {
+            return response()->json($query->paginate((int) $rawPerPage));
         }
 
         return response()->json(['services' => $query->get()]);
@@ -180,7 +183,6 @@ class ServiceController extends Controller
      */
     public function show(Request $request, Service $service): JsonResponse
     {
-        /** @var User|null $user */
         $user = $request->user();
         abort_unless($user instanceof User, Response::HTTP_UNAUTHORIZED);
         abort_if($service->isTemplate() || $service->city_id === null, Response::HTTP_NOT_FOUND);
@@ -255,7 +257,6 @@ class ServiceController extends Controller
      */
     public function destroy(Request $request, Service $service): JsonResponse
     {
-        /** @var User|null $user */
         $user = $request->user();
         abort_unless($user instanceof User, Response::HTTP_UNAUTHORIZED);
         abort_unless(
@@ -264,7 +265,7 @@ class ServiceController extends Controller
         );
 
         event(new ServiceBeforeDelete($service));
-        $deletedId = (int) $service->id;
+        $deletedId = $service->id;
         $service->delete();
 
         return response()->json(['deleted' => true, 'id' => $deletedId]);
@@ -279,10 +280,13 @@ class ServiceController extends Controller
      */
     public function assign(AssignExtranetServiceRequest $request, Service $service): JsonResponse
     {
+        /** @var array<string, mixed> $data */
         $data = $request->validated();
         $participants = $service->getSyncableParticipantsArray();
-        $ministries = is_array($data['ministry']) ? $data['ministry'] : [$data['ministry']];
-        $exclusive = (bool) $data['exclusive'];
+        $rawMinistry = $data['ministry'] ?? null;
+        $ministries = is_array($rawMinistry) ? $rawMinistry : [$rawMinistry];
+        $users = is_array($data['users'] ?? null) ? $data['users'] : [];
+        $exclusive = (bool) ($data['exclusive'] ?? false);
         $noToggle = (bool) ($data['no-toggle'] ?? false);
 
         foreach ($ministries as $ministry) {
@@ -293,7 +297,10 @@ class ServiceController extends Controller
             if ($exclusive) {
                 $participants[$ministry] = [];
             }
-            foreach ($data['users'] as $userId) {
+            foreach ($users as $userId) {
+                if (! is_int($userId) && ! (is_string($userId) && is_numeric($userId))) {
+                    continue;
+                }
                 $id = (int) $userId;
                 if (! $noToggle && isset($existing[$id])) {
                     unset($participants[$ministry][$id]);
@@ -331,15 +338,29 @@ class ServiceController extends Controller
         }
 
         if ($request->has('tags')) {
-            /** @var list<int> $tagIds */
-            $tagIds = $request->input('tags') ?: [];
+            $rawTags = $request->input('tags');
+            $tagIds = [];
+            if (is_array($rawTags)) {
+                foreach ($rawTags as $tagId) {
+                    if (is_int($tagId) || (is_string($tagId) && is_numeric($tagId))) {
+                        $tagIds[] = (int) $tagId;
+                    }
+                }
+            }
             $service->tags()->sync($tagIds);
             $touched = true;
         }
 
         if ($request->has('serviceGroups')) {
-            /** @var array<int, int|string> $groups */
-            $groups = $request->input('serviceGroups') ?: [];
+            $rawGroups = $request->input('serviceGroups');
+            $groups = [];
+            if (is_array($rawGroups)) {
+                foreach ($rawGroups as $group) {
+                    if (is_int($group) || is_string($group)) {
+                        $groups[] = $group;
+                    }
+                }
+            }
             $service->serviceGroups()->sync(ServiceGroup::createIfMissing($groups));
             $touched = true;
         }

@@ -20,7 +20,7 @@ const mountTokensPage = (props = {}) =>
     })
 
 describe('TokensPage', () => {
-    it('hides the church selector without permission and posts a personal token payload', async () => {
+    it('hides the church selector without permission and creates a personal token', async () => {
         const wrapper = mountTokensPage()
 
         expect(wrapper.find('#newTokenCitySelect').exists()).toBe(false)
