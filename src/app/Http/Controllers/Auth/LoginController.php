@@ -147,7 +147,9 @@ class LoginController extends Controller
     {
         $challenge = $this->activeChallenge($request);
         if (! $challenge) {
-            return redirect()->route('login');
+            return redirect()->route('login')->withErrors([
+                'login' => 'Die Anmeldung ist abgelaufen. Bitte beginne erneut.',
+            ]);
         }
 
         /** @var array{code: string} $validated */
@@ -177,7 +179,9 @@ class LoginController extends Controller
         if ($result['state'] === 'inactive') {
             $request->session()->forget('login.challenge');
 
-            return redirect()->route('login');
+            return redirect()->route('login')->withErrors([
+                'login' => 'Die Anmeldung ist nicht mehr gültig. Bitte beginne erneut.',
+            ]);
         }
         if ($result['state'] === 'limited') {
             return back()->withErrors(['code' => 'Zu viele Versuche. Bitte später erneut versuchen.']);

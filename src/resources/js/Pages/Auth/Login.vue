@@ -176,6 +176,23 @@
                                 >
                             </div>
                         </div>
+                        <p
+                            v-if="$page.props.flash?.status"
+                            class="alert alert-warning mt-3"
+                            role="alert"
+                            data-testid="login-status"
+                        >
+                            {{ $page.props.flash.status }}
+                        </p>
+                        <p
+                            v-for="(error, field) in $page.props.errors || {}"
+                            :key="field"
+                            class="alert alert-danger mt-3"
+                            role="alert"
+                            data-testid="login-error"
+                        >
+                            {{ Array.isArray(error) ? error.join(' ') : error }}
+                        </p>
                         <div
                             v-if="demo"
                             class="d-flex flex-wrap align-items-center gap-2 mt-4 pt-2"
