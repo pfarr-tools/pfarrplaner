@@ -16,6 +16,7 @@ namespace Tests\Feature;
 use App\Models\Leave\Pool;
 use App\Services\RoleService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Inertia\Testing\AssertableInertia as Assert;
 use Tests\AbstractModelFeatureTest;
 
 class PoolFeatureTest extends AbstractModelFeatureTest
@@ -28,5 +29,22 @@ class PoolFeatureTest extends AbstractModelFeatureTest
     {
         parent::setUp();
         $this->testUser->assignRole(RoleService::ROLE_SUPER_ADMIN);
+    }
+
+    /**
+     * The pool editor must not depend on the removed legacy users.name column.
+     */
+    public function test_editor_loads_without_legacy_user_name_column(): void
+    {
+        $pool = Pool::factory()->create();
+
+        $this->actingAs($this->testUser)
+            ->get(route(Pool::getSingleRouteName('web', 'edit'), $pool->id))
+            ->assertStatus(200)
+            ->assertInertia(fn (Assert $page) => $page
+                ->component(Pool::getVuePath('editor'))
+                ->has('people')
+                ->etc()
+            );
     }
 }
