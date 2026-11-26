@@ -132,6 +132,10 @@ Kalenderlink erzeugen.
 
 Eine Kalenderverbindung ist meist nur zum Anzeigen gedacht. Bearbeiten Sie Gottesdienste weiterhin in Pfarrplaner, damit alle Beteiligten dieselben Daten sehen.
 
+### Zugangsschlüssel (Tokens) verwalten
+
+Die Tokenverwaltung (`/user/tokens`) erreichen Sie direkt über das **Profilmenü oben rechts → API-Tokens** oder unter **Einstellungen → Sicherheit → API-Tokens verwalten**. Dort sehen Sie Ihre aktiven persönlichen Zugangsschlüssel samt Geltungsbereich und können nicht mehr benötigte Schlüssel jederzeit über das Papierkorb-Symbol widerrufen. Wenn Ihr Konto zusätzlich für externe Gemeinde-Anbindungen freigeschaltet wurde, können Sie beim Anlegen eines neuen Schlüssels gezielt eine Ihrer Kirchengemeinden auswählen. Ein solcher gemeindebezogener Schlüssel gilt ausschließlich für die Gottesdienste und Veranstaltungen dieser Kirchengemeinde.
+
 ---
 
 ## Reiter: Externe Inhalte

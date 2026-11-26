@@ -217,6 +217,34 @@
             </button>
         </section>
 
+        <hr class="my-4" />
+
+        <section
+            class="api-token-management"
+            data-testid="api-token-management"
+        >
+            <h3 class="d-flex align-items-center gap-3">
+                <span class="security-option-icon">
+                    <i
+                        class="fa fa-key fa-3x text-primary"
+                        aria-hidden="true"
+                    />
+                </span>
+                <span>API-Tokens</span>
+            </h3>
+            <p>
+                Verwalte persönliche und gemeindebezogene Zugangsschlüssel für externe Anwendungen,
+                Kalender-Feeds und die Extranet-Schnittstelle.
+            </p>
+            <inertia-link
+                :href="route('tokens.index')"
+                class="btn btn-secondary"
+                data-testid="manage-api-tokens"
+            >
+                API-Tokens verwalten
+            </inertia-link>
+        </section>
+
         <section
             v-if="passkeyNameModalOpen"
             class="setup-backdrop"

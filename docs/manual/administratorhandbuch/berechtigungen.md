@@ -69,5 +69,6 @@ Einige Funktionen werden nicht als CRUD-Policy eines Modells geprüft. Dazu geh�
 | `fremden-urlaub-bearbeiten`, `urlaub-lesen` | Fremde Abwesenheiten bearbeiten bzw. Urlaubsinformationen lesen. |
 | `benutzerliste-lokal-sehen`, `benutzer-bearbeiten` | Lokale Benutzerliste sehen bzw. Benutzerkonten bearbeiten. |
 | `liederbuecher-bearbeiten` | Liederbücher verwalten. |
+| `gemeinde-api-tokens-erstellen` | Gemeindebezogene Extranet-API-Schlüssel unter `/user/tokens` für eigene schreibbare Kirchengemeinden ausstellen und über `/extranet/services…` nutzen (über die dedizierte Rolle **Extranet-API-Berechtigte:r** oder **Super-Administrator:in**). |
 
 Die verbindliche Zuordnung der Rollen zu diesen Berechtigungen steht in `src/config/roles.php`. Änderungen an Rollen oder Policies müssen dieses Kapitel mitprüfen lassen.

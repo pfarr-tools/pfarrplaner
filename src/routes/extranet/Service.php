@@ -33,3 +33,10 @@ use App\Http\Controllers\Extranet\ServiceController;
 Route::get('/user/services/next', [ServiceController::class, 'next'])->name('services.next');
 Route::get('/user/services/past', [ServiceController::class, 'past'])->name('services.past');
 Route::get('/user/services/lastWithSermon', [ServiceController::class, 'lastWithSermon'])->name('services.lastWithSermon');
+
+Route::get('/services', [ServiceController::class, 'index'])->name('services.manage.index');
+Route::post('/services', [ServiceController::class, 'store'])->name('services.manage.store');
+Route::get('/services/{service}', [ServiceController::class, 'show'])->name('services.manage.show');
+Route::patch('/services/{service}', [ServiceController::class, 'update'])->name('services.manage.update');
+Route::delete('/services/{service}', [ServiceController::class, 'destroy'])->name('services.manage.destroy');
+Route::post('/services/{service}/assign', [ServiceController::class, 'assign'])->name('services.manage.assign');

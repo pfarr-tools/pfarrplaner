@@ -23,7 +23,29 @@ danach gehasht gespeichert. Eine vorwärtsgerichtete Datenbankmigration hasht
 auch bisherige Klartextwerte, ohne den von Integrationen gesendeten Token zu
 ändern; bereits gehashte Werte bleiben unverändert. Persönliche Tokens lassen
 sich im Tokenbereich widerrufen. Der Kalenderfeed-Token ist auf den Feed
-beschränkt und wird von der allgemeinen JSON-API abgewiesen.
+beschränkt und wird von der allgemeinen JSON-API sowie vom Extranet abgewiesen.
+
+### Gemeindebezogene Extranet-API-Schlüssel
+
+Für externe Gemeindeintegrationen (zum Beispiel eine Gemeinde-Website oder ein
+Synchronisationsskript) unterstützt die Tokenverwaltung unter `/user/tokens`
+zusätzlich **gemeindebezogene Sanctum-Tokens**:
+
+- Das Erstellen eines gemeindebezogenen Schlüssels erfordert die Berechtigung
+  `gemeinde-api-tokens-erstellen` (zugeordnet über die dedizierte Rolle
+  `Extranet-API-Berechtigte:r` oder `Super-Administrator:in`)
+  sowie direkte Schreibrechte (`w` oder `a`) in der gewählten Kirchengemeinde.
+- Das ausgestellte Token erhält ausschließlich die Sanctum-Abilities
+  `extranet:services` und `extranet:city:{id}`.
+- `RejectCalendarFeedToken` weist solche gemeindebezogenen Tokens auf allen
+  allgemeinen `/api/*`-Routen mit HTTP `401` ab.
+- `EnforceExtranetTokenScope` beschränkt gemeindebezogene Tokens innerhalb von
+  `/extranet/*` ausschließlich auf die Verwaltungsrouten unter
+  `/extranet/services…` (`extranet.services.manage.*`) und prüft bei jedem
+  Aufruf live gegen die aktuelle Berechtigung `gemeinde-api-tokens-erstellen`
+  sowie die aktuelle Schreibberechtigung für die Kirchengemeinde. Wird die
+  Rolle oder das Gemeindeschreibrecht später entzogen, verliert das Token
+  sofort seine Wirkung (`403`).
 
 ## Projektbezug
 

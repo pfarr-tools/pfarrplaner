@@ -30,20 +30,27 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StorePersonalTokenRequest;
 use App\Models\People\User;
+use App\Models\Places\City;
+use App\Services\ExtranetTokenScope;
+use App\Services\RoleService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
+use Laravel\Sanctum\NewAccessToken;
 use Laravel\Sanctum\PersonalAccessToken;
 
-/** Controller for API token management. */
+/**
+ * Manages personal and church-scoped Sanctum API tokens for the authenticated user.
+ */
 class TokenController extends Controller
 {
     /**
-     * @return void
+     * Require an authenticated web session for token management routes.
      */
     public function __construct()
     {
@@ -51,46 +58,53 @@ class TokenController extends Controller
     }
 
     /**
-     * Render the token overview for the authenticated user.
+     * Render the token overview page for the authenticated user.
      *
-     * @return Response Inertia response with the user's tokens.
+     * @return Response Inertia token management page.
      */
     public function index(): Response
     {
         $user = Auth::user();
         abort_unless($user instanceof User, 401);
         Gate::authorize('update', $user);
-        $tokens = $user->tokens;
-        $token = null;
 
-        return Inertia::render('tokens', compact('tokens', 'token'));
+        return $this->renderTokensPage($user, null);
     }
 
     /**
-     * Create a new personal access token from the validated request.
+     * Issue a personal or church-scoped Sanctum token and display its plain-text secret once.
      *
-     * @param  Request  $request  Request containing the token title.
-     * @return Response Inertia response with the new token and all tokens.
+     * @param  StorePersonalTokenRequest  $request  Validated token creation request.
+     * @return Response Inertia token management page including the newly issued token.
      */
-    public function create(Request $request): Response
+    public function create(StorePersonalTokenRequest $request): Response
     {
-        $user = Auth::user();
+        $user = $request->user();
         abort_unless($user instanceof User, 401);
-        Gate::authorize('update', $user);
-        $request->validate(['title' => 'required|string']);
-        $title = $request->get('title');
-        $token = $user->createToken(is_string($title) ? $title : '');
-        $tokens = $user->tokens;
+        /** @var array<string, mixed> $validated */
+        $validated = $request->validated();
+        $rawTitle = $validated['title'] ?? '';
+        $title = is_string($rawTitle) ? $rawTitle : '';
+        $rawCityId = $validated['city_id'] ?? null;
+        $cityId = is_int($rawCityId) || (is_string($rawCityId) && is_numeric($rawCityId))
+            ? (int) $rawCityId
+            : null;
 
-        return Inertia::render('tokens', compact('tokens', 'token'));
+        $abilities = $cityId !== null
+            ? ExtranetTokenScope::abilitiesForCity($cityId)
+            : ['*'];
+
+        $newToken = $user->createToken($title, $abilities);
+
+        return $this->renderTokensPage($user, $newToken);
     }
 
     /**
-     * Delete the given personal access token.
+     * Revoke an existing Sanctum token owned by the authenticated user.
      *
-     * @param  Request  $request  Incoming request.
-     * @param  PersonalAccessToken  $token  Token to delete.
-     * @return RedirectResponse Redirect to the token overview.
+     * @param  Request  $request  Authenticated deletion request.
+     * @param  PersonalAccessToken  $token  Token selected for revocation.
+     * @return RedirectResponse Redirect back to the token overview.
      */
     public function destroy(Request $request, PersonalAccessToken $token): RedirectResponse
     {
@@ -100,5 +114,69 @@ class TokenController extends Controller
         $user->tokens()->where('id', $token->id)->delete();
 
         return redirect()->route('tokens.index');
+    }
+
+    /**
+     * Build the Inertia response payload for the token management view.
+     *
+     * @param  User  $user  Current user whose tokens are displayed.
+     * @param  NewAccessToken|null  $token  Newly created token to display once, if any.
+     * @return Response Rendered Inertia response.
+     */
+    private function renderTokensPage(User $user, ?NewAccessToken $token): Response
+    {
+        $canCreateChurchTokens = $user->can(RoleService::PERMISSION_CREATE_CHURCH_API_TOKENS);
+        $writableCityIds = $canCreateChurchTokens
+            ? ExtranetTokenScope::directlyWritableCityIds($user)->all()
+            : [];
+
+        $churchTokenCities = $writableCityIds === []
+            ? []
+            : City::query()
+                ->whereIn('id', $writableCityIds)
+                ->orderBy('name')
+                ->get(['id', 'name'])
+                ->map(static fn (City $city): array => [
+                    'id' => $city->id,
+                    'name' => $city->name,
+                ])
+                ->values()
+                ->all();
+
+        $rawTokens = $user->tokens()->orderByDesc('created_at')->get();
+        /** @var list<PersonalAccessToken> $personalTokens */
+        $personalTokens = [];
+        /** @var list<int> $referencedCityIds */
+        $referencedCityIds = [];
+        foreach ($rawTokens as $item) {
+            if (! $item instanceof PersonalAccessToken) {
+                continue;
+            }
+            $personalTokens[] = $item;
+            foreach (ExtranetTokenScope::allowedCityIds($item) ?? [] as $referencedCityId) {
+                $referencedCityIds[] = $referencedCityId;
+            }
+        }
+        $referencedCityIds = array_values(array_unique($referencedCityIds));
+
+        /** @var array<int, string> $cityNamesById */
+        $cityNamesById = [];
+        if ($referencedCityIds !== []) {
+            foreach (City::query()->whereIn('id', $referencedCityIds)->get(['id', 'name']) as $city) {
+                $cityNamesById[$city->id] = $city->name;
+            }
+        }
+
+        $tokens = array_map(
+            static fn (PersonalAccessToken $item): array => ExtranetTokenScope::describeToken($item, $cityNamesById),
+            $personalTokens
+        );
+
+        return Inertia::render('tokens', [
+            'tokens' => $tokens,
+            'token' => $token,
+            'canCreateChurchTokens' => $canCreateChurchTokens,
+            'churchTokenCities' => $churchTokenCities,
+        ]);
     }
 }

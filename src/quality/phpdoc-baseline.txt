@@ -865,7 +865,6 @@ app/Services/NameService.php:686:T_FUNCTION
 app/Services/NameService.php:94:T_FUNCTION
 app/Services/PackageService.php:36:T_CLASS
 app/Services/QRService.php:33:T_CLASS
-app/Services/RoleService.php:33:T_CLASS
 app/Services/SentryFeedbackService.php:21:T_CLASS
 app/Services/UpdateService.php:33:T_CLASS
 app/StudyHelpers/AbstractStudyHelper.php:38:T_CLASS
