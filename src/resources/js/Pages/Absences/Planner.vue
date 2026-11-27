@@ -414,6 +414,7 @@ export default {
 
         return {
             users: {},
+            plannerUsers: [],
             userDays: {},
             loadingUsers: true,
             loadingUserDays: {},
@@ -636,6 +637,7 @@ export default {
         },
         async loadPlanner() {
             const response = await axios.get(route('planner.users'))
+            this.plannerUsers = response.data
             const users = this.sortUsers(response.data)
             this.users = users
             this.loadingUsers = false
@@ -972,41 +974,10 @@ export default {
                     : this.pinnedUsers.filter((id) => String(id) !== String(user.id))
             }
 
-            if (user.pinned) {
-                this.addUserToVisibilitySection(user)
-            } else {
-                this.removeUserFromVisibilitySection(user)
-            }
+            this.users = this.sortUsers(this.plannerUsers)
             this.persistPlannerSetting(
                 settingKey,
                 user.isPastor ? this.pinnedPastors : this.pinnedUsers,
-            )
-        },
-        /**
-         * Add a visible user to the correct planner section.
-         *
-         * @param {Object} user User to add.
-         * @returns {void}
-         */
-        addUserToVisibilitySection(user) {
-            const section = user.isPastor ? this.pastorPluralLabel() : 'Mitarbeitende'
-            if (!this.users[section]) this.users[section] = []
-            if (!this.users[section].find((existingUser) => existingUser.id === user.id)) {
-                this.users[section].push(user)
-                this.users[section].sort((a, b) => (a.sortName < b.sortName ? -1 : 1))
-            }
-        },
-        /**
-         * Remove a hidden user from the correct planner section.
-         *
-         * @param {Object} user User to remove.
-         * @returns {void}
-         */
-        removeUserFromVisibilitySection(user) {
-            const section = user.isPastor ? this.pastorPluralLabel() : 'Mitarbeitende'
-            if (!this.users[section]) return
-            this.users[section] = this.users[section].filter(
-                (existingUser) => existingUser.id !== user.id,
             )
         },
         getUserDay(user, day) {

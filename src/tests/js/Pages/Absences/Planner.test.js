@@ -196,4 +196,42 @@ describe('Absences Planner timezone handling', () => {
         expect(ctx.sections).toEqual(['Pfarrer:innen Nord', 'Mitarbeitende'])
         expect(sorted['Pfarrer:innen']).toBeUndefined()
     })
+
+    it('updates pastor group sections when visibility changes', () => {
+        const pastor = {
+            id: 1,
+            isPastor: true,
+            show_absences_with_services: true,
+            pools: [{ id: 10, name: 'Nord', groupable: true }],
+            sortName: 'A',
+        }
+        const ctx = {
+            isPastor: true,
+            pinnedPastors: [],
+            pinnedUsers: [],
+            plannerUsers: [pastor],
+            sections: [],
+            users: {},
+            toggleableUsers: [],
+            openSections: {},
+            $page: {
+                props: {
+                    currentUser: { data: { id: 99, isPastor: true } },
+                    labels: { pastor: 'Pfarrer' },
+                },
+            },
+            pastorPluralLabel: () => 'Pfarrer:innen',
+            sortUsers: Planner.methods.sortUsers,
+            persistPlannerSetting: vi.fn(),
+        }
+
+        ctx.users = Planner.methods.sortUsers.call(ctx, ctx.plannerUsers)
+        Planner.methods.togglePinned.call(ctx, pastor)
+
+        expect(ctx.sections).toEqual(['Pfarrer:innen Nord', 'Mitarbeitende'])
+
+        Planner.methods.togglePinned.call(ctx, pastor)
+
+        expect(ctx.sections).toEqual(['Mitarbeitende'])
+    })
 })
