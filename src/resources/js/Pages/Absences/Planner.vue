@@ -468,17 +468,42 @@ export default {
          */
         plannerVisibilitySections() {
             const pastorLabel = this.pastorPluralLabel()
+            const pastors = this.plannerVisibilityUsers.filter((user) => user.isPastor)
+            const employees = this.plannerVisibilityUsers.filter((user) => !user.isPastor)
+            const groupablePools = pastors
+                .flatMap((user) => user.pools || [])
+                .filter((pool) => pool.groupable)
+                .reduce((pools, pool) => {
+                    if (!pools.some((existingPool) => existingPool.id === pool.id)) {
+                        pools.push(pool)
+                    }
+                    return pools
+                }, [])
+                .sort((a, b) => (a.name < b.name ? -1 : 1))
 
-            return [
-                {
-                    label: pastorLabel,
-                    users: this.plannerVisibilityUsers.filter((user) => user.isPastor),
-                },
-                {
-                    label: 'Mitarbeitende',
-                    users: this.plannerVisibilityUsers.filter((user) => !user.isPastor),
-                },
-            ].filter((section) => section.users.length)
+            const sections = groupablePools
+                .map((pool) => ({
+                    label: `${pastorLabel} ${pool.name}`,
+                    users: pastors.filter((user) =>
+                        (user.pools || []).some((userPool) => userPool.id === pool.id),
+                    ),
+                }))
+                .filter((section) => section.users.length)
+
+            const ungroupedPastors = pastors.filter(
+                (user) =>
+                    !groupablePools.some((pool) =>
+                        (user.pools || []).some((userPool) => userPool.id === pool.id),
+                    ),
+            )
+            if (ungroupedPastors.length) {
+                sections.push({ label: pastorLabel, users: ungroupedPastors })
+            }
+            if (employees.length) {
+                sections.push({ label: 'Mitarbeitende', users: employees })
+            }
+
+            return sections
         },
         activeToggleableUsersCount() {
             return this.plannerVisibilityUsers.filter((user) => user.pinned).length
@@ -918,7 +943,6 @@ export default {
                     this.sections.push(pastorSection)
                 }
                 sortedUsers['Mitarbeitende'] = []
-                this.sections.push('Mitarbeitende')
                 users.forEach((user) => {
                     if (usedIds.includes(user.id)) return
                     if (this.isPastor && user.isPastor) return
@@ -935,16 +959,23 @@ export default {
                     }
                 })
             } else {
-                this.sections.push('Mitarbeitende')
                 sortedUsers['Mitarbeitende'] = []
             }
 
-            users.forEach((user) => {
-                if (usedIds.includes(user.id)) return
-                if (this.isPastor && user.isPastor) return
-                user.pinned = true
-                sortedUsers['Mitarbeitende'].push(user)
-            })
+            if (!this.$page.props.currentUser.data.isPastor) {
+                users.forEach((user) => {
+                    if (usedIds.includes(user.id)) return
+                    if (user.isPastor) return
+                    user.pinned = true
+                    sortedUsers['Mitarbeitende'].push(user)
+                })
+            }
+
+            if (sortedUsers['Mitarbeitende'].length) {
+                this.sections.push('Mitarbeitende')
+            } else {
+                delete sortedUsers['Mitarbeitende']
+            }
 
             this.toggleableUsers = allToggleableUsers.sort((a, b) =>
                 a.sortName < b.sortName ? -1 : 1,

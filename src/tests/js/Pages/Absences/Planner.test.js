@@ -94,6 +94,40 @@ describe('Absences Planner timezone handling', () => {
         ])
     })
 
+    it('groups pastor visibility controls by pool and keeps multi-pool pastors in every group', () => {
+        const northPool = { id: 10, name: 'Nord', groupable: true }
+        const southPool = { id: 11, name: 'Süd', groupable: true }
+        const ctx = {
+            toggleableUsers: [
+                { id: 1, isPastor: true, pools: [northPool, southPool] },
+                { id: 2, isPastor: true, pools: [] },
+                { id: 3, isPastor: false },
+            ],
+            plannerVisibilityUsers: [
+                { id: 1, isPastor: true, pools: [northPool, southPool] },
+                { id: 2, isPastor: true, pools: [] },
+                { id: 3, isPastor: false },
+            ],
+            $page: { props: { labels: { pastor: 'Pfarrer' } } },
+            pastorPluralLabel: () => 'Pfarrer:innen',
+        }
+
+        const sections = Planner.computed.plannerVisibilitySections.call(ctx)
+
+        expect(sections).toEqual([
+            {
+                label: 'Pfarrer:innen Nord',
+                users: [{ id: 1, isPastor: true, pools: [northPool, southPool] }],
+            },
+            {
+                label: 'Pfarrer:innen Süd',
+                users: [{ id: 1, isPastor: true, pools: [northPool, southPool] }],
+            },
+            { label: 'Pfarrer:innen', users: [{ id: 2, isPastor: true, pools: [] }] },
+            { label: 'Mitarbeitende', users: [{ id: 3, isPastor: false }] },
+        ])
+    })
+
     it('does not add pastors to the visibility controls twice', () => {
         const pastor = { id: 1, isPastor: true, show_absences_with_services: false, sortName: 'Pastor' }
         const ctx = {
@@ -158,7 +192,6 @@ describe('Absences Planner timezone handling', () => {
             'Pfarrer:innen Nord',
             'Pfarrer:innen Süd',
             'Pfarrer:innen',
-            'Mitarbeitende',
         ])
         expect(sorted['Pfarrer:innen Nord'].map((user) => user.id)).toEqual([1])
         expect(sorted['Pfarrer:innen Süd'].map((user) => user.id)).toEqual([1])
@@ -193,8 +226,48 @@ describe('Absences Planner timezone handling', () => {
 
         const sorted = Planner.methods.sortUsers.call(ctx, [pastor])
 
-        expect(ctx.sections).toEqual(['Pfarrer:innen Nord', 'Mitarbeitende'])
+        expect(ctx.sections).toEqual(['Pfarrer:innen Nord'])
         expect(sorted['Pfarrer:innen']).toBeUndefined()
+    })
+
+    it('allows hiding employees and omits an empty employee section', () => {
+        const employee = {
+            id: 2,
+            isPastor: false,
+            show_absences_with_services: false,
+            sortName: 'B',
+        }
+        const ctx = {
+            isPastor: true,
+            pinnedPastors: null,
+            pinnedUsers: [2],
+            plannerUsers: [employee],
+            sections: [],
+            users: {},
+            toggleableUsers: [],
+            openSections: {},
+            $page: {
+                props: {
+                    currentUser: { data: { id: 99, isPastor: true } },
+                    labels: { pastor: 'Pfarrer' },
+                },
+            },
+            pastorPluralLabel: () => 'Pfarrer:innen',
+            sortUsers: Planner.methods.sortUsers,
+            persistPlannerSetting: vi.fn(),
+        }
+
+        const sorted = Planner.methods.sortUsers.call(ctx, [employee])
+
+        expect(sorted['Mitarbeitende'].map((user) => user.id)).toEqual([2])
+        expect(ctx.sections).toEqual(['Mitarbeitende'])
+        expect(ctx.toggleableUsers.map((user) => user.id)).toEqual([2])
+
+        ctx.users = sorted
+        Planner.methods.togglePinned.call(ctx, employee)
+
+        expect(ctx.sections).toEqual([])
+        expect(ctx.users['Mitarbeitende']).toBeUndefined()
     })
 
     it('updates pastor group sections when visibility changes', () => {
@@ -228,10 +301,10 @@ describe('Absences Planner timezone handling', () => {
         ctx.users = Planner.methods.sortUsers.call(ctx, ctx.plannerUsers)
         Planner.methods.togglePinned.call(ctx, pastor)
 
-        expect(ctx.sections).toEqual(['Pfarrer:innen Nord', 'Mitarbeitende'])
+        expect(ctx.sections).toEqual(['Pfarrer:innen Nord'])
 
         Planner.methods.togglePinned.call(ctx, pastor)
 
-        expect(ctx.sections).toEqual(['Mitarbeitende'])
+        expect(ctx.sections).toEqual([])
     })
 })
