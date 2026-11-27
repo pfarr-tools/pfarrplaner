@@ -35,6 +35,28 @@ Einträge werden nicht automatisch gelöscht. Die Rolle
 - **Urlaub und Vertretung**: Abwesenheiten, Pools, Poolmaster
 - **Liturgie**: Bausteine, Lieder, Psalmen, liturgische Texte
 
+## Sichtbarkeitsmodell des Urlaubsplaners
+
+Die Pool-Mitgliedschaft (`pool_user`) und die Leseberechtigung für
+Pfarrer:innen sind bewusst getrennt. Die zusätzliche Pivot-Tabelle
+`pool_user_visibility` verbindet ein Benutzerkonto mit den Pools, deren
+Pfarrer:innen es im Urlaubsplan sehen darf. Beide Fremdschlüssel löschen ihre
+Pivotzeilen beim Löschen des jeweiligen Kontos oder Pools; die Kombination aus
+`user_id` und `pool_id` ist eindeutig.
+
+`User::getViewableAbsenceUsers()` setzt die serverseitige Vereinigungsmenge
+zusammen. Sie umfasst die eigene Person, die bestehende Sichtbarkeit von
+Mitarbeitenden und Gemeinden, gemeinsame Pools für Pfarrer:innen und
+Diakon:innen sowie – bei `pfarrer_urlaub_sehen` – die Pfarrer:innen aus den
+explizit zugewiesenen `visiblePools`. Ohne `manage_absences` wird weiterhin
+keine Urlaubsplanliste geladen. Die Abfrage verwendet `groupable` nicht;
+dieses Feld ist ausschließlich ein Darstellungsmerkmal des Vue-Urlaubsplaners.
+
+Die Benutzerverwaltung synchronisiert `visiblePools` separat von `pools` und
+filtert die Auswahl auf den Verwaltungsbereich des ausführenden Kontos. Die
+API-Antwort des Urlaubsplaners enthält anschließend nur die autorisierten
+Benutzer:innen und lädt deren normale Poolmitgliedschaften für die Anzeige.
+
 ## Soft-Delete-Domäne
 
 Für `Service`, `Absence`, `Baptism`, `Funeral`, `Wedding` sowie fachlich abhängige `Replacement`- und `AdConfig`-Datensätze nutzt Pfarrplaner Soft Deletes.

@@ -830,9 +830,10 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
      * Find all users for which this user may see the absences
      *
      * Permission logic:
-     * (A) Pastors (role Pastor:in, Diakon:in) may see all fellow pastors in their district (cities with view rights) and all staff in their home cities
+     * (A) Pastors (role Pastor:in, Diakon:in) may see all fellow pastors in their district (cities with view rights), all staff in their home cities, and pastors sharing a pool
      * (B) Staff (users with manage_absences flag set) may see all fellow staff in their home city
-     * (C) Users without the manage_absences flag see nothing at all
+     * (C) Users with pfarrer_urlaub_sehen may see pastors from explicitly assigned visibility pools
+     * (D) Users without the manage_absences flag see nothing at all
      *
      * @return Collection<int, User>
      */
@@ -878,6 +879,28 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
                 }
             )->pluck('id')->all();
             $ids = array_merge($ids, $newIds);
+
+            $poolIds = $this->pools()->pluck('pools.id');
+            if ($poolIds->isNotEmpty()) {
+                /** @var array<int|string> $newIds */
+                $newIds = User::whereHas('roles', function ($query) {
+                    $query->whereIn('name', ['Pfarrer:in', 'Diakon:in']);
+                })->whereHas('pools', function ($query) use ($poolIds) {
+                    $query->whereIn('pools.id', $poolIds);
+                })->pluck('id')->all();
+                $ids = array_merge($ids, $newIds);
+            }
+        } elseif ($this->hasPermissionTo('pfarrer_urlaub_sehen')) {
+            $poolIds = $this->visiblePools()->pluck('pools.id');
+            if ($poolIds->isNotEmpty()) {
+                /** @var array<int|string> $newIds */
+                $newIds = User::whereHas('roles', function ($query) {
+                    $query->whereIn('name', ['Pfarrer:in', 'Diakon:in']);
+                })->whereHas('pools', function ($query) use ($poolIds) {
+                    $query->whereIn('pools.id', $poolIds);
+                })->pluck('id')->all();
+                $ids = array_merge($ids, $newIds);
+            }
         }
 
         $ids = array_unique($ids);
@@ -1074,6 +1097,14 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
     public function pools()
     {
         return $this->belongsToMany(Pool::class);
+    }
+
+    /** Return pools whose pastors this user may see in the absence planner.
+     * @return BelongsToMany<Pool, $this>
+     */
+    public function visiblePools()
+    {
+        return $this->belongsToMany(Pool::class, 'pool_user_visibility')->withTimestamps();
     }
 
     /**

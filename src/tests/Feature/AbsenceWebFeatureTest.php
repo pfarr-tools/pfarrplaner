@@ -25,6 +25,7 @@ use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
 use Inertia\Testing\AssertableInertia as Assert;
+use Spatie\Permission\Models\Permission;
 use Tests\TestCase;
 
 class AbsenceWebFeatureTest extends TestCase
@@ -46,6 +47,58 @@ class AbsenceWebFeatureTest extends TestCase
             ->get(route('absences.index', ['year' => date('Y'), 'month' => date('m')]))
             ->assertStatus(200)
             ->assertInertia(fn (Assert $page) => $page->component('Absences/Planner'));
+    }
+
+    /** A secretary without the dedicated permission cannot see pastors from assigned pools. */
+    public function test_secretary_without_pastor_visibility_permission_cannot_see_pool_pastors(): void
+    {
+        $secretary = User::factory()->create(['manage_absences' => true]);
+        $pastor = User::factory()->create();
+        $secretary->visiblePools()->attach(Pool::factory()->create());
+        $pastor->pools()->attach($secretary->visiblePools->first());
+
+        $this->assertFalse($secretary->getViewableAbsenceUsers()->contains('id', $pastor->id));
+    }
+
+    /** Assigned pools form a deduplicated union for authorized non-pastors. */
+    public function test_authorized_secretary_sees_pastors_from_all_assigned_pools_once(): void
+    {
+        $permission = Permission::findOrCreate('pfarrer_urlaub_sehen', 'web');
+        $secretary = User::factory()->create(['manage_absences' => true]);
+        $secretary->givePermissionTo($permission);
+        $poolA = Pool::factory()->create();
+        $poolB = Pool::factory()->create();
+        $pastorA = User::factory()->create();
+        $pastorB = User::factory()->create();
+        $pastorBoth = User::factory()->create();
+        $pastorA->assignRole(RoleService::ROLE_PASTOR);
+        $pastorB->assignRole(RoleService::ROLE_PASTOR);
+        $pastorBoth->assignRole(RoleService::ROLE_PASTOR);
+        $secretary->visiblePools()->attach([$poolA->id, $poolB->id]);
+        $pastorA->pools()->attach($poolA);
+        $pastorB->pools()->attach($poolB);
+        $pastorBoth->pools()->attach([$poolA->id, $poolB->id]);
+
+        $visibleIds = $secretary->getViewableAbsenceUsers()->pluck('id');
+
+        $this->assertTrue($visibleIds->contains($pastorA->id));
+        $this->assertTrue($visibleIds->contains($pastorB->id));
+        $this->assertTrue($visibleIds->contains($pastorBoth->id));
+        $this->assertCount($visibleIds->unique()->count(), $visibleIds);
+    }
+
+    /** Pastors gain visibility of fellow pastors sharing a pool. */
+    public function test_pastor_sees_fellow_pastor_from_shared_pool(): void
+    {
+        $pastor = User::factory()->create(['manage_absences' => true]);
+        $pastor->assignRole(RoleService::ROLE_PASTOR);
+        $fellowPastor = User::factory()->create();
+        $fellowPastor->assignRole(RoleService::ROLE_PASTOR);
+        $pool = Pool::factory()->create();
+        $pastor->pools()->attach($pool);
+        $fellowPastor->pools()->attach($pool);
+
+        $this->assertTrue($pastor->getViewableAbsenceUsers()->contains('id', $fellowPastor->id));
     }
 
     public function test_editor_loads(): void

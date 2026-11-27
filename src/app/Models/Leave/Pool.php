@@ -82,6 +82,15 @@ class Pool extends AbstractModel
         return $this->belongsToMany(User::class);
     }
 
+    /** Return users explicitly assigned to see pastors from this pool.
+     * @return BelongsToMany<User, $this>
+     */
+    public function visibilityUsers()
+    {
+        return $this->belongsToMany(User::class, 'pool_user_visibility', 'pool_id', 'user_id')
+            ->withTimestamps();
+    }
+
     /**
      * @return BelongsToMany<City, $this>
      */

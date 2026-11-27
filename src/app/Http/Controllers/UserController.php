@@ -39,6 +39,7 @@ use App\Http\Requests\RecoverTwoFactorRequest;
 use App\Http\Requests\UserRequest;
 use App\Mail\User\AccountData;
 use App\Models\Calendar\External\CalendarConnection;
+use App\Models\Leave\Pool;
 use App\Models\Location;
 use App\Models\Parish;
 use App\Models\People\TwoFactorRecoveryAudit;
@@ -170,6 +171,7 @@ class UserController extends Controller
             'adminCities',
             'vacationAdmins',
             'vacationApprovers',
+            'visiblePools',
         ]);
 
         $cities = City::query()->select(['id', 'name'])->orderBy('name')->get();
@@ -197,6 +199,7 @@ class UserController extends Controller
                 'locations' => $this->compactOptions($this->locationsForUser()),
                 'ministries' => MinistryService::all(),
                 'modules' => Modules::tree(),
+                'pools' => $this->compactOptions($this->visibilityPoolsFor($authUser)),
             ]
         );
     }
@@ -260,6 +263,7 @@ class UserController extends Controller
             'adminCities',
             'vacationAdmins',
             'vacationApprovers',
+            'visiblePools',
         ]);
         $cities = City::query()->select(['id', 'name'])->orderBy('name')->get();
         $adminCities = [];
@@ -295,6 +299,7 @@ class UserController extends Controller
         $adminCities = $this->compactOptions($adminCities);
         $roles = $this->compactRoles($roles);
         $parishes = $this->compactOptions($parishes);
+        $pools = $this->compactOptions($this->visibilityPoolsFor($actor));
 
         $activeTab = $request->get('tab', 'home');
         $canViewRecoveryHistory = $actor->hasRole(AuthServiceProvider::SUPER)
@@ -354,6 +359,7 @@ class UserController extends Controller
                 'ministries',
                 'modules',
                 'twoFactorRecovery',
+                'pools',
             )
         );
     }
@@ -421,6 +427,8 @@ class UserController extends Controller
         $vacationAdmins = $user->getRelation('vacationAdmins');
         /** @var Collection<int, User> $vacationApprovers */
         $vacationApprovers = $user->getRelation('vacationApprovers');
+        /** @var Collection<int, Pool> $visiblePools */
+        $visiblePools = $user->getRelation('visiblePools');
 
         return [
             'id' => $user->id,
@@ -439,6 +447,7 @@ class UserController extends Controller
             'isOfficialUser' => $user->isOfficialUser,
             'isLocked' => $user->isLocked,
             'isSuperAdmin' => $user->hasRole(AuthServiceProvider::SUPER),
+            'isPastorOrDeacon' => $user->hasAnyRole(['Pfarrer:in', 'Diakon:in']),
             'home_cities' => $this->compactIds($homeCities),
             'parishes' => $this->compactIds($parishes),
             'roles' => $this->compactIds($roles),
@@ -447,7 +456,25 @@ class UserController extends Controller
             'admin_cities' => $this->compactIds($adminCities),
             'vacation_admins' => $this->compactIds($vacationAdmins),
             'vacation_approvers' => $this->compactIds($vacationApprovers),
+            'visible_pools' => $this->compactIds($visiblePools),
         ];
+    }
+
+    /** Return pools that the current administrator may assign as visibility pools.
+     * @param  User  $actor  User assigning the visibility.
+     * @return Collection<int, Pool>
+     */
+    protected function visibilityPoolsFor(User $actor): Collection
+    {
+        $query = Pool::query()->select(['pools.id', 'pools.name'])->orderBy('name');
+        if (! $actor->isAdmin) {
+            $cityIds = $actor->adminCities->pluck('id');
+            $query->whereHas('cities', function ($cityQuery) use ($cityIds) {
+                $cityQuery->whereIn('cities.id', $cityIds);
+            });
+        }
+
+        return $query->get();
     }
 
     /**
@@ -493,7 +520,7 @@ class UserController extends Controller
     /**
      * Convert option models to the fields used by form select components.
      *
-     * @param  iterable<int, City|Parish|Location>  $options  Option models with an id and a name.
+     * @param  iterable<int, City|Parish|Location|Pool>  $options  Option models with an id and a name.
      * @return array<int, array<string, mixed>>
      */
     protected function compactOptions(iterable $options): array
@@ -920,6 +947,13 @@ class UserController extends Controller
         /** @var array<int|string, mixed> $permissions */
         $permissions = $request->get('permissions') ?: [];
         $user->updateCityPermissions($permissions, $authUser);
+
+        $allowedPoolIds = $this->visibilityPoolsFor($authUser)->pluck('id');
+        $visiblePoolIds = collect($request->getRelationIdsForSync('visible_pools', 'pools'))
+            ->filter(fn ($id) => $allowedPoolIds->contains((int) $id))
+            ->map(fn ($id) => (int) $id)
+            ->all();
+        $user->visiblePools()->sync($visiblePoolIds);
 
     }
 

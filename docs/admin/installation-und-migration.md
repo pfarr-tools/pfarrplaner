@@ -480,6 +480,36 @@ entfernen. Nicht kompatible Änderungen erhalten eine geplante kurze
 Wartungszeit. Das vorherige Release bleibt in der Registry als Rollback-
 Grundlage verfügbar und wird bei Bedarf erneut lokal gezogen.
 
+### Poolbezogene Sichtbarkeit der Pfarrer:innen
+
+Die Migration `2026_11_27_000000_create_pool_user_visibility_table` ergänzt die
+Pivot-Tabelle `pool_user_visibility`. Sie enthält ausschließlich die
+ausdrücklichen Sichtbarkeitszuweisungen von Benutzerkonten zu Pools. Bestehende
+Poolmitgliedschaften in `pool_user` werden nicht verändert. Die Migration wird
+wie alle Anwendungsmigrationen beim normalen Update ausgeführt:
+
+```sh
+./planer backup create
+./planer backup verify
+./planer update --backup-confirmed
+```
+
+Nach dem Update muss die Rolle bzw. Berechtigung mit dem üblichen Abgleich
+geprüft werden:
+
+```sh
+./planer artisan roles:sync --dry-run
+./planer artisan roles:sync
+```
+
+Die Rücknahme der Migration entfernt nur die ausdrücklichen
+Sichtbarkeitszuweisungen; die normale Poolmitgliedschaft bleibt fachlich
+unverändert. Vor einem produktiven Rollback sind trotzdem das vorherige Image
+und ein verifiziertes Datenbankbackup gemeinsam zu verwenden, weil die ältere
+Anwendung die neue Tabelle nicht kennt. Nach einer Rücknahme müssen die
+Sichtbarkeitszuweisungen bei einem erneuten Vorwärtsupdate erneut geprüft und
+gegebenenfalls wieder eingerichtet werden.
+
 ### API-Token sicher migrieren
 
 Die Migration `2026_11_22_000001_hash_legacy_user_api_tokens` ersetzt bisherige

@@ -67,7 +67,36 @@ Einige Funktionen werden nicht als CRUD-Policy eines Modells geprüft. Dazu geh�
 | `gd-abendmahl-bearbeiten`, `gd-kinderkirche-bearbeiten`, `gd-opfer-bearbeiten`, `gd-kasualien-bearbeiten`, `gd-taufe-bearbeiten` | Jeweilige fachliche Eingabe- oder Kasualienbereiche. |
 | `ort-bearbeiten`, `kirche-bearbeiten`, `pfarramt-bearbeiten` | Schreiben in Orts-, Kirchen- bzw. Pfarramtsdaten. |
 | `fremden-urlaub-bearbeiten`, `urlaub-lesen` | Fremde Abwesenheiten bearbeiten bzw. Urlaubsinformationen lesen. |
+| `pfarrer_urlaub_sehen` | Pfarrer:innen und Diakon:innen aus den für das Benutzerkonto zugewiesenen Sichtbarkeitspools im Urlaubsplan sehen. |
 | `benutzerliste-lokal-sehen`, `benutzer-bearbeiten` | Lokale Benutzerliste sehen bzw. Benutzerkonten bearbeiten. |
 | `liederbuecher-bearbeiten` | Liederbücher verwalten. |
 
 Die verbindliche Zuordnung der Rollen zu diesen Berechtigungen steht in `src/config/roles.php`. Änderungen an Rollen oder Policies müssen dieses Kapitel mitprüfen lassen.
+
+## Poolbezogene Sichtbarkeit im Urlaubsplan
+
+Die Berechtigung `pfarrer_urlaub_sehen` ist für Benutzer:innen gedacht, die den
+Urlaub von Pfarrer:innen lesen sollen, ohne selbst Pfarrer:in zu sein. Sie ist
+in der Standardrolle **Gemeindesekretär:in** enthalten. Die Berechtigung allein
+legt jedoch noch keine Personen fest.
+
+So richten Sie die Sichtbarkeit ein:
+
+1. Öffnen Sie **Administration → Benutzer** und bearbeiten Sie das gewünschte
+   Konto.
+2. Aktivieren Sie im Reiter **Urlaub** die Urlaubsverwaltung, falls die Person
+   den Urlaubsplan bedienen soll.
+3. Wählen Sie im Feld **Pfarrer:innen aus diesen Pools im Urlaubsplan anzeigen**
+   einen oder mehrere Pools aus und speichern Sie.
+
+Die Auswahl steuert ausschließlich die Sichtbarkeit von Pfarrer:innen und
+Diakon:innen im Urlaubsplan. Sie ändert weder die normale Mitgliedschaft im
+Pool noch die Zuständigkeit für Vertretungen. Mehrere Pools gelten als
+Vereinigungsmenge. Die Auswahl ist für Benutzerkonten mit entsprechender
+Verwaltungsberechtigung verfügbar; lokale Administrator:innen können nur
+Pools aus ihren verwalteten Gemeinden zuweisen.
+
+Pfarrer:innen und Diakon:innen erhalten die gemeinsame-Pool-Sichtbarkeit
+automatisch. Für sie ist keine zusätzliche Sichtbarkeitszuordnung erforderlich.
+Die Markierung **Gruppierbar im Urlaubsplaner** eines Pools betrifft nur die
+Darstellung mit Gruppenüberschriften und ist keine Zugriffsberechtigung.
