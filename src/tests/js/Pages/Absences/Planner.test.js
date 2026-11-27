@@ -116,15 +116,16 @@ describe('Absences Planner timezone handling', () => {
         expect(ctx.toggleableUsers.map(user => user.id)).toEqual([1])
     })
 
-    it('groups visible pastors by groupable pools and keeps ungrouped pastors visible', () => {
-        const groupablePool = { id: 10, name: 'Nord', groupable: true }
+    it('groups visible pastors into every matching group and keeps ungrouped pastors visible', () => {
+        const northPool = { id: 10, name: 'Nord', groupable: true }
+        const southPool = { id: 11, name: 'Süd', groupable: true }
         const regularPool = { id: 20, name: 'Sonstige', groupable: false }
         const pastors = [
             {
                 id: 1,
                 isPastor: true,
                 show_absences_with_services: true,
-                pools: [groupablePool],
+                pools: [northPool, southPool],
                 sortName: 'A',
             },
             {
@@ -153,9 +154,46 @@ describe('Absences Planner timezone handling', () => {
 
         const sorted = Planner.methods.sortUsers.call(ctx, pastors)
 
-        expect(ctx.sections).toEqual(['Nord', 'Pfarrer:innen', 'Mitarbeitende'])
-        expect(sorted.Nord.map((user) => user.id)).toEqual([1])
+        expect(ctx.sections).toEqual([
+            'Pfarrer:innen Nord',
+            'Pfarrer:innen Süd',
+            'Pfarrer:innen',
+            'Mitarbeitende',
+        ])
+        expect(sorted['Pfarrer:innen Nord'].map((user) => user.id)).toEqual([1])
+        expect(sorted['Pfarrer:innen Süd'].map((user) => user.id)).toEqual([1])
         expect(sorted['Pfarrer:innen'].map((user) => user.id)).toEqual([2])
-        expect(ctx.openSections.Nord).toBe(true)
+        expect(ctx.openSections['Pfarrer:innen Nord']).toBe(true)
+    })
+
+    it('does not add an empty general pastor section', () => {
+        const groupablePool = { id: 10, name: 'Nord', groupable: true }
+        const pastor = {
+            id: 1,
+            isPastor: true,
+            show_absences_with_services: true,
+            pools: [groupablePool],
+            sortName: 'A',
+        }
+        const ctx = {
+            isPastor: true,
+            pinnedPastors: null,
+            pinnedUsers: [],
+            sections: [],
+            toggleableUsers: [],
+            openSections: {},
+            $page: {
+                props: {
+                    currentUser: { data: { id: 99, isPastor: true } },
+                    labels: { pastor: 'Pfarrer' },
+                },
+            },
+            pastorPluralLabel: () => 'Pfarrer:innen',
+        }
+
+        const sorted = Planner.methods.sortUsers.call(ctx, [pastor])
+
+        expect(ctx.sections).toEqual(['Pfarrer:innen Nord', 'Mitarbeitende'])
+        expect(sorted['Pfarrer:innen']).toBeUndefined()
     })
 })

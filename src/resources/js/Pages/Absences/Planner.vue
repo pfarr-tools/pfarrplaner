@@ -869,15 +869,17 @@ export default {
                     }, [])
                     .sort((a, b) => (a.name < b.name ? -1 : 1))
 
-                groupablePools.forEach((pool) => {
-                    sortedUsers[pool.name] = []
-                    this.sections.push(pool.name)
-                    this.openSections[pool.name] = this.openSections[pool.name] ?? true
-                })
-
                 const pastorSection = this.pastorPluralLabel()
-                sortedUsers[pastorSection] = []
-                this.sections.push(pastorSection)
+                const groupedPastors = new Map(
+                    groupablePools.map((pool) => [
+                        pool.id,
+                        {
+                            label: `${pastorSection} ${pool.name}`,
+                            users: [],
+                        },
+                    ]),
+                )
+                const ungroupedPastors = []
                 users.forEach((user) => {
                     if (usedIds.includes(user.id)) return
                     if (user.isPastor) {
@@ -891,14 +893,28 @@ export default {
                                 (user.pools || []).some((userPool) => userPool.id === pool.id),
                             )
                             if (userPools.length) {
-                                userPools.forEach((pool) => sortedUsers[pool.name].push(user))
+                                userPools.forEach((pool) =>
+                                    groupedPastors.get(pool.id).users.push(user),
+                                )
                             } else {
-                                sortedUsers[pastorSection].push(user)
+                                ungroupedPastors.push(user)
                             }
                             usedIds.push(user.id)
                         }
                     }
                 })
+
+                groupedPastors.forEach(({ label, users: groupedUsers }) => {
+                    if (!groupedUsers.length) return
+
+                    sortedUsers[label] = groupedUsers
+                    this.sections.push(label)
+                    this.openSections[label] = this.openSections[label] ?? true
+                })
+                if (ungroupedPastors.length) {
+                    sortedUsers[pastorSection] = ungroupedPastors
+                    this.sections.push(pastorSection)
+                }
                 sortedUsers['Mitarbeitende'] = []
                 this.sections.push('Mitarbeitende')
                 users.forEach((user) => {
