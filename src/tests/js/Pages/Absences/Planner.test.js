@@ -199,6 +199,38 @@ describe('Absences Planner timezone handling', () => {
         expect(ctx.openSections['Pfarrer:innen Nord']).toBe(true)
     })
 
+    it('shows grouped pastors and visibility controls for non-pastors', () => {
+        const pool = { id: 10, name: 'Oberes Gäu', groupable: true }
+        const pastor = {
+            id: 1,
+            isPastor: true,
+            show_absences_with_services: true,
+            pools: [pool],
+            sortName: 'A',
+        }
+        const ctx = {
+            isPastor: false,
+            pinnedPastors: null,
+            pinnedUsers: [],
+            sections: [],
+            toggleableUsers: [],
+            openSections: {},
+            $page: {
+                props: {
+                    currentUser: { data: { id: 99, isPastor: false } },
+                    labels: { pastor: 'Pfarrer' },
+                },
+            },
+            pastorPluralLabel: () => 'Pfarrer:innen',
+        }
+
+        const sorted = Planner.methods.sortUsers.call(ctx, [pastor])
+
+        expect(sorted['Pfarrer:innen Oberes Gäu'].map((user) => user.id)).toEqual([1])
+        expect(ctx.sections).toEqual(['Pfarrer:innen Oberes Gäu'])
+        expect(ctx.toggleableUsers.map((user) => user.id)).toEqual([1])
+    })
+
     it('does not add an empty general pastor section', () => {
         const groupablePool = { id: 10, name: 'Nord', groupable: true }
         const pastor = {

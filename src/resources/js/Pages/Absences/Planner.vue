@@ -883,7 +883,7 @@ export default {
                 }
             })
 
-            if (this.$page.props.currentUser.data.isPastor) {
+            {
                 const groupablePools = users
                     .filter((user) => user.isPastor)
                     .flatMap((user) => user.pools || [])
@@ -958,8 +958,6 @@ export default {
                         usedIds.push(user.id)
                     }
                 })
-            } else {
-                sortedUsers['Mitarbeitende'] = []
             }
 
             if (!this.$page.props.currentUser.data.isPastor) {

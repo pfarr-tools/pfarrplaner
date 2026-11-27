@@ -90,7 +90,11 @@ Die Monatsübersicht bleibt auch bei langen Listen gut lesbar:
 - Die Kopfzeile mit den Tagen bleibt beim Scrollen nach unten sichtbar.
 - Die linke Spalte mit den Namen bleibt beim seitlichen Scrollen sichtbar.
 - Oberhalb der Tabelle sehen Sie zusätzlich eine kleine Zusammenfassung mit Anzahl der Tage und aktuell sichtbaren Personen.
-- Rechts oben finden Pfarrpersonen eine aufklappbare Liste **Mitarbeitende**. Dort können Mitarbeitende mit einem Schalter **An** oder **Aus** in der Tabelle ein- oder ausgeblendet werden. Die Liste ist scrollbar, wenn viele Personen zur Auswahl stehen.
+- Rechts oben finden Sie eine aufklappbare Liste **Angezeigte Personen**. Dort
+  können ein- und ausblendbare Personen mit einem Schalter **An** oder **Aus**
+  in der Tabelle ein- oder ausgeblendet werden. Pfarrer:innen sind dabei unter
+  denselben Poolgruppen wie in der Tabelle zusammengefasst. Die Liste ist
+  scrollbar, wenn viele Personen zur Auswahl stehen.
 
 Die Benutzer:innen sind in Bereiche gegliedert:
 
