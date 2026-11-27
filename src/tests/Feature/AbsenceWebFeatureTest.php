@@ -63,7 +63,7 @@ class AbsenceWebFeatureTest extends TestCase
     /** Assigned pools form a deduplicated union for authorized non-pastors. */
     public function test_authorized_secretary_sees_pastors_from_all_assigned_pools_once(): void
     {
-        $permission = Permission::findOrCreate('pfarrer_urlaub_sehen', 'web');
+        $permission = Permission::findOrCreate('pfarrer_urlaub_lesen', 'web');
         $secretary = User::factory()->create(['manage_absences' => true]);
         $secretary->givePermissionTo($permission);
         $poolA = Pool::factory()->create();

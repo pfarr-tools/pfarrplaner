@@ -486,7 +486,7 @@
                         v-model="myUser.visible_pools"
                         multiple
                         label="Pfarrer:innen aus diesen Pools im Urlaubsplaner anzeigen"
-                        help="Diese Zuordnung gilt zusätzlich zur normalen Pool-Mitgliedschaft und steuert nur die Sichtbarkeit für Benutzer:innen mit der Berechtigung pfarrer_urlaub_sehen."
+                        help="Diese Zuordnung gilt zusätzlich zur normalen Pool-Mitgliedschaft und steuert nur die Sichtbarkeit für Benutzer:innen mit der Berechtigung pfarrer_urlaub_lesen."
                         :options="pools"
                         :settings="{ labelField: 'name', searchFields: ['name'] }"
                     />

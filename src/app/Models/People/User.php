@@ -832,7 +832,7 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
      * Permission logic:
      * (A) Pastors (role Pastor:in, Diakon:in) may see all fellow pastors in their district (cities with view rights), all staff in their home cities, and pastors sharing a pool
      * (B) Staff (users with manage_absences flag set) may see all fellow staff in their home city
-     * (C) Users with pfarrer_urlaub_sehen may see pastors from explicitly assigned visibility pools
+     * (C) Users with pfarrer_urlaub_lesen may see pastors from explicitly assigned visibility pools
      * (D) Users without the manage_absences flag see nothing at all
      *
      * @return Collection<int, User>
@@ -890,7 +890,7 @@ class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticata
                 })->pluck('id')->all();
                 $ids = array_merge($ids, $newIds);
             }
-        } elseif ($this->hasPermissionTo('pfarrer_urlaub_sehen')) {
+        } elseif ($this->hasPermissionTo('pfarrer_urlaub_lesen')) {
             $poolIds = $this->visiblePools()->pluck('pools.id');
             if ($poolIds->isNotEmpty()) {
                 /** @var array<int|string> $newIds */

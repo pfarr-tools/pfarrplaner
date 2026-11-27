@@ -47,7 +47,7 @@ Pivotzeilen beim Löschen des jeweiligen Kontos oder Pools; die Kombination aus
 `User::getViewableAbsenceUsers()` setzt die serverseitige Vereinigungsmenge
 zusammen. Sie umfasst die eigene Person, die bestehende Sichtbarkeit von
 Mitarbeitenden und Gemeinden, gemeinsame Pools für Pfarrer:innen und
-Diakon:innen sowie – bei `pfarrer_urlaub_sehen` – die Pfarrer:innen aus den
+Diakon:innen sowie – bei `pfarrer_urlaub_lesen` – die Pfarrer:innen aus den
 explizit zugewiesenen `visiblePools`. Ohne `manage_absences` wird weiterhin
 keine Urlaubsplanliste geladen. Die Abfrage verwendet `groupable` nicht;
 dieses Feld ist ausschließlich ein Darstellungsmerkmal des Vue-Urlaubsplaners.

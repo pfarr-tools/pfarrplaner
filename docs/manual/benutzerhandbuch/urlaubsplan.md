@@ -41,7 +41,7 @@ für Ihr Konto eingerichteten Pool-Sichtbarkeiten ab:
   Diakon:innen, die mindestens einem gemeinsamen Pool angehören.
 - Andere Benutzer:innen sehen Pfarrer:innen aus den Pools, die ihnen in der
   Administration ausdrücklich zugewiesen wurden. Dafür benötigen sie die
-  Berechtigung `pfarrer_urlaub_sehen`.
+  Berechtigung `pfarrer_urlaub_lesen`.
 - Mehrere zugewiesene Pools werden zusammengefasst. Eine Person erscheint
   dadurch höchstens einmal in der Tabelle, auch wenn sie mehreren dieser Pools
   angehört.

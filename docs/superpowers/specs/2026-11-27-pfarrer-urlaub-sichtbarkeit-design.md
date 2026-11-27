@@ -20,10 +20,10 @@ Darstellung im Planner und keine Berechtigung.
 
 ## Berechtigungsregeln
 
-- Die neue Berechtigung heißt `pfarrer_urlaub_sehen`.
+- Die neue Berechtigung heißt `pfarrer_urlaub_lesen`.
 - Pfarrer:innen behalten die bisherige Sichtbarkeit und sehen zusätzlich
   Pfarrer:innen, mit denen sie einen Pool teilen.
-- Nicht-Pfarrer:innen benötigen `pfarrer_urlaub_sehen`, um Pfarrer:innen aus
+- Nicht-Pfarrer:innen benötigen `pfarrer_urlaub_lesen`, um Pfarrer:innen aus
   ihren zugewiesenen Sichtbarkeitspools zu sehen.
 - Mehrere zugewiesene Pools werden vereinigt; ein gemeinsamer Pool genügt.
 - Die bisherige Sichtbarkeit von Mitarbeiter:innen, die eigene Person und

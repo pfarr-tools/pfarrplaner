@@ -67,7 +67,7 @@ Einige Funktionen werden nicht als CRUD-Policy eines Modells gepr체ft. Dazu geh�
 | `gd-abendmahl-bearbeiten`, `gd-kinderkirche-bearbeiten`, `gd-opfer-bearbeiten`, `gd-kasualien-bearbeiten`, `gd-taufe-bearbeiten` | Jeweilige fachliche Eingabe- oder Kasualienbereiche. |
 | `ort-bearbeiten`, `kirche-bearbeiten`, `pfarramt-bearbeiten` | Schreiben in Orts-, Kirchen- bzw. Pfarramtsdaten. |
 | `fremden-urlaub-bearbeiten`, `urlaub-lesen` | Fremde Abwesenheiten bearbeiten bzw. Urlaubsinformationen lesen. |
-| `pfarrer_urlaub_sehen` | Pfarrer:innen und Diakon:innen aus den f체r das Benutzerkonto zugewiesenen Sichtbarkeitspools im Urlaubsplan sehen. |
+| `pfarrer_urlaub_lesen` | Pfarrer:innen und Diakon:innen aus den f체r das Benutzerkonto zugewiesenen Sichtbarkeitspools im Urlaubsplan lesen. |
 | `benutzerliste-lokal-sehen`, `benutzer-bearbeiten` | Lokale Benutzerliste sehen bzw. Benutzerkonten bearbeiten. |
 | `liederbuecher-bearbeiten` | Liederb체cher verwalten. |
 
@@ -75,7 +75,7 @@ Die verbindliche Zuordnung der Rollen zu diesen Berechtigungen steht in `src/con
 
 ## Poolbezogene Sichtbarkeit im Urlaubsplan
 
-Die Berechtigung `pfarrer_urlaub_sehen` ist f체r Benutzer:innen gedacht, die den
+Die Berechtigung `pfarrer_urlaub_lesen` ist f체r Benutzer:innen gedacht, die den
 Urlaub von Pfarrer:innen lesen sollen, ohne selbst Pfarrer:in zu sein. Sie ist
 in der Standardrolle **Gemeindesekret채r:in** enthalten. Die Berechtigung allein
 legt jedoch noch keine Personen fest.

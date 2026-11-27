@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Sekretär:innen mit `pfarrer_urlaub_sehen` sehen im Urlaubsplaner nur Pfarrer:innen aus den ihnen zugewiesenen Pools; Pfarrer:innen behalten und erweitern ihre bestehende Pool-Sichtbarkeit.
+**Goal:** Sekretär:innen mit `pfarrer_urlaub_lesen` sehen im Urlaubsplaner nur Pfarrer:innen aus den ihnen zugewiesenen Pools; Pfarrer:innen behalten und erweitern ihre bestehende Pool-Sichtbarkeit.
 
 **Architecture:** Eine separate `pool_user_visibility`-Pivot-Beziehung trennt Zugriff von Pool-Mitgliedschaft. `User::getViewableAbsenceUsers()` bildet die serverseitige Vereinigungsmenge aus bestehender City-/Rollenlogik, gemeinsamen Pools und zugewiesenen Sichtbarkeitspools. `groupable` bleibt reine Planner-Darstellung.
 
@@ -20,7 +20,7 @@
 
 ## Review Focus
 
-- Ein Nicht-Pfarrer ohne `pfarrer_urlaub_sehen` darf trotz zugewiesenem Pool keine Pfarrer:innen sehen; Test in Task 2.
+- Ein Nicht-Pfarrer ohne `pfarrer_urlaub_lesen` darf trotz zugewiesenem Pool keine Pfarrer:innen sehen; Test in Task 2.
 - Ein berechtigter Benutzer mit mehreren Pools erhält die Vereinigungsmenge ohne Duplikate; Test in Task 2.
 - Ein Pfarrer sieht gemeinsame Poolmitglieder zusätzlich zur bestehenden City-Sichtbarkeit; Test in Task 2.
 - Eine leere oder entfernte Poolzuweisung verändert keine Pool-Mitgliedschaften; Test in Task 1 und Task 3.
@@ -37,10 +37,10 @@
 - Modify: `src/config/roles.php`
 - Test: `src/tests/Feature/RoleConfigurationFeatureTest.php` und passende User/Pool-Feature-Tests
 
-- [ ] Failing tests for the unique user/pool visibility relation, inverse relations, and the `pfarrer_urlaub_sehen` permission.
+- [ ] Failing tests for the unique user/pool visibility relation, inverse relations, and the `pfarrer_urlaub_lesen` permission.
 - [ ] Add the reversible pivot migration with foreign keys, cascade deletes, and a unique `(user_id, pool_id)` constraint.
 - [ ] Add typed Eloquent relations `visiblePools()` and `visibilityUsers()` without changing `pools()`.
-- [ ] Add `pfarrer_urlaub_sehen` to the permission configuration and assign it only to the explicitly intended role(s), preserving existing role permissions unless the issue requires otherwise.
+- [ ] Add `pfarrer_urlaub_lesen` to the permission configuration and assign it only to the explicitly intended role(s), preserving existing role permissions unless the issue requires otherwise.
 - [ ] Run the focused Docker tests and verify the migration rollback path.
 
 ### Task 2: Server-side absence visibility
@@ -50,8 +50,8 @@
 - Test: `src/tests/Feature/AbsenceWebFeatureTest.php` or a focused absence visibility feature test
 
 - [ ] Add failing tests for unauthorized secretaries, authorized secretaries with one and multiple visibility pools, deduplication, and pastors sharing a pool.
-- [ ] Extend `getViewableAbsenceUsers()` with a server-side union: current user, existing staff/city visibility, existing pastor/city visibility, shared pools for pastors, and assigned visibility pools for users with `pfarrer_urlaub_sehen`.
-- [ ] Keep non-pastor access to pastor records gated by `pfarrer_urlaub_sehen`; do not use `groupable` in the query.
+- [ ] Extend `getViewableAbsenceUsers()` with a server-side union: current user, existing staff/city visibility, existing pastor/city visibility, shared pools for pastors, and assigned visibility pools for users with `pfarrer_urlaub_lesen`.
+- [ ] Keep non-pastor access to pastor records gated by `pfarrer_urlaub_lesen`; do not use `groupable` in the query.
 - [ ] Load `pools` for the Planner response without exposing unrelated credentials or access data.
 - [ ] Run the focused PHP feature tests and the complete relevant PHP suite.
 

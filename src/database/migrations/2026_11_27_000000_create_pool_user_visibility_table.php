@@ -11,7 +11,7 @@ return new class extends Migration
     {
         Schema::create('pool_user_visibility', function (Blueprint $table) {
             $table->id();
-            $table->unsignedInteger('user_id');
+            $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('pool_id');
             $table->timestamps();
 
