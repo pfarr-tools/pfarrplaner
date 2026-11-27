@@ -94,7 +94,7 @@ describe('Absences Planner timezone handling', () => {
         ])
     })
 
-    it('groups pastor visibility controls by pool and keeps multi-pool pastors in every group', () => {
+    it('groups pastor visibility controls by pool without duplicating multi-pool pastors', () => {
         const northPool = { id: 10, name: 'Nord', groupable: true }
         const southPool = { id: 11, name: 'Süd', groupable: true }
         const ctx = {
@@ -117,10 +117,6 @@ describe('Absences Planner timezone handling', () => {
         expect(sections).toEqual([
             {
                 label: 'Pfarrer:innen Nord',
-                users: [{ id: 1, isPastor: true, pools: [northPool, southPool] }],
-            },
-            {
-                label: 'Pfarrer:innen Süd',
                 users: [{ id: 1, isPastor: true, pools: [northPool, southPool] }],
             },
             { label: 'Pfarrer:innen', users: [{ id: 2, isPastor: true, pools: [] }] },
@@ -228,6 +224,36 @@ describe('Absences Planner timezone handling', () => {
 
         expect(sorted['Pfarrer:innen Oberes Gäu'].map((user) => user.id)).toEqual([1])
         expect(ctx.sections).toEqual(['Pfarrer:innen Oberes Gäu'])
+        expect(ctx.toggleableUsers.map((user) => user.id)).toEqual([1])
+    })
+
+    it('does not add a deactivated pastor to the employee visibility controls', () => {
+        const pastor = {
+            id: 1,
+            isPastor: true,
+            show_absences_with_services: false,
+            pools: [{ id: 10, name: 'Oberes Gäu', groupable: true }],
+            sortName: 'A',
+        }
+        const ctx = {
+            isPastor: false,
+            pinnedPastors: [],
+            pinnedUsers: [],
+            sections: [],
+            toggleableUsers: [],
+            openSections: {},
+            $page: {
+                props: {
+                    currentUser: { data: { id: 99, isPastor: false } },
+                    labels: { pastor: 'Pfarrer' },
+                },
+            },
+            pastorPluralLabel: () => 'Pfarrer:innen',
+        }
+
+        const sorted = Planner.methods.sortUsers.call(ctx, [pastor])
+
+        expect(sorted).toEqual({})
         expect(ctx.toggleableUsers.map((user) => user.id)).toEqual([1])
     })
 

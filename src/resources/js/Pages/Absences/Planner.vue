@@ -481,20 +481,22 @@ export default {
                 }, [])
                 .sort((a, b) => (a.name < b.name ? -1 : 1))
 
-            const sections = groupablePools
-                .map((pool) => ({
-                    label: `${pastorLabel} ${pool.name}`,
-                    users: pastors.filter((user) =>
+            const assignedPastorIds = new Set()
+            const sections = []
+            groupablePools.forEach((pool) => {
+                const users = pastors.filter(
+                    (user) =>
+                        !assignedPastorIds.has(user.id) &&
                         (user.pools || []).some((userPool) => userPool.id === pool.id),
-                    ),
-                }))
-                .filter((section) => section.users.length)
+                )
+                users.forEach((user) => assignedPastorIds.add(user.id))
+                if (users.length) {
+                    sections.push({ label: `${pastorLabel} ${pool.name}`, users })
+                }
+            })
 
             const ungroupedPastors = pastors.filter(
-                (user) =>
-                    !groupablePools.some((pool) =>
-                        (user.pools || []).some((userPool) => userPool.id === pool.id),
-                    ),
+                (user) => !assignedPastorIds.has(user.id),
             )
             if (ungroupedPastors.length) {
                 sections.push({ label: pastorLabel, users: ungroupedPastors })
@@ -945,7 +947,7 @@ export default {
                 sortedUsers['Mitarbeitende'] = []
                 users.forEach((user) => {
                     if (usedIds.includes(user.id)) return
-                    if (this.isPastor && user.isPastor) return
+                    if (user.isPastor) return
                     if (!user.show_absences_with_services) {
                         user.pinned =
                             this.pinnedUsers.includes(String(user.id)) ||
