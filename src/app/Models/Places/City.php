@@ -87,6 +87,7 @@ class City extends AbstractModel
         'youtube_cutoff_days' => 'nullable|int',
         'default_offering_url' => 'nullable|string',
         'offering_certificate_email' => 'nullable|email',
+        'electronic_offering_signatures' => 'nullable|boolean',
         'youtube_self_declared_for_children' => 'nullable|int',
         'communiapp_url' => 'nullable|string',
         'communiapp_token' => 'nullable|string',
@@ -105,6 +106,11 @@ class City extends AbstractModel
     ];
 
     public static $adminIcon = 'mdi mdi-church';
+
+    /** @var array<string, string> Casts for city-level feature switches. */
+    protected $casts = [
+        'electronic_offering_signatures' => 'boolean',
+    ];
 
     public static $adminGroup = 'Orte';
 
@@ -140,6 +146,7 @@ class City extends AbstractModel
         'youtube_cutoff_days',
         'default_offering_url',
         'offering_certificate_email',
+        'electronic_offering_signatures',
         'youtube_self_declared_for_children',
         'communiapp_url',
         'communiapp_token',

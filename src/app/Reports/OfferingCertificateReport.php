@@ -13,11 +13,14 @@
 
 namespace App\Reports;
 
+use App\Models\OfferingSettlement;
 use App\Models\Places\City;
 use App\Models\Service;
 use App\Services\FileNameService;
+use App\Services\OfferingSettlementFinalizer;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -69,6 +72,25 @@ class OfferingCertificateReport extends AbstractPDFDocumentReport
         /** @var array{service: int} $data */
         $data = $request->validate(['service' => ['required', 'integer']]);
         $service = $this->accessibleServices()->whereKey($data['service'])->firstOrFail();
+        $settlement = OfferingSettlement::query()
+            ->where('service_id', $service->id)
+            ->where('status', 'finalized')
+            ->latest('revision')
+            ->first();
+        if ($settlement && app(OfferingSettlementFinalizer::class)->verify($settlement)) {
+            return Storage::download(
+                $settlement->pdf_path,
+                FileNameService::make(
+                    self::FILE_TITLE,
+                    'pdf',
+                    self::FILE_SIGNATURE,
+                    $service->trueDate(),
+                    false,
+                    $this->authenticatedUser(),
+                ),
+                ['Content-Type' => 'application/pdf'],
+            );
+        }
         /** @var City $city */
         $city = $service->city;
 

@@ -9,6 +9,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates
  && sed -i 's|^listen = .*|listen = 9000|' /etc/php/8.4/fpm/pool.d/www.conf \
  && sed -i -E 's|^[[:space:];]*clear_env[[:space:]]*=.*$|clear_env = no|' /etc/php/8.4/fpm/pool.d/www.conf \
  && sed -i -E 's|^[[:space:];]*catch_workers_output[[:space:]]*=.*$|catch_workers_output = yes|' /etc/php/8.4/fpm/pool.d/www.conf \
+ && mkdir -p /var/www/.config /var/www/.cache \
+ && chown -R www-data:www-data /var/www \
  && echo 'de_DE.UTF-8 UTF-8' > /etc/locale.gen && locale-gen \
  && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
  && rm -rf /var/lib/apt/lists/*

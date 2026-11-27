@@ -14,12 +14,16 @@
 namespace App\Mail;
 
 use App\Documents\PDF;
+use App\Models\OfferingSettlement;
 use App\Models\Places\City;
 use App\Models\Service;
+use App\Services\OfferingSettlementFinalizer;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Storage;
+use RuntimeException;
 
 /**
  * Send an automatically generated offering certificate.
@@ -51,7 +55,23 @@ class OfferingCertificateMail extends Mailable implements ShouldQueue
         $service = $this->service->load(['city', 'location', 'organists']);
         /** @var City $city */
         $city = $service->city;
-        $pdf = PDF::fromView('reports.offeringcertificate.render', compact('service'))->pdf();
+        $settlement = OfferingSettlement::query()
+            ->where('service_id', $service->id)
+            ->where('status', 'finalized')
+            ->latest('revision')
+            ->first();
+        if (
+            $settlement
+            && is_string($settlement->pdf_path)
+            && app(OfferingSettlementFinalizer::class)->verify($settlement)
+        ) {
+            $pdf = Storage::get($settlement->pdf_path);
+            if (! is_string($pdf)) {
+                throw new RuntimeException('Die archivierte Opferurkunde konnte nicht gelesen werden.');
+            }
+        } else {
+            $pdf = PDF::fromView('reports.offeringcertificate.render', compact('service'))->pdf();
+        }
         $filename = 'Opferurkunde-'.$service->date?->format('Y-m-d').'.pdf';
 
         return $this

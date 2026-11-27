@@ -41,12 +41,14 @@ use App\Models\Attachment;
 use App\Models\Calendar\Day;
 use App\Models\LiturgyInfo;
 use App\Models\Location;
+use App\Models\OfferingSettlement;
 use App\Models\People\User;
 use App\Models\Places\City;
 use App\Models\Service;
 use App\Models\ServiceGroup;
 use App\Models\Tag;
 use App\Services\GiroCodeService;
+use App\Services\OfferingSettlementFinalizer;
 use App\Services\RedirectorService;
 use App\Traits\HandlesAttachmentsTrait;
 use Carbon\Carbon;
@@ -241,6 +243,27 @@ class ServiceController extends Controller
         $city = $service->city;
         abort_unless($city instanceof City, 404);
         $adChannels = $city->getActiveAdChannels();
+        $settlement = OfferingSettlement::query()
+            ->where('service_id', $service->id)
+            ->where('status', 'finalized')
+            ->latest('revision')
+            ->first();
+        $offeringCertificate = null;
+        if (
+            $settlement
+            && is_string($settlement->pdf_path)
+            && app(OfferingSettlementFinalizer::class)->verify($settlement)
+        ) {
+            $offeringCertificate = [
+                'key' => 'offering-certificate',
+                'title' => 'Signierte Opferurkunde',
+                'extension' => 'pdf',
+                'size' => Storage::size($settlement->pdf_path),
+                'icon' => 'mdi mdi-file-pdf-box',
+                'type' => 'offering-certificate',
+                'url' => route('offerings.settlement.download', ['offeringSettlement' => $settlement]),
+            ];
+        }
 
         return Inertia::render(
             $view,
@@ -256,6 +279,7 @@ class ServiceController extends Controller
                 'liturgyInfo',
                 'adsConfig',
                 'adChannels',
+                'offeringCertificate',
             )
         );
     }

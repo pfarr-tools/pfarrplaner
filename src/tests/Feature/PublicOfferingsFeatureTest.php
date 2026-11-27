@@ -14,12 +14,15 @@
 namespace Tests\Feature;
 
 use App\Mail\OfferingCertificateMail;
+use App\Models\OfferingSettlement;
 use App\Models\Places\City;
 use App\Models\Service;
+use App\Services\OfferingSettlementFinalizer;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\URL;
+use Mockery;
 use Tests\TestCase;
 
 /**
@@ -28,6 +31,8 @@ use Tests\TestCase;
 class PublicOfferingsFeatureTest extends TestCase
 {
     use RefreshDatabase;
+
+    private const PNG = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=';
 
     /**
      * A valid signed URL exposes today's services without requiring login.
@@ -49,6 +54,18 @@ class PublicOfferingsFeatureTest extends TestCase
                 ->where('city.id', $city->id)
                 ->where('services.0.id', $service->id)
                 ->where('fallback', false));
+    }
+
+    /**
+     * The public page receives the configured electronic-signature switch.
+     */
+    public function test_guest_sees_electronic_signature_configuration(): void
+    {
+        $city = City::factory()->create(['electronic_offering_signatures' => true]);
+
+        $this->get(URL::signedRoute('offerings.public', ['city' => $city]))
+            ->assertOk()
+            ->assertInertia(fn ($page) => $page->where('electronicSignatures', true));
     }
 
     /**
@@ -160,6 +177,68 @@ class PublicOfferingsFeatureTest extends TestCase
         $this->assertSame(['2000' => 1, '500' => 2, '50' => 3], $service->offering_denominations);
         $this->assertSame('Anna', $service->offerings_counter1);
         $this->assertSame('Berta', $service->offerings_counter2);
+    }
+
+    /**
+     * A configured signed form rejects malformed signature images.
+     */
+    public function test_configured_electronic_signatures_reject_invalid_images(): void
+    {
+        $city = City::factory()->create(['electronic_offering_signatures' => true]);
+        $service = Service::factory()->create([
+            'city_id' => $city->id,
+            'date' => Carbon::now('Europe/Berlin')->setTime(10, 0),
+            'offering_amount' => '',
+            'offerings_counter1' => 'Anna',
+            'offerings_counter2' => 'Bernd',
+        ]);
+
+        $this->post(URL::signedRoute('offerings.save', ['city' => $city]), [
+            'service_id' => $service->id,
+            'offering_amount' => '12,50',
+            'offerings_counter1' => 'Anna',
+            'offerings_counter2' => 'Bernd',
+            'signatures' => [
+                ['name' => 'Anna', 'image' => 'not-a-png'],
+                ['name' => 'Bernd', 'image' => 'not-a-png'],
+            ],
+        ])->assertUnprocessable();
+
+        $this->assertSame('', $service->refresh()->offering_amount);
+    }
+
+    /**
+     * A valid configured submission is handed to the atomic finalizer.
+     */
+    public function test_configured_electronic_signatures_are_finalized(): void
+    {
+        $city = City::factory()->create(['electronic_offering_signatures' => true]);
+        $service = Service::factory()->create([
+            'city_id' => $city->id,
+            'date' => Carbon::now('Europe/Berlin')->setTime(10, 0),
+            'offering_amount' => '',
+        ]);
+        $finalizer = Mockery::mock(OfferingSettlementFinalizer::class);
+        $finalizer->expects('finalize')
+            ->once()
+            ->withArgs(static function (Service $actualService, array $signatures) use ($service): bool {
+                return $actualService->is($service)
+                    && $signatures[0]['name'] === 'Anna'
+                    && $signatures[1]['name'] === 'Bernd';
+            })
+            ->andReturn(OfferingSettlement::make(['status' => 'finalized']));
+        $this->app->instance(OfferingSettlementFinalizer::class, $finalizer);
+
+        $this->post(URL::signedRoute('offerings.save', ['city' => $city]), [
+            'service_id' => $service->id,
+            'offering_amount' => '12,50',
+            'offerings_counter1' => 'Anna',
+            'offerings_counter2' => 'Bernd',
+            'signatures' => [
+                ['name' => 'Anna', 'image' => 'data:image/png;base64,'.self::PNG],
+                ['name' => 'Bernd', 'image' => 'data:image/png;base64,'.self::PNG],
+            ],
+        ])->assertRedirect();
     }
 
     /**

@@ -187,10 +187,37 @@
                         </div>
                     </div>
 
+                    <div
+                        v-if="electronicSignatures && signatureEntries.length"
+                        class="mt-4"
+                        data-testid="signature-section"
+                    >
+                        <p
+                            class="alert alert-info"
+                            data-testid="signature-confirmation"
+                        >
+                            Wir bestätigen mit unseren Unterschriften die Richtigkeit der
+                            vorstehenden Opferabrechnung.
+                        </p>
+                        <div
+                            v-for="entry in signatureEntries"
+                            :key="entry.index"
+                            class="mb-3"
+                            data-testid="signature-field"
+                        >
+                            <SignaturePad
+                                v-model="form.signatures[entry.index]"
+                                :label="entry.name"
+                                :required="true"
+                            />
+                        </div>
+                    </div>
+
                     <button
                         type="submit"
                         class="btn btn-primary btn-lg w-100"
                         data-testid="save-offering"
+                        :disabled="electronicSignatures && !hasAllSignatures"
                     >
                         Opfer speichern
                     </button>
@@ -202,6 +229,7 @@
 
 <script>
 import { formatPlannerDateForDisplay } from '../../../helpers/plannerDates'
+import SignaturePad from '../../../Components/Forms/SignaturePad.vue'
 
 /**
  * Create a fresh empty array for nearby services.
@@ -217,12 +245,14 @@ function defaultNearbyServices() {
  */
 export default {
     name: 'PublicCityOfferings',
+    components: { SignaturePad },
     props: {
         city: { type: Object, required: true },
         services: { type: Array, default: () => [] },
         nearbyServices: { type: Array, default: defaultNearbyServices },
         fallback: { type: Boolean, default: false },
         denominations: { type: Object, default: () => ({}) },
+        electronicSignatures: { type: Boolean, default: false },
     },
     data() {
         return {
@@ -282,6 +312,40 @@ export default {
             )
         },
         /**
+         * Return named counters that need an electronic signature.
+         *
+         * @returns {Array<{index: number, name: string}>} Signers.
+         */
+        signatureEntries() {
+            return [this.form.offerings_counter1, this.form.offerings_counter2]
+                .map((name, index) => ({ name: String(name || '').trim(), index }))
+                .filter(({ name }) => name !== '')
+        },
+        /**
+         * Determine whether every named counter has signed.
+         *
+         * @returns {boolean} True when all required signatures exist.
+         */
+        hasAllSignatures() {
+            return (
+                this.signatureEntries.length > 0 &&
+                this.signatureEntries.every(({ index }) => this.form.signatures[index])
+            )
+        },
+        /**
+         * Identify changes that invalidate collected signatures.
+         *
+         * @returns {string} Stable key for certificate data.
+         */
+        signableDataKey() {
+            return JSON.stringify({
+                amount: this.form.offering_amount,
+                denominations: this.form.offering_denominations,
+                counter1: this.form.offerings_counter1,
+                counter2: this.form.offerings_counter2,
+            })
+        },
+        /**
          * Return the success message shared after a saved offering redirect.
          *
          * @returns {string|null} Success message, if present.
@@ -299,6 +363,9 @@ export default {
         },
     },
     watch: {
+        signableDataKey() {
+            if (this.form.signatures.some(Boolean)) this.form.signatures = ['', '']
+        },
         calculatedTotalCents(total) {
             if (this.denominationsExpanded) {
                 this.form.offering_amount = total > 0 ? this.formatAmount(total) : ''
@@ -331,6 +398,7 @@ export default {
                 offering_denominations: counts,
                 offerings_counter1: service?.offerings_counter1 ?? '',
                 offerings_counter2: service?.offerings_counter2 ?? '',
+                signatures: ['', ''],
             }
         },
         /**
@@ -406,6 +474,10 @@ export default {
                 offering_denominations: denominations,
                 offerings_counter1: this.form.offerings_counter1,
                 offerings_counter2: this.form.offerings_counter2,
+                signatures: this.signatureEntries.map(({ index, name }) => ({
+                    name,
+                    image: this.form.signatures[index],
+                })),
             })
         },
         /**

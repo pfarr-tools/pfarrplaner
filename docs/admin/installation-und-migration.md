@@ -525,6 +525,38 @@ das vorherige Image gemeinsam wiederherzustellen.
 Produktionsupdate sind Datenbank und MinIO zu sichern und die Sicherung zu
 verifizieren.
 
+### Elektronische Opferunterschriften und revisionssichere Opferurkunden
+
+Die Migration `2026_11_27_000002_add_electronic_offering_settlements` ergänzt
+die stadtbezogene Option für elektronische Unterschriften sowie die Tabellen
+`offering_settlements` und `offering_settlement_corrections`. Die Option wird
+im Stadt-Editor aktiviert. Ist sie aktiv, muss die öffentliche Opfererfassung
+für jede eingetragene Opferzähler:in eine Unterschrift als PNG übermitteln.
+
+Nach erfolgreicher Übermittlung archiviert die Anwendung die signierten Bilder,
+den normalisierten Abrechnungssnapshot, ein signiertes Manifest und die PDF-
+Opferurkunde im konfigurierten privaten Standardspeicher (in Produktion
+MinIO). Die Dateien werden nicht ersetzt; Integritätsprüfungen vergleichen
+die gespeicherten SHA-256-Prüfsummen und die Manifest-Signatur.
+
+Eine bereits finalisierte Abrechnung kann nur über den authentifizierten
+Korrektur-Endpunkt mit Begründung geöffnet werden. Dabei wird die vorherige
+Beleg-ID mit Benutzerkonto und Grund in `offering_settlement_corrections`
+protokolliert. Die neue Eingabe erzeugt anschließend eine eigene Revision.
+
+Vor dem produktiven Aktivieren sind wie bei jeder Schemaänderung ein
+verifiziertes Backup und ein Rollback über das vorherige Image vorzubereiten:
+
+```sh
+./planer backup create
+./planer backup verify
+./planer update --backup-confirmed
+```
+
+Die bestehende öffentliche Opfererfassung bleibt unverändert, solange die
+Option für die Stadt deaktiviert ist. Ohne aktivierte Option wird weiterhin
+die bisherige Opferurkunde ohne elektronische Unterschrift erzeugt.
+
 ### Migration der Kontoklassifikation und des Sicherheits-Onboardings
 
 Die Migration `2026_11_18_090000_persist_official_user_and_security_onboarding_state` ergänzt `users.is_official_user`, `users.security_onboarding_email_logins` und `users.security_onboarding_last_shown_at`. Bei Bestandskonten wird `is_official_user` auf `true` gesetzt, wenn zuvor ein nichtleerer Legacy-Passwort-Hash vorhanden war. Für alle Konten setzt die Migration `must_change_password` auf `false`. Die bisherigen Hashwerte bleiben in der Datenbank erhalten, werden nach dem Update aber von keinem Anmelde- oder Verwaltungsweg verwendet.
