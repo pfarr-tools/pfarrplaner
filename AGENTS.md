@@ -121,6 +121,14 @@ Bezeichnern, Dateinamen, URLs und CLI-Optionen vorbehalten.
   erfolgreichen Push die entsprechende Prüfung frisch ausführen.
 - Committen oder pushen nur auf ausdrücklichen Auftrag. Ein solcher Auftrag
   liegt für den aktuellen Repository-Aufbau ausdrücklich vor.
+- Commits und Merges nach `main` sind nur erlaubt, wenn Formatierung,
+  Qualitätsprüfung und Tests grün sind. Vor jedem Merge nach `main` müssen
+  `./planer dev format:check`, `./planer dev quality` und `./planer dev test
+  --no-browser --no-js` frisch und erfolgreich ausgeführt worden sein.
+- Auf Feature-Branches darf der Prüfumfang während der Arbeit reduziert sein;
+  vor dem Merge nach `main` müssen jedoch dieselben Prüfungen vollständig
+  grün sein. Abschließende, Issue- und Branch-schließende Merges nach `main`
+  werden nach Möglichkeit als Squash-Commit ausgeführt.
 
 ### Qualitätsprüfung
 

@@ -10,6 +10,10 @@ repair_dev_query_log_permissions() {
   compose exec -T -u 0 app sh -c \
     'if [ -e storage/logs/query.log ]; then chmod 666 storage/logs/query.log; fi'
 }
+repair_dev_build_permissions() {
+  compose exec -T -u 0 app sh -c \
+    'if [ -d public/build ]; then chown -R www-data:www-data public/build; fi'
+}
 production_compose() {
   local args=( -f "$ROOT/compose.production.yaml" )
   if [[ "${MAIL_POSTFIX_ENABLED:-}" == true ]] || grep -q '^MAIL_POSTFIX_ENABLED=true$' "$ROOT/.env" 2>/dev/null; then
@@ -166,7 +170,8 @@ EOF
       QUALITY_FILES="$js_quality_files" run_dev lint
       run_dev complexity:check
       compose run --rm vite npm run build
-      run_dev test --no-js
+      repair_dev_build_permissions
+      run_dev test --no-js --no-browser
       compose run --rm vite npm run test:js:run
       ;;
     complexity:check) compose exec --user www-data app composer complexity:check ;;

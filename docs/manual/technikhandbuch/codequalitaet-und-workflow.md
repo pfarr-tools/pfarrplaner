@@ -125,6 +125,17 @@ für Qualitätsprüfungen verwendet. Der kombinierte Befehl verändert keine
 Dateien. Formatierung ist bewusst ein separater, manueller Schritt; der
 Quality-Lauf prüft sie jedoch schreibgeschützt.
 
+## Merge-Regeln
+
+Commits und Merges nach `main` sind nur erlaubt, wenn Formatierung,
+Qualitätsprüfung und Tests grün sind. Vor jedem Merge nach `main` müssen
+`./planer dev format:check`, `./planer dev quality` und
+`./planer dev test --no-browser --no-js` frisch und erfolgreich ausgeführt
+worden sein. Auf Feature-Branches darf der Prüfumfang während der Arbeit
+reduziert sein; vor dem Merge nach `main` müssen dieselben Prüfungen
+vollständig grün sein. Abschließende, Issue- und Branch-schließende Merges
+nach `main` werden nach Möglichkeit als Squash-Commit ausgeführt.
+
 ## Empfohlener Ablauf
 
 1. Verwandten Code und die geltenden AGENTS-Regeln lesen.
@@ -134,3 +145,5 @@ Quality-Lauf prüft sie jedoch schreibgeschützt.
 4. `./planer dev quality` ausführen.
 5. Baselines nur für bereits vorhandene, dokumentierte Verstöße aktualisieren
    und die offene Altlast im Issue nachvollziehbar halten.
+6. Vor dem Merge nach `main` die Merge-Regeln prüfen und den abschließenden
+   Merge nach Möglichkeit squashen.

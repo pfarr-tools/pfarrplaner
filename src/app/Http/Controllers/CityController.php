@@ -249,7 +249,10 @@ class CityController extends AbstractCRUDController
             try {
                 $this->validateElectronicSignatures($data, $signatureService);
             } catch (ValidationException $exception) {
-                abort(422, (string) ($exception->errors()['signatures'][0] ?? 'Die Unterschriften sind ungültig.'));
+                $errors = $exception->errors();
+                $messages = $errors['signatures'] ?? [];
+                $message = is_array($messages) ? ($messages[0] ?? null) : null;
+                abort(422, is_string($message) ? $message : 'Die Unterschriften sind ungültig.');
             }
         }
 
@@ -285,11 +288,16 @@ class CityController extends AbstractCRUDController
      */
     private function validateElectronicSignatures(array $data, OfferingSignatureService $signatureService): void
     {
-        $requiredNames = collect([$data['offerings_counter1'] ?? null, $data['offerings_counter2'] ?? null])
-            ->map(static fn (mixed $name): string => trim((string) $name))
+        $names = [$data['offerings_counter1'] ?? null, $data['offerings_counter2'] ?? null];
+        $requiredNames = collect(array_map(
+            static fn (mixed $name): string => is_string($name) ? trim($name) : '',
+            $names,
+        ))
             ->filter()
             ->values();
-        $signatures = collect($data['signatures'] ?? []);
+        $signaturesInput = $data['signatures'] ?? [];
+        /** @var array<int|string, mixed> $signaturesInput */
+        $signatures = collect($signaturesInput);
 
         if ($requiredNames->isEmpty() || $signatures->count() !== $requiredNames->count()) {
             throw ValidationException::withMessages(['signatures' => 'Für jede Opferzähler:in ist eine Unterschrift erforderlich.']);
@@ -301,7 +309,11 @@ class CityController extends AbstractCRUDController
                 throw ValidationException::withMessages(['signatures' => "Die Unterschrift von {$name} fehlt."]);
             }
 
-            $signatureService->validateImage((string) $signature['image']);
+            $image = $signature['image'];
+            if (! is_string($image)) {
+                throw ValidationException::withMessages(['signatures' => "Die Unterschrift von {$name} ist ungültig."]);
+            }
+            $signatureService->validateImage($image);
         }
     }
 
@@ -333,13 +345,17 @@ class CityController extends AbstractCRUDController
         OfferingSettlementFinalizer $finalizer,
     ) {
         $offeringSettlement->load('service.city');
+        $service = $offeringSettlement->service;
+        abort_unless($service instanceof Service, 404);
         $user = Auth::user();
         abort_unless($user instanceof User, 401);
         abort_unless(
-            $user->isAdmin || $user->cities->contains('id', $offeringSettlement->service->city_id),
+            $user->isAdmin || $user->cities->contains('id', $service->city_id),
             403,
         );
         abort_unless($finalizer->verify($offeringSettlement), 409, 'Die Opferurkunde ist nicht mehr integer.');
+
+        abort_unless(is_string($offeringSettlement->pdf_path), 404);
 
         return Storage::download(
             $offeringSettlement->pdf_path,
@@ -361,11 +377,14 @@ class CityController extends AbstractCRUDController
         Service $service,
         OfferingSettlementRevisionService $revisionService,
     ): RedirectResponse {
+        /** @var array{reason: string} $data */
         $data = $request->validate([
             'reason' => ['required', 'string', 'max:1000'],
         ]);
 
-        $revisionService->create($service, $data['reason'], Auth::user());
+        $user = Auth::user();
+        abort_unless($user instanceof User, 401);
+        $revisionService->create($service, $data['reason'], $user);
 
         return back()->with('success', 'Die Opferabrechnung wurde für eine Korrektur geöffnet.');
     }
