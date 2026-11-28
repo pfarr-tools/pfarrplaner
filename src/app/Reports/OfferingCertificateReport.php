@@ -78,6 +78,8 @@ class OfferingCertificateReport extends AbstractPDFDocumentReport
             ->latest('revision')
             ->first();
         if ($settlement && app(OfferingSettlementFinalizer::class)->verify($settlement)) {
+            abort_unless(is_string($settlement->pdf_path), 404);
+
             return Storage::download(
                 $settlement->pdf_path,
                 FileNameService::make(

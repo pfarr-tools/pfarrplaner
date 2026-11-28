@@ -68,7 +68,8 @@ class OfferingSettlementFinalizer
                 return $existing;
             }
 
-            $revision = ((int) OfferingSettlement::query()->where('service_id', $service->id)->max('revision')) + 1;
+            $maxRevision = OfferingSettlement::query()->where('service_id', $service->id)->max('revision');
+            $revision = (is_numeric($maxRevision) ? (int) $maxRevision : 0) + 1;
             $settlement = OfferingSettlement::query()->create([
                 'service_id' => $service->id,
                 'revision' => $revision,
@@ -129,16 +130,26 @@ class OfferingSettlementFinalizer
         if ($settlement->status !== 'finalized' || ! $settlement->pdf_path || ! Storage::exists($settlement->pdf_path)) {
             return false;
         }
-        if (hash('sha256', Storage::get($settlement->pdf_path)) !== $settlement->pdf_hash) {
+        $pdf = Storage::get($settlement->pdf_path);
+        if (! is_string($pdf) || hash('sha256', $pdf) !== $settlement->pdf_hash) {
             return false;
         }
-        foreach ($settlement->signatures ?? [] as $signature) {
-            if (! Storage::exists($signature['path']) || hash('sha256', Storage::get($signature['path'])) !== $signature['hash']) {
+        /** @var array<int, array{hash: string, path: string}> $storedSignatures */
+        $storedSignatures = is_array($settlement->signatures) ? $settlement->signatures : [];
+        foreach ($storedSignatures as $signature) {
+            $path = $signature['path'] ?? null;
+            $hash = $signature['hash'] ?? null;
+            if (! is_string($path) || ! is_string($hash)) {
+                return false;
+            }
+            $contents = Storage::get($path);
+            if (! is_string($contents) || hash('sha256', $contents) !== $hash) {
                 return false;
             }
         }
 
-        $manifest = $settlement->manifest ?? [];
+        /** @var array<string, mixed> $manifest */
+        $manifest = is_array($settlement->manifest) ? $settlement->manifest : [];
         if (hash('sha256', $this->canonicalJson($manifest)) !== $settlement->manifest_hash) {
             return false;
         }
@@ -148,9 +159,9 @@ class OfferingSettlementFinalizer
 
         return is_string($signature)
             && is_string($keyId)
-            && hash_equals(hash('sha256', (string) config('app.key')), $keyId)
+            && hash_equals(hash('sha256', is_string(config('app.key')) ? config('app.key') : ''), $keyId)
             && hash_equals(
-                hash_hmac('sha256', $this->canonicalJson($manifest), (string) config('app.key')),
+                hash_hmac('sha256', $this->canonicalJson($manifest), is_string(config('app.key')) ? config('app.key') : ''),
                 $signature,
             );
     }
@@ -181,7 +192,11 @@ class OfferingSettlementFinalizer
             if (! is_array($submitted) || ! isset($submitted['image'])) {
                 throw ValidationException::withMessages(['signatures' => "Die Unterschrift von {$name} fehlt."]);
             }
-            $validated[] = ['name' => $name, 'image' => $this->signatures->validateImage((string) $submitted['image'])];
+            $image = $submitted['image'];
+            if (! is_string($image)) {
+                throw ValidationException::withMessages(['signatures' => "Die Unterschrift von {$name} ist ungültig."]);
+            }
+            $validated[] = ['name' => $name, 'image' => $this->signatures->validateImage($image)];
         }
 
         return $validated;
@@ -197,7 +212,9 @@ class OfferingSettlementFinalizer
     private function renderPdf(Service $service, OfferingSettlement $settlement): string
     {
         if ($this->pdfRenderer !== null) {
-            return (string) ($this->pdfRenderer)($service, $settlement);
+            $rendered = ($this->pdfRenderer)($service, $settlement);
+
+            return is_string($rendered) ? $rendered : '';
         }
 
         return PDF::fromView('reports.offeringcertificate.render', compact('service', 'settlement'))->pdf();
@@ -212,6 +229,7 @@ class OfferingSettlementFinalizer
      */
     private function manifest(OfferingSettlement $settlement, string $pdf): array
     {
+        /** @var array<string, mixed> $payload */
         $payload = [
             'settlement_id' => $settlement->id,
             'service_id' => $settlement->service_id,
@@ -220,8 +238,8 @@ class OfferingSettlementFinalizer
             'signatures' => $settlement->signatures,
             'pdf_hash' => hash('sha256', $pdf),
         ];
-        $payload['key_id'] = hash('sha256', (string) config('app.key'));
-        $payload['signature'] = hash_hmac('sha256', $this->canonicalJson($payload), (string) config('app.key'));
+        $payload['key_id'] = hash('sha256', is_string(config('app.key')) ? config('app.key') : '');
+        $payload['signature'] = hash_hmac('sha256', $this->canonicalJson($payload), is_string(config('app.key')) ? config('app.key') : '');
 
         return $payload;
     }

@@ -43,7 +43,7 @@ class OfferingSignatureService
         }
 
         $imageInfo = @getimagesizefromstring($image);
-        if ($imageInfo === false || ($imageInfo['mime'] ?? '') !== 'image/png') {
+        if ($imageInfo === false || $imageInfo['mime'] !== 'image/png') {
             throw ValidationException::withMessages(['signatures' => 'Die Unterschrift ist keine gültige PNG-Datei.']);
         }
 
