@@ -94,6 +94,8 @@ class UserRequest extends FormRequest
             'own_podcast_itunes' => 'nullable|bool',
             'show_vacations_with_services' => 'nullable|bool',
             'needs_replacement' => 'nullable|bool',
+            'visible_pools' => 'nullable|array',
+            'visible_pools.*' => 'int|exists:pools,id',
         ];
 
         if ($this->boolean('createAccount')

@@ -166,7 +166,7 @@ EOF
       QUALITY_FILES="$js_quality_files" run_dev lint
       run_dev complexity:check
       compose run --rm vite npm run build
-      run_dev test --no-browser --no-js
+      run_dev test --no-js
       compose run --rm vite npm run test:js:run
       ;;
     complexity:check) compose exec --user www-data app composer complexity:check ;;

@@ -75,7 +75,7 @@ class OfferingCertificateReportFeatureTest extends TestCase
         $this->assertStringNotContainsString('Name Organist:in:', $html);
         $this->assertStringNotContainsString('Einzelaufstellung des Opfers', $html);
         $this->assertStringContainsString('maschinell erstellt', $html);
-        $this->assertStringContainsString('ohne Unterschrift gültig', $html);
+        $this->assertStringContainsString('ohne Unterschrift gültig', preg_replace('/\s+/', ' ', $html));
         $this->assertStringNotContainsString('1. Unterschrift', $html);
         $this->assertStringNotContainsString('2. Unterschrift', $html);
     }

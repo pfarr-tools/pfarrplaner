@@ -414,6 +414,7 @@ export default {
 
         return {
             users: {},
+            plannerUsers: [],
             userDays: {},
             loadingUsers: true,
             loadingUserDays: {},
@@ -467,17 +468,44 @@ export default {
          */
         plannerVisibilitySections() {
             const pastorLabel = this.pastorPluralLabel()
+            const pastors = this.plannerVisibilityUsers.filter((user) => user.isPastor)
+            const employees = this.plannerVisibilityUsers.filter((user) => !user.isPastor)
+            const groupablePools = pastors
+                .flatMap((user) => user.pools || [])
+                .filter((pool) => pool.groupable)
+                .reduce((pools, pool) => {
+                    if (!pools.some((existingPool) => existingPool.id === pool.id)) {
+                        pools.push(pool)
+                    }
+                    return pools
+                }, [])
+                .sort((a, b) => (a.name < b.name ? -1 : 1))
 
-            return [
-                {
-                    label: pastorLabel,
-                    users: this.plannerVisibilityUsers.filter((user) => user.isPastor),
-                },
-                {
-                    label: 'Mitarbeitende',
-                    users: this.plannerVisibilityUsers.filter((user) => !user.isPastor),
-                },
-            ].filter((section) => section.users.length)
+            const assignedPastorIds = new Set()
+            const sections = []
+            groupablePools.forEach((pool) => {
+                const users = pastors.filter(
+                    (user) =>
+                        !assignedPastorIds.has(user.id) &&
+                        (user.pools || []).some((userPool) => userPool.id === pool.id),
+                )
+                users.forEach((user) => assignedPastorIds.add(user.id))
+                if (users.length) {
+                    sections.push({ label: `${pastorLabel} ${pool.name}`, users })
+                }
+            })
+
+            const ungroupedPastors = pastors.filter(
+                (user) => !assignedPastorIds.has(user.id),
+            )
+            if (ungroupedPastors.length) {
+                sections.push({ label: pastorLabel, users: ungroupedPastors })
+            }
+            if (employees.length) {
+                sections.push({ label: 'Mitarbeitende', users: employees })
+            }
+
+            return sections
         },
         activeToggleableUsersCount() {
             return this.plannerVisibilityUsers.filter((user) => user.pinned).length
@@ -636,6 +664,7 @@ export default {
         },
         async loadPlanner() {
             const response = await axios.get(route('planner.users'))
+            this.plannerUsers = response.data
             const users = this.sortUsers(response.data)
             this.users = users
             this.loadingUsers = false
@@ -856,7 +885,7 @@ export default {
                 }
             })
 
-            if (this.$page.props.currentUser.data.isPastor) {
+            {
                 const groupablePools = users
                     .filter((user) => user.isPastor)
                     .flatMap((user) => user.pools || [])
@@ -869,15 +898,17 @@ export default {
                     }, [])
                     .sort((a, b) => (a.name < b.name ? -1 : 1))
 
-                groupablePools.forEach((pool) => {
-                    sortedUsers[pool.name] = []
-                    this.sections.push(pool.name)
-                    this.openSections[pool.name] = this.openSections[pool.name] ?? true
-                })
-
                 const pastorSection = this.pastorPluralLabel()
-                sortedUsers[pastorSection] = []
-                this.sections.push(pastorSection)
+                const groupedPastors = new Map(
+                    groupablePools.map((pool) => [
+                        pool.id,
+                        {
+                            label: `${pastorSection} ${pool.name}`,
+                            users: [],
+                        },
+                    ]),
+                )
+                const ungroupedPastors = []
                 users.forEach((user) => {
                     if (usedIds.includes(user.id)) return
                     if (user.isPastor) {
@@ -891,19 +922,32 @@ export default {
                                 (user.pools || []).some((userPool) => userPool.id === pool.id),
                             )
                             if (userPools.length) {
-                                userPools.forEach((pool) => sortedUsers[pool.name].push(user))
+                                userPools.forEach((pool) =>
+                                    groupedPastors.get(pool.id).users.push(user),
+                                )
                             } else {
-                                sortedUsers[pastorSection].push(user)
+                                ungroupedPastors.push(user)
                             }
                             usedIds.push(user.id)
                         }
                     }
                 })
+
+                groupedPastors.forEach(({ label, users: groupedUsers }) => {
+                    if (!groupedUsers.length) return
+
+                    sortedUsers[label] = groupedUsers
+                    this.sections.push(label)
+                    this.openSections[label] = this.openSections[label] ?? true
+                })
+                if (ungroupedPastors.length) {
+                    sortedUsers[pastorSection] = ungroupedPastors
+                    this.sections.push(pastorSection)
+                }
                 sortedUsers['Mitarbeitende'] = []
-                this.sections.push('Mitarbeitende')
                 users.forEach((user) => {
                     if (usedIds.includes(user.id)) return
-                    if (this.isPastor && user.isPastor) return
+                    if (user.isPastor) return
                     if (!user.show_absences_with_services) {
                         user.pinned =
                             this.pinnedUsers.includes(String(user.id)) ||
@@ -916,17 +960,22 @@ export default {
                         usedIds.push(user.id)
                     }
                 })
-            } else {
-                this.sections.push('Mitarbeitende')
-                sortedUsers['Mitarbeitende'] = []
             }
 
-            users.forEach((user) => {
-                if (usedIds.includes(user.id)) return
-                if (this.isPastor && user.isPastor) return
-                user.pinned = true
-                sortedUsers['Mitarbeitende'].push(user)
-            })
+            if (!this.$page.props.currentUser.data.isPastor) {
+                users.forEach((user) => {
+                    if (usedIds.includes(user.id)) return
+                    if (user.isPastor) return
+                    user.pinned = true
+                    sortedUsers['Mitarbeitende'].push(user)
+                })
+            }
+
+            if (sortedUsers['Mitarbeitende'].length) {
+                this.sections.push('Mitarbeitende')
+            } else {
+                delete sortedUsers['Mitarbeitende']
+            }
 
             this.toggleableUsers = allToggleableUsers.sort((a, b) =>
                 a.sortName < b.sortName ? -1 : 1,
@@ -956,41 +1005,10 @@ export default {
                     : this.pinnedUsers.filter((id) => String(id) !== String(user.id))
             }
 
-            if (user.pinned) {
-                this.addUserToVisibilitySection(user)
-            } else {
-                this.removeUserFromVisibilitySection(user)
-            }
+            this.users = this.sortUsers(this.plannerUsers)
             this.persistPlannerSetting(
                 settingKey,
                 user.isPastor ? this.pinnedPastors : this.pinnedUsers,
-            )
-        },
-        /**
-         * Add a visible user to the correct planner section.
-         *
-         * @param {Object} user User to add.
-         * @returns {void}
-         */
-        addUserToVisibilitySection(user) {
-            const section = user.isPastor ? this.pastorPluralLabel() : 'Mitarbeitende'
-            if (!this.users[section]) this.users[section] = []
-            if (!this.users[section].find((existingUser) => existingUser.id === user.id)) {
-                this.users[section].push(user)
-                this.users[section].sort((a, b) => (a.sortName < b.sortName ? -1 : 1))
-            }
-        },
-        /**
-         * Remove a hidden user from the correct planner section.
-         *
-         * @param {Object} user User to remove.
-         * @returns {void}
-         */
-        removeUserFromVisibilitySection(user) {
-            const section = user.isPastor ? this.pastorPluralLabel() : 'Mitarbeitende'
-            if (!this.users[section]) return
-            this.users[section] = this.users[section].filter(
-                (existingUser) => existingUser.id !== user.id,
             )
         },
         getUserDay(user, day) {

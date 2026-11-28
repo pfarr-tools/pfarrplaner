@@ -38,3 +38,7 @@ Route::post('opfer/{city}', [CityController::class, 'savePublicOffering'])
     ->middleware('signed')
     ->name('offerings.save');
 Route::get('opfer/{city}/qr', [CityController::class, 'offeringsQr'])->name('offerings.qr');
+Route::get('opferurkunde/{offeringSettlement}/pdf', [CityController::class, 'downloadOfferingSettlement'])
+    ->name('offerings.settlement.download');
+Route::post('opferurkunde/{service}/revision', [CityController::class, 'createOfferingSettlementRevision'])
+    ->name('offerings.settlement.revision');

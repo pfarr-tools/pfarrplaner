@@ -194,6 +194,11 @@
                     label="Opferurkunde automatisch versenden an:"
                     v-model="myCity.offering_certificate_email"
                 />
+                <form-check
+                    name="electronic_offering_signatures"
+                    label="Elektronische Unterschriften bei der öffentlichen Opfererfassung verlangen"
+                    v-model="myCity.electronic_offering_signatures"
+                />
                 <div
                     v-if="city.id"
                     class="mt-3 rounded border p-3"

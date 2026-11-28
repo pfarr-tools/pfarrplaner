@@ -305,6 +305,7 @@
                             :service="service"
                             :liturgy-sheets="liturgySheets"
                             :files="files"
+                            :offering-certificate="offeringCertificate"
                         />
                     </tab>
                     <tab
@@ -375,6 +376,7 @@ export default {
         liturgyInfo: Array,
         adsConfig: Object,
         adChannels: Object,
+        offeringCertificate: Object,
     },
     created() {
         this.normalizeServiceArrays(this.service)

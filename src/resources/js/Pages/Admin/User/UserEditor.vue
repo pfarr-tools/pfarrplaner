@@ -480,6 +480,16 @@
                         :people="users"
                         v-model="myUser.vacation_approvers"
                     />
+                    <FormSelectize
+                        v-if="!myUser.isPastorOrDeacon"
+                        name="visible_pools[]"
+                        v-model="myUser.visible_pools"
+                        multiple
+                        label="Pfarrer:innen aus diesen Pools im Urlaubsplaner anzeigen"
+                        help="Diese Zuordnung gilt zusätzlich zur normalen Pool-Mitgliedschaft und steuert nur die Sichtbarkeit für Benutzer:innen mit der Berechtigung pfarrer_urlaub_lesen."
+                        :options="pools"
+                        :settings="{ labelField: 'name', searchFields: ['name'] }"
+                    />
                 </div>
             </Tab>
         </Tabs>
@@ -526,6 +536,7 @@ export default {
         'locations',
         'ministries',
         'modules',
+        'pools',
         'twoFactorRecovery',
     ],
     components: {
@@ -560,6 +571,7 @@ export default {
         myUser.admin_cities = this.reduceToIds(myUser.admin_cities)
         myUser.vacation_admins = this.reduceToIds(myUser.vacation_admins)
         myUser.vacation_approvers = this.reduceToIds(myUser.vacation_approvers)
+        myUser.visible_pools = this.reduceToIds(myUser.visible_pools)
 
         const raw = this.settings
         // Normalize: treat null/undefined/[] as "no settings"

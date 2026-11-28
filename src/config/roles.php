@@ -28,6 +28,7 @@ return [
         'liederbuecher-bearbeiten',
         'ort-bearbeiten',
         'pfarramt-bearbeiten',
+        'pfarrer_urlaub_lesen',
         'rollen-bearbeiten',
         'urlaub-lesen',
     ],
@@ -60,6 +61,7 @@ return [
             'gd-loeschen', 'gd-mesner-bearbeiten', 'gd-opfer-bearbeiten',
             'gd-organist-bearbeiten', 'gd-pfarrer-bearbeiten', 'gd-taufe-bearbeiten',
             'kirche-bearbeiten', 'ort-bearbeiten', 'pfarramt-bearbeiten',
+            'pfarrer_urlaub_lesen',
         ],
         'Kirchenpflege' => [
             'fremden-urlaub-bearbeiten', 'gd-allgemein-bearbeiten', 'gd-bearbeiten',

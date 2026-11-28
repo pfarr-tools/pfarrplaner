@@ -33,9 +33,13 @@ namespace App\Http\Controllers;
 use App\Integrations\KonfiApp\KonfiAppIntegration;
 use App\Mail\OfferingCertificateMail;
 use App\Models\AbstractModel;
+use App\Models\OfferingSettlement;
 use App\Models\People\User;
 use App\Models\Places\City;
 use App\Models\Service;
+use App\Services\OfferingSettlementFinalizer;
+use App\Services\OfferingSettlementRevisionService;
+use App\Services\OfferingSignatureService;
 use App\Services\QRService;
 use App\Traits\HandlesAttachedImageTrait;
 use App\Traits\HandlesAttachmentsTrait;
@@ -44,11 +48,15 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
  * Controller for handling city-related functionality.
@@ -187,6 +195,7 @@ class CityController extends AbstractCRUDController
             'nearbyServices' => $nearbyServices->map(fn (Service $service): array => $this->publicOfferingService($service))->values(),
             'fallback' => $fallback,
             'denominations' => $this->offeringDenominations(),
+            'electronicSignatures' => (bool) $city->electronic_offering_signatures,
         ]);
     }
 
@@ -197,8 +206,12 @@ class CityController extends AbstractCRUDController
      * @param  City  $city  Selected city.
      * @return RedirectResponse Redirect back to the signed page.
      */
-    public function savePublicOffering(Request $request, City $city)
-    {
+    public function savePublicOffering(
+        Request $request,
+        City $city,
+        OfferingSignatureService $signatureService,
+        OfferingSettlementFinalizer $settlementFinalizer,
+    ) {
         /** @var array<string, mixed> $data */
         $data = $request->validate([
             'service_id' => ['required', 'integer'],
@@ -206,6 +219,9 @@ class CityController extends AbstractCRUDController
             'offering_denominations' => ['nullable', 'array'],
             'offerings_counter1' => ['nullable', 'string', 'max:255'],
             'offerings_counter2' => ['nullable', 'string', 'max:255'],
+            'signatures' => ['nullable', 'array'],
+            'signatures.*.name' => ['required', 'string', 'max:255'],
+            'signatures.*.image' => ['required', 'string'],
         ]);
 
         $today = Carbon::now('Europe/Berlin')->startOfDay();
@@ -229,18 +245,64 @@ class CityController extends AbstractCRUDController
 
         abort_unless($amount !== null, 422, 'Bitte eine gültige Opfersumme eingeben.');
 
-        $service->update([
-            'offering_amount' => $amount,
-            'offering_denominations' => $denominations ?: null,
-            'offerings_counter1' => $data['offerings_counter1'] ?? null,
-            'offerings_counter2' => $data['offerings_counter2'] ?? null,
-        ]);
+        if ($city->electronic_offering_signatures) {
+            try {
+                $this->validateElectronicSignatures($data, $signatureService);
+            } catch (ValidationException $exception) {
+                abort(422, (string) ($exception->errors()['signatures'][0] ?? 'Die Unterschriften sind ungültig.'));
+            }
+        }
+
+        DB::transaction(function () use ($service, $amount, $denominations, $data, $city, $settlementFinalizer): void {
+            $service->update([
+                'offering_amount' => $amount,
+                'offering_denominations' => $denominations ?: null,
+                'offerings_counter1' => $data['offerings_counter1'] ?? null,
+                'offerings_counter2' => $data['offerings_counter2'] ?? null,
+            ]);
+
+            if ($city->electronic_offering_signatures) {
+                /** @var list<array{name: string, image: string}> $signatures */
+                $signatures = $data['signatures'];
+                $settlementFinalizer->finalize($service->refresh(), $signatures);
+            }
+        });
 
         if ($city->offering_certificate_email) {
             Mail::to($city->offering_certificate_email)->queue(new OfferingCertificateMail($service->refresh()));
         }
 
         return back()->with('success', 'Die Opferangaben wurden gespeichert.');
+    }
+
+    /**
+     * Validate that every named counter supplied a valid PNG signature.
+     *
+     * @param  array<string, mixed>  $data  Validated request data.
+     * @param  OfferingSignatureService  $signatureService  Signature validator.
+     *
+     * @throws ValidationException When a signer or image is missing.
+     */
+    private function validateElectronicSignatures(array $data, OfferingSignatureService $signatureService): void
+    {
+        $requiredNames = collect([$data['offerings_counter1'] ?? null, $data['offerings_counter2'] ?? null])
+            ->map(static fn (mixed $name): string => trim((string) $name))
+            ->filter()
+            ->values();
+        $signatures = collect($data['signatures'] ?? []);
+
+        if ($requiredNames->isEmpty() || $signatures->count() !== $requiredNames->count()) {
+            throw ValidationException::withMessages(['signatures' => 'Für jede Opferzähler:in ist eine Unterschrift erforderlich.']);
+        }
+
+        foreach ($requiredNames as $name) {
+            $signature = $signatures->firstWhere('name', $name);
+            if (! is_array($signature) || ! isset($signature['image'])) {
+                throw ValidationException::withMessages(['signatures' => "Die Unterschrift von {$name} fehlt."]);
+            }
+
+            $signatureService->validateImage((string) $signature['image']);
+        }
     }
 
     /**
@@ -257,6 +319,55 @@ class CityController extends AbstractCRUDController
         abort_if($png === false, 500, 'Der QR-Code konnte nicht gelesen werden.');
 
         return response($png)->header('Content-Type', 'image/png');
+    }
+
+    /**
+     * Download an authorized, integrity-verified archived offering certificate.
+     *
+     * @param  OfferingSettlement  $offeringSettlement  Archived settlement.
+     * @param  OfferingSettlementFinalizer  $finalizer  Integrity verifier.
+     * @return StreamedResponse PDF download.
+     */
+    public function downloadOfferingSettlement(
+        OfferingSettlement $offeringSettlement,
+        OfferingSettlementFinalizer $finalizer,
+    ) {
+        $offeringSettlement->load('service.city');
+        $user = Auth::user();
+        abort_unless($user instanceof User, 401);
+        abort_unless(
+            $user->isAdmin || $user->cities->contains('id', $offeringSettlement->service->city_id),
+            403,
+        );
+        abort_unless($finalizer->verify($offeringSettlement), 409, 'Die Opferurkunde ist nicht mehr integer.');
+
+        return Storage::download(
+            $offeringSettlement->pdf_path,
+            'Opferurkunde-'.$offeringSettlement->id.'-Revision-'.$offeringSettlement->revision.'.pdf',
+            ['Content-Type' => 'application/pdf'],
+        );
+    }
+
+    /**
+     * Open a finalized offering settlement for an authorized correction.
+     *
+     * @param  Request  $request  Correction request.
+     * @param  Service  $service  Service whose settlement is corrected.
+     * @param  OfferingSettlementRevisionService  $revisionService  Revision workflow.
+     * @return RedirectResponse Redirect back to the service view.
+     */
+    public function createOfferingSettlementRevision(
+        Request $request,
+        Service $service,
+        OfferingSettlementRevisionService $revisionService,
+    ): RedirectResponse {
+        $data = $request->validate([
+            'reason' => ['required', 'string', 'max:1000'],
+        ]);
+
+        $revisionService->create($service, $data['reason'], Auth::user());
+
+        return back()->with('success', 'Die Opferabrechnung wurde für eine Korrektur geöffnet.');
     }
 
     /**

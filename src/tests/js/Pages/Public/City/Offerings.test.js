@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils'
-import { vi } from 'vitest'
+import { beforeEach, vi } from 'vitest'
 import Offerings from '@/Pages/Public/City/Offerings.vue'
 
 const city = { id: 1, name: 'Musterstadt' }
@@ -32,6 +32,20 @@ const denominations = {
 }
 
 describe('Public offerings page', () => {
+    beforeEach(() => {
+        window.HTMLCanvasElement.prototype.getContext = () => ({
+            beginPath() {},
+            moveTo() {},
+            lineTo() {},
+            stroke() {},
+            clearRect() {},
+            fillRect() {},
+            scale() {},
+            closePath() {},
+        })
+        window.HTMLCanvasElement.prototype.toDataURL = () => 'data:image/png;base64,signature'
+    })
+
     const mountPage = (props = {}, inertia = { post: vi.fn() }, flash = {}) =>
         mount(Offerings, {
             props: {
@@ -89,6 +103,40 @@ describe('Public offerings page', () => {
             expect.objectContaining({
                 service_id: 10,
                 offering_denominations: expect.objectContaining({ 2000: 1 }),
+            }),
+        )
+    })
+
+    it('requires and submits one signature for each named counter', async () => {
+        const wrapper = mountPage({
+            electronicSignatures: true,
+            services: [
+                {
+                    ...service,
+                    offerings_counter1: 'Anna Beispiel',
+                    offerings_counter2: 'Bernd Beispiel',
+                },
+            ],
+        })
+
+        await wrapper.get('[data-testid="service-selector"]').trigger('click')
+        expect(wrapper.findAll('[data-testid="signature-field"]')).toHaveLength(2)
+        expect(wrapper.find('[data-testid="signature-confirmation"]').text()).toContain(
+            'Richtigkeit der vorstehenden Opferabrechnung',
+        )
+
+        const signatures = wrapper.findAllComponents({ name: 'SignaturePadField' })
+        await signatures[0].vm.$emit('update:modelValue', 'data:image/png;base64,anna')
+        await signatures[1].vm.$emit('update:modelValue', 'data:image/png;base64,bernd')
+        await wrapper.get('form').trigger('submit.prevent')
+
+        expect(wrapper.vm.$inertia.post).toHaveBeenCalledWith(
+            expect.any(String),
+            expect.objectContaining({
+                signatures: [
+                    { name: 'Anna Beispiel', image: 'data:image/png;base64,anna' },
+                    { name: 'Bernd Beispiel', image: 'data:image/png;base64,bernd' },
+                ],
             }),
         )
     })

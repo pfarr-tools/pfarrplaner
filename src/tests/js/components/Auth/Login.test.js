@@ -62,6 +62,20 @@ describe('Login', () => {
         wrapper.unmount()
     })
 
+    it('shows server flash status and validation errors after returning to login', () => {
+        const wrapper = mountLogin({
+            errors: { login: 'Die Anmeldung ist abgelaufen.' },
+            flash: { status: 'Der Anmeldelink ist ungültig oder abgelaufen.' },
+        })
+
+        expect(wrapper.find('[data-testid="login-status"]').text()).toContain(
+            'Der Anmeldelink ist ungültig oder abgelaufen.',
+        )
+        expect(wrapper.find('[data-testid="login-error"]').text()).toContain(
+            'Die Anmeldung ist abgelaufen.',
+        )
+    })
+
     it('focuses the email field on entry', async () => {
         const wrapper = mount(Login, {
             attachTo: document.body,

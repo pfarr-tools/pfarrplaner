@@ -13,6 +13,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Leave\Pool;
 use App\Models\People\TwoFactorRecoveryAudit;
 use App\Models\People\User;
 use App\Services\RoleService;
@@ -163,6 +164,34 @@ class UserWebFeatureTest extends TestCase
                 ->missing('user.created_at')
                 ->missing('user.updated_at')
             );
+    }
+
+    /** Pool visibility assignments load and save independently of pool membership. */
+    public function test_editor_manages_pool_visibility_assignments(): void
+    {
+        $this->withoutMiddleware(VerifyCsrfToken::class);
+        $target = User::factory()->create();
+        $pool = Pool::factory()->create(['name' => 'Sichtbarkeitspool']);
+        $target->pools()->attach(Pool::factory()->create());
+
+        $this->actingAs($this->user)
+            ->patch(route('user.update', $target), [
+                'id' => $target->id,
+                'first_name' => $target->first_name,
+                'last_name' => $target->last_name,
+                'email' => $target->email,
+                'visible_pools' => [$pool->id],
+            ])
+            ->assertRedirect(route('users.index'));
+
+        $this->assertTrue($target->fresh()->visiblePools->contains($pool));
+        $this->assertCount(1, $target->fresh()->pools);
+
+        $this->actingAs($this->user)
+            ->get(route('user.edit', $target->id))
+            ->assertInertia(fn (Assert $page) => $page
+                ->where('user.visible_pools.0', $pool->id)
+                ->where('pools.0.name', 'Sichtbarkeitspool'));
     }
 
     /** Only a Super-Admin editing another account receives recovery controls and history. */

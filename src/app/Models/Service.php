@@ -81,6 +81,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use LogicException;
 use Throwable;
 
 /**
@@ -584,7 +585,7 @@ class Service extends Model implements HasDAVCalendarItems
     {
         $date = $this->date;
         if (! $date instanceof Carbon) {
-            throw new \LogicException('Der Gottesdienst hat kein Datum.');
+            throw new LogicException('Der Gottesdienst hat kein Datum.');
         }
 
         return $date;
@@ -1544,6 +1545,21 @@ class Service extends Model implements HasDAVCalendarItems
         });
 
         static::updating(function (Service $service) {
+            $protectedFields = [
+                'offering_amount',
+                'offering_denominations',
+                'offering_goal',
+                'offering_description',
+                'offering_type',
+                'offerings_counter1',
+                'offerings_counter2',
+            ];
+            if (
+                $service->isDirty($protectedFields)
+                && OfferingSettlement::query()->where('service_id', $service->id)->where('status', 'finalized')->exists()
+            ) {
+                throw new LogicException('Eine finalisierte Opferabrechnung kann nur über eine neue Revision geändert werden.');
+            }
             $service->slug = $service->createSlug();
         });
 

@@ -144,6 +144,22 @@ final class EmailLoginLinkFeatureTest extends TestCase
         $this->assertGuest();
     }
 
+    public function test_login_shares_redirect_status_and_expired_challenge_errors(): void
+    {
+        $this->withSession(['status' => 'Dieser Anmeldelink ist ungültig oder abgelaufen.'])
+            ->get(route('login'))
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('Auth/Login')
+                ->where('flash.status', 'Dieser Anmeldelink ist ungültig oder abgelaufen.')
+            );
+
+        $this->withSession([])
+            ->from(route('login.challenge'))
+            ->post(route('login.challenge.verify'), ['code' => '123456'])
+            ->assertRedirect(route('login'))
+            ->assertSessionHasErrors('login');
+    }
+
     public function test_link_is_expired_at_the_exact_expiration_instant(): void
     {
         $user = User::factory()->create(['email' => 'person@example.test']);

@@ -32,7 +32,7 @@ class PoolController extends AbstractCRUDController
         $user = Auth::user();
         abort_unless($user instanceof User, 401);
         $cities = $user->cities;
-        $people = ListedPerson::select(['id', 'name'])
+        $people = ListedPerson::select(['id', 'first_name', 'last_name', 'title'])
             ->visibleFor($user)
             ->get();
 

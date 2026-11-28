@@ -31,6 +31,28 @@ Ein Pool wird verwendet für:
 
 Ein Pool kann entweder über Benutzer:innen arbeiten oder feste Kontaktangaben haben. Feste Kontaktangaben sind für Sonderfälle gedacht, zum Beispiel wenn ein Dekanatamt als zentrale Kontaktstelle angegeben werden soll.
 
+### Sichtbarkeit von Pfarrer:innen
+
+Welche Pfarrer:innen Sie im Urlaubsplan sehen, hängt von Ihrer Rolle und den
+für Ihr Konto eingerichteten Pool-Sichtbarkeiten ab:
+
+- Pfarrer:innen und Diakon:innen sehen weiterhin die bereits freigegebenen
+  Personen ihrer Gemeinden. Zusätzlich sehen sie Pfarrer:innen und
+  Diakon:innen, die mindestens einem gemeinsamen Pool angehören.
+- Andere Benutzer:innen sehen Pfarrer:innen aus den Pools, die ihnen in der
+  Administration ausdrücklich zugewiesen wurden. Dafür benötigen sie die
+  Berechtigung `pfarrer_urlaub_lesen`.
+- Mehrere zugewiesene Pools werden zusammengefasst. Eine Person erscheint
+  dadurch höchstens einmal in der Tabelle, auch wenn sie mehreren dieser Pools
+  angehört.
+- Ohne passende Freigabe erscheinen fremde Pfarrer:innen nicht im Urlaubsplan.
+  Die eigene Person und sonstige bereits freigegebene Mitarbeitende werden
+  davon nicht entfernt.
+
+Die Einstellung **Gruppierbar im Urlaubsplaner** eines Pools bestimmt nur, ob
+Pfarrer:innen unter einer eigenen Poolüberschrift angeordnet werden. Sie ist
+keine Berechtigung und erteilt oder entzieht keine Sichtbarkeit.
+
 ---
 
 ## Was ist ein:e Poolmaster:in?
@@ -68,13 +90,17 @@ Die Monatsübersicht bleibt auch bei langen Listen gut lesbar:
 - Die Kopfzeile mit den Tagen bleibt beim Scrollen nach unten sichtbar.
 - Die linke Spalte mit den Namen bleibt beim seitlichen Scrollen sichtbar.
 - Oberhalb der Tabelle sehen Sie zusätzlich eine kleine Zusammenfassung mit Anzahl der Tage und aktuell sichtbaren Personen.
-- Rechts oben finden Pfarrpersonen eine aufklappbare Liste **Mitarbeitende**. Dort können Mitarbeitende mit einem Schalter **An** oder **Aus** in der Tabelle ein- oder ausgeblendet werden. Die Liste ist scrollbar, wenn viele Personen zur Auswahl stehen.
+- Rechts oben finden Sie eine aufklappbare Liste **Angezeigte Personen**. Dort
+  können ein- und ausblendbare Personen mit einem Schalter **An** oder **Aus**
+  in der Tabelle ein- oder ausgeblendet werden. Pfarrer:innen sind dabei unter
+  denselben Poolgruppen wie in der Tabelle zusammengefasst. Die Liste ist
+  scrollbar, wenn viele Personen zur Auswahl stehen.
 
 Die Benutzer:innen sind in Bereiche gegliedert:
 
 - **Eigenes Konto**: Ihr eigener Eintrag.
 - **Pfarrer:innen**: Pfarrpersonen ohne gruppierbaren Pool, falls Ihre Installation diese Bezeichnung verwendet und Sie diese Personen sehen dürfen.
-- **Gruppen mit Poolnamen**: Pfarrpersonen aus Pools, die in der Administration als **Gruppierbar im Urlaubsplaner** markiert wurden.
+- **Gruppen mit Poolnamen**: Pfarrpersonen aus Pools, die in der Administration als **Gruppierbar im Urlaubsplaner** markiert wurden. Die Überschriften lauten **Pfarrer:innen <Poolname>**; bei mehreren gemeinsamen Pools kann eine Person in mehreren Gruppen erscheinen.
 - **Mitarbeitende**: Weitere Personen, deren Abwesenheiten sichtbar sind.
 
 Klicken Sie auf die Überschrift eines Bereichs, um ihn ein- oder auszuklappen. Pfarrplaner merkt sich diese Einstellung für Ihr Konto.

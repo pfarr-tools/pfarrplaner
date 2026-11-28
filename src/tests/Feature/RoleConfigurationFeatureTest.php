@@ -38,6 +38,8 @@ class RoleConfigurationFeatureTest extends TestCase
         $this->assertArrayHasKey(RoleService::ROLE_PREDICANT, $configuration['roles']);
         $this->assertContains('gd-kasualien-nur-statistik', $configuration['permissions']);
         $this->assertContains('rollen-bearbeiten', $configuration['permissions']);
+        $this->assertContains('pfarrer_urlaub_lesen', $configuration['permissions']);
+        $this->assertContains('pfarrer_urlaub_lesen', $configuration['roles']['Gemeindesekretär:in']);
     }
 
     public function test_sync_is_idempotent_and_keeps_unconfigured_records(): void

@@ -98,6 +98,7 @@ export default {
         service: Object,
         liturgySheets: Object,
         files: Object,
+        offeringCertificate: Object,
     },
     computed: {
         downloadableLiturgySheets() {
@@ -150,6 +151,7 @@ export default {
                     type: 'announcements',
                 })
             }
+            if (this.offeringCertificate) attachments.push(this.offeringCertificate)
             return attachments
         },
     },
@@ -232,6 +234,10 @@ export default {
         openAutoAttachment(attachment) {
             if (attachment.type === 'qr') return this.downloadQR()
             if (attachment.type === 'announcements') return this.downloadAnnouncements()
+            if (attachment.type === 'offering-certificate') {
+                window.location.href = attachment.url
+                return
+            }
             if (attachment.configurationComponent) return this.openDialog(attachment.key)
             return this.downloadSheet(attachment)
         },
